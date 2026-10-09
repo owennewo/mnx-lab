@@ -325,6 +325,21 @@ preferences; a part rig is about 4 KB, so the Worker's preferences cap went from
 - [ ] guitar-faust: a final commit pointing to `mnx-lab/synth/`; the repository kept read-only.
 - [ ] Resume performance-listening (the lead's call).
 
+### Found on a phone: re-planning a whole piece's history (9 Oct 2026)
+
+The lead heard Classical Gas turn "skippy" after about 20 bars on a Pixel 10 Pro, and
+slightly on the laptop. Measured under Node: the host and its instruments remembered every
+note ever scheduled, and every batch (twice a second) re-planned all of them on the audio
+thread — 4 remembered notes at the start, 643 by bar 73; render cost 5% of real time rising
+to 16% after two minutes, in spikes. Fixed in the synth (`synth/docs/contract.md` §5,
+Forgetting): notes that ended 2 s ago fold into each planner's carried state; the live render
+is sample-identical to all-at-once (`tests/forgetting.test.mjs`, which a broken fold in the
+guitar or the keys fails). After: about 15–25 notes remembered, cost flat at 6–7% for the
+whole piece. And the lead's ask, a sign when the synth struggles: the worklet reports its load
+twice a second (`load`), `src/audio/hostStrain.ts` decides strain (busy > 70% or a stall over
+8 ms in two reports running, or an underrun where Chrome counts them; clears after 3 quiet
+seconds), and the play button's border pulses (`button.primary.strained`).
+
 ## Decisions register
 
 | # | Decision | Status |

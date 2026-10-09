@@ -7,6 +7,8 @@ import {BLOCK_TYPES,BlockNode,resolveParams,MASTER_PARAMS} from './blocks.js';
 
 const dbToGain=db=>10**(db/20);
 const RAMP_SECONDS=.02,DUCK_SECONDS=.01;
+// Notes that ended this long ago are forgotten (HostCore.forget).
+export const FORGET_SECONDS=2;
 
 // Ordered insert chain of one part. Blocks keep their DSP while their id survives;
 // new blocks fade in, removed ones fade out, a reorder dips the part for 2 × 10 ms.
@@ -112,8 +114,9 @@ class Bus{
 }
 
 export class HostCore{
- constructor({rate,block=128,instruments,assets}){
-  this.rate=rate;this.block=block;this.instruments=instruments instanceof Map?instruments:new Map(Object.entries(instruments??{}));this.assets=assets;
+ // `history: false` (the worklet) drops forgotten notes; offline keeps them for labels.
+ constructor({rate,block=128,instruments,assets,history=true}){
+  this.rate=rate;this.history=history;this.block=block;this.instruments=instruments instanceof Map?instruments:new Map(Object.entries(instruments??{}));this.assets=assets;
   this.listeners=new Map();this.emit=(type,data)=>{for(const fn of this.listeners.get(type)??[])fn(data);};
   this.master=new FaustNode(assets.blocks.master.module,assets.blocks.master.meta,rate,block);
   this.position=0;this.parts=new Map();this.buses=new Map();this.through=-Infinity;this.session={};this.bpm=DEFAULT_BPM;this.tempos=new Map();this.tempoEvents=[];this.anySolo=false;
@@ -162,6 +165,7 @@ export class HostCore{
  // Upsert notes and controls by id. Anything at or after `committed` (now plus the
  // part's horizon) may change; earlier onsets play as scheduled (D15).
  schedule({notes=[],controls=[],through}={}){
+  this.forget();
   const diagnostics=[],changes=new Map(),gestured=new Map(),change=part=>{if(!changes.has(part))changes.set(part,{notes:[],removed:[],controls:[],removedControls:[]});return changes.get(part);};
   const ordered=[...notes].sort((a,b)=>(a?.at??0)-(b?.at??0));
   for(const n of ordered){
@@ -193,6 +197,32 @@ export class HostCore{
   for(const [part,c] of changes)part.instrument.apply(c);
   if(this.pendingOnsets.length)this.pendingOnsets.sort((a,b)=>a.frame-b.frame);
   return this.report(diagnostics);
+ }
+ // Forgetting. Every batch re-plans an instrument's remembered notes, so remembering every
+ // note of a long piece makes each batch cost more than the last until the audio thread
+ // misses its deadlines (a skipping guitar some minutes in). Notes that ended
+ // FORGET_SECONDS ago, and that no remembered note leads from by legato, go to the
+ // instrument's `forget`; it folds them into what its planner carries from note to note,
+ // so what it plays is unchanged (tests/forgetting.test.mjs). An instrument without
+ // `forget` keeps them. Live, the host drops them too; offline it keeps them for labels.
+ forget(){
+  const cutoff=this.position-Math.round(FORGET_SECONDS*this.rate);
+  for(const part of this.parts.values()){
+   if(!part.instrument?.forget)continue;
+   part.forgotten??=new Set();
+   const old=[],kept=[];
+   for(const e of part.notes.values())if(!part.forgotten.has(e.id))(e.endFrame<cutoff?old:kept).push(e);
+   if(!old.length)continue;
+   const reached=new Set(kept.map(e=>e.id)),stack=[...kept];
+   while(stack.length){
+    const from=stack.pop().note.techniques?.find(t=>t.type==='legato')?.from,e=from&&part.notes.get(from);
+    if(e&&!reached.has(from)){reached.add(from);stack.push(e);}
+   }
+   const ids=old.filter(e=>!reached.has(e.id)).map(e=>e.id);
+   if(!ids.length)continue;
+   part.instrument.forget(ids);
+   for(const id of ids)if(this.history)part.forgotten.add(id);else part.notes.delete(id);
+  }
  }
  // Tempo is session-wide; the commit horizon is the longest part horizon.
  scheduleTempo(c,diagnostics){

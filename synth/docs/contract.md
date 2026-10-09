@@ -246,10 +246,21 @@ host.cancel({from} | {ids}, silence?)       // drop notes/controls with at ≥ f
                                             // silence: true also cuts notes sounding at `from` (gate end only; curves keep
                                             // their timing) — mnx Sink seek/stop semantics, outside the invariance promise
 host.now()
-host.on('meter' | 'diagnostic' | 'sounding', fn)   // 'sounding' acknowledges note ids as they start
+host.on('meter' | 'diagnostic' | 'sounding' | 'load', fn)   // 'sounding' acknowledges note ids as they start;
+                                            // 'load' (worklet, twice a second): {busy, peakMs, windowMs}
 host.dispose()
 renderOffline(setup, {notes, controls}, {rate, seconds?, batches?}) → {audio, labels, diagnostics}
 ```
+
+**Forgetting.** Each `schedule()` first forgets notes that ended `FORGET_SECONDS` (2 s) ago
+and that no remembered note leads from by legato: the host hands them to the instrument's
+optional `forget(ids)`, which folds the leading run of them (in onset order, chord gestures
+whole) into the state its planner carries from note to note — each string's last pluck,
+busy time and finger muting; each keys voice; each kit piece's last hit — and plans the rest
+from there. What plays is unchanged, sample for sample (`tests/forgetting.test.mjs`); what it
+saves is re-planning a piece's whole history on every batch, a cost that grew until the audio
+thread missed deadlines. The worklet drops forgotten notes (`history: false`); offline hosts
+keep them for labels.
 
 ## 7. Golden equivalence (built in Phase 1, before any internals change)
 

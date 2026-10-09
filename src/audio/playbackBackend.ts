@@ -53,6 +53,8 @@ export interface BackendSnapshot {
   readonly mediaDuration?: number;
   readonly syncIssue?: string;
   readonly error?: string;
+  /** The synth's audio thread is not keeping up on this device (src/audio/hostStrain.ts). */
+  readonly strained?: boolean;
   /** Present only for synth. No synthetic onsets/clock are fabricated for media. */
   readonly transport?: TransportSnapshot;
 }

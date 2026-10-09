@@ -12,6 +12,7 @@ import {LEGACY_NOTE_POLICY} from '../../model/note-ownership.js';
 import {migrateDesign,resolveDesign} from './plucked-design.js';
 import {planPlucked,gestureEntries} from './plucked-plan.js';
 import {layoutCompensationDb,loudnessCurve} from './plucked-loudness.js';
+import {forgetLeading} from './forget.js';
 
 const seedOf=id=>{let h=2166136261;for(const c of id)h=Math.imul(h^c.charCodeAt(0),16777619)>>>0;return h||1;};
 export class Plucked{
@@ -49,8 +50,14 @@ export class Plucked{
   for(const e of notes)this.entries.set(e.id,e);
   this.replan();
  }
+ // Notes the host has forgotten fold into `memory`, what the planner carries from note to
+ // note (forget.js): the plan of the rest is unchanged, and stays small.
+ forget(ids){
+  forgetLeading(this,ids,()=>gestureEntries([...this.entries.values()],this.resolved,this.rate,this.memory),
+   prefix=>{this.memory=planPlucked(prefix,this.resolved,this.rate,this.memory).state;});
+ }
  replan(){
-  const {events,diagnostics,assigned}=planPlucked(gestureEntries([...this.entries.values()],this.resolved,this.rate),this.resolved,this.rate);this.assigned=assigned;
+  const {events,diagnostics,assigned}=planPlucked(gestureEntries([...this.entries.values()],this.resolved,this.rate,this.memory),this.resolved,this.rate,this.memory);this.assigned=assigned;
   for(const d of diagnostics){const key=`${d.code}:${d.noteId}`;if(!this.reported.has(key)){this.reported.add(key);this.emit('diagnostic',d);}}
   // Before the first block the engine loads exactly as processor.js loads a packet.
   // Excitation off until each string's first pluck (the planner gates it per pluck).

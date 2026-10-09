@@ -48,6 +48,7 @@ try {
     const sounding=new Set(),errors=[];
     host.on('sounding',list=>list.forEach(s=>sounding.add(s.id.slice(0,s.id.lastIndexOf(':')))));
     host.on('diagnostic',d=>{if(d.severity!=='info')errors.push(d.code+': '+d.message);});
+    const loads=[];host.on('load',d=>loads.push(d));
     const lit=new Set();
     for(let i=0;i<60;i++){await delay(100);for(const w of player.snapshot.activeWritten)lit.add(w.noteKey);if(player.snapshot.state==='stopped')break;}
     check(player.snapshot.state==='stopped','The piece did not play to its end');
@@ -55,17 +56,25 @@ try {
     check(lit.size>0,'No note was highlighted while playing');
     check(!player.error,'The player reported: '+player.error);
     check(errors.length===0,'Host diagnostics: '+errors.join('; '));
+    // The worklet reports its load twice a second (how the page tells a struggling device).
+    check(loads.length>=2&&loads.every(l=>l.busy>=0&&l.busy<1&&l.peakMs>=0),'No sensible load reports from the worklet: '+JSON.stringify(loads.slice(0,3)));
+    const button=()=>player.shadowRoot.querySelector('button.primary');
     // Pause silences: nothing more is scheduled, and what was sounding is cut.
-    await player.play();await delay(600);player.pause();
+    // Strain — two hot reports running — pulses the play button; pausing clears it.
+    await player.play();await delay(300);
+    backend.port.loadListener({busy:.95,peakMs:2});backend.port.loadListener({busy:.95,peakMs:2});await delay(100);
+    check(button().classList.contains('strained')&&/struggling/.test(button().title),'A strained synth did not mark the play button');
+    await delay(200);player.pause();await delay(100);
+    check(!button().classList.contains('strained'),'The play button stayed marked after pausing');
     const meter=[];const off=host.on('meter',m=>meter.push(m));await delay(500);off();
     check(player.snapshot.state==='paused','Pause did not pause');
-    return JSON.stringify({notes,sounding:sounding.size,lit:lit.size,context:backend.port.context.state});
+    return JSON.stringify({notes,sounding:sounding.size,lit:lit.size,context:backend.port.context.state,load:Math.max(...loads.map(l=>l.busy))});
   })()`));
   await open('?synth=native');
   const native = await cdp.evaluate(`(()=>{const p=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page').shadowRoot.querySelector('mnx-player');
     return p.synthEngine+' '+(typeof p.session.backend.setPartMix);})()`);
   if (native !== 'native undefined') throw new Error(`?synth=native did not keep the browser on the sink: ${native}`);
-  console.log(`Synth host smoke passed: ${SCENARIO} played on the instrument host — ${played.sounding}/${played.notes} notes sounding, ${played.lit} highlighted, audio ${played.context}; paused; the flag off again.`);
+  console.log(`Synth host smoke passed: ${SCENARIO} played on the instrument host — ${played.sounding}/${played.notes} notes sounding, ${played.lit} highlighted, audio ${played.context}, worklet load at most ${(played.load*100).toFixed(1)}%; strain marks the play button and pausing clears it; ?synth=native keeps the sink.`);
   if (cdp.logs.length) throw new Error('Browser console errors: ' + cdp.logs.join('\n'));
 } finally {
   ws?.close(); await stopChrome(chrome); server?.server.close();

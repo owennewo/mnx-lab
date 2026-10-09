@@ -6,6 +6,7 @@
  */
 import type { Control, Diagnostic, InstrumentHost, Note, Setup } from '@mnx-lab/synth';
 import type { HostPort } from '../hostBackend.ts';
+import type { LoadReport } from '../hostStrain.ts';
 import type { FactoryDesign } from '../hostInstruments.ts';
 
 type HostModule = typeof import('@mnx-lab/synth');
@@ -27,6 +28,8 @@ export class NativeHostPort implements HostPort {
   private setup: Setup | undefined;
   private volume: number;
   private disposed = false;
+  private loadListener: ((report: LoadReport) => void) | undefined;
+  private underruns: number | undefined;
   constructor(private readonly options: NativeHostPortOptions = {}) { this.volume = options.volume ?? 1; }
   now() { return this.context?.currentTime ?? 0; }
   /** The audio context and the master gain the host plays into, once unlocked. */
@@ -51,10 +54,18 @@ export class NativeHostPort implements HostPort {
     this.output.connect(context.destination);
     host.connect(this.output);
     host.on('diagnostic', (d: Diagnostic) => this.options.onDiagnostic?.(d));
+    host.on('load', (load: { busy: number; peakMs: number }) => {
+      // Chrome counts output underruns where it can (AudioContext.playbackStats); elsewhere load alone.
+      const counted = (context as AudioContext & { playbackStats?: { underrunEvents?: number } }).playbackStats?.underrunEvents;
+      const underruns = typeof counted === 'number' && this.underruns !== undefined ? Math.max(0, counted - this.underruns) : undefined;
+      if (typeof counted === 'number') this.underruns = counted;
+      this.loadListener?.({ busy: load.busy, peakMs: load.peakMs, ...(underruns === undefined ? {} : { underruns }) });
+    });
     host.on('error', (e: unknown) => this.options.onError?.(String((e as { message?: unknown })?.message ?? e)));
     if (this.setup) await host.configure(this.setup);
     this.host = host;
   }
+  watchLoad(listener: (report: LoadReport) => void) { this.loadListener = listener; }
   configure(setup: Setup) { this.setup = setup; void this.host?.configure(setup).catch(this.reject); }
   schedule(batch: { notes?: Note[]; controls?: Control[]; through?: number }) { void this.host?.schedule(batch).catch(this.reject); }
   cancel(cancel: { from?: number; silence?: boolean }) { void this.host?.cancel(cancel).catch(this.reject); }

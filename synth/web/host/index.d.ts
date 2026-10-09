@@ -27,6 +27,8 @@ export interface Instrument {
   configure(part: Setup['parts'][number]): void;
   /** Upserts and removals; never touches material before the commit point. */
   apply(changes: InstrumentChanges): void;
+  /** Optional: fold these notes (ended, unreferenced) into planning state; what plays must not change. */
+  forget?(ids: string[]): void;
   /** Called once before the first render with the host frame the instrument's clock starts at. */
   begin?(frame: number): void;
   /** Render the next `count` frames (≤ block); returns stereo views valid until the next call. */
@@ -34,7 +36,10 @@ export interface Instrument {
 }
 
 export class HostCore {
-  constructor(options: { rate: number; block?: number; instruments: Map<string, InstrumentClass> | Record<string, InstrumentClass>; assets: HostAssets });
+  /** `history: false` drops notes once forgotten (the worklet); by default they are kept for labels. */
+  constructor(options: { rate: number; block?: number; instruments: Map<string, InstrumentClass> | Record<string, InstrumentClass>; assets: HostAssets; history?: boolean });
+  /** Hands notes that ended FORGET_SECONDS ago to their instruments to fold (called by schedule). */
+  forget(): void;
   readonly rate: number; readonly block: number; position: number; readonly seconds: number; readonly horizonFrames: number; readonly limited: number;
   on(type: 'diagnostic' | 'meter' | 'sounding', fn: (data: any) => void): () => void;
   configure(setup: Setup): Diagnostic[];
@@ -58,7 +63,8 @@ export class InstrumentHost {
   cancel(cancel: { from?: number; ids?: string[]; silence?: boolean }): Promise<Diagnostic[]>;
   profile(action: 'start' | 'snapshot'): Promise<unknown>;
   now(): number;
-  on(type: 'diagnostic' | 'meter' | 'sounding' | 'error', fn: (data: any) => void): () => void;
+  /** 'load' (twice a second): `{busy, peakMs, windowMs}` — the share of the audio thread the host took, and its longest single stretch. */
+  on(type: 'diagnostic' | 'meter' | 'sounding' | 'error' | 'load', fn: (data: any) => void): () => void;
   connect(destination?: AudioNode): this;
   dispose(): void;
 }

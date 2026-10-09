@@ -5,11 +5,17 @@ import {INSTRUMENTS} from './instruments/index.js';
 class InstrumentHostProcessor extends AudioWorkletProcessor{
  constructor(options){
   super();
-  this.host=new HostCore({rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:options.processorOptions.assets});
+  this.host=new HostCore({rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:options.processorOptions.assets,history:false});
   for(const type of ['diagnostic','meter'])this.host.on(type,data=>this.port.postMessage({type,data}));
   this.host.on('sounding',data=>this.port.postMessage({type:'sounding',data}));
   this.started=false;
-  this.port.onmessage=({data})=>{
+  // Load: the share of the audio thread's time the host takes — rendering, and the messages
+  // that re-plan — reported twice a second, so a page can tell when a device is not keeping
+  // up. The worklet may have no clock finer than Date.now; over half a second of calls its
+  // millisecond steps average out.
+  this.clock=globalThis.performance?.now?.bind(globalThis.performance)??Date.now;
+  this.load={since:this.clock(),busy:0,peak:0};
+  this.port.onmessage=({data})=>this.timed(()=>{
    try{
     // Messages carry their reply id so the client can await them (offline tests do).
     let result;
@@ -20,14 +26,21 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
     else if(data.type==='profile'){if(data.action==='start')this.host.profile(true);else{result=[];this.port.postMessage({type:'profile',data:this.host.profileSnapshot()});}}
     this.port.postMessage({type:'reply',id:data.id,diagnostics:result??[]});
    }catch(error){this.port.postMessage({type:'reply',id:data.id,error:String(error.message||error)});}
-  };
+  });
+ }
+ timed(work){
+  const start=this.clock();work();const now=this.clock(),spent=now-start,load=this.load;
+  load.busy+=spent;load.peak=Math.max(load.peak,spent);
+  if(now-load.since>=500){this.port.postMessage({type:'load',data:{busy:load.busy/(now-load.since),peakMs:load.peak,windowMs:now-load.since}});this.load={since:now,busy:0,peak:0};}
  }
  process(_,outputs){
   const output=outputs[0],n=output[0].length;
   if(!this.started){this.host.position=currentFrame;this.started=true;}
-  try{
-   const [l,r]=this.host.render(n);output[0].set(l.subarray(0,n));output[1]?.set(r.subarray(0,n));
-  }catch(error){output.forEach(c=>c.fill(0));this.port.postMessage({type:'error',message:String(error.message||error)});}
+  this.timed(()=>{
+   try{
+    const [l,r]=this.host.render(n);output[0].set(l.subarray(0,n));output[1]?.set(r.subarray(0,n));
+   }catch(error){output.forEach(c=>c.fill(0));this.port.postMessage({type:'error',message:String(error.message||error)});}
+  });
   return true;
  }
 }

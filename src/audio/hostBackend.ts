@@ -33,6 +33,7 @@ import type { MnxStructure } from '../model/mnx.ts';
 import type { PartMix } from './partMix.ts';
 import { performanceToStream, type ContractStream } from './contractStream.ts';
 import { hostSetup, type HostSetup } from './hostSetup.ts';
+import { StrainMonitor, type LoadReport } from './hostStrain.ts';
 import { ZERO, compare } from './time.ts';
 
 /** What the backend needs of an instrument host and its audio output. */
@@ -46,6 +47,8 @@ export interface HostPort {
   cancel(cancel: { from?: number; silence?: boolean }): void;
   setVolume(volume: number): void;
   dispose(): void;
+  /** How busy the host's audio thread is, as the worklet reports it (hostStrain.ts). */
+  watchLoad?(listener: (report: LoadReport) => void): void;
 }
 export interface HostBackendOptions {
   volume?: number;
@@ -114,6 +117,7 @@ export class HostBackend implements PlaybackBackend {
   private plan: Plan | undefined;
   private closed = false;
   private listeners = new Set<() => void>();
+  private readonly strain = new StrainMonitor();
   private readonly legacyFactory: (() => Sink) | undefined;
   private legacy: Sink | undefined;
   /** Voices whose part plays on the old player's sound. */
@@ -165,6 +169,11 @@ export class HostBackend implements PlaybackBackend {
       dispose: () => {},
     };
     this.port.setVolume(this.volume);
+    // Strain matters only while playing; it clears when playback stops.
+    this.port.watchLoad?.(report => {
+      if (this.closed || this.live.snapshot.state !== 'playing') return;
+      if (this.strain.report(report, Date.now())) for (const listener of this.listeners) listener();
+    });
     this.derive();
     this.live = this.makeTransport(performance);
   }
@@ -211,7 +220,7 @@ export class HostBackend implements PlaybackBackend {
       this.plan = snapshot.state === 'playing' ? this.newPlan(snapshot.position, snapshot.rate) : undefined;
     }
     // At the end of the piece the transport stops by itself: what is scheduled plays out.
-    if (snapshot.state !== 'playing') { this.plan = undefined; return; }
+    if (snapshot.state !== 'playing') { this.plan = undefined; this.strain.reset(); return; }
     if (this.plan && !this.plan.done && this.plan.through - this.clock.now() < this.ahead / 2) this.topUp(this.plan);
   }
   private newPlan(position: Performance['sounding'][number]['position'], speed: number): Plan {
@@ -343,7 +352,8 @@ export class HostBackend implements PlaybackBackend {
     const p = scorePositionAt(this.performance, transport.position);
     return { sourceId: this.id, kind: 'synth', state: transport.state, scorePosition: p.ok ? p.value : null,
       syncIssue: p.ok ? undefined : p.diagnostic.message, rate: transport.rate, volume: this.volume, hidePlayhead: false,
-      highlight: transport.activeWritten.map(w => ({ noteKey: w.noteKey, ordinal: w.ordinal })), transport };
+      highlight: transport.activeWritten.map(w => ({ noteKey: w.noteKey, ordinal: w.ordinal })), transport,
+      ...(this.strain.strained ? { strained: true } : {}) };
   }
   subscribe(listener: () => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   prepare() { return Promise.resolve(); }

@@ -37,6 +37,8 @@ class CorePort implements HostPort {
   cancel(cancel: { from?: number; silence?: boolean }) { this.cancels.push(cancel); this.diagnostics.push(...this.core.cancel(cancel)); }
   setVolume(volume: number) { this.volume = volume; }
   dispose() {}
+  load: ((report: { busy: number; peakMs: number; underruns?: number }) => void) | undefined;
+  watchLoad(listener: (report: { busy: number; peakMs: number; underruns?: number }) => void) { this.load = listener; }
 }
 /** Timers on the host's clock; each callback runs in its own turn, as in a browser. */
 function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) {
@@ -218,4 +220,21 @@ it('moving a part between the host and the sink re-plans; a design change only r
   expect(port.cancels.length, 'a part leaving the host re-plans').toBeGreaterThan(cancels);
   const after = port.batches.at(-1)!.notes;
   expect(after.every(n => n.part !== `part${keys}`)).toBe(true);
+}, 60_000);
+
+it('the worklet’s load reports raise strain while playing; stopping clears it', async () => {
+  const { backend, port, run, flush } = rig(scenario('vibrato-and-palm-mute'));
+  let changes = 0;
+  backend.subscribe(() => changes++);
+  port.load!({ busy: 0.9, peakMs: 2 }); port.load!({ busy: 0.9, peakMs: 2 });
+  expect(backend.snapshot.strained, 'not while stopped').toBeUndefined();
+  await backend.play(); await flush(); await run(0.2);
+  port.load!({ busy: 0.9, peakMs: 2 });
+  expect(backend.snapshot.strained).toBeUndefined();
+  const before = changes;
+  port.load!({ busy: 0.2, peakMs: 20 });
+  expect(backend.snapshot.strained).toBe(true);
+  expect(changes, 'listeners hear it').toBeGreaterThan(before);
+  backend.stop(); await flush();
+  expect(backend.snapshot.strained).toBeUndefined();
 }, 60_000);

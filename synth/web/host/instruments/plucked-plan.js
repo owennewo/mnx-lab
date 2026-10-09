@@ -38,9 +38,11 @@ export function palmSustain(amount,frequency,decaySeconds,releaseSeconds){
 const byOnset=(a,b)=>a.frame-b.frame||(a.id<b.id?-1:a.id>b.id?1:0);
 
 // Strings for every note, in onset order. Depends only on earlier onsets, so a
-// note added at or after the commit point never reassigns an earlier one.
-export function assignStrings(entries,resolved,rate){
- const {slots,slotOf,preset}=resolved,assigned=new Map(),diagnostics=[],lastPluck=new Map(),busy=new Map();
+// note added at or after the commit point never reassigns an earlier one. `state` is
+// what earlier, forgotten notes left behind (each string's last pluck and how long it is
+// busy; see foldPlucked); the result carries it on.
+export function assignStrings(entries,resolved,rate,state){
+ const {slots,slotOf,preset}=resolved,assigned=new Map(),diagnostics=[],lastPluck=new Map(state?.lastPluck),busy=new Map(state?.busy);
  const report=(code,e,fields={})=>diagnostics.push(diagnostic(code,{noteId:e.id,part:e.note.part,...fields}));
  const stringOf=slot=>slots.find(x=>x.slot===slot);
  const frequency=(slot,pitch,cents)=>440*2**((pitch-69+(preset.instrument.strings[slot].tuningCents+cents)/100)/12);
@@ -75,15 +77,15 @@ export function assignStrings(entries,resolved,rate){
   if(previous)previous.until=Math.min(previous.until,e.frame);
   assigned.set(e.id,a);busy.set(slot,Math.max(e.endFrame,busy.get(slot)??-1));
  }
- return {assigned,diagnostics};
+ return {assigned,diagnostics,lastPluck,busy};
 }
 
 // Chord gestures, natively (C18): strings are assigned as written, then each member
 // moves to its place in the stroke (strum: by string number; roll: by pitch) and keeps
 // its string. Returns the entries to plan.
-export function gestureEntries(entries,resolved,rate){
+export function gestureEntries(entries,resolved,rate,state){
  const {groups}=gestureGroups(entries.map(e=>e.note));if(!groups.size)return entries;
- const {assigned}=assignStrings(entries,resolved,rate),byId=new Map(entries.map(e=>[e.id,e])),out=new Map(byId);
+ const {assigned}=assignStrings(entries,resolved,rate,state),byId=new Map(entries.map(e=>[e.id,e])),out=new Map(byId);
  const stringOf=n=>assigned.get(n.id)?.string??0;
  for(const members of groups.values()){
   const g=members[0].gesture,order=g.type==='strum'?[...members].sort((a,b)=>(g.direction==='down'?stringOf(b)-stringOf(a):stringOf(a)-stringOf(b))||(a.id<b.id?-1:1)):pitchOrder(members,g);
@@ -96,9 +98,9 @@ export function gestureEntries(entries,resolved,rate){
  return [...out.values()];
 }
 
-export function planPlucked(entries,resolved,rate){
- const {assigned,diagnostics}=assignStrings(entries,resolved,rate),{preset}=resolved,exc=preset.instrument.excitation;
- const events=[],law=[],fingerMuted=new Map();
+export function planPlucked(entries,resolved,rate,state){
+ const {assigned,diagnostics,lastPluck,busy}=assignStrings(entries,resolved,rate,state),{preset}=resolved,exc=preset.instrument.excitation;
+ const events=[],law=[],fingerMuted=new Map(state?.fingerMuted);
  const put=(frame,key,value,noteStart,note)=>{const e={frame:Math.round(frame),key,value,noteStart};events.push(e);if(note)law.push([e,note]);};
  const step=Math.max(1,Math.round(rate/200));
  for(const a of [...assigned.values()].sort((x,y)=>byOnset(x.entry,y.entry))){
@@ -137,7 +139,7 @@ export function planPlucked(entries,resolved,rate){
  }
  applySetupLaw(law,preset.instrument.setup,rate);
  events.sort((x,y)=>x.frame-y.frame);
- return {events:latestPluckEvents(events).map(({frame,key,value})=>({frame,key,value})),assigned,diagnostics};
+ return {events:latestPluckEvents(events).map(({frame,key,value})=>({frame,key,value})),assigned,diagnostics,state:{lastPluck,busy,fingerMuted}};
 }
 
 // instrument-setup.js withInstrumentSetup, per sounding note (a legato target uses

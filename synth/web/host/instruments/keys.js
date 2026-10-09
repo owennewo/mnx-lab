@@ -7,6 +7,7 @@
 // and the output does not depend on block size or batching.
 import {CAPABILITIES,diagnostic} from '../../contract/index.js';
 import {FaustNode} from '../faust-node.js';
+import {forgetLeading} from './forget.js';
 export const KEY_VOICES=16,KEY_TAIL_SECONDS=.5,KILL_SECONDS=.02;
 const byOnset=(a,b)=>a.frame-b.frame||(a.id<b.id?-1:a.id>b.id?1:0);
 // Loudness calibration (chain campaign Phase 4): each kind's default material at a 0 dB
@@ -20,9 +21,13 @@ export function designLevel(part,kind){
  if(typeof levelDb!=='number'||levelDb<-30||levelDb>12)throw Error('Invalid design level');
  return 10**((BASE_LEVEL_DB[kind]+levelDb)/20);
 }
-// → per voice: control events and active windows [start, end) in frames.
-export function planKeys(entries,controls,rate){
- const voices=Array.from({length:KEY_VOICES},(_,i)=>({i,events:[],windows:[],busyUntil:-Infinity,note:null,killed:false,start:-Infinity})),diagnostics=[];
+// → per voice: control events and active windows [start, end) in frames. `memory` is each
+// voice's state after earlier, forgotten notes (forget.js); `state` carries it on.
+export function planKeys(entries,controls,rate,memory){
+ // A voice's last active window always ends at its busyUntil, so a folded voice carries
+ // that window: a steal or a reuse can still cut it as the whole plan would.
+ const voices=Array.from({length:KEY_VOICES},(_,i)=>({i,events:[],windows:memory?.[i]?.busyUntil>-Infinity?[[-Infinity,memory[i].busyUntil]]:[],
+  busyUntil:-Infinity,note:null,killed:false,start:-Infinity,...memory?.[i]})),diagnostics=[];
  const pedal=[...controls].filter(c=>c.control.type==='sustainPedal').sort((a,b)=>a.frame-b.frame||(a.id<b.id?-1:1));
  for(const v of voices)for(const c of pedal)v.events.push({frame:c.frame,key:'sustain_pedal',value:c.control.value});
  const down=frame=>{let on=false;for(const c of pedal){if(c.frame>frame)break;on=c.control.value>=.5;}return on;};
@@ -48,7 +53,7 @@ export function planKeys(entries,controls,rate){
  }
  // A gate-off after a steal is moot but harmless. Stable sort keeps same-frame order.
  for(const v of voices)v.events.sort((a,b)=>a.frame-b.frame);
- return {voices:voices.map(({events,windows})=>({events,windows})),diagnostics};
+ return {voices:voices.map(({events,windows})=>({events,windows})),diagnostics,state:voices.map(({busyUntil,note,killed,start})=>({busyUntil,note,killed,start}))};
 }
 class Voice{
  constructor(module,meta,rate,block){this.node=new FaustNode(module,meta,rate,block);this.position=0;this.events=[];this.index=0;this.windows=[];}
@@ -79,9 +84,18 @@ export class Keys{
  apply({notes=[],removed=[],controls=[],removedControls=[]}){
   for(const id of removed)this.entries.delete(id);for(const e of notes)this.entries.set(e.id,e);
   for(const id of removedControls)this.controls.delete(id);for(const c of controls)this.controls.set(c.id,c);
-  const {voices,diagnostics}=planKeys([...this.entries.values()],[...this.controls.values()],this.rate);
+  const {voices,diagnostics}=planKeys([...this.entries.values()],[...this.controls.values()],this.rate,this.memory);
   for(const d of diagnostics){const key=`${d.code}:${d.noteId}`;if(!this.reported.has(key)){this.reported.add(key);this.emit('diagnostic',d);}}
   voices.forEach((p,i)=>this.voices[i].plan(p));
+ }
+ // Forgotten notes fold into the voices' state once every voice they used is free again
+ // (a held pedal or a let-ring note keeps them until then).
+ forget(ids){
+  forgetLeading(this,ids,()=>[...this.entries.values()],prefix=>{
+   const {state}=planKeys(prefix,[...this.controls.values()],this.rate,this.memory);
+   if(state.some(v=>v.busyUntil>=this.voices[0].position))return false;
+   this.memory=state;
+  });
  }
  begin(frame){for(const v of this.voices)v.position=frame;}
  render(n){const [L,R]=this.out;L.fill(0,0,n);R.fill(0,0,n);for(const v of this.voices)v.renderInto(this.out,n);return this.out;}

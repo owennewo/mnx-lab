@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "python3 scripts/serve.py",
-    "test": "node --test --test-concurrency=6 tests/contract.test.mjs tests/host-core.test.mjs tests/blocks.test.mjs tests/references.test.mjs tests/loudness.test.mjs tests/rig.test.mjs tests/conformance-measure.test.mjs tests/plucked.test.mjs tests/basic-instruments.test.mjs tests/lib-smoke.test.mjs tests/live-thwack.test.mjs tests/prepared-note-ownership.test.mjs tests/wasm-effects-memo.test.mjs tests/live-thwack-cache.test.mjs tests/math-kernel.test.mjs tests/app-player.test.mjs tests/app-state.test.mjs tests/pieces.test.mjs tests/build-output.test.mjs && npm run -s test:cost",
+    "test": "node --test --test-concurrency=6 tests/contract.test.mjs tests/host-core.test.mjs tests/forgetting.test.mjs tests/blocks.test.mjs tests/references.test.mjs tests/loudness.test.mjs tests/rig.test.mjs tests/conformance-measure.test.mjs tests/plucked.test.mjs tests/basic-instruments.test.mjs tests/lib-smoke.test.mjs tests/live-thwack.test.mjs tests/prepared-note-ownership.test.mjs tests/wasm-effects-memo.test.mjs tests/live-thwack-cache.test.mjs tests/math-kernel.test.mjs tests/app-player.test.mjs tests/app-state.test.mjs tests/pieces.test.mjs tests/build-output.test.mjs && npm run -s test:cost",
     "test:cost": "node tests/basic-instruments-cost.test.mjs",
     "test:app-unit": "node --test tests/app-player.test.mjs tests/app-state.test.mjs",
     "test:contract": "node tests/contract.test.mjs",
@@ -49,7 +49,7 @@
     "verify:math-kernel": "node scripts/verify_math_kernel.mjs",
     "build:blocks": "node scripts/build_blocks.mjs",
     "measure:loudness": "node scripts/measure_loudness.mjs",
-    "test:gate": "node --test --test-concurrency=6 tests/contract.test.mjs tests/host-core.test.mjs tests/blocks.test.mjs tests/references.test.mjs tests/loudness.test.mjs tests/rig.test.mjs tests/conformance-measure.test.mjs tests/plucked.test.mjs tests/basic-instruments.test.mjs tests/lib-smoke.test.mjs tests/live-thwack.test.mjs tests/prepared-note-ownership.test.mjs tests/wasm-effects-memo.test.mjs tests/live-thwack-cache.test.mjs tests/math-kernel.test.mjs tests/app-player.test.mjs tests/app-state.test.mjs tests/pieces.test.mjs tests/build-output.test.mjs"
+    "test:gate": "node --test --test-concurrency=6 tests/contract.test.mjs tests/host-core.test.mjs tests/forgetting.test.mjs tests/blocks.test.mjs tests/references.test.mjs tests/loudness.test.mjs tests/rig.test.mjs tests/conformance-measure.test.mjs tests/plucked.test.mjs tests/basic-instruments.test.mjs tests/lib-smoke.test.mjs tests/live-thwack.test.mjs tests/prepared-note-ownership.test.mjs tests/wasm-effects-memo.test.mjs tests/live-thwack-cache.test.mjs tests/math-kernel.test.mjs tests/app-player.test.mjs tests/app-state.test.mjs tests/pieces.test.mjs tests/build-output.test.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.63.0"

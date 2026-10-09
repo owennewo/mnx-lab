@@ -238,6 +238,17 @@ export class Player extends LitElement {
       border-color: var(--accent);
       color: #fff;
     }
+    /* The synth's audio thread is not keeping up (src/audio/hostStrain.ts): the border pulses. */
+    button.primary.strained {
+      animation: strained 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes strained {
+      from { box-shadow: 0 0 0 2px var(--player-ground), 0 0 0 4px transparent; }
+      to { box-shadow: 0 0 0 2px var(--player-ground), 0 0 0 4px oklch(0.78 0.16 75); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      button.primary.strained { animation: none; box-shadow: 0 0 0 2px var(--player-ground), 0 0 0 4px oklch(0.78 0.16 75); }
+    }
     button:disabled {
       opacity: 0.4;
       cursor: default;
@@ -1366,10 +1377,10 @@ export class Player extends LitElement {
       || this.soundControl && this.sourceId === 'synth';
     return html` <div class=${busy ? 'controls busy' : 'controls'}>
         <button
-          class="primary"
+          class=${playing && this.status?.strained ? 'primary strained' : 'primary'}
           ?disabled=${!this.performance || (this.status?.needsStart && !this.status.alignmentIssue)}
           aria-label=${playing ? 'Pause' : 'Play'}
-          title=${playing ? 'Pause' : 'Play'}
+          title=${playing && this.status?.strained ? 'Pause — the synth is struggling to keep up on this device' : playing ? 'Pause' : 'Play'}
           @click=${() => (playing ? this.pause() : void this.play())}
         >
           ${playing ? Player.glyph('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z') : Player.glyph('M8 5l11 7-11 7z')}
