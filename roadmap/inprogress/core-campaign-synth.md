@@ -340,6 +340,12 @@ twice a second (`load`), `src/audio/hostStrain.ts` decides strain (busy > 70% or
 8 ms in two reports running, or an underrun where Chrome counts them; clears after 3 quiet
 seconds), and the play button's border pulses (`button.primary.strained`).
 
+The first version pulsed for the first few bars of every first play (the lead, phone and
+laptop): setting up the guitar and warming its first block stall the worklet ~30 ms each
+before any note sounds, and Chrome counts the resulting underruns of silence half a second
+late. Reports now count from the first note plus one report window, and the underrun count
+starts from the first report that counts.
+
 ## Decisions register
 
 | # | Decision | Status |

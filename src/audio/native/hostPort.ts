@@ -29,7 +29,6 @@ export class NativeHostPort implements HostPort {
   private volume: number;
   private disposed = false;
   private loadListener: ((report: LoadReport) => void) | undefined;
-  private underruns: number | undefined;
   constructor(private readonly options: NativeHostPortOptions = {}) { this.volume = options.volume ?? 1; }
   now() { return this.context?.currentTime ?? 0; }
   /** The audio context and the master gain the host plays into, once unlocked. */
@@ -57,9 +56,7 @@ export class NativeHostPort implements HostPort {
     host.on('load', (load: { busy: number; peakMs: number }) => {
       // Chrome counts output underruns where it can (AudioContext.playbackStats); elsewhere load alone.
       const counted = (context as AudioContext & { playbackStats?: { underrunEvents?: number } }).playbackStats?.underrunEvents;
-      const underruns = typeof counted === 'number' && this.underruns !== undefined ? Math.max(0, counted - this.underruns) : undefined;
-      if (typeof counted === 'number') this.underruns = counted;
-      this.loadListener?.({ busy: load.busy, peakMs: load.peakMs, ...(underruns === undefined ? {} : { underruns }) });
+      this.loadListener?.({ busy: load.busy, peakMs: load.peakMs, ...(typeof counted === 'number' ? { underrunsTotal: counted } : {}) });
     });
     host.on('error', (e: unknown) => this.options.onError?.(String((e as { message?: unknown })?.message ?? e)));
     if (this.setup) await host.configure(this.setup);

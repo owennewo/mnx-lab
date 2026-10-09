@@ -118,6 +118,11 @@ export class HostBackend implements PlaybackBackend {
   private closed = false;
   private listeners = new Set<() => void>();
   private readonly strain = new StrainMonitor();
+  /** Host time the current plan's first note sounds: load before it (setting up the
+   *  instruments, warming the first block) stalls only silence, so it is not strain. */
+  private audibleAt = Infinity;
+  /** The browser's underrun count when the current plan's reports began to count. */
+  private underrunBase: number | undefined;
   private readonly legacyFactory: (() => Sink) | undefined;
   private legacy: Sink | undefined;
   /** Voices whose part plays on the old player's sound. */
@@ -169,10 +174,16 @@ export class HostBackend implements PlaybackBackend {
       dispose: () => {},
     };
     this.port.setVolume(this.volume);
-    // Strain matters only while playing; it clears when playback stops.
+    // Strain matters only while playing and sounding — from the first note plus one report
+    // window (half a second) — and clears when playback stops.
     this.port.watchLoad?.(report => {
-      if (this.closed || this.live.snapshot.state !== 'playing') return;
-      if (this.strain.report(report, Date.now())) for (const listener of this.listeners) listener();
+      if (this.closed || this.live.snapshot.state !== 'playing' || this.port.now() < this.audibleAt + 0.5) return;
+      // The browser counts underruns late: the first report that counts only sets the baseline,
+      // so the start-up stall's (in silence) never count.
+      const total = report.underrunsTotal;
+      const underruns = total === undefined ? report.underruns : this.underrunBase === undefined ? 0 : Math.max(0, total - this.underrunBase);
+      if (total !== undefined) this.underrunBase = total;
+      if (this.strain.report({ busy: report.busy, peakMs: report.peakMs, ...(underruns === undefined ? {} : { underruns }) }, Date.now())) for (const listener of this.listeners) listener();
     });
     this.derive();
     this.live = this.makeTransport(performance);
@@ -226,6 +237,8 @@ export class HostBackend implements PlaybackBackend {
   private newPlan(position: Performance['sounding'][number]['position'], speed: number): Plan {
     // The frozen clock is the transport's anchor time: restart() read it, then pumped and emitted.
     const audio = this.clock.now(), score = this.stream.secondsAt(position);
+    this.audibleAt = audio + this.lead;
+    this.underrunBase = undefined;
     const region = this.live.loopRegion;
     const loop = region ? { start: this.stream.secondsAt(region.start), end: this.stream.secondsAt(region.end) } : undefined;
     return {

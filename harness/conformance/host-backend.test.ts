@@ -10,6 +10,7 @@ import { compilePerformance } from '../../src/audio/performance.ts';
 import { HostBackend, type HostBackendOptions, type HostPort } from '../../src/audio/hostBackend.ts';
 import type { Sink, SinkEvent } from '../../src/audio/sink.ts';
 import type { PartMix } from '../../src/audio/partMix.ts';
+import type { LoadReport } from '../../src/audio/hostStrain.ts';
 import { performanceToStream } from '../../src/audio/contractStream.ts';
 import { scorePositionAt } from '../../src/audio/scorePosition.ts';
 import { rational } from '../../src/audio/time.ts';
@@ -37,8 +38,8 @@ class CorePort implements HostPort {
   cancel(cancel: { from?: number; silence?: boolean }) { this.cancels.push(cancel); this.diagnostics.push(...this.core.cancel(cancel)); }
   setVolume(volume: number) { this.volume = volume; }
   dispose() {}
-  load: ((report: { busy: number; peakMs: number; underruns?: number }) => void) | undefined;
-  watchLoad(listener: (report: { busy: number; peakMs: number; underruns?: number }) => void) { this.load = listener; }
+  load: ((report: LoadReport) => void) | undefined;
+  watchLoad(listener: (report: LoadReport) => void) { this.load = listener; }
 }
 /** Timers on the host's clock; each callback runs in its own turn, as in a browser. */
 function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) {
@@ -229,6 +230,10 @@ it('the worklet’s load reports raise strain while playing; stopping clears it'
   port.load!({ busy: 0.9, peakMs: 2 }); port.load!({ busy: 0.9, peakMs: 2 });
   expect(backend.snapshot.strained, 'not while stopped').toBeUndefined();
   await backend.play(); await flush(); await run(0.2);
+  // Before the first note has sounded for a report window, stalls are setting up in silence.
+  port.load!({ busy: 0.2, peakMs: 40 }); port.load!({ busy: 0.9, peakMs: 30 });
+  expect(backend.snapshot.strained, 'a slow start is not strain').toBeUndefined();
+  await run(0.6);
   port.load!({ busy: 0.9, peakMs: 2 });
   expect(backend.snapshot.strained).toBeUndefined();
   const before = changes;
@@ -237,4 +242,13 @@ it('the worklet’s load reports raise strain while playing; stopping clears it'
   expect(changes, 'listeners hear it').toBeGreaterThan(before);
   backend.stop(); await flush();
   expect(backend.snapshot.strained).toBeUndefined();
+  // Underruns the browser counts: those from before the music sounded (reported late) set
+  // the baseline; one while it sounds is strain at once.
+  await backend.play(); await flush(); await run(0.8);
+  port.load!({ busy: 0.2, peakMs: 1, underrunsTotal: 4 });
+  expect(backend.snapshot.strained, 'the start-up stall’s underruns').toBeUndefined();
+  port.load!({ busy: 0.2, peakMs: 1, underrunsTotal: 4 });
+  expect(backend.snapshot.strained).toBeUndefined();
+  port.load!({ busy: 0.2, peakMs: 1, underrunsTotal: 5 });
+  expect(backend.snapshot.strained).toBe(true);
 }, 60_000);

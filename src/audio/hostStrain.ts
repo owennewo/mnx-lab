@@ -10,7 +10,14 @@
  * strain: one slow report — the first configure, say — is not. Strain clears after three
  * quiet seconds, so a struggling device does not flicker in and out of it.
  */
-export interface LoadReport { busy: number; peakMs: number; /** Underruns since the last report, where counted. */ underruns?: number }
+export interface LoadReport {
+  busy: number;
+  peakMs: number;
+  /** Underruns since the last report counted, where the browser counts them. */
+  underruns?: number;
+  /** The browser's running count of underruns (the port reports this; the backend turns it into `underruns`). */
+  underrunsTotal?: number;
+}
 export const STRAIN = Object.freeze({ busy: 0.7, peakMs: 8, clearAfterMs: 3000 });
 export class StrainMonitor {
   private hotRun = 0;

@@ -61,7 +61,8 @@ try {
     const button=()=>player.shadowRoot.querySelector('button.primary');
     // Pause silences: nothing more is scheduled, and what was sounding is cut.
     // Strain — two hot reports running — pulses the play button; pausing clears it.
-    await player.play();await delay(300);
+    // (Reports count once the first note has sounded for half a second.)
+    await player.play();await delay(900);
     backend.port.loadListener({busy:.95,peakMs:2});backend.port.loadListener({busy:.95,peakMs:2});await delay(100);
     check(button().classList.contains('strained')&&/struggling/.test(button().title),'A strained synth did not mark the play button');
     await delay(200);player.pause();await delay(100);
