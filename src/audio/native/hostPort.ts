@@ -93,8 +93,11 @@ export class NativeHostPort implements HostPort {
   }
   /** The context and a configured, warm host (no gesture needed: the context starts suspended). */
   private prepare(): AudioContext {
-    // Under a playback trace the output buffer can be chosen (playbackTrace.ts), for A/B on a device.
-    const latencyHint = playbackTrace.latencyHint;
+    // 'balanced': on the tablet the browser's default buffer dropped out a dozen times in a play
+    // and 'playback' skipped below the page with seconds of delay; 'balanced' played clean at a
+    // delay too small to see (roadmap core-synth-performance, step 2). Under a playback trace
+    // the buffer can be chosen (playbackTrace.ts), for A/B on a device.
+    const latencyHint = playbackTrace.on ? playbackTrace.latencyHint : 'balanced';
     const context = this.context ??= (this.options.createContext ?? (() => new AudioContext(latencyHint !== undefined ? { latencyHint } : {})))();
     this.loading ??= this.load(context).then(() => { if (!this.wanted && context.state === 'running') void context.suspend(); });
     return context;

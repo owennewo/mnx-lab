@@ -186,3 +186,25 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
 - **9 Oct 2026: the master limiter landed on main** (c192f6b6), outside this plan's steps:
   3 ms look-ahead, soft knee and two-stage release, signed off by the lead while listening
   to step 1. All output is 3 ms later than its scheduled frame (`MASTER_LOOKAHEAD_SECONDS`).
+- **9 Oct 2026: the device baseline and step 2.** Traces from the lead's phone and tablet
+  (`?trace`, `src/audio/playbackTrace.ts`):
+  - **Average load is fine:** phone 25–30%, tablet 35–45% of real time. The room bus is
+    40–45% of the guitar's cost on both.
+  - **The skips are stalls, not load.** Most are planner `schedule` batches on the audio
+    thread (10–38 ms on the tablet), plus `configure` (105–185 ms) at the start of a page's
+    first play, and 2–5 underruns about 0.7 s into every play. This is step 4's target.
+  - **Step 2 settled on `balanced`, now the studio's default** (`hostPort.ts`). On the
+    tablet the browser's default buffer gave 12 underruns in the first 10 s and 5 after;
+    `balanced` gave 2, then none.
+  - **`playback` was rejected.** It halved the audio thread's cost per second on both
+    devices, and the phone played it clean. But on the tablet it skipped below the page
+    (the audio thread never missed a deadline) and the delay measured at the speaker grew
+    from 1.8 to 2.8 s over 30 s.
+  - **Browsers misreport output latency.** The tablet reported 40 ms for `playback` while
+    the sound came 2 s late. The cursor now follows `getOutputTimestamp()` (15a8cc57).
+  - **A chunky audio clock needs a lookahead.** With big buffers, `currentTime` advances in
+    chunks; the transport's backlog guard then restarted playback in a loop until its
+    lookahead became 1 s (9cf5f81c).
+  - **The remaining steps are measured on the laptop**, with one Android round at the end to
+    confirm them together. Stalls on the laptop are about a quarter of the tablet's, so a
+    step is judged by the stall times the trace records, not by whether the laptop skips.
