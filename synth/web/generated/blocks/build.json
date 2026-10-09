@@ -3,15 +3,15 @@
   "blocks": {
     "drive": {
       "source": "dsp/blocks/drive.dsp",
-      "sourceSha256": "08f6b1aaaa766c211404da23b359d9b40a5da955dc24179b260660e48566b0cb",
-      "wasmSha256": "817d357cc42da9d416a0d7690bc2cbea982dd5abfbc146fb769245d3392b2487",
+      "sourceSha256": "aced2ce8d1adc3787e59e059ecf8fee75937e1e6b02034962a24a1963fed6dc1",
+      "wasmSha256": "7e02af9f1361f66c3b03f0e827a065a127f5f15eb5387087565de69d56f1d8f1",
       "inputs": 2,
       "outputs": 2
     },
     "echo": {
       "source": "dsp/blocks/echo.dsp",
-      "sourceSha256": "98d38910d0ebb0ed13893d26ba82111844d40526b05788151fe46200d198d216",
-      "wasmSha256": "318fee2fd5a50d7156818139194db58b58e8cdb7bcf02adf3a41d67f8fa6187b",
+      "sourceSha256": "55662008ef2b8aa9609e71c3d01318c33aaffc662df105c267a1e1735db5d826",
+      "wasmSha256": "ab24999c4817ecc3d5963933a1283de76e39239e9bb8e18a0ac11be199b16326",
       "inputs": 2,
       "outputs": 2
     },
@@ -24,8 +24,8 @@
     },
     "room": {
       "source": "dsp/blocks/room.dsp",
-      "sourceSha256": "ff7d8de47407a5a303b0304efaffad468c5a24b6def30f5ca9a0cc1cff2929e8",
-      "wasmSha256": "d8347d8877b221cb4fe3f72218c3e2cc4ff58fd5fc16755cc9d7a337759cce27",
+      "sourceSha256": "eeec7e4b06e7e634d5ab2c5b31842f188ee567494630185c780895936e285aae",
+      "wasmSha256": "b1bd8d0c6c16c0c7e18be40918fd2c05a0cb81c7ff0246dbabe8486cbd6075dc",
       "inputs": 2,
       "outputs": 2
     },

@@ -3,7 +3,7 @@
   "filename": "drive.dsp",
   "version": "2.81.10",
   "compile_options": "-lang wasm -ct 1 -cn DriveDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
-  "size": 84,
+  "size": 68,
   "inputs": 2,
   "outputs": 2,
   "meta": [
@@ -38,7 +38,7 @@
       "filters.lib/iir:license": "MIT-style STK-4.3 license"
     },
     {
-      "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+      "filters.lib/lowpass0_highpass1": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
     },
     {
       "filters.lib/lowpass0_highpass1:author": "Julius O. Smith III"
@@ -118,7 +118,7 @@
           "varname": "fHslider1",
           "shortname": "gain",
           "address": "/Drive/gain",
-          "index": 36,
+          "index": 20,
           "init": 12,
           "min": 0,
           "max": 30,
@@ -130,7 +130,7 @@
           "varname": "fHslider2",
           "shortname": "mix",
           "address": "/Drive/mix",
-          "index": 60,
+          "index": 40,
           "init": 0.7,
           "min": 0,
           "max": 1,
@@ -142,7 +142,7 @@
           "varname": "fHslider0",
           "shortname": "tone",
           "address": "/Drive/tone",
-          "index": 16,
+          "index": 12,
           "init": 4000,
           "min": 600,
           "max": 16000,
@@ -153,13 +153,13 @@
   ],
   "librarySha256": {
     "stdfaust.lib": "536d6270c7925239a0cdd0b6f26addd070ca009e6554e1036d770d61fae1b1a5",
-    "basics.lib": "855d280f983a5d3c3943183c51fd31698b420da9f0d1f8d31561b23338dd3cf3",
     "maths.lib": "d9647d09009647e4c727c4621f78979d088e94453b97af58fa3947f5670df6bf",
     "platform.lib": "e142c1e9643c38c6c7223b005067abd393b007e9966938b6c78f8968a9b8d5a3",
-    "signals.lib": "8b85de979268836be1c989b475c3126ec1953c5558f03c9add20d073acdb5b5f",
-    "filters.lib": "ff5dc252814660c1172e9fa44af8435f35816d62f72db6d4ed793a2f32b8fa9b"
+    "filters.lib": "ff5dc252814660c1172e9fa44af8435f35816d62f72db6d4ed793a2f32b8fa9b",
+    "basics.lib": "855d280f983a5d3c3943183c51fd31698b420da9f0d1f8d31561b23338dd3cf3",
+    "signals.lib": "8b85de979268836be1c989b475c3126ec1953c5558f03c9add20d073acdb5b5f"
   },
   "block": "drive",
-  "sourceSha256": "08f6b1aaaa766c211404da23b359d9b40a5da955dc24179b260660e48566b0cb",
-  "wasmSha256": "817d357cc42da9d416a0d7690bc2cbea982dd5abfbc146fb769245d3392b2487"
+  "sourceSha256": "aced2ce8d1adc3787e59e059ecf8fee75937e1e6b02034962a24a1963fed6dc1",
+  "wasmSha256": "7e02af9f1361f66c3b03f0e827a065a127f5f15eb5387087565de69d56f1d8f1"
 }

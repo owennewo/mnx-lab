@@ -3,10 +3,12 @@
 import("stdfaust.lib");
 declare name "Echo";
 smooth(x) = x : si.smooth(ba.tau2pole(0.04));
+// Controls that set filter coefficients are not smoothed here (that recomputes them every
+// sample): the host glides them a block at a time (blocks.js, `glide`).
 time = hslider("time",.375,.04,2,.001);
 feedback = hslider("feedback",.5,0,.8,.01) : smooth;
 mix = hslider("mix",.4,0,1,.01) : smooth;
-tone = hslider("tone",5000,500,12000,1) : smooth;
+tone = hslider("tone",5000,500,12000,1);
 ping = hslider("ping_pong",1,0,1,1) : smooth;
 echo(l,r) = l+el,r+er with {
     delays = (+ : fi.lowpass(1,tone) : de.sdelay(262144,2048,time*ma.SR)),

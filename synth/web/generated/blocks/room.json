@@ -3,7 +3,7 @@
   "filename": "room.dsp",
   "version": "2.81.10",
   "compile_options": "-lang wasm -ct 1 -cn RoomDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
-  "size": 1917392,
+  "size": 1917376,
   "inputs": 2,
   "outputs": 2,
   "meta": [
@@ -130,7 +130,7 @@
           "varname": "fHslider1",
           "shortname": "damping",
           "address": "/Room/damping",
-          "index": 36,
+          "index": 20,
           "init": 7000,
           "min": 1000,
           "max": 12000,
@@ -142,7 +142,7 @@
           "varname": "fHslider0",
           "shortname": "decay",
           "address": "/Room/decay",
-          "index": 12,
+          "index": 0,
           "init": 1,
           "min": 0.2,
           "max": 12,
@@ -154,7 +154,7 @@
           "varname": "fHslider2",
           "shortname": "level",
           "address": "/Room/level",
-          "index": 131144,
+          "index": 131124,
           "init": 0.2,
           "min": 0,
           "max": 1,
@@ -166,7 +166,7 @@
           "varname": "fHslider3",
           "shortname": "predelay",
           "address": "/Room/predelay",
-          "index": 262228,
+          "index": 262212,
           "init": 15,
           "min": 0,
           "max": 100,
@@ -178,7 +178,7 @@
           "varname": "fHslider4",
           "shortname": "width",
           "address": "/Room/width",
-          "index": 1917380,
+          "index": 1917364,
           "init": 1,
           "min": 0,
           "max": 1.5,
@@ -199,6 +199,6 @@
     "routes.lib": "51b4593d8f3d5f0106463fffc0d12514b7d7d758a18f9bf4660b42b2d89d0851"
   },
   "block": "room",
-  "sourceSha256": "ff7d8de47407a5a303b0304efaffad468c5a24b6def30f5ca9a0cc1cff2929e8",
-  "wasmSha256": "d8347d8877b221cb4fe3f72218c3e2cc4ff58fd5fc16755cc9d7a337759cce27"
+  "sourceSha256": "eeec7e4b06e7e634d5ab2c5b31842f188ee567494630185c780895936e285aae",
+  "wasmSha256": "b1bd8d0c6c16c0c7e18be40918fd2c05a0cb81c7ff0246dbabe8486cbd6075dc"
 }

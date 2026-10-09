@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
-import {BLOCK_TYPES,defaultParams} from '../web/host/blocks.js';
+import {BLOCK_TYPES,Glides,defaultParams} from '../web/host/blocks.js';
 import {FaustNode} from '../web/host/faust-node.js';
 const sha=b=>createHash('sha256').update(b).digest('hex'),read=p=>JSON.parse(fs.readFileSync(p));
 const build=read('web/generated/blocks/build.json'),sources=fs.readdirSync('dsp/blocks').filter(f=>f.endsWith('.dsp')).sort();
@@ -26,4 +26,20 @@ test('every catalogue type has an asset that accepts all of its mapped controls'
   for(const [k,d] of Object.entries(def.params))if(d.type!=='boolean'){assert.ok(d.min<=d.default&&d.default<=d.max,`${type}.${k} default in range`);for(const name of Object.keys(def.presets))assert.ok(def.presets[name][k]===undefined||(def.presets[name][k]>=d.min&&def.presets[name][k]<=d.max),`${type} preset ${name} ${k}`);}
  }
  const m=read('web/generated/blocks/master.json');assert.deepEqual([Number(m.inputs),Number(m.outputs)],[2,3],'master: stereo in, stereo + limiter gain out');
+});
+// Filter-coefficient controls are taken per block by the DSP and glided by the host
+// (blocks.js `glide`): set at once when a block starts, glided over ~40 ms when changed.
+test('glide controls are set at once at the start and glide a block at a time when changed',()=>{
+ for(const [type,def] of Object.entries(BLOCK_TYPES))for(const k of def.glide??[])assert.ok(k in def.controls(defaultParams(type),{bpm:96}),`${type} glides ${k}, one of its controls`);
+ const node={values:{},set(c){Object.assign(this.values,c);}},glides=new Glides('room',48000,128);
+ node.set(glides.split({level:.2,decay:1,damping:7000},undefined));
+ assert.deepEqual(node.values,{level:.2,decay:1,damping:7000},'no previous value: at once');
+ node.set(glides.split({level:.5,decay:3,damping:7000},{level:.2,decay:1,damping:7000}));
+ assert.equal(node.values.level,.5,'a control the DSP smooths itself is set at once');
+ assert.equal(node.values.decay,1,'decay waits to glide');
+ const path=[];for(let b=0;b<200;b++){glides.advance(node,128);path.push(node.values.decay);}
+ assert.ok(path[0]>1&&path[0]<1.2,`one block moves part of the way: ${path[0]}`);
+ assert.ok(path.every((v,i)=>i===0||v>=path[i-1]),'monotonic');
+ const tau=path.findIndex(v=>v>=1+2*(1-Math.exp(-1)));assert.ok(Math.abs(tau*128/48000-.04)<.004,`time constant ${tau*128/48000} s`);
+ assert.equal(path.at(-1),3,'lands exactly');assert.equal(glides.active.size,0);
 });

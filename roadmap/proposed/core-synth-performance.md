@@ -233,3 +233,26 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
   - **Expected on the tablet:** the tablet ran about 4–8× the laptop's times, so a 10–38 ms
     stall should now be about 3–10 ms. Moving planning to a Worker stays on the list in case
     the end-of-plan Android round still shows stalls.
+- **9 Oct 2026: step 8, first part: the room recomputed its filters every sample.** Its
+  decay and damping were smoothed inside the DSP, so FAUST rebuilt zita's eight delay-line
+  filters every sample: 8 `exp`, 8 `sqrt` and a `cos` a sample, each a call out of the
+  WebAssembly. Drive (gain, tone) and echo (tone) had smaller versions of the same thing.
+  - **The change:** the DSP takes those controls as they are, once per block. The host glides
+    them a block at a time with the same 40 ms time constant (`Glides`, the types' `glide`
+    lists in `blocks.js`).
+  - **Results** (Node, ms per audio second):
+
+    | | Before | After |
+    |---|---|---|
+    | Room | 13.7 | 3.7 |
+    | Drive | 4.2 | 2.8 |
+    | Echo | 1.9 | 1.4 |
+    | Reference session, whole | 87 | 69 (−21%) |
+
+    The room was about 40% of the guitar's cost on the phone and tablet.
+  - **Sound:** the 15 references with a room or those effects were re-captured. Each
+    differs only from about 0.16 s on, at −65 to −86 dB. The old smoothing started from
+    zero, so a room began short and dark for its first ~0.2 s; it now starts as set. On
+    the multi-part mix the difference is −134 dB (rounding).
+  - **Not done:** sizing the room for 48 kHz saved only another 5%, and would break devices
+    that run at 96 kHz. A half-rate room or a 4-line network can wait for the device round.

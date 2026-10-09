@@ -3,7 +3,7 @@
   "filename": "echo.dsp",
   "version": "2.81.10",
   "compile_options": "-lang wasm -ct 1 -cn EchoDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
-  "size": 4194444,
+  "size": 4194436,
   "inputs": 2,
   "outputs": 2,
   "meta": [
@@ -103,10 +103,10 @@
         {
           "type": "hslider",
           "label": "feedback",
-          "varname": "fHslider2",
+          "varname": "fHslider1",
           "shortname": "feedback",
           "address": "/Echo/feedback",
-          "index": 44,
+          "index": 28,
           "init": 0.5,
           "min": 0,
           "max": 0.8,
@@ -115,10 +115,10 @@
         {
           "type": "hslider",
           "label": "mix",
-          "varname": "fHslider3",
+          "varname": "fHslider2",
           "shortname": "mix",
           "address": "/Echo/mix",
-          "index": 56,
+          "index": 40,
           "init": 0.4,
           "min": 0,
           "max": 1,
@@ -127,10 +127,10 @@
         {
           "type": "hslider",
           "label": "ping_pong",
-          "varname": "fHslider1",
+          "varname": "fHslider0",
           "shortname": "ping_pong",
           "address": "/Echo/ping_pong",
-          "index": 32,
+          "index": 12,
           "init": 1,
           "min": 0,
           "max": 1,
@@ -142,7 +142,7 @@
           "varname": "fHslider4",
           "shortname": "time",
           "address": "/Echo/time",
-          "index": 2097232,
+          "index": 2097224,
           "init": 0.375,
           "min": 0.04,
           "max": 2,
@@ -151,10 +151,10 @@
         {
           "type": "hslider",
           "label": "tone",
-          "varname": "fHslider0",
+          "varname": "fHslider3",
           "shortname": "tone",
           "address": "/Echo/tone",
-          "index": 12,
+          "index": 64,
           "init": 5000,
           "min": 500,
           "max": 12000,
@@ -173,6 +173,6 @@
     "delays.lib": "a2a6dd6ce935566a3285236921f40c22fe6488556fa62b108f9ef4d5f37084aa"
   },
   "block": "echo",
-  "sourceSha256": "98d38910d0ebb0ed13893d26ba82111844d40526b05788151fe46200d198d216",
-  "wasmSha256": "318fee2fd5a50d7156818139194db58b58e8cdb7bcf02adf3a41d67f8fa6187b"
+  "sourceSha256": "55662008ef2b8aa9609e71c3d01318c33aaffc662df105c267a1e1735db5d826",
+  "wasmSha256": "ab24999c4817ecc3d5963933a1283de76e39239e9bb8e18a0ac11be199b16326"
 }

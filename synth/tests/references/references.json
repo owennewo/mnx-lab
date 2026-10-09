@@ -21,8 +21,8 @@
   },
   "fixture:multi-part-mix": {
    "frames": 432000,
-   "peak": 0.800832986831665,
-   "sha256": "efd039eeee1d2075da54f596f1841e574019a19ddc55d2006c5ef1cb65f1ea7e"
+   "peak": 0.8008329272270203,
+   "sha256": "79cb2c7ded17b5f9b398f9bb5a23839870aab4aa0b713b01f44d27870a4bf1a6"
   },
   "fixture:plucked-techniques": {
    "frames": 912000,
@@ -36,73 +36,73 @@
   },
   "piece:band-ballad": {
    "frames": 835200,
-   "peak": 0.7923744916915894,
-   "sha256": "7e059ee19327b5e702aaa5e9dc84173091086f1796806ebe2bf10181ec33983c"
+   "peak": 0.7923743724822998,
+   "sha256": "5234aa3a3f8ab6c458a1481a1232a79cf4c6b908931fabca3034b0c9799abf52"
   },
   "piece:band-groove": {
    "frames": 590400,
    "peak": 0.755699872970581,
-   "sha256": "79ed318da221f7ffd0d4c100048665efcbf2e66aa2117e4a58dee5b8df20a674"
+   "sha256": "e81dd741daaa5836f8f365d0a209a2ef7a6d3f725cc4d5a95076f2fa28c0eeab"
   },
   "piece:guitar-bends": {
    "frames": 705600,
    "peak": 0.25458529591560364,
-   "sha256": "191cede4dca5893c676915356423ec177e07dccf67f37083474c9c390035458f"
+   "sha256": "9217d97c67571aeda20c8c2331b22bda03593a0df57b8f81c8ef9746c39a856c"
   },
   "piece:guitar-dynamics": {
    "frames": 643200,
    "peak": 0.7163533568382263,
-   "sha256": "b1758e43e8d8431e44f0b86192372008a2e31bf573affe23a880a55b7a006401"
+   "sha256": "1dd52a85df58a6c4f5cffe900f5c4d6e6fd2b634812ffe34508f5ba6f62bee84"
   },
   "piece:guitar-fingerpick": {
    "frames": 696000,
    "peak": 0.7838817834854126,
-   "sha256": "1eec11cef6965b069c46f40a64fe968d43b21588800e8e87640ddd833e28edc1"
+   "sha256": "9a657e003182a714fe90c982a18491b560aa0533d1399d21bdf130e5ba01b06d"
   },
   "piece:guitar-legato": {
    "frames": 604800,
-   "peak": 0.5385617017745972,
-   "sha256": "fde7aaf841be938284f502583bad299bd0baa57c26c747949794f87ca9ef2bcc"
+   "peak": 0.5385652780532837,
+   "sha256": "fb4792ea92b50a27d7f61e9672ca1517d38f55c02ed1ed69ead3f7cea21e4a35"
   },
   "piece:guitar-recorded": {
    "frames": 1118400,
    "peak": 0.8165073990821838,
-   "sha256": "204228b546dbc8dfaf0777701d45bb5d8c0d90cd1003c735561d6ca0df706df9"
+   "sha256": "49c606ec46fd14bc0f2feea986525f869e3f949e5f667732b91cec7034853887"
   },
   "piece:guitar-strums": {
    "frames": 667200,
    "peak": 0.6973491907119751,
-   "sha256": "f7582f6ddf9e3ef6d1d74b6ba29612c2d2ba30e74523388781b17ee41adc7ef5"
+   "sha256": "cd5d02c0fd11b28f152cff7c33e39ac8439e798ebca2a7a71e238248bdcbdc5a"
   },
   "piece:guitar-sustain": {
    "frames": 729600,
    "peak": 0.7136059999465942,
-   "sha256": "02fa44ab0b7a67d2530b47d9dc3cf732a2b500dc86e5d4b46b2484a6d1e3c758"
+   "sha256": "b3a91820eb81c74670f5d409331042d6c71de9f52718c86beea625a1653c9fb6"
   },
   "piece:guitar-tempo-echo": {
    "frames": 595200,
-   "peak": 0.20492695271968842,
-   "sha256": "4dc7ce4596f49235637125c9fcb8d00f8622196c2432ec61fcaab2eb5ba45032"
+   "peak": 0.2049270123243332,
+   "sha256": "e8e4e21063eeb9c692ca12728feda96b9a468097ff77bc4e70939c44b52c56e4"
   },
   "piece:keys-pedal": {
    "frames": 734400,
    "peak": 0.6921818256378174,
-   "sha256": "c4181ecc502fa0ccfc0c9f8a3b82f6396c971255f5a398e5c0fdaf27288dcbb7"
+   "sha256": "4c2a4872749497083f95e456bed40831c8d10b68bf961413970748ddbe58ea48"
   },
   "piece:kit-groove": {
    "frames": 619200,
    "peak": 0.7051089406013489,
-   "sha256": "ff5c867fde449bab750ce46e97bb5e0c2037bd357bf092f49637cde9e3b8ceb7"
+   "sha256": "5176323170fe84098fbe6c609afe9ed57d2ed7c8b5b2cb209b15314d95796b27"
   },
   "piece:ukulele-strum": {
    "frames": 590400,
    "peak": 0.47548040747642517,
-   "sha256": "7cc0e621b1074ec7741ea42a0dcde5d17678956f5a4d5b4a98937b36685c7ecc"
+   "sha256": "5b535b97130a27c18248cdb1dda100616d94bcd19bf22f70f5b46faa9b09f799"
   },
   "session:reference": {
    "frames": 1098322,
-   "peak": 0.8897736072540283,
-   "sha256": "afcb80360f24d97a32a3b76e3728e4fb7de85a990cb56b172d2cca8cc1ccd78e"
+   "peak": 0.8897737860679626,
+   "sha256": "cce085123c9d239a675d9dc8568056c2ec19d8df085324e59b0d41841bec9a0f"
   }
  }
 }

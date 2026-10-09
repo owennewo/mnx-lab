@@ -3,7 +3,7 @@
 // by the AudioWorklet processor and offline rendering; no DOM, no clock of its own.
 import {CAPABILITIES,DEFAULT_BPM,GESTURES,frameAt,diagnostic,validateSetup,validateNote,validateControl,lower,knownControl,sessionControl,gestureGroups,pitchOrder,gestureTimes} from '../contract/index.js';
 import {FaustNode} from './faust-node.js';
-import {BLOCK_TYPES,BlockNode,resolveParams,MASTER_PARAMS} from './blocks.js';
+import {BLOCK_TYPES,BlockNode,Glides,resolveParams,MASTER_PARAMS} from './blocks.js';
 
 const dbToGain=db=>10**(db/20);
 const RAMP_SECONDS=.02,DUCK_SECONDS=.01;
@@ -95,17 +95,20 @@ class Part{
 const QUIET=1e-7,SLEEP_SECONDS=.5;
 class Bus{
  constructor(host,setup){this.host=host;this.id=setup.id;this.type=setup.type;this.node=new FaustNode(host.assets.blocks[setup.type].module,host.assets.blocks[setup.type].meta,host.rate,host.block);
-  this.input=[new Float32Array(host.block),new Float32Array(host.block)];this.g=0;this.gTarget=0;this.quiet=0;this.step=1/(host.rate*RAMP_SECONDS);this.asleep=true;}
+  this.input=[new Float32Array(host.block),new Float32Array(host.block)];this.g=0;this.gTarget=0;this.quiet=0;this.step=1/(host.rate*RAMP_SECONDS);this.asleep=true;
+  this.glides=new Glides(this.type,host.rate,host.block);}
  configure(setup,initial,diagnostics){
   const {params,problems}=resolveParams(this.type,setup.params);
   for(const message of problems)diagnostics.push(diagnostic('invalid-block',{bus:this.id,message}));
-  this.params=params;this.controls=BLOCK_TYPES[this.type].controls(params,{bpm:this.host.bpm});this.node.set(this.controls);
+  const was=this.controls;this.params=params;this.controls=BLOCK_TYPES[this.type].controls(params,{bpm:this.host.bpm});
+  if(initial||this.asleep){this.node.set(this.controls);this.glides.clear();}else this.node.set(this.glides.split(this.controls,was));
   this.gTarget=(setup.state??'on')==='off'?0:1;if(initial)this.g=this.gTarget;
-  if(this.gTarget&&this.asleep){this.node.reset(this.controls);this.asleep=false;this.quiet=0;}
+  if(this.gTarget&&this.asleep){this.node.reset(this.controls);this.glides.clear();this.asleep=false;this.quiet=0;}
  }
- retempo(bpm){this.controls=BLOCK_TYPES[this.type].controls(this.params,{bpm});this.node.set(this.controls);}
+ retempo(bpm){const was=this.controls;this.controls=BLOCK_TYPES[this.type].controls(this.params,{bpm});this.node.set(this.glides.split(this.controls,was));}
  render(n){
   if(this.asleep)return null;
+  this.glides.advance(this.node,n);
   if(this.g!==1||this.gTarget!==1){const [L,R]=this.input;let g=this.g;for(let i=0;i<n;i++){g=g<this.gTarget?Math.min(this.gTarget,g+this.step):Math.max(this.gTarget,g-this.step);L[i]*=g;R[i]*=g;}this.g=g;}
   const y=this.node.render(this.input,n);
   if(this.gTarget===0&&this.g===0){let peak=0;for(let i=0;i<n;i++)peak=Math.max(peak,Math.abs(y[0][i]),Math.abs(y[1][i]));this.quiet=peak<QUIET?this.quiet+n:0;if(this.quiet>=SLEEP_SECONDS*this.host.rate)this.asleep=true;}

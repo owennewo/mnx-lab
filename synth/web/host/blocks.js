@@ -14,7 +14,7 @@ export const BLOCK_TYPES=Object.freeze({
  drive:{name:'Drive',role:'effect',hue:'#d08a52',summary:'Saturation with tone and mix',
   params:{gain:p('Gain',0,30,12,{unit:'dB'}),mix:p('Mix',0,1,.7,{unit:'%',scale:100}),tone:p('Tone',600,16000,4000,{unit:'Hz',log:true})},
   presets:{'Warm drive':{gain:12,mix:.7,tone:4000},'Crunch':{gain:22,mix:.9,tone:5500},'Edge':{gain:6,mix:.35,tone:7500}},
-  controls:x=>({gain:x.gain,mix:x.mix,tone:x.tone})},
+  glide:['gain','tone'],controls:x=>({gain:x.gain,mix:x.mix,tone:x.tone})},
  vibrato:{name:'Vibrato',role:'effect',hue:'#a493e0',summary:'Pitch wobble, depth in cents',
   params:{depth:p('Depth',0,50,10,{unit:'cents'}),mix:p('Mix',0,1,.5,{unit:'%',scale:100}),rate:p('Rate',.2,10,4.5,{unit:'Hz'})},
   presets:{'Gentle':{depth:10,mix:.5,rate:4.5},'Seasick':{depth:30,mix:.7,rate:2},'Shimmer':{depth:6,mix:.4,rate:7}},
@@ -27,12 +27,12 @@ export const BLOCK_TYPES=Object.freeze({
   params:{mix:p('Mix',0,1,.4,{unit:'%',scale:100}),beats:p('Time',.25,2,.75,{unit:'beats',choices:ECHO_BEATS}),
    feedback:p('Feedback',0,.8,.5,{unit:'%',scale:100}),tone:p('Tone',500,12000,5000,{unit:'Hz',log:true}),pingPong:{label:'Ping-pong',type:'boolean',default:true}},
   presets:{'Dotted echo':{mix:.4,beats:.75,feedback:.5,pingPong:true},'Slapback':{mix:.32,beats:.25,feedback:.12,pingPong:false},'Long repeats':{mix:.35,beats:1,feedback:.65,pingPong:true}},
-  controls:(x,{bpm})=>({mix:x.mix,time:Math.min(2,Math.max(.04,60/bpm*x.beats)),feedback:x.feedback,tone:x.tone,ping_pong:x.pingPong?1:0})},
+  glide:['tone'],controls:(x,{bpm})=>({mix:x.mix,time:Math.min(2,Math.max(.04,60/bpm*x.beats)),feedback:x.feedback,tone:x.tone,ping_pong:x.pingPong?1:0})},
  room:{name:'Room',role:'bus',hue:'#8fd8c4',summary:'Reverb return bus',
   params:{level:p('Mix',0,1,.2,{unit:'%',scale:100}),decay:p('Decay',.2,12,1,{unit:'s',log:true}),predelay:p('Pre-delay',0,100,15,{unit:'ms'}),
    damping:p('Damping',1000,12000,7000,{unit:'Hz',log:true}),width:p('Width',0,1.5,1,{unit:'%',scale:100})},
   presets:{'Studio':{level:.18,decay:.6,predelay:8,damping:8500,width:.8},'Hall':{level:.32,decay:3,predelay:25,damping:6000,width:1.1},'Cathedral':{level:.44,decay:8,predelay:55,damping:4500,width:1.4}},
-  controls:x=>({level:x.level,decay:x.decay,predelay:x.predelay,damping:x.damping,width:x.width})},
+  glide:['decay','damping'],controls:x=>({level:x.level,decay:x.decay,predelay:x.predelay,damping:x.damping,width:x.width})},
 });
 export const EFFECT_TYPES=Object.freeze(Object.keys(BLOCK_TYPES).filter(t=>BLOCK_TYPES[t].role==='effect'));
 export const BUS_TYPES=Object.freeze(Object.keys(BLOCK_TYPES).filter(t=>BLOCK_TYPES[t].role==='bus'));
@@ -58,15 +58,47 @@ export function resolveParams(type,params={}){
 }
 
 const RAMP_SECONDS=.02,QUIET=1e-7,SLEEP_SECONDS=.5;
+// A type's `glide` controls set filter coefficients. Smoothed inside the DSP they made it
+// recompute those every sample (the room: 8 exp, 8 sqrt and a cos a sample, three quarters
+// of its cost), so the DSP takes them as they are and they glide here instead, a block at a
+// time, with the same 40 ms time constant.
+const GLIDE_SECONDS=.04;
+export class Glides{
+ constructor(type,rate,block){this.keys=BLOCK_TYPES[type]?.glide??[];this.rate=rate;this.block=block;this.pole=Math.exp(-block/(rate*GLIDE_SECONDS));this.active=new Map();}
+ // The controls to set at once; glide controls that changed from `was` are held back to glide.
+ split(controls,was){
+  const now={};
+  for(const [k,v] of Object.entries(controls)){
+   if(!this.keys.includes(k)||was?.[k]===undefined)now[k]=v;
+   else if(v!==was[k]||this.active.has(k))this.active.set(k,{value:this.active.get(k)?.value??was[k],target:v});
+  }
+  return now;
+ }
+ clear(){this.active.clear();}
+ // One block's step of every glide, set on the node.
+ advance(node,n){
+  if(!this.active.size)return;
+  const pole=n===this.block?this.pole:Math.exp(-n/(this.rate*GLIDE_SECONDS)),set={};
+  for(const [k,g] of this.active){
+   g.value=g.target+(g.value-g.target)*pole;
+   if(Math.abs(g.value-g.target)<=1e-4*Math.abs(g.target)){g.value=g.target;this.active.delete(k);}
+   set[k]=g.value;
+  }
+  node.set(set);
+ }
+}
 export class BlockNode{
  constructor(asset,type,rate,block){
   this.type=type;this.rate=rate;this.block=block;this.node=new FaustNode(asset.module,asset.meta,rate,block);
   this.out=[new Float32Array(block),new Float32Array(block)];this.zero=[new Float32Array(block),new Float32Array(block)];this.x=[new Float32Array(block),new Float32Array(block)];
   this.step=1/(rate*RAMP_SECONDS);this.g=0;this.w=0;this.gTarget=0;this.wTarget=0;this.asleep=true;this.quiet=0;this.state='off';this.controls={};
+  this.glides=new Glides(type,rate,block);
  }
  // fade: false sets the state immediately (a block present from the first render).
  configure(state,controls,{fade=true}={}){
-  this.controls=controls;this.node.set(controls);
+  const was=this.controls;this.controls=controls;
+  if(this.asleep||!fade){this.node.set(controls);this.glides.clear();}
+  else this.node.set(this.glides.split(controls,was));
   if(state!==this.state){
    this.state=state;
    // 'removed' (internal): a block leaving the chain fades its contribution out.
@@ -75,7 +107,7 @@ export class BlockNode{
    if(state==='on'&&this.asleep)this.wake();
   }
  }
- wake(){this.node.reset(this.controls);this.asleep=false;this.quiet=0;}
+ wake(){this.node.reset(this.controls);this.glides.clear();this.asleep=false;this.quiet=0;}
  get settled(){return this.g===this.gTarget&&this.w===this.wTarget;}
  // → output channels (the input arrays themselves when the block is asleep).
  render(input,n){
@@ -88,6 +120,7 @@ export class BlockNode{
    x=this.x;let g=this.g;
    for(let i=0;i<n;i++){g=g<this.gTarget?Math.min(this.gTarget,g+step):Math.max(this.gTarget,g-step);x[0][i]=g*L[i];x[1][i]=g*R[i];}
   }
+  this.glides.advance(this.node,n);
   const [yL,yR]=this.node.render(x,n);
   if(this.settled&&this.g===1&&this.w===1){oL.set(yL.subarray(0,n));oR.set(yR.subarray(0,n));this.quiet=0;return this.out;}
   let g=this.g,w=this.w,peak=0;
