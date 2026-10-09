@@ -1,11 +1,10 @@
-// The plucked instrument: the Engine2 guitar (live thwack engine) driven by
+// The plucked instrument: the Engine2 guitar (stage 7, the attack soak) driven by
 // contract notes. Designs are schema-3 register curves resolved onto a layout;
 // unused DSP slots are parked. Plans are recompiled from the whole note set on
 // every change and only events at or after the engine position are handed over,
 // which is what makes batched and all-at-once schedules render identically.
 import {CAPABILITIES,diagnostic} from '../../contract/index.js';
 import {GuitarEngine} from '../../audio/engine.js';
-import {LiveThwackEngine} from '../../audio/live-thwack.js';
 import {baseControls} from '../../model/presets.js';
 import {STRING_V2} from '../../model/instrument-v2.js';
 import {LEGACY_NOTE_POLICY} from '../../model/note-ownership.js';
@@ -13,6 +12,7 @@ import {migrateDesign,resolveDesign} from './plucked-design.js';
 import {planPlucked,gestureEntries} from './plucked-plan.js';
 import {layoutCompensationDb,loudnessCurve} from './plucked-loudness.js';
 import {forgetLeading} from './forget.js';
+import {bodyTrim} from './plucked-body.js';
 
 const seedOf=id=>{let h=2166136261;for(const c of id)h=Math.imul(h^c.charCodeAt(0),16777619)>>>0;return h||1;};
 export class Plucked{
@@ -22,7 +22,7 @@ export class Plucked{
  constructor({part,rate,block,assets,emit=()=>{}}){
   if(!assets?.guitar)throw Error('Plucked instrument needs the Engine2 guitar asset');
   this.rate=rate;this.block=block;this.emit=emit;this.assets=assets;
-  const {module,meta}=assets.guitar;this.engine=new (meta.liveThwack?LiveThwackEngine:GuitarEngine)(module,meta,rate,block);
+  const {module,meta}=assets.guitar;this.engine=new GuitarEngine(module,meta,rate,block);
   this.entries=new Map();this.started=false;this.reported=new Set();this.out=null;this.stringEnergy=new Float64Array(6);
   this.configure(part);
  }
@@ -37,12 +37,14 @@ export class Plucked{
   const design=this.design(part),resolved=resolveDesign(design,part.instrument.layout??design.defaultLayout),p=resolved.preset;
   const params=baseControls(p);delete params.coupling;
   for(let i=0;i<6;i++){params[`s${i}-sustain`]=0;for(const [k,d] of Object.entries(STRING_V2))params[`s${i}-${d.dsp}`]=p.instrument.strings[i][k];}
-  this.resolved=resolved;this.params=params;this.thwack=p.instrument.excitation.thwack;this.seed=part.seed??seedOf(part.id);
+  // The thwack body's per-design calibration (plucked-body.js).
+  params.thwack_body_trim=bodyTrim(p,resolved.slots,this.rate);
+  this.resolved=resolved;this.params=params;this.seed=part.seed??seedOf(part.id);
   // The design's level, the layout's loudness compensation, then the design's Level trim.
   const layout=part.instrument.layout??design.defaultLayout,trim=Number.isFinite(design.trimDb)?Math.min(24,Math.max(-24,design.trimDb)):0;
   this.compensationDb=layoutCompensationDb(loudnessCurve(this.assets.loudness,design),layout);
   this.outputGain=10**((p.recording.levelDb+this.compensationDb+trim)/20);
-  if(this.started){this.engine.update(params,undefined,.04);this.engine.setThwack?.(this.thwack);this.replan();}
+  if(this.started){this.engine.update(params,undefined,.04);this.replan();}
   else this.replan();
  }
  apply({notes=[],removed=[]}){
@@ -61,7 +63,7 @@ export class Plucked{
   for(const d of diagnostics){const key=`${d.code}:${d.noteId}`;if(!this.reported.has(key)){this.reported.add(key);this.emit('diagnostic',d);}}
   // Before the first block the engine loads exactly as processor.js loads a packet.
   // Excitation off until each string's first pluck (the planner gates it per pluck).
-  if(!this.started){this.engine.reset({...this.params,...Object.fromEntries([0,1,2,3,4,5].map(s=>[`s${s}-excite`,0]))},events,this.seed,LEGACY_NOTE_POLICY);this.engine.setThwack?.(this.thwack);}
+  if(!this.started){this.engine.reset({...this.params,...Object.fromEntries([0,1,2,3,4,5].map(s=>[`s${s}-excite`,0]))},events,this.seed,LEGACY_NOTE_POLICY);}
   else this.engine.update({},events);
  }
  // The first rendered host frame: the engine counts in host frames from there.

@@ -227,9 +227,9 @@ diagnosed: an instrument either uses it or ignores it.
   rounding for all 338.6 M (source rate, target rate, frame) pairs over 10 minutes
   (44.1/48/96 kHz).
 - **Commit horizon (D15).** An instrument's output at time *t* may depend on notes up to
-  `horizonSeconds` after *t*. Plucked's is 0.1 s: live thwack sizes each transient's fade
-  from the next pluck on the same string (`THWACK_SETTLING`), and ownership cuts trajectories
-  at the next onset. Every `schedule()` batch therefore carries `through`: "complete up to
+  `horizonSeconds` after *t*. Plucked's is 0.1 s: ownership cuts a note's trajectories at the
+  next onset on its string. (The 0.1 s was sized for engine generation 3's thwack, which
+  faded each transient by the next pluck; generation 4's attack soak needs no lookahead.) Every `schedule()` batch therefore carries `through`: "complete up to
   this time".
   - **Offline:** renders only up to `through − horizon`. That makes all-at-once, lookahead
     batches and cancel/seek render identically **by construction**.
@@ -377,13 +377,13 @@ keep them for labels.
 | D6 | Room | Shared room bus (rack 3.0.0); rig split into part rig + session. The room's dry duck `(1 − 0.35·mix)` stays on the **master sum**, as today. | Keeps single-part bit identity. Note: with several parts every dry signal is ducked by the room mix, whatever its send; revisit after the campaign. |
 | D7 | String count | Parked strings: `free_ringing 0`, `sustain 0`, never triggered. That gives bridge weight 0 (no loading, no sympathy). CPU unchanged. Weights stay √(1/6) and are not renormalised, so a 4-string layout has less total bridge loading. | Mechanism confirmed in `instrument-bridge.dsp` |
 | D8 | Kit vocabulary | `kick`, `snare`, `side-stick`, `tom-high`, `tom-mid`, `tom-low`, `hihat-closed`, `hihat-open`, `hihat-pedal`, `crash`, `ride`. A `pieceFromGm(n)` helper maps GM numbers 35–59; unmapped → silent + `unknown-piece`. Choke group `hihat`: closed/pedal cut open. | Adds `side-stick` and the GM helper (mnx resolves kit sounds to MIDI numbers) |
-| D9 | Basic quality bar | Correct behaviour, bounded levels, cost ≤ 25% of one plucked part; `basic: true` in capabilities and UI | — |
+| D9 | Basic quality bar | Correct behaviour, bounded levels, cost ≤ ⅓ of one plucked part (D13); `basic: true` in capabilities and UI | — |
 | D10 | Player layer | Today's `perform()` stays an optional per-part humaniser for standalone use and data generation, bypassed for score playback. It emits ordinary notes with `vibrato` + `nuance`, so its output is itself a valid event log. Guitar-only fields (strum spread) apply only to `plucked`. | Output defined as contract data |
 | D11 | Unknown techniques | Lowered if known, otherwise ignored + `unknown-technique`; never throw. The same applies to controls and pieces. | — |
 | D12 | `classic.html` / Engine1 | Retired after Phase 6 (lead, 7 Oct 2026); Engine1 sounds still convert explicitly | Revised |
-| D13 | Performance budget | Native ≥ 10× end-to-end (stretch 20×); browser offline ≥ 5× per workload; multi-part session ≥ 5× (stretch 10×); live tracked, not gating; keys/kit ≤ 25% of one plucked part. Minimums over repeated trials. | Reading confirmed by the lead |
+| D13 | Performance budget | Native ≥ 10× end-to-end (stretch 20×); browser offline ≥ 5× per workload; multi-part session ≥ 5× (stretch 10×); live tracked, not gating; keys/kit ≤ ⅓ of one plucked part (25% until engine generation 4 made a plucked part 35% cheaper; raised by the lead, 9 Oct 2026). Minimums over repeated trials. | Reading confirmed by the lead |
 | D14 | Native renderer | Guitar-only; parity checks unchanged | — |
-| D15 | Commit horizon | **New.** Instruments declare `horizonSeconds` (plucked 0.1 s); batches carry `through`; offline renders lag by the horizon; live late notes play with `late-note`; mnx lookahead ≥ 0.25 s at integration. | Needed for batching invariance; live thwack depends on the next pluck |
+| D15 | Commit horizon | **New.** Instruments declare `horizonSeconds` (plucked 0.1 s); batches carry `through`; offline renders lag by the horizon; live late notes play with `late-note`; mnx lookahead ≥ 0.25 s at integration. | Needed for batching invariance; ownership depends on the next onset |
 | D16 | Performer nuance | **New.** Optional `note.nuance` (intonation cents, attack bend cents, excitation deltas): never diagnosed, never lowered, ignored by kinds that cannot use it. | Golden equivalence needs it: today's take carries per-note intonation, attack bend and position deltas |
 | D17 | Synth packaging | **New (lead, 7 Oct 2026).** Separate repository and deployable configuration app plus a versioned headless library; mnx-lab consumes the library and never edits instruments or rigs. Rig 2.0.0 JSON is the hand-over format. | Replaces "move into `mnx-lab/synth`" |
 | D18 | Pedalboard studio | **New (lead, 7 Oct 2026).** Replaced by the synth app rather than extended | — |

@@ -23,7 +23,7 @@ const note=(id,at,duration,pitch,extra={})=>({id,part:'gtr',at,duration,velocity
 test('design schema 3: factory designs are register curves on the standard anchors and resolve exactly at them',()=>{
  for(const p of factory){
   const d=migrateDesign(deepFreeze(structuredClone(p)));
-  assert.equal(d.schemaVersion,DESIGN_SCHEMA);assert.deepEqual(d.instrument.strings.register,[40,45,50,55,59,64]);assert.deepEqual(d.engine,{id:'guitar-lab',generation:3});
+  assert.equal(d.schemaVersion,DESIGN_SCHEMA);assert.deepEqual(d.instrument.strings.register,[40,45,50,55,59,64]);assert.deepEqual(d.engine,{id:'guitar-lab',generation:4});
   const slots=resolveDesign(d,STANDARD_GUITAR).preset.instrument.strings;
   assert.deepEqual(slots.map(s=>s.decayScale),d.instrument.strings.decayScale,p.id);assert.deepEqual(slots.map(s=>s.tuningCents),d.instrument.strings.detuneCents,p.id);
   assert.deepEqual(resolveDesign(d).preset,resolveDesign(d,STANDARD_GUITAR).preset,p.id+' default layout');
@@ -58,7 +58,27 @@ test('designs saved by 0.2.0 development builds are brought to the engine genera
  }
 });
 
-// The planner must reproduce the pre-host automation() law event for event.
+// Generation 3 played a thwack strength through shadow engines; generation 4's attack soak
+// replaced it. A design that used the thwack gets the factory soak (and the factory glide if it
+// had none); one that did not gets no soak; its own values are otherwise kept.
+test('generation 3 designs are brought to the attack soak',()=>{
+ const generation3=(thwack,tension)=>{const d=structuredClone(factory[0]);d.engine.generation=3;d.instrument.excitation.thwack=thwack;
+  for(const k of ['thwack_soak','thwack_time','thwack_body','thwack_treble'])delete d.instrument.parameters[k];
+  d.instrument.setup={...d.instrument.setup,...tension};d.instrument.parameters.decay=7.25;return d;};
+ const used=migrateDesign(generation3(.2,{tensionCents:0,tensionSeconds:.045}));
+ assert.deepEqual(used.engine,{id:'guitar-lab',generation:4});assert.equal('thwack' in used.instrument.excitation,false);
+ assert.deepEqual(['thwack_soak','thwack_time','thwack_body','thwack_treble'].map(k=>used.instrument.parameters[k]),[6,.12,.5,2]);
+ assert.deepEqual([used.instrument.setup.tensionCents,used.instrument.setup.tensionSeconds],[12,.12],'the factory glide, where it had none');
+ assert.equal(used.instrument.parameters.decay,7.25,'its own values are kept');
+ const ownGlide=migrateDesign(generation3(.2,{tensionCents:4,tensionSeconds:.2}));
+ assert.deepEqual([ownGlide.instrument.setup.tensionCents,ownGlide.instrument.setup.tensionSeconds],[4,.2],'its own glide is kept');
+ const unused=migrateDesign(generation3(0,{tensionCents:0,tensionSeconds:.045}));
+ assert.deepEqual([unused.instrument.parameters.thwack_soak,unused.instrument.parameters.thwack_body],[0,0]);
+ assert.equal(unused.instrument.setup.tensionCents,0,'no glide added');
+});
+
+// The planner must reproduce the pre-host automation() law event for event, except that
+// pitch events after an onset fall on the render quantum grid (planPlucked).
 test('planPlucked reproduces automation() + setup law + ownership for plain and humanised takes',()=>{
  const takes=['full','strum','fingerpick','accents'].map(k=>selectPassage(reference,k));
  for(const d of factory)for(const take of takes)for(const rate of [44100,96000]){const p=resolveDesign(d,STANDARD_GUITAR).preset;
@@ -66,7 +86,12 @@ test('planPlucked reproduces automation() + setup law + ownership for plain and 
   const expected=latestPluckEvents(withInstrumentSetup({events:legacy.events.filter(e=>e.noteStart!==undefined||e.frame!==final)},{preset:p,performance:take,rate,setup:p.instrument.setup}).events).map(({frame,key,value})=>({frame,key,value}));
   const entries=performanceToNotes(take,{part:'gtr'}).map(n=>{const frame=frameAt(n.at,rate),endFrame=frameAt(n.at+n.duration,rate);return {id:n.id,note:n,lowered:n,primitives:{},frame,endFrame,lengthFrames:endFrame-frame};});
   const {events:all,diagnostics}=planPlucked(entries,resolveDesign(d,STANDARD_GUITAR),rate),events=all.filter(e=>!e.key.endsWith('-excite'));
-  assert.deepEqual(diagnostics,[]);assert.deepEqual(events,expected,`${p.id} ${rate}`);
+  const pitch=e=>e.key.endsWith('-frequency'),onsets=new Set(expected.filter(e=>e.key.endsWith('-trigger')&&e.value===1).map(e=>`${e.key[1]}:${e.frame}`));
+  const quantum=Math.max(128,Math.round(rate/200/128)*128);
+  assert.deepEqual(diagnostics,[]);assert.deepEqual(events.filter(e=>!pitch(e)),expected.filter(e=>!pitch(e)),`${p.id} ${rate}`);
+  // Pitch at every onset as before; after it, only on the grid.
+  const at=new Map(expected.filter(pitch).map(e=>[`${e.key[1]}:${e.frame}`,e.value]));
+  for(const e of events.filter(pitch)){const k=`${e.key[1]}:${e.frame}`;if(onsets.has(k))assert.equal(e.value,at.get(k),`${p.id} onset pitch ${k}`);else assert.equal(e.frame%quantum,0,`${p.id} ${rate} pitch event off the grid at ${e.frame}`);}
   // The excitation is on from every pluck until its attack window ends or the string is plucked again.
   const excite=all.filter(e=>e.key.endsWith('-excite')),plucks=all.filter(e=>e.key.endsWith('-trigger')&&e.value===1);
   for(const t of plucks){const s=t.key.slice(0,2),on=excite.find(e=>e.key===`${s}-excite`&&e.frame===t.frame&&e.value===1);assert.ok(on,`${p.id} excite at ${t.frame}`);

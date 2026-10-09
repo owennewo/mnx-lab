@@ -6,7 +6,7 @@
 // setup, and the Inspect panel shows diagnostics, note labels and checks. Rigs (3.0.0)
 // carry no music.
 import {h,knob,ControlContext} from './controls.js';
-import {PARAMS_V2,HARDNESS_V2,THWACK_V2,STRING_V2} from '../model/instrument-v2.js';
+import {PARAMS_V2,HARDNESS_V2,STRING_V2} from '../model/instrument-v2.js';
 import {validateFixture,validateEventLog,ContractError,BLOCK_TYPES,EFFECT_TYPES,MASTER_PARAMS} from '../host/index.js';
 import {STORE,LAYOUTS,KINDS,PART_CHOICES,factoryDesigns,newPart,partIds,defaultSession,loadSession,exportRig,importRig,partRig,ROOM_BUS,exampleSession,hearingLog,
  addBlock,duplicateBlock,removeBlock,moveBlock,applyPreset,resetBlock,resetStrip,History,Store,storedCollection,saveOwnDesign,copy} from './state.js';
@@ -60,11 +60,15 @@ const paramSpec=(p,k)=>{const s=PARAMS_V2[k];return spec(`${p.id}.d.${k}`,s.name
  get:()=>p.instrument.design.instrument.parameters[k],set:v=>{design(p).instrument.parameters[k]=v;}});};
 const excitationSpecs=p=>[
  spec(`${p.id}.x.position`,'Pluck point',{min:.01,max:.49,normal:[.04,.46],help:'Distance from the bridge, as a fraction of the string',color:HUES.plucked,get:()=>p.instrument.design.instrument.excitation.position,set:v=>{design(p).instrument.excitation.position=v;}}),
- spec(`${p.id}.x.hardness`,'Hardness',{...HARDNESS_V2,help:'Pick or finger hardness',color:HUES.plucked,get:()=>p.instrument.design.instrument.excitation.hardness,set:v=>{design(p).instrument.excitation.hardness=v;}}),
- spec(`${p.id}.x.thwack`,THWACK_V2.name,{min:THWACK_V2.min,max:THWACK_V2.max,mapping:THWACK_V2.mapping,unit:'%',scale:100,help:'Weight of the attack transient',color:HUES.plucked,get:()=>p.instrument.design.instrument.excitation.thwack,set:v=>{design(p).instrument.excitation.thwack=v;}})];
+ spec(`${p.id}.x.hardness`,'Hardness',{...HARDNESS_V2,help:'Pick or finger hardness',color:HUES.plucked,get:()=>p.instrument.design.instrument.excitation.hardness,set:v=>{design(p).instrument.excitation.hardness=v;}})];
 const GUITAR_SECTIONS=[
  ['Tone & decay',p=>['decay','treble_decay','brightness','dispersion','release'].map(k=>paramSpec(p,k))],
  ['Strike & pickups',p=>[...['pluck_body','pick_texture','contact_width','pluck_release_time','texture_colour','velocity_tone'].map(k=>paramSpec(p,k)),...excitationSpecs(p),...['electric','pickup','pickup2','pickup_width','pickup_blend'].map(k=>paramSpec(p,k))]],
+ // Attack: the soak of a hard pluck's extra energy (core-synth-performance step 1) and the
+ // pitch glide of the stretched string (the setup's tension law).
+ ['Attack',p=>[...['thwack_soak','thwack_time','thwack_body','thwack_treble'].map(k=>paramSpec(p,k)),
+  spec(`${p.id}.s.tensionCents`,'Glide',{min:0,max:30,unit:'cents',help:'How sharp a full-strength pluck starts; it scales with strength squared and settles to pitch',color:HUES.plucked,get:()=>p.instrument.design.instrument.setup.tensionCents,set:v=>{design(p).instrument.setup.tensionCents=v;}}),
+  spec(`${p.id}.s.tensionSeconds`,'Glide time',{min:.005,max:.25,unit:'s',log:true,help:'How quickly the glide settles',color:HUES.plucked,get:()=>p.instrument.design.instrument.setup.tensionSeconds,set:v=>{design(p).instrument.setup.tensionSeconds=v;}})]],
  ['Motion & bridge',p=>['beating_cents','motion_exchange','motion_loss_ratio','initial_damping','initial_damping_time','bridge_transfer','bridge_rolloff','sympathetic_response'].map(k=>paramSpec(p,k))],
  ['Body & output',p=>['body_mix','body_size','body_low_weight','body_damping','body_breadth'].map(k=>paramSpec(p,k))],
  ['Strings & setup',null],['Layout',null]];
@@ -229,6 +233,14 @@ function trashZone(){
 }
 
 // --- Detail editors ---------------------------------------------------------------
+// Listening switch (core-synth-performance step 1): Off plays every guitar without the
+// attack soak, its body tone and the glide; the designs keep their values.
+const ATTACK_OFF={thwack_soak:0,thwack_body:0};
+player.prepare=s=>!app.thwackOff?s:{...s,parts:s.parts.map(p=>p.instrument.kind!=='plucked'||typeof p.instrument.design!=='object'?p
+ :{...p,instrument:{...p.instrument,design:{...p.instrument.design,instrument:{...p.instrument.design.instrument,
+   parameters:{...p.instrument.design.instrument.parameters,...ATTACK_OFF},setup:{...p.instrument.design.instrument.setup,tensionCents:0}}}}})};
+const attackSwitch=()=>h('button',{type:'button',class:'btn small','aria-pressed':String(!app.thwackOff),title:'Hear every guitar with or without the attack soak, its body tone and the glide; the designs keep their values',
+ onclick:()=>{app.thwackOff=!app.thwackOff;render();player.configure(setup()).catch(e=>toast(e.message,true));}},`Thwack: ${app.thwackOff?'Off':'On'}`);
 const knobs=specs=>h('div',{class:'knobs'},...specs.map(s=>knob(s,ctx,{size:72})));
 function detail(){
  const s=app.sel,body=s.kind==='block'?effectEditor(part(s.part),part(s.part).chain.find(b=>b.id===s.block)):s.kind==='instrument'?instrumentEditor(part(s.part))
@@ -282,7 +294,7 @@ function instrumentEditor(p){
  const level=spec(`${p.id}.trim`,'Level',{min:-24,max:24,unit:'dB',color:HUES.plucked,help:'Every design and layout plays at one loudness; Level trims this part around it',
   get:()=>p.instrument.design.trimDb??0,set:v=>{design(p).trimDb=Math.round(v*10)/10;}});
  const content=[h('div',{class:'design-level'},knob(level,ctx,{size:56}),h('p',{class:'hint'},'Designs and layouts are matched in loudness as heard (A-weighted), so you can compare them as they are. Level trims this one; the strip level and the master do the rest.')),
-  tabs,specs?knobs(specs(p)):GUITAR_SECTIONS[tab][0]==='Layout'?layoutEditor(p):registerTable(p)];
+  tabs,...(GUITAR_SECTIONS[tab][0]==='Attack'?[h('div',{class:'attack-switch',style:{padding:'16px 26px 0'}},attackSwitch())]:[]),specs?knobs(specs(p)):GUITAR_SECTIONS[tab][0]==='Layout'?layoutEditor(p):registerTable(p)];
  // Bound, not static: the first edit makes an editable copy mid-drag, without a redraw.
  const sourceOf=()=>{const x=p.instrument.design;return x.source&&(allDesigns().find(o=>o.id===x.source)??factory.find(o=>o.id===x.basis));};
  const edited=h('span',{class:'edited'},'● edited'),reset=h('button',{type:'button',class:'btn small',onclick:()=>{const src=sourceOf();if(!src)return;const layout=p.instrument.layout;p.instrument.design=copy(src);p.instrument.layout=layout;changed({structural:true});}},'Reset');

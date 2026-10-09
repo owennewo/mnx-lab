@@ -25,6 +25,10 @@ export const PROTOTYPE_CONTROLS={
  coupling:{label:'Legacy shared coupling',help:'The retained convex string mixer, not yet the planned bridge-loading model.'},
  bridge_transfer:{label:'Bridge energy transfer',help:'Passive shared termination: more transfer adds bridge loss and inter-string response, independently of radiation amount.'},
  bridge_rolloff:{label:'Bridge loading rolloff',unit:'Hz',log:true,help:'Lower values extend loading to lower frequencies. This reflectance belongs in feedback; it is not a microphone body resonance.'},
+ thwack_soak:{label:'Thwack',unit:'dB',help:'How much of a hard pluck\'s extra energy is soaked up after the attack, in dB at full strength. It scales with strength squared, so soft plucks are barely touched.'},
+ thwack_time:{label:'Thwack time',unit:'s',log:true,help:'How long the soak lasts.'},
+ thwack_body:{label:'Thwack body',help:'How loudly the soaked energy sounds through the body resonances, pitched with the note.'},
+ thwack_treble:{label:'Thwack treble',help:'How many times faster the treble soaks than the bass.'},
  sympathetic_response:{label:'Sympathetic participation',help:'Participation of freely ringing idle strings. Sounding notes always participate; disabling sympathy does not multiply their own loading.'},
 };
 export const PICKUP_CONTROLS={

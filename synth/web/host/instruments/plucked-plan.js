@@ -1,7 +1,7 @@
 // Contract notes → per-string DSP events for the plucked instrument. For a plain
-// plucked note this is the pre-host automation() law event for event (same
-// expressions, insertion order and stable sort), followed by the instrument-setup
-// pitch law and latest-pluck ownership, so the standard layout renders as before.
+// plucked note this is the pre-host automation() law (same expressions, insertion order
+// and stable sort), except that pitch events after the onset fall on the render quantum
+// grid; then the instrument-setup pitch law and latest-pluck ownership.
 // Native techniques add pitch curves, legato chains without re-plucks, finger
 // damping for mutes, and let-ring.
 import {clamp} from '../../model/presets.js';
@@ -11,6 +11,8 @@ import {vibratoCents,techniqueCents,diagnostic,frameAt,gestureGroups,pitchOrder,
 import {isNeutralSetup} from './plucked-design.js';
 
 const ATTACK_BEND_SECONDS=.045;
+// The host's render quantum (the AudioWorklet's), in frames.
+const QUANTUM=128;
 // The excitation is computed only from a pluck to the end of its attack window: 0.1 s
 // (past the DSP's 4096-sample contact delay) or 40 release time constants, after which
 // its filters hold less than −150 dB. The release constant is the DSP's own law.
@@ -105,7 +107,10 @@ export function planPlucked(entries,resolved,rate,state,from=-Infinity){
  const {assigned,diagnostics,lastPluck,busy}=assignStrings(entries,resolved,rate,state),{preset}=resolved,exc=preset.instrument.excitation;
  const events=[],law=[],fingerMuted=new Map(state?.fingerMuted);
  const put=(frame,key,value,noteStart,note)=>{const e={frame:Math.round(frame),key,value,noteStart};events.push(e);if(note)law.push([e,note]);};
- const step=Math.max(1,Math.round(rate/200));
+ // Plain and vibrato notes' pitch events fall on a grid of whole render quanta near 200 Hz
+ // (256 frames at 48 kHz), in host frames: an event inside a block splits the engine's DSP
+ // call there, and every call re-runs the DSP's per-call setup (~5 µs on a laptop).
+ const step=Math.max(QUANTUM,Math.round(rate/200/QUANTUM)*QUANTUM);
  for(const a of [...assigned.values()].sort((x,y)=>byOnset(x.entry,y.entry))){
   const e=a.entry,n=e.lowered,s=a.slot,start=e.frame,owner=a.root.frame,techniques=n.techniques??[];
   const mute=techniques.find(t=>t.type==='mute'),letRing=!e.cut&&techniques.some(t=>t.type==='letRing');
@@ -130,9 +135,10 @@ export function planPlucked(entries,resolved,rate,state,from=-Infinity){
   const vibrato=techniques.find(t=>t.type==='vibrato'),curves=techniques.filter(t=>t.type==='bend'||t.type==='slide'||(t.type==='legato'&&t.via==='slide'));
   const attack=a.previous?0:n.nuance?.attackBendCents??0,velocity=a.root.lowered.velocity,seconds=n.duration;
   const hammer=a.previous&&!curves.some(t=>t.type==='legato')?(a.previous.pitch-a.pitch)*100:0,glide=Math.round(LEGATO_GLIDE_SECONDS*rate);
-  // Plain and vibrato notes keep the pre-host 200 Hz grid; pitch curves use 1 kHz.
+  // After the onset, plain and vibrato notes take the quantum grid; pitch curves use 1 kHz.
   const grid=curves.length?Math.max(1,Math.round(rate/1000)):step,fine=1,key=`s${s}-frequency`,note={slot:s,fret:a.setupFret,velocity};
-  for(let frame=start;frame<stop;frame+=hammer&&frame-start<glide?fine:grid){
+  const next=frame=>hammer&&frame-start<glide?frame+fine:curves.length?frame+grid:(Math.floor(frame/grid)+1)*grid;
+  for(let frame=start;frame<stop;frame=next(frame)){
    if(frame<from)continue;
    const age=(frame-start)/rate,bend=attack*Math.exp(-age/ATTACK_BEND_SECONDS),vib=vibrato?vibratoCents(vibrato,age,seconds):0;
    let cents=bend+vib;

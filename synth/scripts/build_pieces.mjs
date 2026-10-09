@@ -143,8 +143,10 @@ function strumBar(w,t,bar,name,pattern,{open=GUITAR_OPEN,shapes=SHAPES,downSprea
  const t=clock([[0,60]]),g=writer('guitar'),ring=[{type:'letRing'}];
  g.fretted(GUITAR_OPEN,t(0,0),t(0,4)-t(0,0),.75,6,0,{techniques:ring});g.fretted(GUITAR_OPEN,t(1,0),t(1,4)-t(1,0),.75,1,12,{techniques:ring});
  const big=g.chord(GUITAR_OPEN,SHAPES,'G',t(2,0),t(2,1)-t(2,0),.8,down(.04),{extra:{techniques:ring}});
+ // Let ring holds the chord past its end: -48 dB a second later, where a cut note is far below
+ // -60 (the attack soak sets a hard pluck's tail some 4 dB further under its attack).
  piece('guitar-sustain','Guitar','Guitar – sustain & let ring','A low open string and a high 12th-fret note left to ring, then a chord struck once and let ring through two bars: decay and the bridge’s sympathetic response.',
-  session([guitar('wide-ringing',{levelDb:-2})]),g.notes,[tempo(0,60)],[...baseChecks(['guitar']),{kind:'sustainedPast',note:big.find(n=>n.fingering.string===1).id,seconds:1,aboveDb:-40}],6);
+  session([guitar('wide-ringing',{levelDb:-2})]),g.notes,[tempo(0,60)],[...baseChecks(['guitar']),{kind:'sustainedPast',note:big.find(n=>n.fingering.string===1).id,seconds:1,aboveDb:-48}],6);
 }
 // 8. Guitar – soft to hard
 {

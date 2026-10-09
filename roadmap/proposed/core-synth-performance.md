@@ -312,3 +312,23 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
     at 44.1 and 48 kHz; the engine is republished with that one change.
   - **Not done:** compensating the interpolation's extra treble loss at 32 kHz in the
     loss filter.
+- **9 Oct 2026: step 1 adopted.** The attack soak (stage 7) is the published guitar engine,
+  generation 4.
+  - **Removed:** the live thwack engine (a shadow engine per pluck, 643 KB of state copied
+    each time), its knock guard, and stages 5 and 6.
+  - **Cost:** a guitar part on the reference take costs 24 ms per audio second, down from
+    37 (−35%), with no per-pluck spikes.
+  - **Generation 3 designs migrate:** one that used the thwack gets the factory soak (and the
+    factory glide if it had none); one that did not gets no soak.
+  - **Damped strings send nothing to the body:** a dead or palm-muted note, or a note-off,
+    no longer feeds the thwack body. Dead notes were −34 dB at 80 ms, where the technique
+    fixture wants −40.
+  - **Checks moved:** the guitar-sustain let-ring check is −48 dB (the soak puts a hard
+    pluck's tail ~4 dB further under its attack), and budget D13 is ⅓ (the lead raised it:
+    the keys did not change, the guitar got cheaper).
+  - **Listening:** the lead A/B'd six pieces against the old engine. They are equal except
+    that soft nylon's high notes lose a "chime": the old knock's fixed 980/2450 Hz ping,
+    which lifted 1–2 kHz by ~7 dB even at thwack 0.05. Accepted as the honest sound; bringing
+    back a cheap knock control was offered and declined.
+  - **Learning:** the laptop's default player drops chunks of audio at random. Listening
+    files are checked with `pw-play`.

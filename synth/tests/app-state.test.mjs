@@ -18,9 +18,9 @@ test('a new session is a valid mnx-sound/2 setup with a guitar, a Room bus and a
 test('named save persists the actual edited design and reload preserves every value',()=>{
  const s=storage(),store=new Store(s),session=defaultSession(factory),p=guitar(session),original=structuredClone(p.instrument.design);
  p.instrument.design={...structuredClone(original),factory:false,name:'Rounded steel · edited'};
- p.instrument.design.instrument.parameters.decay=7.25;p.instrument.design.instrument.excitation.thwack=.225;
+ p.instrument.design.instrument.parameters.decay=7.25;p.instrument.design.instrument.parameters.thwack_soak=11.5;
  const expected=structuredClone(p.instrument.design),designs=saveOwnDesign(store,[],p,'My actual edits','saved-test');
- assert.equal(designs[0].instrument.parameters.decay,7.25);assert.equal(designs[0].instrument.excitation.thwack,.225);
+ assert.equal(designs[0].instrument.parameters.decay,7.25);assert.equal(designs[0].instrument.parameters.thwack_soak,11.5);
  assert.deepEqual(store.get(STORE.designs,[]),designs);assert.deepEqual(designs[0].instrument,expected.instrument);assert.deepEqual(factory[0],original);
  store.set(STORE.session,session);assert.deepEqual(loadSession(store.get(STORE.session)),session);
  const rig=exportRig(session);assert.equal(rig.rig,'3.0.0');assert.deepEqual(importRig(JSON.parse(JSON.stringify(rig))).setup,session.setup);

@@ -15,13 +15,15 @@ export class Player extends EventTarget{
   })().catch(e=>{this.ready=null;throw e;});
   return this.ready;
  }
- async configure(setup){this.setup=setup;if(this.host)await this.host.configure(setup);}
+ // What the host is sent; the app can adjust it for listening (the Thwack switch).
+ prepare=setup=>setup;
+ async configure(setup){this.setup=setup;if(this.host)await this.host.configure(this.prepare(setup));}
  async play(setup,material,{loop=true}={}){
   const command=++this.command;
   await this.ensure();if(command!==this.command)return;
   await this.context.resume();if(command!==this.command)return;
   await this.silence(false);if(command!==this.command)return;
-  await this.host.configure(setup);if(command!==this.command)return;this.setup=setup;
+  await this.host.configure(this.prepare(setup));if(command!==this.command)return;this.setup=setup;
   // Each run gets its own ids: notes of a stopped run that already sounded stay in the host.
   Object.assign(this,{material,loop,start:this.context.currentTime+LEAD,iteration:0,playing:true,run:++this.runs});
   await this.schedule(0);
@@ -54,7 +56,7 @@ export class Player extends EventTarget{
   const command=this.command;
   await this.ensure();if(command!==this.command)return;
   await this.context.resume();if(command!==this.command)return;
-  if(setup)await this.host.configure(setup);if(command!==this.command)return;this.setup=setup;
+  if(setup)await this.host.configure(this.prepare(setup));if(command!==this.command)return;this.setup=setup;
   const at=this.context.currentTime+.15;
   await this.host.schedule({notes:[{...note,id:`preview-${++this.previews}`,at}],controls:[]});
  }

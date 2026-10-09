@@ -28,14 +28,30 @@ export function curveAt(register,values,pitch,stepped=false){
  return values[j]+(values[j+1]-values[j])*((pitch-a)/(b-a));
 }
 
-// Checks a design and returns it. Designs saved by 0.2.0 development builds named the
-// engine by its source hash and carried the guitar's own drive, tone and room (now
-// chain blocks, and zero in every factory design); they are brought to this form.
+// Checks a design and returns it, bringing older ones to this engine generation:
+// - designs saved by 0.2.0 development builds named the engine by its source hash and
+//   carried the guitar's own drive, tone and room (now chain blocks, and zero in every
+//   factory design): they become generation 3;
+// - generation 3 had a thwack strength (excitation.thwack) played by shadow engines.
+//   Generation 4's attack soak replaced it (core-synth-performance step 1): a design that
+//   used the thwack gets the factory soak, and the factory glide if it had none; one that
+//   did not gets no soak.
+const FACTORY_SOAK=Object.freeze({thwack_soak:6,thwack_time:.12,thwack_body:.5,thwack_treble:2});
+const NO_SOAK=Object.freeze({...FACTORY_SOAK,thwack_soak:0,thwack_body:0});
+const FACTORY_GLIDE=Object.freeze({tensionCents:12,tensionSeconds:.12});
+function fromGeneration3(d){
+ const {thwack=0,...excitation}=d.instrument.excitation,used=thwack>0,setup=d.instrument.setup;
+ return {...d,engine:{id:GUITAR_ENGINE.id,generation:4},instrument:{...d.instrument,excitation,
+  parameters:{...(used?FACTORY_SOAK:NO_SOAK),...d.instrument.parameters},
+  setup:used&&!(setup?.tensionCents>0)?{...setup,...FACTORY_GLIDE}:setup}};
+}
 export function migrateDesign(source){
- if(isObject(source)&&source.schemaVersion===DESIGN_SCHEMA&&source.engine?.id===GUITAR_ENGINE.id&&source.engine.generation===undefined&&isObject(source.recording)){
-  const d=copy(source);d.engine={id:GUITAR_ENGINE.id,generation:GUITAR_ENGINE.generation};d.recording={levelDb:source.recording.levelDb};return validateDesign(d);
+ let d=source;
+ if(isObject(d)&&d.schemaVersion===DESIGN_SCHEMA&&d.engine?.id===GUITAR_ENGINE.id&&d.engine.generation===undefined&&isObject(d.recording)){
+  d=copy(d);d.engine={id:GUITAR_ENGINE.id,generation:3};d.recording={levelDb:source.recording.levelDb};
  }
- return validateDesign(source);
+ if(isObject(d)&&d.schemaVersion===DESIGN_SCHEMA&&d.engine?.id===GUITAR_ENGINE.id&&d.engine.generation===3&&isObject(d.instrument?.excitation))d=fromGeneration3(copy(d));
+ return validateDesign(d);
 }
 export function validateDesign(d){
  if(!isObject(d)||d.schemaVersion!==DESIGN_SCHEMA)throw Error('Plucked designs need schema 3');

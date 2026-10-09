@@ -1,4 +1,5 @@
-// Budget (D13 / plan table): a basic part costs at most a quarter of a plucked part. The
+// Budget (D13 / plan table): a basic part costs at most a third of a plucked part (a quarter
+// until the attack soak made a plucked part 35% cheaper on 9 Oct 2026; the lead raised it). The
 // plucked part plays the performed reference take (chain campaign Phase 5: after the
 // excitation gating, sparse single notes no longer represent a plucked part's cost).
 // Timing-based, so npm test runs this file on its own after the parallel suites.
@@ -12,7 +13,7 @@ import {referenceSession} from '../web/host/workloads.js';
 const fixture=name=>JSON.parse(fs.readFileSync(`web/contract/fixtures/${name}.json`));
 
 // Ratios of the minimum over repeated trials are robust to a uniformly loaded machine.
-test('per-part cost: keys and kit ≤ 25 % of one plucked part',()=>{
+test('per-part cost: keys and kit ≤ ⅓ of one plucked part',()=>{
  const cost=(name,part)=>{const f=typeof name==='string'?fixture(name):name,seconds=f.render.seconds;let best=Infinity;
   for(let trial=0;trial<5;trial++){
    const host=new HostCore({rate:48000,block:128,instruments:INSTRUMENTS,assets:hostAssets()});host.configure(f.setup);host.schedule({notes:f.notes,controls:f.controls??[]});
@@ -22,5 +23,5 @@ test('per-part cost: keys and kit ≤ 25 % of one plucked part',()=>{
  const r=referenceSession(JSON.parse(fs.readFileSync('web/data/material/guitar-takes.json')),{guitarDesign:'rounded-steel'}),guitar={...r.setup,parts:r.setup.parts.filter(p=>p.id==='guitar').map(p=>({...p,chain:[]}))};
  const plucked=cost({setup:guitar,notes:r.notes.filter(n=>n.part==='guitar'),controls:[],render:{seconds:r.seconds}},'guitar'),k=cost('keys-pedal','keys'),d=cost('kit-chokes','drums');
  console.log(`# cost per audio second: plucked ${plucked.toFixed(1)} ms, keys ${k.toFixed(1)} ms (${(k/plucked).toFixed(3)}), kit ${d.toFixed(1)} ms (${(d/plucked).toFixed(3)})`);
- assert.ok(k/plucked<=.25,`keys ${k/plucked}`);assert.ok(d/plucked<=.25,`kit ${d/plucked}`);
+ assert.ok(k/plucked<=1/3,`keys ${k/plucked}`);assert.ok(d/plucked<=1/3,`kit ${d/plucked}`);
 });

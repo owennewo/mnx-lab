@@ -1,15 +1,15 @@
 // The guitar engine (dsp/engine2): its identity, parameter catalogue and the
 // validation of a resolved per-slot preset. Designs name the engine by id and
 // generation only, so a rebuilt or optimised DSP of the same generation keeps every
-// saved design; the source hash pins the build (scripts/build_engine2.mjs).
+// saved design; the source hash pins the build (scripts/build_engine2.mjs). Generation 4 is
+// the attack soak (stage 7), which replaced generation 3's thwack strength and its shadow
+// engines (plucked-design.js migrates generation 3 designs).
 import {clone,PARAMS as BASE_PARAMS} from './presets.js';
 import {NEUTRAL_SETUP,validateInstrumentSetup,withInstrumentSetup} from './instrument-setup.js';
 import {LATEST_NOTE_POLICY} from './note-ownership.js';
 import {PROTOTYPE_CONTROLS,PICKUP_CONTROLS,nextPluckControl} from './instrument-controls.js';
-import {THWACK_V2} from './thwack.js';
 
-export const GUITAR_ENGINE=Object.freeze({id:'guitar-lab',generation:3,sourceSha256:'be20116050559c4be0ac261f086451e12551b91c35a4434891eb27b7327049d1'});
-export {THWACK_V2};
+export const GUITAR_ENGINE=Object.freeze({id:'guitar-lab',generation:4,sourceSha256:'ab0b5e9d82b7b2e9bb94aaea5191410863354fb0c03b85f68b686eef8356c995'});
 export const HARDNESS_V2={min:.025,max:40,normal:[.1,1],step:.001,log:true};
 const spec=(key,min,max,value,step=.001)=>({name:(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key])?.label||key,min,max,default:value,step,
  policy:nextPluckControl(key)?'next pluck':'smooth',...(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key]),unit:(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key])?.unit||''});
@@ -21,6 +21,7 @@ for(const [key,min,max,value,step] of [
  ['body_size',.6,1.8,1],['body_low_weight',0,2,1],['body_damping',.25,4,1],['body_breadth',.5,3,1],
  ['bridge_transfer',0,.3,0,.0001],['bridge_rolloff',20,4000,250,.1],['sympathetic_response',0,1,0],
  ['pickup_width',0,.15,0,.0001],['pickup2',.04,.45,.32],['pickup_blend',0,1,0],
+ ['thwack_soak',0,24,0,.01],['thwack_time',.02,.5,.12],['thwack_body',0,4,0],['thwack_treble',1,4,2,.01],
 ])PARAMS_V2[key]=spec(key,min,max,value,step);
 PARAMS_V2.body_mix={...BASE_PARAMS.body_mix,default:0,name:'Body radiation · experimental',help:'Fixed 24-mode experimental radiation. Zero bypasses it. Not listening-accepted; disabled in every factory design.'};
 PARAMS_V2.decay={...BASE_PARAMS.decay,name:'Bass sustain',log:true,help:PROTOTYPE_CONTROLS.decay.help};
@@ -44,7 +45,7 @@ export function validatePresetV2(p){
  exact(p.instrument,['parameters','strings','excitation','modes','setup'],'instrument');exact(p.instrument.parameters,INSTRUMENT_KEYS_V2,'instrument parameters');
  exact(p.recording,['levelDb'],'recording');
  for(const [k,v] of Object.entries({...p.instrument.parameters,...p.recording}))number(v,PARAMS_V2[k].min,PARAMS_V2[k].max,k);
- exact(p.instrument.excitation,['position','hardness','thwack'],'excitation');number(p.instrument.excitation.position,.01,.49,'position');number(p.instrument.excitation.hardness,HARDNESS_V2.min,HARDNESS_V2.max,'hardness');number(p.instrument.excitation.thwack,THWACK_V2.min,THWACK_V2.max,'thwack');
+ exact(p.instrument.excitation,['position','hardness'],'excitation');number(p.instrument.excitation.position,.01,.49,'position');number(p.instrument.excitation.hardness,HARDNESS_V2.min,HARDNESS_V2.max,'hardness');
  if(!Array.isArray(p.instrument.strings)||p.instrument.strings.length!==6||!Array.isArray(p.instrument.modes)||p.instrument.modes.length!==12)throw Error('Expected six strings and twelve radiation seeds');
  for(const s of p.instrument.strings){
   exact(s,['openMidi','tuningCents','decayScale',...Object.keys(STRING_V2)],'string');
@@ -64,5 +65,5 @@ export function instrumentPlanV2(packet,{preset,rate}){
   params[`s${i}-sustain`]=0;
   for(const [k,d] of Object.entries(STRING_V2))params[`s${i}-${d.dsp}`]=preset.instrument.strings[i][k];
  }
- return {...withInstrumentSetup({...packet,params},{preset,performance:packet.performance,rate,setup:preset.instrument.setup}),eventPolicy:LATEST_NOTE_POLICY,thwack:{strength:preset.instrument.excitation.thwack}};
+ return {...withInstrumentSetup({...packet,params},{preset,performance:packet.performance,rate,setup:preset.instrument.setup}),eventPolicy:LATEST_NOTE_POLICY};
 }

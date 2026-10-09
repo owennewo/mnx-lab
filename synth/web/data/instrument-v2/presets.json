@@ -3,7 +3,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "rounded-steel",
   "name": "Rounded steel",
@@ -40,12 +40,15 @@
     "sympathetic_response": 0.3,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.23,
-    "hardness": 0.4,
-    "thwack": 0.05
+    "hardness": 0.4
    },
    "modes": [
     {
@@ -200,8 +203,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -235,7 +238,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "clear-steel",
   "name": "Clear steel",
@@ -272,12 +275,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.15,
-    "hardness": 0.85,
-    "thwack": 0.08
+    "hardness": 0.85
    },
    "modes": [
     {
@@ -432,8 +438,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -467,7 +473,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "dry-small",
   "name": "Dry small voice",
@@ -504,12 +510,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.27,
-    "hardness": 0.5,
-    "thwack": 0.05
+    "hardness": 0.5
    },
    "modes": [
     {
@@ -664,8 +673,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -699,7 +708,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "wide-ringing",
   "name": "Wide ringing steel",
@@ -736,12 +745,15 @@
     "sympathetic_response": 0.65,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.2,
-    "hardness": 0.55,
-    "thwack": 0.05
+    "hardness": 0.55
    },
    "modes": [
     {
@@ -931,7 +943,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "soft-nylon",
   "name": "Soft nylon design",
@@ -968,12 +980,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.3,
-    "hardness": 0.3,
-    "thwack": 0.05
+    "hardness": 0.3
    },
    "modes": [
     {
@@ -1128,8 +1143,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -1163,7 +1178,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "nail-nylon",
   "name": "Nail nylon design",
@@ -1200,12 +1215,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.18,
-    "hardness": 0.9,
-    "thwack": 0.15
+    "hardness": 0.9
    },
    "modes": [
     {
@@ -1360,8 +1378,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -1395,7 +1413,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "muted-jazz",
   "name": "Muted jazz design",
@@ -1432,12 +1450,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.33,
-    "hardness": 0.35,
-    "thwack": 0.05
+    "hardness": 0.35
    },
    "modes": [
     {
@@ -1592,8 +1613,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -1627,7 +1648,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "bright-metallic",
   "name": "Bright metallic design",
@@ -1664,12 +1685,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.11,
-    "hardness": 1.1,
-    "thwack": 0.5
+    "hardness": 1.1
    },
    "modes": [
     {
@@ -1824,8 +1848,8 @@
      4,
      6
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -1859,7 +1883,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "bridge-electric",
   "name": "Bridge electric",
@@ -1896,12 +1920,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0.012,
     "pickup2": 0.32,
-    "pickup_blend": 0
+    "pickup_blend": 0,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.17,
-    "hardness": 0.8,
-    "thwack": 0.5
+    "hardness": 0.8
    },
    "modes": [
     {
@@ -2056,8 +2083,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
@@ -2091,7 +2118,7 @@
   "schemaVersion": 3,
   "engine": {
    "id": "guitar-lab",
-   "generation": 3
+   "generation": 4
   },
   "id": "warm-dual-electric",
   "name": "Warm dual pickup",
@@ -2128,12 +2155,15 @@
     "sympathetic_response": 0,
     "pickup_width": 0.08,
     "pickup2": 0.35,
-    "pickup_blend": 0.5
+    "pickup_blend": 0.5,
+    "thwack_soak": 6,
+    "thwack_time": 0.12,
+    "thwack_body": 0.5,
+    "thwack_treble": 2
    },
    "excitation": {
     "position": 0.26,
-    "hardness": 0.45,
-    "thwack": 0.08
+    "hardness": 0.45
    },
    "modes": [
     {
@@ -2288,8 +2318,8 @@
      0,
      0
     ],
-    "tensionCents": 0,
-    "tensionSeconds": 0.045
+    "tensionCents": 12,
+    "tensionSeconds": 0.12
    }
   },
   "defaultLayout": {
