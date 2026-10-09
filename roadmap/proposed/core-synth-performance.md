@@ -332,3 +332,25 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
     back a cheap knock control was offered and declined.
   - **Learning:** the laptop's default player drops chunks of audio at random. Listening
     files are checked with `pw-play`.
+- **9 Oct 2026: the Android round, build 07cd1fc7.** All steps were together on the lead's
+  phone and tablet, with Anji in the studio and a Balanced buffer:
+
+  | Device | Sound | Busy (mean) | Dropouts, first 10 s · after | Longest stall | Guitar · room, ms/s |
+  |---|---|---|---|---|---|
+  | Phone, before | Full | 25–30% | 2–5 · some | 10–38 ms | 155–173 · ~70 |
+  | Phone | Full | 21% | 1 · 0 | 12 ms | 147 · 33 |
+  | Phone (2nd play) | Light | 20% | 0 · 0 | 7 ms | 132 · 30 |
+  | Tablet, before | Full | 39% | 2 · 0 | 23 ms | 234 · 87 |
+  | Tablet | Full | 29% | 1 · 0 | 12 ms | 198 · 40 |
+  | Tablet | Light | 25% | 1 · 0 | 15 ms | 164 · 35 |
+
+  - **The lead heard it play well.** At most one dropout per play, about 0.7 s in, and none
+    after.
+  - **The room** costs half what it did on the tablet.
+  - **The guitar is 15% cheaper on Anji.** The new thwack saves little on fingerpicking (the
+    old one was cheap there too); its saving is on strums.
+  - **Light saves less than on the laptop:** 10–17% of the guitar's time, not a third. A
+    lighter load lets a phone's CPU clock down, so wall time falls less than the work does.
+    It still played the one fully clean run.
+  - **What remains:** the single dropout at the start of a play, and `configure` (60–150 ms)
+    before the first play of a page.
