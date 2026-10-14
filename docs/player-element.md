@@ -82,9 +82,12 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   convention, so it would have nothing to light: the layout puts an invisible pill on
   its centre band spanning the rest's duration, drawn hollow and dashed by the viewer's
   stylesheet only while the playhead is inside it. The pill carries `data-playback-id`
-  rather than `data-source-id` — it exists for the playhead alone, joins no selection
-  and answers no click — and is emitted under `durationSpans`, the flag the viewer
-  passes and the goldens never do, so the committed engraving is untouched.
+  rather than `data-source-id` — it exists for the playhead alone — and is emitted
+  under `durationSpans`, the flag the viewer passes and the goldens never do, so the
+  committed engraving is untouched. Selection and clicks use a second mark beside it:
+  an invisible target where the rest's digit would stand, carrying the rest's
+  `data-source-id` ([core-tab-rest-targets](../roadmap/complete/core-tab-rest-targets.md)).
+  Rests inside a tuplet are lit too, each under its own container-indexed key.
   Identical context updates
   are suppressed. `seek`, `onset` and `bar` are bubbling, composed events;
   onsets include the transport's scheduled audio time and written occurrence id.

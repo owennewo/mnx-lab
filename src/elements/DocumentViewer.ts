@@ -751,6 +751,12 @@ export class DocumentViewer extends LitElement {
          it reads as "the beat is here and nothing is fretted" rather than as
          a note. Dashed, because a rest is a silence and the sounding mark is
          a solid tinted pill — the shapes must not be confused at a glance. */
+      /* A rest's TARGET in the tab (core-tab-rest-targets): laid out, so it has a
+         box the cursor, a press and the selection's enclosure can measure, and
+         never painted — not selected, not under the playhead. The pill below is
+         what the playhead shows. */
+      :host #projection-container svg .tab-rest,
+      :host([selection-inactive]) #projection-container svg .tab-rest { fill: transparent !important; stroke: none !important; }
       :host #projection-container svg .tab-rest-pill { display: none; }
       :host #projection-container svg .tab-rest-pill.playback-ink,
       :host([selection-inactive]) #projection-container svg .tab-rest-pill.playback-ink {

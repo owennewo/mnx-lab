@@ -518,6 +518,12 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-tab-rest-targets.md](complete/core-tab-rest-targets.md)** — **complete 2026-10-14**:
+  a tab rest gets an invisible, selectable target where its digit would stand (viewer only,
+  no golden moved), so the cursor stands on it, a press finds it and the enclosure wraps it;
+  rests in tuplets are each their own; the inspector's `at` counts the tuplet ratio.
+  Overturns the 2026-09-20 "a tab rest answers no click" clause.
+
 - **[core-note-audition.md](complete/core-note-audition.md)** — **complete 2026-10-14**:
   a press, an arrow or an edit that lands the editor's cursor on a note (or changes how it
   sounds) sounds that note — just it, its whole tie, at the rate — stopped only; with a

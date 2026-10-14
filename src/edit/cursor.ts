@@ -1,6 +1,8 @@
 import { eventAtContainer } from '../model/noteWalk.ts';
 import { sameContainerIndex, syntheticEventKey } from '../model/noteKeys.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
+import { containerPath } from '../model/noteKeys.ts';
+import { containerContent } from '../model/noteWalk.ts';
 // The position cursor — roadmap/complete/core-editor-input-layer.md.
 //
 // The cursor is a RHYTHMIC POSITION plus a VERTICAL LINE, not a note id: an
@@ -269,6 +271,19 @@ function tupletScale(item: MnxSequenceItem): Onset | null {
   return reduce(outer.num * item.outer.multiple * inner.den, outer.den * inner.num * item.inner.multiple);
 }
 
+/** How long an event at `containerIndex` inside `item` lasts as played: its written
+ *  value scaled by every tuplet it sits in (a triplet eighth is a twelfth). */
+export function playedSpan(item: MnxSequenceItem, containerIndex?: ContainerIndex): Onset {
+  let scale: Onset = { num: 1, den: 1 }, current: MnxSequenceItem | undefined = item;
+  for (const index of containerPath(containerIndex)) {
+    const ratio = current ? tupletScale(current) : null;
+    if (ratio) scale = scaleOnset(scale, ratio);
+    current = containerContent(current)?.[index];
+  }
+  const event = current as { duration?: { base: string; dots?: number } } | undefined;
+  return scaleOnset(durationSpan(event?.duration), scale);
+}
+
 function scaleOnset(span: Onset, scale: Onset): Onset {
   return reduce(span.num * scale.num, span.den * scale.den);
 }
@@ -351,14 +366,16 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
             ...(containerIndex === undefined ? {} : { containerIndex }),
             ...(together ? { together: true as const } : {})
             ,
-            // The renderer's spelling, container index and all omitted — which
-            // is how notation spells a rest's `sourceId`, so the two meet.
+            // The renderer's spelling: a top-level rest as notation names it, a rest in a
+            // tuplet with its container index, as the tab names its target — every rest
+            // of one triplet answering to its own name.
             key: event.id ?? syntheticEventKey({
               partIndex,
               measureIndex,
               staffIndex: sequenceStaff,
               voiceIndex,
-              eventIndex
+              eventIndex,
+              ...(containerIndex === undefined ? {} : { containerIndex })
             })
           });
           (event.notes ?? []).forEach((note, noteIndex) => {

@@ -105,6 +105,8 @@ const MASK_END_CLEAR_SP = 1.0;
  *  the same air `render/playbackInk.ts` gives a stretched fret mask on its
  *  left, so the two marks begin at the same distance from their beat. */
 const REST_PILL_LEAD_SP = 0.4;
+/** The width of a rest's invisible target: a one-digit fret's mask, where its digit would stand. */
+const REST_TARGET_WIDTH_SP = 0.8;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
@@ -619,22 +621,41 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // while the playhead is inside it (`render/playbackInk.ts`).
       //
       // It is emitted under `durationSpans`, the flag the viewer passes and
-      // the goldens never do, so the committed engraving is untouched — and
-      // it carries `playbackId`, not `sourceId`, so it joins no selection
-      // and answers no click (see `primitives.ts`).
+      // the goldens never do, so the committed engraving is untouched. The
+      // pill carries `playbackId` only: it spans the whole rest, and a
+      // selection or a click wants the rest's ONSET.
+      //
+      // That is the second mark: an invisible target where the rest's digit
+      // would stand, carrying the rest's `sourceId` (core-tab-rest-targets).
+      // Without one the tab had nothing to name a rest by, so the cursor
+      // guessed its column from a fraction of the bar, a press on it found
+      // no column, and the selection had nothing to enclose — four fixes in
+      // core-rung-insert went round that gap before it was closed here.
       if (durationSpans) {
         // The key notation spells for the same rest (`layout/notation.ts`),
-        // so one playhead lookup lights both staves of the combined view.
+        // so one playhead lookup lights both staves of the combined view — and,
+        // in a tuplet, its container index, so each rest of a triplet is its own.
         const restKey = event.id ?? (synthesizeKeys
           ? syntheticEventKey({
               partIndex: args.keyPartIndex ?? 0,
               measureIndex,
               staffIndex: args.keyStaffIndex ?? 1,
               voiceIndex,
-              eventIndex
+              eventIndex,
+              ...(containerIndex === undefined ? {} : { containerIndex })
             })
           : undefined);
         if (restKey !== undefined) {
+          primitives.push({
+            kind: 'rect',
+            x: eventX - (REST_TARGET_WIDTH_SP / 2) * ink,
+            y: staffTop + TAB_STAFF_HEIGHT_SP / 2 - FRET_BG_HEIGHT_SP / 2,
+            w: REST_TARGET_WIDTH_SP,
+            h: FRET_BG_HEIGHT_SP,
+            fill: 'transparent',
+            className: 'rest tab-rest',
+            sourceId: restKey
+          });
           primitives.push({
             kind: 'rect',
             x: eventX - REST_PILL_LEAD_SP * ink,

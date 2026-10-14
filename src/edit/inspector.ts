@@ -11,7 +11,7 @@ import { findNoteAddress } from '../model/noteWalk.ts';
 import { midiOfSpelling } from './staffSpace.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
 import type { EditorIntent } from './intents.ts';
-import { addOnsets, durationSpan, itemSpan } from './cursor.ts';
+import { addOnsets, durationSpan, itemSpan, playedSpan } from './cursor.ts';
 import { containerCoincidence, sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
 import {
   beamStartingAt,
@@ -542,7 +542,10 @@ export function eventPills(doc: MnxStructure, member: Extract<SelectionMember, {
     pills.push({ key: 'duration', word: 'duration', value: durationText(event.duration), pillClass: 'floor', remove: null });
     // Where the event sits in its bar (whole-note fractions) — a reading, so
     // over/underfull bars can be audited event by event (one-surface item 8).
-    const ends = addOnsets(member.onset, durationSpan(event.duration));
+    // As played: an event in a triplet ends a twelfth later, not an eighth.
+    const item = (doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]?.sequences ?? [])
+      .filter(sequence => (sequence.staff ?? 1) === member.staffIndex)[member.voiceIndex]?.content?.[member.eventIndex];
+    const ends = addOnsets(member.onset, item ? playedSpan(item, member.containerIndex) : durationSpan(event.duration));
     pills.push(derived('at', 'at', `${fractionText(member.onset)} → ${fractionText(ends)}`));
   }
   for (const [name, attrs] of Object.entries(event.markings ?? {})) {

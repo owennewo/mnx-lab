@@ -22,11 +22,11 @@
  * tremolo its outer or its first child) and the corpus keeps them honest:
  * a span that disagreed with the layout would put the mark on the wrong beat.
  *
- * TOP-LEVEL RESTS ONLY. A rest inside a tuplet or a grace is passed over for
- * time but never recorded, because the key the layouts give it does not carry
- * its container index — every rest in one container would answer to the same
- * name. Containers still advance the cursor exactly as they do everywhere
- * else, so a rest AFTER one is found at the right offset.
+ * A rest inside a TUPLET is recorded too, under the key the tab gives its
+ * target — container index and all (core-tab-rest-targets) — at its played
+ * offset and length. Notation draws such a rest under no key, so only the tab
+ * lights it. A rest inside a grace or a tremolo is passed over for time, as
+ * before: it holds no metric span of its own.
  */
 import {
   isGrace,
@@ -44,6 +44,7 @@ import {
   fromSafeFraction,
   multiply,
   noteDuration,
+  tupletScale,
   type Rational
 } from './time.ts';
 
@@ -114,6 +115,23 @@ export function restSpansOf(doc: MnxStructure): RestSpan[] {
         let cursor = ZERO;
         (sequence.content ?? []).forEach((item, eventIndex) => {
           const duration = itemDuration(item);
+          // A tuplet's rests at their played times, each named with its container path.
+          const tuplet = (container: MnxSequenceItem, at: Rational, scale: Rational, path: number[]) => {
+            if (!isTuplet(container)) return;
+            const inner = multiply(scale, tupletScale(container));
+            let local = at;
+            container.content.forEach((child, index) => {
+              const span = multiply(itemDuration(child), inner);
+              if (isTimedEvent(child) && child.rest) spans.push({
+                key: child.id ?? syntheticEventKey({ partIndex, measureIndex, staffIndex, voiceIndex, eventIndex,
+                  containerIndex: path.length === 0 ? index : [...path, index] }),
+                partIndex, staffIndex, voiceIndex, measureIndex, start: local, duration: multiply(noteDuration(child.duration), inner)
+              });
+              tuplet(child, local, inner, [...path, index]);
+              local = add(local, span);
+            });
+          };
+          tuplet(item, cursor, integer(1), []);
           if (isTimedEvent(item) && item.rest) {
             spans.push({
               key: item.id ?? syntheticEventKey({

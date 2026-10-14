@@ -28,9 +28,13 @@ import {
 } from '../../src/engine/render/selectionGeometry.ts';
 import { isNavigationIntent } from '../../src/edit/intents.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
+import { layoutTab } from '../../src/engine/layout/tab.ts';
+import { restSpansOf } from '../../src/model/restSpans.ts';
+import { syntheticEventKey } from '../../src/model/noteKeys.ts';
+import { eventPills } from '../../src/edit/inspector.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
-import type { GlyphPrim, LinePrim } from '../../src/engine/primitives.ts';
+import type { GlyphPrim, LinePrim, RectPrim } from '../../src/engine/primitives.ts';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus } from '../verify/check-scenarios.mjs';
 
@@ -340,5 +344,77 @@ describe('a click on drawn ink reaches the ink it was on', () => {
     // becomes linear enough that this is empty, the measured column has stopped
     // earning its keep and this test should be the one that says so.
     expect(missed.length).toBeGreaterThan(0);
+  });
+});
+
+
+// core-tab-rest-targets: the tab draws no rest, but in the viewer each rest has an
+// invisible target where its digit would stand, named like everything selectable —
+// so the cursor anchors on it, a press finds it and the playhead names it. In a
+// tuplet each rest is its own (bar 2 of a Bert Jansch piece: a triplet of a chord
+// and two rests, whose rests the cursor drew a column to the LEFT of the chord).
+describe('a rest in tab is a place you can stand on and click', () => {
+  initSmufl();
+  const eighth = (rest: boolean) => rest
+    ? { duration: { base: 'eighth' }, rest: {} }
+    : { duration: { base: 'eighth' }, notes: [{ pitch: { step: 'D', octave: 4 }, _x: { mnxLab: { string: 2, fret: 3 } } }] };
+  const doc = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [{
+      id: 'g',
+      _x: { mnxLab: { strings: STRINGS, tab: { staffKind: 'tab' } } },
+      measures: [{ sequences: [{ content: [
+        { duration: { base: 'quarter' }, notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { string: 1, fret: 0 } } }] },
+        { type: 'tuplet', inner: { duration: { base: 'eighth' }, multiple: 3 }, outer: { duration: { base: 'eighth' }, multiple: 2 },
+          content: [eighth(false), eighth(true), eighth(true)] },
+        { duration: { base: 'half' }, rest: {} }
+      ] }] }]
+    }]
+  } as unknown as MnxStructure;
+  const key = (eventIndex: number, containerIndex?: number) =>
+    syntheticEventKey({ measureIndex: 0, voiceIndex: 0, eventIndex, ...(containerIndex === undefined ? {} : { containerIndex }) });
+  const rests = [{ key: key(1, 1), onset: 1 / 3 }, { key: key(1, 2), onset: 5 / 12 }, { key: key(2), onset: 1 / 2 }];
+  const layout = () => layoutTab({ mnx: doc, widthSp: 120, durationSpans: true });
+  const targets = () => new Map(layout().primitives
+    .filter((p): p is RectPrim & { sourceId: string } => p.kind === 'rect' && /\btab-rest\b/.test(p.className ?? '') && typeof p.sourceId === 'string')
+    .map(p => [p.sourceId, p.x + p.w / 2]));
+
+  it('names every rest — each of a triplet’s its own — with a target in onset order, right of the chord before it', () => {
+    const found = targets();
+    expect([...found.keys()].sort()).toEqual(rests.map(r => r.key).sort());
+    const chord = layout().primitives.find(p => p.kind === 'text' && p.text === '3') as { x: number } | undefined;
+    expect(chord).toBeDefined();
+    const xs = [chord!.x, ...rests.map(r => found.get(r.key)!)];
+    for (let i = 1; i < xs.length; i++) expect(xs[i], `rest ${i} drawn left of what precedes it`).toBeGreaterThan(xs[i - 1]!);
+    // Nothing for the goldens: without the viewer's flag there is no target.
+    expect(layoutTab({ mnx: doc, widthSp: 120 }).primitives.some(p => /\btab-rest\b/.test(p.className ?? ''))).toBe(false);
+  });
+
+  it('is the column the cursor’s grid names, and a press on it lands on that rest', () => {
+    const grid = buildGrid(doc, 0, 1);
+    const named = new Set(grid.positions.flatMap(p => p.events.map(e => e.key)));
+    for (const rest of rests) expect(named.has(rest.key), rest.key).toBe(true);
+    const span = measureSpans(doc)[0];
+    for (const rest of rests) {
+      const placed = moveToPointer(grid, start(), { measureIndex: 0, line: 3, columnKey: rest.key, fraction: 0 }, span, 'tab' as Projection);
+      expect(placed.onset.num / placed.onset.den, rest.key).toBeCloseTo(rest.onset, 9);
+    }
+  });
+
+  it('is a rest the playhead can stand in, at its played time', () => {
+    const spans = restSpansOf(doc);
+    expect(spans.map(s => s.key)).toEqual(rests.map(r => r.key));
+    expect(spans.map(s => Number(s.start.num) / Number(s.start.den))).toEqual(rests.map(r => r.onset).map(x => expect.closeTo(x, 9)));
+    expect(Number(spans[0]!.duration.num) / Number(spans[0]!.duration.den)).toBeCloseTo(1 / 12, 9);
+  });
+
+  it('reads its time in the inspector as played: a triplet eighth ends a twelfth later', () => {
+    const at = (eventIndex: number, containerIndex: number | undefined, onset: { num: number; den: number }) =>
+      eventPills(doc, { kind: 'event', partIndex: 0, staffIndex: 1, measureIndex: 0, voiceIndex: 0, eventIndex, onset,
+        ...(containerIndex === undefined ? {} : { containerIndex }) }).find(p => p.key === 'at')?.value;
+    expect(at(1, 0, { num: 1, den: 4 })).toBe('1/4 → 1/3');
+    expect(at(1, 2, { num: 5, den: 12 })).toBe('5/12 → 1/2');
+    expect(at(0, undefined, { num: 0, den: 1 })).toBe('0 → 1/4');
   });
 });
