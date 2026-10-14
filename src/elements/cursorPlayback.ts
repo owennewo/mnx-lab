@@ -33,4 +33,7 @@ export interface CursorPlayback {
    * than seeking a second time. Returns the release.
    */
   couple(): () => void;
+  /** Sound the note the cursor landed on, on that visit — the player decides whether it can
+   *  (roadmap: core-note-audition). Optional: a player without one stays silent. */
+  audition?(note: { noteKey: string; ordinal: number }): void;
 }

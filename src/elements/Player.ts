@@ -71,6 +71,8 @@ export class Player extends LitElement {
   /** The synth's sample rate (undefined: the device's). A change rebuilds the synth: an
    *  AudioContext's rate is fixed when it is made. */
   @property({ type: Number }) sampleRate: number | undefined;
+  /** Sound a note the editor's cursor lands on (`audition`); a host's per-device choice. */
+  @property({ type: Boolean }) auditionNotes = true;
   /** Whether the tray offers the Source select and its `source-tools` slot. A
    *  host that chooses sources elsewhere (studio's Source sheet) turns it off;
    *  `selectSource()` is the same either way. */
@@ -868,6 +870,12 @@ export class Player extends LitElement {
   }
   async play() { this.localError = ''; if (this.status?.needsStart && this.status.alignmentIssue) await this.session?.start(); else await this.session?.play(); }
   pause() { this.session?.pause(); }
+  /** Sound one written note on that visit, with the synth (roadmap: core-note-audition).
+   *  Silent with a recording as the source, when switched off, and while playing. */
+  audition(noteKey: string, ordinal: number): boolean {
+    const backend = this.session?.backend;
+    return this.auditionNotes && backend instanceof HostBackend ? backend.audition(noteKey, ordinal) : false;
+  }
   stop() { this.localError = ''; this.session?.stop(); }
   toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
   private hideYouTubeNotice() {

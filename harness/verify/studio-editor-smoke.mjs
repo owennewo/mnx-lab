@@ -15,7 +15,7 @@ const { origin, session } = library;
 const api = async path => fetch(`${origin}/api/library${path}`, { headers: { 'Cf-Access-Jwt-Assertion': session.browser } });
 const title = `Editor smoke ${Date.now()}`;
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-editor-browser-`);
-const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1280,900','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1280,900','--remote-debugging-port=0','--autoplay-policy=no-user-gesture-required',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');
@@ -72,6 +72,35 @@ try {
   await wait(`JSON.parse(${frets}).some(f => f.endsWith(':12'))`);
   assert.equal((await fretsNow()).length, 2);
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-editor.png',Buffer.from(shot.result.data,'base64'));
+
+  // Landing on a note sounds it, stopped and with the synth (roadmap: core-note-audition):
+  // each arrow onto a note and each press on one sends the host exactly that one note.
+  const player = `${piece}.querySelector('mnx-player')`;
+  await c.evaluate(`{ const port = ${player}.session.backend.port, schedule = port.schedule.bind(port); window.__auditions = [];
+    port.schedule = batch => { window.__auditions.push((batch.notes ?? []).map(n => n.id)); schedule(batch); }; }`);
+  const auditions = async () => JSON.parse(await c.evaluate('JSON.stringify(window.__auditions)'));
+  await key('ArrowLeft'); await wait('window.__auditions.length === 1');
+  await key('ArrowRight'); await wait('window.__auditions.length === 2');
+  const fret = await c.evaluate(`JSON.stringify((r => ({ x: r.x + r.width / 2, y: r.y + r.height / 2 }))(${viewer}.shadowRoot.querySelector('.fret-number').getBoundingClientRect()))`);
+  const { x, y } = JSON.parse(fret);
+  await c.send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
+  await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
+  await wait('window.__auditions.length === 3');
+  const sounded = await auditions();
+  assert.ok(sounded.every(batch => batch.length === 1), `one note per landing: ${JSON.stringify(sounded)}`);
+  assert.notEqual(sounded[0][0].split(':')[0], sounded[1][0].split(':')[0], 'the arrows sounded two different notes');
+  assert.equal(sounded[2][0].split(':')[0], sounded[0][0].split(':')[0], 'the press sounded the note pressed');
+  // Switched off in the Instruments sheet, the arrows are silent.
+  await c.evaluate(`${action('Instruments')}.click()`);
+  const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
+  await wait(`!!${instruments}?.querySelector('.audition input')`);
+  await c.evaluate(`${instruments}.querySelector('.audition input').click()`);
+  await wait(`${player}.auditionNotes === false && localStorage.getItem('mnx-studio.audition-notes') === 'off'`);
+  await c.evaluate(`${instruments}.querySelector('header button').click()`);
+  await c.evaluate(`${viewer}.focus()`);
+  await key('ArrowRight'); await key('ArrowLeft');
+  await new Promise(r => setTimeout(r, 600));
+  assert.equal((await auditions()).length, 3, 'a note sounded with audition switched off');
 
   // Undo and redo from the keyboard.
   await key('KeyZ', { ctrl: true }); await wait(`JSON.parse(${frets}).length === 1`);

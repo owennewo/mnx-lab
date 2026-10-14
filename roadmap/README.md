@@ -518,6 +518,11 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-note-audition.md](complete/core-note-audition.md)** — **complete 2026-10-14**:
+  a press or an arrow that lands the editor's cursor on a note sounds that note (just it,
+  its whole tie, at the rate) with the synth, stopped only and only when the synth is the
+  source; a paused seek no longer silences the host; a toggle in studio's Instruments sheet.
+
 - **[studio-new-piece-from-file.md](complete/studio-new-piece-from-file.md)** — **complete
   2026-10-14**: `#/new` offers Blank | From a file. A GP/GPX/GP3–5, MusicXML or MNX file opens
   through the importers layer; title, artist and capo are settled in the form (written by the

@@ -1,0 +1,47 @@
+# Sounding a note as the cursor lands on it
+
+> **Status: complete 2026-10-14.** Implementation loop. No golden moved; no verification debt.
+> Shared by both editors: studio's piece page and the workbench's scenario page.
+
+## Why
+
+Checking a transcription against a recording note by note (the owner's Bert Jansch piece,
+synced the same day) wants each note heard as it is selected, the way a notation editor
+plays a clicked note. The editor placed its cursor and seeked the player; nothing sounded.
+
+## What was built
+
+- **`HostBackend.audition(noteKey, ordinal)`** (`src/audio/hostBackend.ts`): the written
+  occurrence's sounding events on that visit — so a tied note sounds for its whole tie,
+  from its head — retimed for the rate through the same `placed` playback uses, sent a
+  little past the plucked instrument's commit horizon (0.12 s, D15) rather than the
+  transport's 0.25 s lead. A newer press or play silences it; when it has rung out the
+  port may idle, as after a stop. Refused while playing.
+- **A paused seek no longer silences the host.** Playback's pause already did; with nothing
+  of playback's sounding, the only thing a paused seek could cut was the note the cursor's
+  own seek had just sounded.
+- **`CursorPlayback.audition?`** (`src/elements/cursorPlayback.ts`), implemented by
+  `bindPlayback` (studio) and the workbench's scenario page; **`Player.audition`** sounds
+  only when the synth is the source and `auditionNotes` is on.
+- **`bindEditor`** sounds the note under the cursor (`slotAt`, the cursor's line — just
+  that note of a chord) after a press or an arrow move that lands on one, stopped only. An
+  arrow that stays on the same note does not sound it again; a press always does.
+- **Studio's Instruments sheet**: *Sound notes as you select them*, on by default,
+  remembered per browser (`mnx-studio.audition-notes`, stored only when off).
+
+## Decisions (owner, 2026-10-14)
+
+- With a recording as the source the synth does not exist, and clicks are **silent** —
+  chosen over starting a separate synth for auditions.
+- **Click and arrow keys** both sound; **just the note** clicked, not its chord;
+  **on by default with a toggle** in the Instruments sheet.
+
+## Proof
+
+- `harness/conformance/host-backend.test.ts` — *auditions one written note*: against the
+  real HostCore, the tied-to half sounds the one tied note at its full length ÷ rate, past
+  the commit horizon and heard; a paused seek cancels nothing; a newer press and play each
+  silence; playing and an unsounded visit refuse; the port idles once it has rung out.
+- `npm run smoke -- studio-editor` — in a real browser, an arrow onto each of two notes and
+  a mouse press on the first send the host exactly one note each, the press the note
+  pressed; switched off in the Instruments sheet, the arrows send nothing.

@@ -91,6 +91,9 @@ interface Plan {
 }
 
 const LEAD = 0.25, AHEAD = 1, MAX_WRAPS = 10000;
+/** A clicked note is one note, not a stream to keep invariant: it needs only to clear the
+ *  plucked instrument's commit horizon (0.1 s, synth/docs/contract.md D15), not the transport's lead. */
+const AUDITION_LEAD = 0.12;
 /** How far ahead the transport schedules into its silent sink. Its backlog guard restarts
  *  playback when the clock jumps past that (a tab that slept), and an audio clock steps a
  *  whole output chunk at a time: 170 ms and more under a large buffer or on Bluetooth, which
@@ -148,6 +151,8 @@ export class HostBackend implements PlaybackBackend {
   private audibleAt = Infinity;
   /** The browser's underrun count when the current plan's reports began to count. */
   private underrunBase: number | undefined;
+  /** When the last clicked note has rung out and the host may idle (`audition`). */
+  private auditionTimer: unknown;
   constructor(performance: Performance, document: MnxStructure, private readonly port: HostPort,
     options: HostBackendOptions, private readonly onEvent: (event: TransportEvent) => void) {
     this.performance = performance;
@@ -249,7 +254,9 @@ export class HostBackend implements PlaybackBackend {
     const snapshot = this.live.snapshot, wasPlaying = this.plan !== undefined;
     if (this.dirty || (snapshot.state === 'playing' && !this.plan)) {
       this.dirty = false;
-      this.port.cancel({ from: this.port.now(), silence: true });
+      // Paused and still paused (a seek, a rate), playback has nothing sounding — its pause
+      // silenced it — so a clicked note (`audition`) is left to ring rather than cut by the seek it made.
+      if (wasPlaying || snapshot.state === 'playing') this.port.cancel({ from: this.port.now(), silence: true });
       this.plan = snapshot.state === 'playing' ? this.newPlan(snapshot.position, snapshot.rate) : undefined;
     }
     // At the end of the piece the transport stops by itself: what is scheduled plays out.
@@ -356,6 +363,38 @@ export class HostBackend implements PlaybackBackend {
     return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - v.vs) / p.speed), ...(techniques.length ? { techniques } : {}) };
   }
 
+  /**
+   * Sound one written note on its own, as playback sounds it on that visit (roadmap:
+   * core-note-audition): its pitch on its string with the part's sound, for its whole tie,
+   * retimed for the rate. Stopped or paused only — playing, a press is a seek, and a note
+   * over the music is noise. A newer press, or play, silences it. False when the note
+   * makes no sound on that visit.
+   */
+  audition(noteKey: string, ordinal: number): boolean {
+    if (this.closed || this.live.snapshot.state === 'playing') return false;
+    const ids = new Set(this.performance.written.find(w => w.noteKey === noteKey && w.ordinal === ordinal)?.soundingIds ?? []);
+    const notes = this.notes.filter(n => ids.has(n.id));
+    if (!notes.length) return false;
+    const speed = this.live.snapshot.rate, gen = ++this.generation;
+    this.clock.clearTimeout(this.auditionTimer);
+    void this.port.unlock().then(() => {
+      // Play, or a newer press, got there first.
+      if (this.closed || gen !== this.generation || this.live.snapshot.state === 'playing') return;
+      const first = Math.min(...notes.map(n => n.at)), at = this.port.now() + AUDITION_LEAD;
+      const plan = { gen, speed, loop: undefined } as Plan;
+      const visit: Visit = { k: 0, vs: first, ve: Infinity, va: at, started: true, emitted: new Set() };
+      const placed = notes.map(n => this.placed(n, plan, visit, at + (n.at - first) / speed));
+      const end = Math.max(...placed.map(n => n.at + n.duration));
+      this.port.cancel({ from: this.port.now(), silence: true });
+      this.port.schedule({ notes: placed, controls: [{ id: `tempo:${gen}.audition`, at, type: 'tempo', bpm: this.bpmAt(first) * speed }], through: end + AUDITION_LEAD });
+      // Rung out: the host may stop computing silence, as after a stop.
+      this.auditionTimer = this.clock.setTimeout(() => {
+        if (!this.closed && gen === this.generation && this.live.snapshot.state !== 'playing') this.port.idle?.();
+      }, Math.max(0, end - this.port.now()) * 1000);
+    }, () => {});
+    return true;
+  }
+
   /** The mix moved: the parts' strips are reconfigured in place (no pause). */
   setPartMix(mix: PartMix) {
     if (this.closed) return;
@@ -427,6 +466,7 @@ export class HostBackend implements PlaybackBackend {
     if (this.closed) return;
     this.endTrace();
     this.closed = true;
+    this.clock.clearTimeout(this.auditionTimer);
     this.listeners.clear();
     this.live.dispose();
     this.port.cancel({ from: this.port.now(), silence: true });

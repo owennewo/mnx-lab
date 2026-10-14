@@ -55,6 +55,9 @@ export function readSpacingMode(): 'natural' | 'fill' {
 export function readSound(): 'full' | 'light' {
   return read(SOUND_KEY) === 'light' ? 'light' : 'full';
 }
+/** Sound a note the editor's cursor lands on (InstrumentsSheet); stored only when switched off. */
+export const AUDITION_KEY = 'mnx-studio.audition-notes';
+export const readAuditionNotes = () => read(AUDITION_KEY) !== 'off';
 /** The synth's sample rate for a sound choice (undefined: the device's own). */
 export const soundRate = (sound: 'full' | 'light') => sound === 'light' ? 32000 : undefined;
 export function readFocused(): boolean {

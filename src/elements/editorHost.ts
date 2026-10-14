@@ -71,6 +71,7 @@ import { CURSOR_LABEL_MS, type CursorLabel } from './CursorLabel.ts';
 import './CursorLabel.ts';
 import type { PassNotice, PerformedPlace } from '../edit/session.ts';
 import { entryStart } from '../edit/performedCursor.ts';
+import { slotAt } from '../edit/cursor.ts';
 import { barSeekTarget } from '../model/playback.ts';
 import { hasRepeatStructure } from '../model/passes.ts';
 import { rational, type Rational } from '../model/time.ts';
@@ -89,6 +90,12 @@ const toPosition = (place: PerformedPlace): PerformedPosition =>
 /** A playhead offset as a grid onset — floored to 1/3840 of a whole note, which is only ever compared with stops. */
 const onsetOf = (offset: Rational) => ({ num: Number((offset.num * 3840n) / offset.den), den: 3840 });
 const noticeText = (notice: PassNotice) => notice.kind === 'pass' ? `Pass ${notice.pass}` : 'Not played';
+/** Moves that land the cursor ON a note — a press and the arrows — and so sound it when
+ *  the player can (roadmap: core-note-audition). Rung, range and projection changes do not. */
+const AUDITION_MOVES = new Set<EditorIntent['type']>([
+  'goToPointer', 'nextPosition', 'prevPosition', 'nextMeasure', 'prevMeasure', 'lineDown', 'lineUp',
+  'jumpNext', 'jumpPrev', 'jumpUp', 'jumpDown', 'goToMeasure', 'goToEdge', 'cycleSlot',
+]);
 const HORIZONTAL_STEPS: Partial<Record<EditorIntent['type'], 1 | -1>> = { nextPosition: 1, prevPosition: -1, jumpNext: 1, jumpPrev: -1 };
 
 export interface EditorBindingOptions {
@@ -250,6 +257,16 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   /** The playhead as last reported: a paused playhead that MOVED, and not by this cursor, takes the cursor with it. */
   let lastHead = headKey(playback?.playhead ?? null);
   let label: CursorLabel | null = null;
+  /** The note last sounded, as `key@ordinal`: an arrow that stays on it (a bar edge) does not sound it again. */
+  let lastSounded: string | null = null;
+  /** Sound the note the cursor stands on; a press always does, even on the same note. */
+  const audition = (pressed: boolean) => {
+    const slot = slotAt(session.positions, session.cursor, session.projection), ordinal = session.performedOrdinal;
+    const key = slot && ordinal !== null ? `${slot.noteKey}@${ordinal}` : null;
+    if (key === null || (!pressed && key === lastSounded)) { lastSounded = key; return; }
+    lastSounded = key;
+    playback?.audition?.({ noteKey: slot!.noteKey, ordinal: ordinal! });
+  };
   let labelTimer: ReturnType<typeof setTimeout> | undefined;
   /** While playing the playhead is the cursor, so the editor's own is not drawn — except where counted presses are headed. */
   const playingHides = () => playing && pendingBar === null;
@@ -428,6 +445,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
     if (!handled) options.onRefused?.(intent, 'unavailable');
     settle(intent.type === 'goToPointer');
+    if (handled && AUDITION_MOVES.has(intent.type)) audition(intent.type === 'goToPointer');
     return handled;
   };
 

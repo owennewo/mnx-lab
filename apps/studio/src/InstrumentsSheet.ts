@@ -46,6 +46,8 @@ export class InstrumentsSheet extends LitElement {
   @property({ attribute: false }) designs: readonly FactoryDesign[] = [];
   /** The synth's sound on this device: Light plays at 32 kHz, a third less work. */
   @property() sound: 'full' | 'light' = 'full';
+  /** Sound a note the editor's cursor lands on, on this device (roadmap: core-note-audition). */
+  @property({ type: Boolean }) auditionNotes = true;
   /** A rig file that could not be imported, by part. */
   @state() private importProblem: { index: number; message: string } | null = null;
 
@@ -84,6 +86,9 @@ export class InstrumentsSheet extends LitElement {
     .quality button span { font-size: 12px; color: var(--ink-dim); }
     .quality button[aria-checked='true'] { background: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60)); border-color: var(--ink-3); }
     .quality-note { padding-left: 0; }
+    .audition { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; cursor: pointer; }
+    .audition input { margin: 2px 0 0; }
+    .audition small { display: block; font-size: 12px; color: var(--ink-dim); }
     .synth-link { font-size: 13px; line-height: 1.5; color: var(--ink-dim); }
     .synth-link a { color: var(--accent); }
     input[type='file'] { display: none; }
@@ -199,6 +204,9 @@ export class InstrumentsSheet extends LitElement {
             <b>${sound === 'full' ? 'Full' : 'Light'}</b><span>${sound === 'full' ? 'The device’s sample rate' : '32 kHz, a third less work'}</span></button>`)}
         </div>
         <p class="note quality-note">Light is for phones and tablets that skip. Notes above 16 kHz are lost, and the top of a ringing note fades a little sooner.</p>
+        <label class="audition"><input type="checkbox" .checked=${this.auditionNotes}
+            @change=${(e: Event) => this.dispatchEvent(new CustomEvent('audition-change', { detail: (e.target as HTMLInputElement).checked, bubbles: true, composed: true }))} />
+          <span>Sound notes as you select them<small>A click or the arrow keys, while stopped, when the source is Synth</small></span></label>
         <p class="synth-link">Make a sound in <a href="/synth/" target="_blank" rel="noopener">the synth</a>, choose <b>Export part</b>, then <b>Import rig…</b> here.</p>
       </section>
     `;

@@ -310,3 +310,40 @@ it('the port hears when playback stops — paused, stopped or at the end — and
   expect(backend.snapshot.state).toBe('stopped');
   expect(port.idles, 'the end of the piece').toBe(2);
 }, 60_000);
+
+// roadmap: core-note-audition. A note the editor's cursor lands on sounds on its own, as
+// playback would sound it on that visit, and nothing playback does while paused cuts it off.
+it('auditions one written note: its whole tie, retimed for the rate, heard, and cut only by play or a newer press', async () => {
+  const { backend, port, run, flush, stream } = rig(scenario('lab/tab-rhythm/tied-notes-on-tab'));
+  await run(0.1);
+  backend.setRate(0.5);
+  // n2 is the tied-to half of n1: pressing it sounds the one tied note, from its head.
+  expect(backend.audition('n2', 0)).toBe(true); await flush();
+  const [batch] = port.batches;
+  expect(batch!.notes.map(n => base(n.id))).toEqual(['s0']);
+  const tied = stream.notes.find(n => n.id === 's0')!;
+  expect(batch!.notes[0]!.duration).toBeCloseTo(tied.duration / 0.5, 6);
+  expect(batch!.notes[0]!.at - batch!.now, 'past the commit horizon').toBeGreaterThan(0.1);
+  // A paused seek (the cursor's own) leaves it ringing; it is heard.
+  const cancelled = port.cancels.length;
+  backend.seek({ ordinal: 1, metricOffset: rational(0n) }); await flush();
+  expect(port.cancels.length).toBe(cancelled);
+  await run(0.3);
+  expect(port.sounding.map(s => base(s.id))).toContain('s0');
+  // A newer press silences the old note first; play silences it too.
+  expect(backend.audition('n7', 1)).toBe(true); await flush();
+  expect(port.cancels.length).toBe(cancelled + 1);
+  expect(port.batches.at(-1)!.notes.map(n => base(n.id))).toEqual(['s5']);
+  await backend.play(); await flush();
+  expect(port.cancels.length).toBe(cancelled + 2);
+  // Playing, a press is a seek and nothing is auditioned; a note on a visit it does not sound on is not either.
+  expect(backend.audition('n8', 1)).toBe(false);
+  backend.pause(); await flush();
+  expect(backend.audition('n8', 0)).toBe(false);
+  expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
+  // Rung out, the host may idle.
+  const idles = port.idles;
+  expect(backend.audition('n1', 0)).toBe(true); await flush();
+  await run(tied.duration / 0.5 + 0.3);
+  expect(port.idles).toBeGreaterThan(idles);
+}, 60_000);
