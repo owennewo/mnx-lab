@@ -254,6 +254,15 @@ describe('the playback paint', () => {
     expect(rest.getAttribute('data-playback-voice')).toBeNull();
   });
 
+  it('never lights a tab rest’s invisible target, though it carries the rest’s key — the pill does', () => {
+    const target = new FakeNode({ 'data-source-id': '@m0.v0.e1' }, ['rest', 'tab-rest']);
+    const rest = pill('@m0.v0.e1');
+    paintPlaybackInk(new FakeRoot([target, rest]) as unknown as ParentNode, new Map([['@m0.v0.e1', 1]]));
+    expect(rest.classes.has('playback-ink')).toBe(true);
+    expect(target.classes.has('playback-ink')).toBe(false);
+    expect(target.getAttribute('data-playback-voice')).toBeNull();
+  });
+
   it('a repaint while still sounding is idempotent', () => {
     const m = mask('m1', 100, 12, 160);
     for (let i = 0; i < 3; i++) stretchMask(m as unknown as Element, true);

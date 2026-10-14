@@ -53,3 +53,25 @@ borrowed-column fallback, which remains the last resort for a moment with no eve
   triplet rests and the quarter rest after stood at 409/423/437 px before (bunched behind the
   chord at 399) and at 428/450/473 px after, on their columns; pressing each target landed
   on that rest.
+
+## Follow-up the same day: two marks too many, and a range box too wide
+
+The owner, on the built change: with the cursor on a triplet rest "there is also a blue
+thing … in the center of the staff line … It looks like there are two", and a two-event
+range "starts before the first event".
+
+- **A solid blue block was the target, lit.** The playback paint lights everything carrying
+  a `data-source-id`, and its colour rule outranks the target's transparent fill.
+  `paintPlaybackInk` now skips `.tab-rest`; the pill is the rest's playback mark.
+  Pinned in `playback-ink.test.ts`.
+- **The dashed outline was the pill**, lit because the paused playhead stands where the
+  cursor does (core-single-cursor). Paused under a bound editor the cursor already marks
+  the rest, so the viewer sets `data-cursor-is-playhead` then and the pill shows only while
+  playing (or with no editor bound, where the playhead is all there is).
+- **The range box** added a linear onset estimate for every member of a range, to keep
+  rest-only endpoints inside it; on a bar whose early notes spread out, the estimate for
+  the first event fell left of its digits (385 px against digits at 401). With tab rests
+  inked, the estimate is now used only for a cell with no ink here or anywhere in the
+  system: the same two-event range measures 397–436, its left edge where the single event's
+  is. Notation's tuplet rests are still unkeyed, so a range ending on one hugs the ink
+  before it — the tab beside it, in the combined view, still reaches it.

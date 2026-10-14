@@ -452,11 +452,14 @@ export function drawEnclosure(
             // than the fraction below, which is linear where the music is not.
             const borrowed = cellBoxes.length === 0 ? boxesInCell(systemBoxes, cell) : [];
             for (const box of borrowed) ranges.push({ left: box.x, right: box.x + box.w });
-            // A lone ink-bearing point keeps the old glyph-tight geometry.
-            // In a range, onset anchors preserve rest-only endpoints and
-            // intermediate silence; with no ink ANYWHERE in the system they
-            // also represent a point selection on a rest.
-            if (isRange || (cellBoxes.length === 0 && borrowed.length === 0)) {
+            // The onset estimate is LINEAR where the music is not, so it is the
+            // last resort: only a cell with no ink here or anywhere in the
+            // system uses it. Every range member used to add one, for its
+            // rest-only endpoints — and on a bar whose early notes spread out
+            // the estimate fell left of the first event's digits and dragged
+            // the box with it. A tab rest has ink now, an invisible target
+            // where its digit would stand (core-tab-rest-targets).
+            if (cellBoxes.length === 0 && borrowed.length === 0) {
               const x = measurePositionX(
                 cell.left,
                 cell.right,

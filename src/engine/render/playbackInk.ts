@@ -48,9 +48,15 @@ export function playbackVoiceSlot(voice: number): number {
  * tab staff's rest pill, which must light like any other mark and must not
  * join a selection or answer a click (`layout/tabStaff.ts`). A node carrying
  * either one is lit the same way.
+ *
+ * A tab rest's TARGET is the one named thing never lit: it carries the rest's
+ * `data-source-id` so a selection and a press can find the rest, and the pill
+ * beside it is the rest's playback mark (core-tab-rest-targets). Lit, it drew
+ * a solid block in the voice's colour over the staff.
  */
 export function paintPlaybackInk(root: ParentNode, sounding: ReadonlyMap<string, number>): void {
   for (const ink of root.querySelectorAll<SVGElement>('[data-source-id], [data-playback-id]')) {
+    if (ink.classList.contains('tab-rest')) continue;
     const key = ink.getAttribute('data-source-id') ?? ink.getAttribute('data-playback-id') ?? '';
     const voice = ink.classList.contains('unperformed')
       ? undefined

@@ -758,6 +758,7 @@ export class DocumentViewer extends LitElement {
       :host #projection-container svg .tab-rest,
       :host([selection-inactive]) #projection-container svg .tab-rest { fill: transparent !important; stroke: none !important; }
       :host #projection-container svg .tab-rest-pill { display: none; }
+      :host([data-cursor-is-playhead]) #projection-container svg .tab-rest-pill.playback-ink { display: none !important; }
       :host #projection-container svg .tab-rest-pill.playback-ink,
       :host([selection-inactive]) #projection-container svg .tab-rest-pill.playback-ink {
         display: inline;
@@ -1104,6 +1105,9 @@ export class DocumentViewer extends LitElement {
       // scroll; following the playhead too would fight it.
       if(this.playbackState?.followPlayback && (this.playbackState.playing || !this.pointerPlacement))this.revealPlayback();
     }
+    // The same fact for the tab's rest pill: paused under an editor the cursor
+    // already marks the rest, and a second, hollow mark beside it read as noise.
+    this.toggleAttribute('data-cursor-is-playhead', !this.playbackState?.playing && !!this.pointerPlacement);
     if (changed.has('noGestures')) this.syncGestures();
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
     if (
