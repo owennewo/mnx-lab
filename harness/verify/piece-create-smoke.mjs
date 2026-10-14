@@ -8,6 +8,7 @@ import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client, until, STUDIO_STATE, stopChrome } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
@@ -72,6 +73,29 @@ try {
   assert.deepEqual(stored.snapshot.renditions.map(r => [r.format, r.role, r.producer]), [['gp', 'original', 'studio']]);
   const tags = stored.snapshot.tags.map(t => `${t.dimension}:${t.value}`);
   for (const tag of [`title:${title}`, 'artist:A synthetic author', 'capo:2', 'tuning-name:DADGAD', 'part:Guitar']) assert.ok(tags.includes(tag), `${tag} in ${tags}`);
-  console.log(`Piece-create smoke passed: the New piece form (a bad tuning refused in a sentence), ${title} made as ${pieceId}, its stored .gp read back as 9 bars of 6/8 in D on DADGAD capo 2, the Source row asking for a recording, and the library listing it.`);
+  // From a file: the GP4 opens in the form, its title is the form's to change,
+  // the capo goes on, and the piece stored is Studio's own .gp of that music.
+  await c.evaluate(`[...${app}.querySelectorAll('header a.button')].find(a => a.textContent === 'New piece').click()`);
+  await wait(`location.hash === '#/new' && !!${form}?.querySelector('.modes')`);
+  await c.evaluate(`[...${form}.querySelectorAll('.modes button')].find(b => b.textContent === 'From a file').click()`);
+  await wait(`!!${form}.querySelector('input[type=file]') && ${form}.querySelector('button.primary').disabled`);
+  const input = await c.send('Runtime.evaluate', { expression: `${form}.querySelector('input[type=file]')` });
+  await c.send('DOM.setFileInputFiles', { objectId: input.result.result.objectId, files: [fileURLToPath(new URL('../../converters/fixtures/Binary-suite.gp4', import.meta.url))] });
+  await wait(`${form}.querySelector('.file-facts')?.textContent.startsWith('Guitar Pro · ') && !${form}.querySelector('button.primary').disabled`);
+  const fileTitle = `From a file ${Date.now()}`;
+  await field('Title', fileTitle); await field('Capo', '1');
+  const fileShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-new-piece-from-file.png',Buffer.from(fileShot.result.data,'base64'));
+  await c.evaluate(`${form}.querySelector('form').requestSubmit()`);
+  await wait(`/^#\\/piece\\/[0-9a-f]{16}$/.test(location.hash) && location.hash !== ${JSON.stringify('#/piece/' + pieceId)}`);
+  const filePieceId = (await c.evaluate('location.hash')).slice('#/piece/'.length);
+  await wait(`!!${piece}?.querySelector('mnx-document-viewer')?.shadowRoot?.querySelector('svg')`);
+  await wait(`${frame}?.querySelector('.strip.top .head h1')?.textContent.includes(${JSON.stringify(fileTitle)})`);
+  await wait(`!!${piece}.querySelector('mnx-player').performance`);
+  const fileRead = JSON.parse(await c.evaluate(`JSON.stringify((d => d.parts.filter(p => p._x?.mnxLab?.strings?.length).map(p => p._x.mnxLab.capo))(${piece}.querySelector('mnx-player').document))`));
+  assert.ok(fileRead.length > 0 && fileRead.every(capo => capo === 1), `capo 1 on every fretted part: ${fileRead}`);
+  const fromFile = await (await fetch(`${origin}/api/library/pieces/${filePieceId}`, { headers: { 'Cf-Access-Jwt-Assertion': session.browser } })).json();
+  assert.deepEqual(fromFile.snapshot.renditions.map(r => [r.format, r.role, r.producer]), [['gp', 'original', 'studio']]);
+  assert.ok(fromFile.snapshot.tags.some(t => t.dimension === 'title' && t.value === fileTitle));
+  console.log(`Piece-create smoke passed: the New piece form (a bad tuning refused in a sentence), ${title} made as ${pieceId}, its stored .gp read back as 9 bars of 6/8 in D on DADGAD capo 2, the Source row asking for a recording, and the library listing it; then a GP4 opened From a file, retitled and capoed, stored as Studio's .gp (${filePieceId}).`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

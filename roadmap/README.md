@@ -518,6 +518,12 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[studio-new-piece-from-file.md](complete/studio-new-piece-from-file.md)** — **complete
+  2026-10-14**: `#/new` offers Blank | From a file. A GP/GPX/GP3–5, MusicXML or MNX file opens
+  through the importers layer; title, artist and capo are settled in the form (written by the
+  editor's ops, the music untouched); the converter's drops are listed with counts before
+  anything is made; Studio's own `.gp` is stored and the chosen file is not kept.
+
 - **[core-synth-performance.md](complete/core-synth-performance.md)** — **complete
   2026-10-09**: the synth on phones and tablets. The guitar's thwack became an attack soak
   (engine generation 4, a guitar part 35% cheaper, no per-pluck spikes); a Balanced output buffer with

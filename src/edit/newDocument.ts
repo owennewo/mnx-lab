@@ -69,3 +69,37 @@ export function buildNewDocument(spec: NewDocumentSpec): MnxStructure {
   document = applyOp(document, { type: 'setKeySignature', measureIndex: 0, fifths: spec.fifths });
   return applyOp(document, { type: 'setWork', work: { title: spec.title, artist: spec.artist ?? null } });
 }
+
+/** What the form lets a person change about a piece made from a file. */
+export interface FromFileSpec {
+  title: string;
+  artist?: string;
+  /** Absent leaves every part's capo as the file wrote it; a number puts the
+   *  capo there on every part that has strings (0 takes it off). */
+  capo?: number;
+}
+
+const stringedParts = (document: MnxStructure) =>
+  (document.parts ?? []).flatMap((part, index) => part._x?.mnxLab?.strings?.length ? [index] : []);
+
+/** The capo the file put on its first fretted part, 0 for none, or null when no part has strings. */
+export function fileCapo(document: MnxStructure): number | null {
+  const [first] = stringedParts(document);
+  return first === undefined ? null : document.parts[first]._x?.mnxLab?.capo ?? 0;
+}
+
+/** A piece made from a file (roadmap: studio-new-piece-from-file): the imported
+ *  document, with the title, artist and capo the form settled on written by the
+ *  same ops the editor uses — so the file's music arrives untouched. */
+export function adoptImportedDocument(imported: MnxStructure, spec: FromFileSpec): MnxStructure {
+  if (!spec.title.trim()) throw new Error('A piece needs a title.');
+  if (spec.capo !== undefined && (!Number.isInteger(spec.capo) || spec.capo < 0 || spec.capo > 24)) throw new Error('A capo sits on fret 0 to 24.');
+  let document = applyOp(imported, { type: 'setWork', work: { title: spec.title.trim(), artist: spec.artist?.trim() || null } });
+  if (spec.capo === undefined) return document;
+  for (const partIndex of stringedParts(document)) {
+    document = spec.capo
+      ? applyOp(document, { type: 'setPartDeclaration', partIndex, declaration: { kind: 'capo', value: spec.capo } })
+      : applyOp(document, { type: 'removePartDeclaration', partIndex, kind: 'capo' });
+  }
+  return document;
+}

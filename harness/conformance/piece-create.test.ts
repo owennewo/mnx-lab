@@ -13,7 +13,9 @@ import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 import { LibraryClient } from '../../src/storage/libraryClient.ts';
-import { buildNewDocument, newDocumentProblem, type NewDocumentSpec } from '../../src/edit/newDocument.ts';
+import { adoptImportedDocument, buildNewDocument, fileCapo, newDocumentProblem, type NewDocumentSpec } from '../../src/edit/newDocument.ts';
+import { readFileSync } from 'node:fs';
+import type { MnxStructure } from '../../src/model/mnx.ts';
 import { parseTuning } from '../../src/edit/setupGrammar.ts';
 import { derivedLibraryTags } from '../../src/model/libraryTags.ts';
 import { compareDocuments } from '../../src/model/documentCompare.ts';
@@ -73,6 +75,44 @@ describe('a blank piece', () => {
     expect(tags.filter(t => t.dimension === 'tuning-name').map(t => t.value)).toEqual(facts.tunings.map(tuningName));
     expect(tags.filter(t => t.dimension === 'capo').map(t => t.value)).toEqual(facts.capos.map(String));
     expect(tags.filter(t => t.dimension === 'part').map(t => t.value)).toEqual(facts.parts);
+  });
+});
+
+describe('a piece from a file', () => {
+  // A GP4, the binary family the clean-room importer reads besides GPIF.
+  const read = (bytes: Uint8Array) => importGuitarProCleanRoom(bytes) as unknown as MnxStructure;
+  const imported = () => read(new Uint8Array(readFileSync(new URL('../../converters/fixtures/Binary-suite.gp4', import.meta.url))));
+  const music = (document: MnxStructure) => JSON.stringify({ global: document.global, parts: document.parts.map(p => ({ ...p, _x: { ...p._x, mnxLab: { ...p._x?.mnxLab, capo: undefined } } })) });
+
+  it('keeps the music as the file wrote it, with the title and artist the form settled on', () => {
+    const file = imported();
+    const document = adoptImportedDocument(file, { title: '  The First Time  ', artist: 'Bert Jansch' });
+    expect(document._x!.mnxLab!.work).toMatchObject({ title: 'The First Time', artist: 'Bert Jansch' });
+    expect(music(document)).toBe(music(file));
+    expect(document.parts.map(p => p._x?.mnxLab?.capo)).toEqual(file.parts.map(p => p._x?.mnxLab?.capo));
+    expect(validateRootExt(document._x!.mnxLab), JSON.stringify(validateRootExt.errors)).toBe(true);
+    expect(adoptImportedDocument(file, { title: 'x', artist: '' })._x!.mnxLab!.work).not.toHaveProperty('artist');
+  });
+
+  it('puts a chosen capo on every fretted part, takes it off at 0, and refuses what it cannot write', () => {
+    const file = imported();
+    const fretted = file.parts.filter(p => p._x?.mnxLab?.strings?.length).length;
+    expect(fretted).toBeGreaterThan(0);
+    expect(fileCapo(file)).toBe(file.parts.find(p => p._x?.mnxLab?.strings?.length)!._x!.mnxLab!.capo ?? 0);
+    const capo1 = adoptImportedDocument(file, { title: 'x', capo: 1 });
+    expect(capo1.parts.filter(p => p._x?.mnxLab?.strings?.length).map(p => p._x!.mnxLab!.capo)).toEqual(Array(fretted).fill(1));
+    expect(music(capo1)).toBe(music(file));
+    expect(adoptImportedDocument(capo1, { title: 'x', capo: 0 }).parts.map(p => p._x?.mnxLab?.capo ?? 0)).toEqual(file.parts.map(() => 0));
+    expect(fileCapo({ ...file, parts: [] })).toBeNull();
+    for (const bad of [{ title: ' ' }, { title: 'x', capo: 25 }, { title: 'x', capo: 1.5 }]) expect(() => adoptImportedDocument(file, bad), JSON.stringify(bad)).toThrow();
+  });
+
+  it('survives its first save as the .gp Studio stores, capo included', () => {
+    const document = adoptImportedDocument(imported(), { title: 'From a file', artist: 'Someone', capo: 1 });
+    const back = read(toGp(document));
+    expect(back._x!.mnxLab!.work).toMatchObject({ title: 'From a file', artist: 'Someone' });
+    expect(fileCapo(back)).toBe(1);
+    expect(derivedLibraryTags(document)).toEqual(expect.arrayContaining([{ dimension: 'title', value: 'From a file' }, { dimension: 'capo', value: '1' }]));
   });
 });
 
