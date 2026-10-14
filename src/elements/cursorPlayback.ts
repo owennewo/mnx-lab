@@ -34,6 +34,7 @@ export interface CursorPlayback {
    */
   couple(): () => void;
   /** Sound the note the cursor landed on, on that visit — the player decides whether it can
-   *  (roadmap: core-note-audition). Optional: a player without one stays silent. */
-  audition?(note: { noteKey: string; ordinal: number }): void;
+   *  (roadmap: core-note-audition). `edited`: an edit just made or changed it, so the sound
+   *  waits for the performance that edit produces. Optional: a player without one stays silent. */
+  audition?(note: { noteKey: string; ordinal: number; edited?: boolean }): void;
 }

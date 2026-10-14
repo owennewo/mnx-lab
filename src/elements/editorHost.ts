@@ -72,6 +72,7 @@ import './CursorLabel.ts';
 import type { PassNotice, PerformedPlace } from '../edit/session.ts';
 import { entryStart } from '../edit/performedCursor.ts';
 import { slotAt } from '../edit/cursor.ts';
+import { findNoteAddress } from '../model/noteWalk.ts';
 import { barSeekTarget } from '../model/playback.ts';
 import { hasRepeatStructure } from '../model/passes.ts';
 import { rational, type Rational } from '../model/time.ts';
@@ -267,6 +268,21 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     lastSounded = key;
     playback?.audition?.({ noteKey: slot!.noteKey, ordinal: ordinal! });
   };
+  /** The note under the cursor and what decides its sound — pitch, string, fret — or null. */
+  const cursorNote = () => {
+    const slot = slotAt(session.positions, session.cursor, session.projection);
+    if (!slot) return null;
+    const note = findNoteAddress(session.doc, slot.noteKey)?.note;
+    return { key: slot.noteKey, sound: JSON.stringify([note?.pitch, note?._x?.mnxLab?.string, note?._x?.mnxLab?.fret]) };
+  };
+  /** An edit made the note under the cursor, or changed how it sounds: sound it, once the
+   *  player has the edit (`edited`). Deleting, or an edit elsewhere, sounds nothing. */
+  const auditionEdit = (before: ReturnType<typeof cursorNote>) => {
+    const after = cursorNote(), ordinal = session.performedOrdinal;
+    if (!after || ordinal === null || (before?.key === after.key && before.sound === after.sound)) return;
+    lastSounded = `${after.key}@${ordinal}`;
+    playback?.audition?.({ noteKey: after.key, ordinal, edited: true });
+  };
   let labelTimer: ReturnType<typeof setTimeout> | undefined;
   /** While playing the playhead is the cursor, so the editor's own is not drawn — except where counted presses are headed. */
   const playingHides = () => playing && pendingBar === null;
@@ -436,6 +452,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       draw();
       return moved;
     }
+    const before = NAVIGATION.has(intent.type) ? null : cursorNote();
     const handled = session.handleIntent(intent);
     cursorHidden = false;
     if (playback && session.passNotice) showLabel(noticeText(session.passNotice));
@@ -446,6 +463,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (!handled) options.onRefused?.(intent, 'unavailable');
     settle(intent.type === 'goToPointer');
     if (handled && AUDITION_MOVES.has(intent.type)) audition(intent.type === 'goToPointer');
+    else if (handled && !NAVIGATION.has(intent.type)) auditionEdit(before);
     return handled;
   };
 
@@ -466,8 +484,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (disposed || suspended() || (readOnly() && !NAVIGATION.has(intent.type))) { inspectorError = 'This piece is read-only here.'; draw(); return; }
     tabDigits.flush();
     cursorHidden = false;
-    inspectorError = fireFromInspector(session, intent) ? null : INSPECTOR_REFUSAL;
+    const before = cursorNote();
+    const fired = fireFromInspector(session, intent);
+    inspectorError = fired ? null : INSPECTOR_REFUSAL;
     settle();
+    if (fired && !NAVIGATION.has(intent.type)) auditionEdit(before);
   };
   const openInspector = () => {
     if (!surfaces || inspector || cursorHidden || suspended()) return;

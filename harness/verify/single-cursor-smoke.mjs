@@ -34,7 +34,7 @@ const fake = `window.__ytInstances=[];window.YT={Player:class{
 }};window.onYouTubeIframeAPIReady?.();`;
 
 const server = await serveStatic(root + 'dist/client'), profile = fs.mkdtempSync(`${os.tmpdir()}/single-cursor-`);
-const chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
+const chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', '--autoplay-policy=no-user-gesture-required', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await new Promise(r => ws.addEventListener('open', r));
@@ -63,6 +63,9 @@ try {
     page.pieceId='piece';document.body.append(page);
     await until(()=>page.editor&&page.shadowRoot?.querySelector('mnx-player')?.performance,'the editor to bind');
     const player=page.shadowRoot.querySelector('mnx-player'),viewer=page.shadowRoot.querySelector('mnx-document-viewer'),editor=page.editor,session=editor.session;
+    // Every note the synth host is sent, by pitch — the player's own, or the one it keeps for auditions.
+    window.__sounded=[];{const Port=player.session.backend.port.constructor,schedule=Port.prototype.schedule;
+      Port.prototype.schedule=function(batch){if(batch.notes?.length)__sounded.push(batch.notes.map(n=>n.target?.pitch));return schedule.call(this,batch);};}
     check(await player.selectSource('yt'),'YouTube source did not map');player.pause();
     await until(()=>window.__ytInstances?.length&&player.playback?.kind==='youtube','the video');
     const video=()=>__ytInstances.at(-1).getCurrentTime();
@@ -132,7 +135,25 @@ try {
     // …and the next move is a seek again.
     key('ArrowRight');await delay(650);
     check(seeks===base+1,'A move after the pause did not seek');
-    return {paused:true,loopLabel:true,playCollapse:true,refused:true,barSeeks:true,park:true};
+
+    // With the video as the source there is no synth in the session, yet the note the cursor
+    // lands on sounds — on one the player keeps for it — and so does a fret typed over it, at
+    // its NEW pitch (roadmap: core-note-audition).
+    check(player.playback?.kind==='youtube','The video is no longer the source');
+    for(let i=0;i<12&&!session.cursorContext().occupied;i++)key('ArrowRight');
+    check(session.cursorContext().occupied,'No note to land on');
+    __sounded.length=0;key('ArrowLeft');
+    for(let i=0;i<12&&!session.cursorContext().occupied;i++)key('ArrowLeft');
+    await until(()=>__sounded.length>0,'a note to sound with the video as the source');
+    await delay(300);
+    check(__sounded.every(b=>b.length===1),'More than one note per landing: '+JSON.stringify(__sounded));
+    // Fret 3, then fret 5 on the same string: the second sounds exactly two semitones above the first.
+    key('Digit3','3');await delay(1500);
+    const three=__sounded.at(-1)[0],count=__sounded.length;
+    key('Digit5','5');
+    await until(()=>__sounded.length===count+1,'the typed fret to sound');
+    check(__sounded.at(-1).length===1&&__sounded.at(-1)[0]===three+2,'Fret 5 sounded '+__sounded.at(-1)+' after fret 3 sounded '+three);
+    return {paused:true,loopLabel:true,playCollapse:true,refused:true,barSeeks:true,park:true,auditionWithVideo:true,auditionOnEdit:true};
   })()`);
   console.log('single cursor OK', JSON.stringify(result));
   if (c.logs.length) throw new Error(c.logs.join('\n'));

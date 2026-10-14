@@ -31,8 +31,8 @@ plays a clicked note. The editor placed its cursor and seeked the player; nothin
 
 ## Decisions (owner, 2026-10-14)
 
-- With a recording as the source the synth does not exist, and clicks are **silent** —
-  chosen over starting a separate synth for auditions.
+- ~~With a recording as the source the synth does not exist, and clicks are **silent**.~~
+  Reversed the same day (owner: "I've changed my mind"): see *Any source, and edits* below.
 - **Click and arrow keys** both sound; **just the note** clicked, not its chord;
   **on by default with a toggle** in the Instruments sheet.
 
@@ -45,3 +45,27 @@ plays a clicked note. The editor placed its cursor and seeked the player; nothin
 - `npm run smoke -- studio-editor` — in a real browser, an arrow onto each of two notes and
   a mouse press on the first send the host exactly one note each, the press the note
   pressed; switched off in the Instruments sheet, the arrows send nothing.
+
+## Any source, and edits (2026-10-14, later)
+
+The owner asked for notes to sound with a recording as the source too, and for a note to
+sound when one is written or its pitch changed.
+
+- **A synth the player keeps for auditions.** With a recording as the source the session
+  has no synth (`PlaybackSession.select` disposes it), so `Player` makes a stopped
+  `HostBackend` of its own on the first note to sound — its own `NativeHostPort`, the same
+  mix, volume and sample rate — keeps it in step with edits, the mix and the volume, and
+  drops it when the synth is the source again, the sample rate changes, or the player
+  tears down. It never plays; only `audition` reaches it. The first note waits for the
+  synth to load. Touch devices bind no editor, so never load it.
+- **An edit sounds the note it made or changed.** `bindEditor` reads the cursor's note and
+  what decides its sound (pitch, string, fret) before and after every edit intent, and the
+  inspector's; when the note is new or sounds different it asks with `edited: true`.
+  `Player` holds that request until the edit's performance arrives (`updated`, at most
+  2 s), so a changed pitch sounds as it now is, not as it was. A two-digit fret sounds
+  once, when the digit window commits it. Deleting, or an edit leaving the cursor's note
+  as it was, sounds nothing; an undo that changes it back sounds it.
+- Proof: `npm run smoke -- single-cursor` — with the (stand-in) YouTube video as the
+  source, arrows onto a note send the kept synth one note each, and fret 3 then fret 5
+  typed over it sound two semitones apart; `npm run smoke -- studio-editor` — with the
+  synth as the source, a fret typed over a pressed note sounds it once, and its undo once.

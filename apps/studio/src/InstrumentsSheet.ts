@@ -206,7 +206,7 @@ export class InstrumentsSheet extends LitElement {
         <p class="note quality-note">Light is for phones and tablets that skip. Notes above 16 kHz are lost, and the top of a ringing note fades a little sooner.</p>
         <label class="audition"><input type="checkbox" .checked=${this.auditionNotes}
             @change=${(e: Event) => this.dispatchEvent(new CustomEvent('audition-change', { detail: (e.target as HTMLInputElement).checked, bubbles: true, composed: true }))} />
-          <span>Sound notes as you select them<small>A click or the arrow keys, while stopped, when the source is Synth</small></span></label>
+          <span>Sound notes as you select them<small>A click, the arrow keys or a note you write, while stopped</small></span></label>
         <p class="synth-link">Make a sound in <a href="/synth/" target="_blank" rel="noopener">the synth</a>, choose <b>Export part</b>, then <b>Import rig…</b> here.</p>
       </section>
     `;

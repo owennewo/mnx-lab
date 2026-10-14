@@ -116,7 +116,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       player.addEventListener('playback-state-changed', listener);
       return () => player.removeEventListener('playback-state-changed', listener);
     },
-    audition: ({ noteKey, ordinal }) => { player.audition(noteKey, ordinal); },
+    audition: ({ noteKey, ordinal, edited }) => { player.audition(noteKey, ordinal, { edited }); },
     couple() {
       coupled++;
       let released = false;

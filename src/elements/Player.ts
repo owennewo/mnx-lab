@@ -60,6 +60,9 @@ function stacked(scope: string) {
 /** A player given a performance without its document: parts play their defaults (keys, kit). */
 const NO_DOCUMENT = { parts: [] } as unknown as MnxStructure;
 
+/** How long an edit's note waits for the performance that sounds it (`Player.audition`). */
+const PENDING_AUDITION_MS = 2000;
+
 @customElement('mnx-player')
 export class Player extends LitElement {
   @property({ attribute: false }) performance: Performance | null = null;
@@ -108,6 +111,12 @@ export class Player extends LitElement {
   static readonly RATE_STEP = 0.05;
   @state() private volume = 0.7;
   private session?: PlaybackSession;
+  /** With a recording as the source the session has no synth: a stopped one of the player's own
+   *  sounds the notes the cursor lands on (roadmap: core-note-audition). Made on the first such
+   *  note, kept while a recording is the source, dropped when the synth is again. */
+  private auditioner?: HostBackend;
+  /** A note an edit made or changed, sounded once the edit reaches the performance. */
+  private pendingAudition?: { noteKey: string; ordinal: number; at: number };
   private revision = 0;
   private youtubeNoticeHidden = false;
   /** Set by a score frame that hosts video and disclosure together. */
@@ -620,6 +629,12 @@ export class Player extends LitElement {
       changed.has('documentId') ||
       (scoreMoved && (!this.session || !this.performance));
     if (!reinstall && scoreMoved) this.replacePerformance();
+    const pending = this.pendingAudition;
+    if (pending && scoreMoved) {
+      this.pendingAudition = undefined;
+      // An edit that never reached the performance says nothing about this one.
+      if (Date.now() - pending.at < PENDING_AUDITION_MS) this.soundNote(pending.noteKey, pending.ordinal);
+    }
     if (reinstall) {
       this.install();
       if (this.initialOrdinal !== null) this.seek(this.initialOrdinal);
@@ -654,6 +669,8 @@ export class Player extends LitElement {
     // The mix — levels, mutes, instruments — reconfigures the host in place.
     if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend)
       this.session.backend.setPartMix(this.partMix);
+    if (changed.has('partMix')) this.auditioner?.setPartMix(this.partMix);
+    if (changed.has('sampleRate') && changed.get('sampleRate') !== this.sampleRate) this.dropAuditioner();
   }
   /** Rests built once per document; the publish runs every beat. */
   private restCache: { doc: MnxStructure; spans: readonly RestSpan[] } | null = null;
@@ -722,6 +739,7 @@ export class Player extends LitElement {
     this.youtubeNotice = false;
     this.revision++;
     this.session?.dispose(); this.session = undefined;
+    this.dropAuditioner(); this.pendingAudition = undefined;
     this.status = undefined; this.lastOrdinal = null; this.publish();
   }
   /** Held while the transport wants playback — a stand's screen must not
@@ -778,6 +796,8 @@ export class Player extends LitElement {
     this.session = new PlaybackSession(factory('synth'), factory, () => {
       if (revision !== this.revision || !this.session) return;
       this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.refreshDerivedSync(); this.publish();
+      if (this.session.backend instanceof HostBackend) this.dropAuditioner();
+      else this.auditioner?.setVolume(this.volume);
     });
     this.session.setRate(this.rate); this.session.setVolume(this.volume);
     this.session.stop();
@@ -794,6 +814,7 @@ export class Player extends LitElement {
     const session = this.session, performance = this.performance;
     if (!session || !performance) return;
     const backend = session.backend;
+    this.auditioner?.replacePerformance(performance, this.document);
     if (backend instanceof HostBackend) backend.replacePerformance(performance, this.document);
     else if (backend instanceof RecordingBackend) {
       const source = this.activeRecording, id = backend.id, duration = this.status?.mediaDuration;
@@ -870,12 +891,25 @@ export class Player extends LitElement {
   }
   async play() { this.localError = ''; if (this.status?.needsStart && this.status.alignmentIssue) await this.session?.start(); else await this.session?.play(); }
   pause() { this.session?.pause(); }
-  /** Sound one written note on that visit, with the synth (roadmap: core-note-audition).
-   *  Silent with a recording as the source, when switched off, and while playing. */
-  audition(noteKey: string, ordinal: number): boolean {
-    const backend = this.session?.backend;
-    return this.auditionNotes && backend instanceof HostBackend ? backend.audition(noteKey, ordinal) : false;
+  /** Sound one written note on that visit with the synth (roadmap: core-note-audition) — the
+   *  session's, or with a recording as the source one kept for this. Silent when switched off
+   *  and while playing. */
+  audition(noteKey: string, ordinal: number, options: { edited?: boolean } = {}): boolean {
+    if (!this.auditionNotes || !this.session || !this.performance || this.playback?.wantsPlayback) return false;
+    // An edit made or changed the note: the performance that sounds it is the one the edit
+    // is about to hand over (`updated`), not the one playing now, which has the old pitch.
+    if (options.edited) { this.pendingAudition = { noteKey, ordinal, at: Date.now() }; return true; }
+    return this.soundNote(noteKey, ordinal);
   }
+  private soundNote(noteKey: string, ordinal: number): boolean {
+    const backend = this.session?.backend;
+    if (backend instanceof HostBackend) { this.dropAuditioner(); return backend.audition(noteKey, ordinal); }
+    if (!this.performance) return false;
+    this.auditioner ??= new HostBackend(this.performance, this.document ?? NO_DOCUMENT,
+      new NativeHostPort({ volume: this.volume, sampleRate: this.sampleRate }), { volume: this.volume, partMix: this.partMix }, () => {});
+    return this.auditioner.audition(noteKey, ordinal);
+  }
+  private dropAuditioner() { this.auditioner?.dispose(); this.auditioner = undefined; }
   stop() { this.localError = ''; this.session?.stop(); }
   toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
   private hideYouTubeNotice() {

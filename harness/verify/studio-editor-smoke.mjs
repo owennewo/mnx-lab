@@ -90,6 +90,14 @@ try {
   assert.ok(sounded.every(batch => batch.length === 1), `one note per landing: ${JSON.stringify(sounded)}`);
   assert.notEqual(sounded[0][0].split(':')[0], sounded[1][0].split(':')[0], 'the arrows sounded two different notes');
   assert.equal(sounded[2][0].split(':')[0], sounded[0][0].split(':')[0], 'the press sounded the note pressed');
+  // A fret typed over the pressed note (3 → 5) sounds it again, from the edited score.
+  await key('Digit5', { text: '5' });
+  await wait('window.__auditions.length === 4');
+  assert.equal((await auditions())[3].length, 1);
+  await wait(`JSON.parse(${frets}).some(f => f.endsWith(':5'))`);
+  // Undone, the note is back at fret 3 — a change of sound like any other, so it sounds.
+  await key('KeyZ', { ctrl: true });
+  await wait(`JSON.parse(${frets}).some(f => f.endsWith(':3')) && window.__auditions.length === 5`);
   // Switched off in the Instruments sheet, the arrows are silent.
   await c.evaluate(`${action('Instruments')}.click()`);
   const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
@@ -100,7 +108,7 @@ try {
   await c.evaluate(`${viewer}.focus()`);
   await key('ArrowRight'); await key('ArrowLeft');
   await new Promise(r => setTimeout(r, 600));
-  assert.equal((await auditions()).length, 3, 'a note sounded with audition switched off');
+  assert.equal((await auditions()).length, 5, 'a note sounded with audition switched off');
 
   // Undo and redo from the keyboard.
   await key('KeyZ', { ctrl: true }); await wait(`JSON.parse(${frets}).length === 1`);
