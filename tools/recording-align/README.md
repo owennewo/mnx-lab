@@ -22,7 +22,7 @@ Each command reads and writes files in `--out`:
 | `piece.json`, `score.mnx.json` | `fetch` | the piece, its recording, its stored score |
 | `score.json` | `score` | performed order, bars, notes, the score's own jumps |
 | `audio/mono.wav` | `audio` | 22.05 kHz mono; downloaded data, kept apart |
-| `notes.json`, `transcription.mid` | `transcribe` | what Basic Pitch heard |
+| `notes.json`, `transcription.mid`, `transcription.json` | `transcribe` | what Basic Pitch heard, and at which speed (`--half-speed`: a pitch-preserving stretch, times scaled back) |
 | `check.json` | `check` | key fit by shift, tuning, density, flags |
 | `structure.json`, `report.md` | `structure` | bar by bar: when, how fast, notes found |
 | `sync-payload.json` | `sync` | the segments and sync points that would be written |

@@ -7,6 +7,9 @@ inside the directory holding downloaded audio:
     $PY -I tools/recording-align/align.py <command> --out <dir>
 
     transcribe   audio/mono.wav → notes.json + transcription.mid (Basic Pitch)
+                 [--half-speed [--audio <wav>]]: transcribe a pitch-preserving half-speed
+                 stretch (Rubber Band, crisp transients) and scale the times back — an
+                 experiment for fast passages; see RUNS.md before relying on it
     check        does the recording sound like the score at all: key/capo shift, tuning, density
     structure    which written bar is played when → structure.json + report.md
     selftest     the bar search against synthetic performances (no audio, no Basic Pitch)
@@ -36,16 +39,35 @@ def save(out, name, value):
 
 # ---------------------------------------------------------------- transcribe
 
-def transcribe(out):
+HALF_SPEED_FILTER = 'rubberband=tempo=0.5:transients=crisp:detector=percussive'
+
+
+def transcribe(out, half_speed=False, audio=None):
+    import subprocess
     from basic_pitch.inference import predict
     from basic_pitch import ICASSP_2022_MODEL_PATH
-    wav = os.path.join(out, 'audio', 'mono.wav')
+    wav = audio or os.path.join(out, 'audio', 'mono.wav')
+    scale = 1.0
+    if half_speed:
+        # Same pitch, twice as long: Basic Pitch hears a fast passage as a slow one. Its
+        # frames and its 58 ms shortest note then cover half as much of the real music.
+        os.makedirs(os.path.join(out, 'audio'), exist_ok=True)
+        slow = os.path.join(out, 'audio', 'mono-half.wav')
+        subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', wav, '-af', HALF_SPEED_FILTER, '-ar', '22050', slow], check=True)
+        wav, scale = slow, 0.5
     _, midi, notes = predict(wav, ICASSP_2022_MODEL_PATH, onset_threshold=0.5, frame_threshold=0.3, minimum_note_length=58)
+    for instrument in midi.instruments:
+        for note in instrument.notes:
+            note.start, note.end = note.start * scale, note.end * scale
+        for bend in instrument.pitch_bends:
+            bend.time *= scale
     midi.write(os.path.join(out, 'transcription.mid'))
-    heard = [{'start': float(s), 'end': float(e), 'pitch': int(p), 'amp': float(a), 'bends': [int(b) for b in (bd or [])]}
+    heard = [{'start': float(s) * scale, 'end': float(e) * scale, 'pitch': int(p), 'amp': float(a), 'bends': [int(b) for b in (bd or [])]}
              for s, e, p, a, bd in sorted(notes, key=lambda n: (n[0], n[2]))]
     save(out, 'notes.json', heard)
-    print(f'{len(heard)} notes over {heard[0]["start"]:.1f}–{max(n["end"] for n in heard):.1f} s' if heard else 'no notes heard')
+    save(out, 'transcription.json', {'speed': scale, 'filter': HALF_SPEED_FILTER if half_speed else None, 'source': os.path.abspath(wav)})
+    print(f'{len(heard)} notes over {heard[0]["start"]:.1f}–{max(n["end"] for n in heard):.1f} s'
+          f'{" (transcribed at half speed, times scaled back)" if half_speed else ""}' if heard else 'no notes heard')
 
 
 # ---------------------------------------------------------------- check
@@ -293,7 +315,10 @@ def structure(out):
         'weakBars': [{'row': i, **r} for i, r in enumerate(report_rows) if r['notes'] >= 3 and r['found'] / r['notes'] < 0.6],
     }
     save(out, 'structure.json', {'summary': summary, 'rows': report_rows})
+    speed = load(out, 'transcription.json').get('speed', 1.0) if os.path.exists(os.path.join(out, 'transcription.json')) else 1.0
+    summary['transcriptionSpeed'] = speed
     lines = [f'# Alignment report', '',
+             f"- **Transcribed at:** {'half speed (times scaled back)' if speed == 0.5 else 'full speed'}; {len(heard)} notes heard",
              f"- **Order:** {' '.join(str(r['bar']) for r in report_rows)}",
              f"- **Follows the score's performed order:** {'yes' if follows else 'NO'} ({len(report_rows)} of {len(order)} performed bars)",
              f"- **Span:** {summary['start']:.2f}–{summary['end']:.2f} s of {summary['audioEnd']:.2f} s heard",
@@ -304,7 +329,7 @@ def structure(out):
     lines += [f"| {i} | {r['bar']} | {r['start']:.2f} | {r['end']:.2f} | {r['qbpm']:.0f} | {r['found']}/{r['notes']} |" for i, r in enumerate(report_rows)]
     with open(os.path.join(out, 'report.md'), 'w') as f:
         f.write('\n'.join(lines) + '\n')
-    print('\n'.join(lines[:8]))
+    print('\n'.join(lines[:9]))
     if departures:
         print('DEPARTURES: ' + ', '.join(f"row {d['row']}: {d['from']}→{d['to']}" for d in summary['departures']))
     if summary['weakBars']:
@@ -367,5 +392,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('command', choices=['transcribe', 'check', 'structure', 'selftest'])
     parser.add_argument('--out', default='.')
+    parser.add_argument('--half-speed', action='store_true', help='transcribe: a half-speed stretch, times scaled back')
+    parser.add_argument('--audio', help='transcribe: the audio to read instead of <out>/audio/mono.wav')
     a = parser.parse_args()
-    {'transcribe': transcribe, 'check': check, 'structure': structure, 'selftest': selftest}[a.command](os.path.abspath(a.out))
+    out = os.path.abspath(a.out)
+    if a.command == 'transcribe':
+        transcribe(out, a.half_speed, a.audio and os.path.abspath(a.audio))
+    else:
+        {'check': check, 'structure': structure, 'selftest': selftest}[a.command](out)

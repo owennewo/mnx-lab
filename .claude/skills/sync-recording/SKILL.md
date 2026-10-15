@@ -75,6 +75,19 @@ performed order may not be what the transcriber meant.
 the score's length at its marked tempo: a much shorter recording usually stops early; a much
 longer one plays more than the score lays out (verses, an intro, talking).
 
+**Experiment — half speed (open question in RUNS.md).** When the piece is fast or full of
+triplets, also transcribe a half-speed stretch in a sibling directory and run Steps 4–5 there:
+
+```bash
+mkdir -p $OUT-half && cp $OUT/piece.json $OUT/score.json $OUT-half/
+$PY transcribe --out $OUT-half --half-speed --audio $OUT/audio/mono.wav
+```
+
+Compare the two reports on **notes found minus chance** (not found alone — slowed audio hears
+more of everything, real and spurious, so chance rises too), weak bars, downbeat timing and
+order. Sync from full speed unless this run's evidence says otherwise, say which you used,
+and record both columns in the run entry.
+
 ## Step 4 — does it sound like the score? `$PY check --out $OUT`
 
 - **Key fit not at +0**: the recording's capo or tuning differs from the score's. **Stop and

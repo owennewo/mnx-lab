@@ -15,6 +15,8 @@ to do — each is a gap to close.
   only a near tie means anything.
 - A transcription's repeat structure can be wrong (an ending no pass reaches); `score` prints
   it as a pass diagnostic, and it is worth telling the owner.
+- Judge a transcription by notes found **minus chance**, not found alone: a denser
+  transcription (half speed, run 3) finds more of the score and matches more by accident.
 
 ## Open questions
 
@@ -23,6 +25,10 @@ to do — each is a gap to close.
 - A singer: Basic Pitch transcribes the voice too. Is pitch-class matching enough, or is a
   source-separation step needed?
 - Recordings longer than ~4 minutes: the search drops to 20 ms frames there; is that enough?
+- **Half-speed transcription** (`transcribe --half-speed`): on a fast piece with triplets, does
+  it beat full speed on found − chance, weak bars or bar placement? Run 3 is the control at
+  ~200 bpm, where it does not. Owner's question, 2026-10-15: "this song is quite fast and has
+  triplets. Perhaps if we do fast and slow we can compare both".
 
 ---
 
@@ -49,3 +55,30 @@ to do — each is a gap to close.
 - **Fixed on the way**: the key check compared twelve shifts instead of seven, and a fifth's
   0.83 tripped the ambiguity flag; the flag now needs a near tie (< 0.05).
 - **Not written** (dry run): the piece already has run 1's sync.
+
+## Run 3 — 2026-10-15 — half-speed transcription, controlled on run 1's recording
+
+- **Question** (owner): does slowing the audio to half speed before Basic Pitch help a fast
+  song with triplets? Tested first where the right sync is known: run 1's recording, ~200 bpm,
+  few triplets. Half speed = a pitch-preserving stretch, times scaled back after.
+- **Result** (bar lines compared with run 1's stored sync, which slightly favours full speed):
+
+  | | full speed | half, ffmpeg `atempo` | half, Rubber Band crisp |
+  |---|---|---|---|
+  | notes heard | 472 | 784 | 909 |
+  | score notes found (pitch class / exact) | 86% / 85% | 87% / 81% | 91% / 88% |
+  | chance | 19% | 28% | 32% |
+  | found − chance | **67** | 59 | 59 |
+  | weak bars | 2 | 3 | **1** |
+  | bar lines vs stored: median / max | 0 / 20 ms | 11 / 70 ms | 11 / 50 ms |
+  | systematic offset (signed median) | — | 1 ms | 1 ms |
+
+  Same order in all three. Slowed, Basic Pitch hears more of everything: more of the score
+  (Rubber Band recovers two of three weak bars) and more that is not there, so the margin over
+  chance falls and bar lines scatter ~±11 ms with no bias.
+- **Verdict at this tempo**: full speed for the sync; half speed (Rubber Band) as a second
+  opinion on which bars the transcription got wrong. Not yet a reason to change the default.
+- **Kept**: `transcribe --half-speed [--audio <wav>]` (Rubber Band, crisp, percussive
+  detector) and a `transcription.json` beside `notes.json` saying which speed made it; the
+  skill's Step 3 runs both on a fast or triplet-heavy piece and compares found − chance.
+- **Next**: the owner's fast song with triplets is the real test.
