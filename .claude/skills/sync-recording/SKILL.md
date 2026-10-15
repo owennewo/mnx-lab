@@ -83,10 +83,18 @@ mkdir -p $OUT-half && cp $OUT/piece.json $OUT/score.json $OUT-half/
 $PY transcribe --out $OUT-half --half-speed --audio $OUT/audio/mono.wav
 ```
 
-Compare the two reports on **notes found minus chance** (not found alone — slowed audio hears
-more of everything, real and spurious, so chance rises too), weak bars, downbeat timing and
-order. Sync from full speed unless this run's evidence says otherwise, say which you used,
-and record both columns in the run entry.
+Decide between them on what a listener would notice — **a bar or a beat in the wrong place**
+— not on milliseconds:
+
+1. **The order** must be right in the one you choose.
+2. **Notes found minus chance** — the margin that keeps a plausible wrong alignment out (not
+   found alone: slowed audio hears more of everything, real and spurious, so chance rises too).
+3. **Weak bars** — where the transcription missed the music; fewer is better.
+
+Bar-line timing differences well under ~50 ms decide nothing: the owner does not notice a
+sync off by less than ~80 ms, and neither speed has been shown the more precise. Sync from
+full speed unless half speed clears weak bars **without** losing margin; say which you used
+and why, and record both columns in the run entry.
 
 ## Step 4 — does it sound like the score? `$PY check --out $OUT`
 
@@ -111,7 +119,9 @@ Then read `$OUT/report.md`. Judge, in this order:
    it starts mid-score) a plain sync-point list that the sync bar cannot edit. The owner chooses.
 4. **Weak bars** — bars where the transcription and the performance (or the transcriber)
    disagree. Not a reason to stop; worth listing for the owner to check by ear.
-5. **Downbeats** — median under ~30 ms means bar lines sit on notes.
+5. **Downbeats** — median under ~30 ms means bar lines sit on notes. This confirms the bar
+   lines are anchored; it is not a contest. Under the owner's ~80 ms, a few milliseconds
+   either way never outweigh a wrong bar.
 
 ## Step 6 — tell the owner, then wait
 

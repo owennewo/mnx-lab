@@ -17,6 +17,11 @@ to do — each is a gap to close.
   it as a pass diagnostic, and it is worth telling the owner.
 - Judge a transcription by notes found **minus chance**, not found alone: a denser
   transcription (half speed, run 3) finds more of the score and matches more by accident.
+- **The owner's tolerance is ~80 ms** (2026-10-15: "I'm unlikely to notice anything under
+  80ms time sync being incorrect"). Timing differences of tens of milliseconds between two
+  methods decide nothing; what matters is a bar or a beat in the wrong place — the order, the
+  margin over chance, the weak bars. Run 3's ±11 ms between speeds was measured against
+  full speed's own sync, so it says neither is more precise.
 
 ## Open questions
 
