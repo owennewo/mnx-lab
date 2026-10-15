@@ -40,19 +40,19 @@
 <text x="36" y="310.1536" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="287.2976" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="333.0112" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="175.68" y="259.5296" width="8.64" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="g1"></rect>
+<rect x="175.32" y="259.5296" width="9.36" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="g1"></rect>
 <text x="180" y="264.44" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="g1">2</text>
-<rect x="220" y="256.2576" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
+<rect x="219.4" y="256.2576" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
 <text x="227.2" y="264.44" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n1">4</text>
-<rect x="334.88" y="314.3872" width="8.64" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="g2"></rect>
+<rect x="334.52" y="314.3872" width="9.36" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="g2"></rect>
 <text x="339.2" y="319.2976" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="g2">0</text>
-<rect x="360.8" y="311.1136" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
+<rect x="360.2" y="311.1136" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
 <text x="368" y="319.2976" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n2">2</text>
-<rect x="475.68" y="277.816" width="8.64" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="g3"></rect>
+<rect x="475.32" y="277.816" width="9.36" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="g3"></rect>
 <text x="480" y="282.7264" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="g3">1</text>
-<rect x="501.6" y="274.5424" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
+<rect x="501" y="274.5424" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
 <text x="508.8" y="282.7264" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n3">3</text>
-<rect x="613.6" y="311.1136" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
+<rect x="613" y="311.1136" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
 <text x="620.8" y="319.2976" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n4">2</text>
 <line x1="689.6" y1="128" x2="689.6" y2="355.8688" stroke-width="2.56" class="barline"></line>
 <line x1="689.6" y1="128" x2="1070" y2="128" stroke-width="2.08" class="staff-line"></line>
@@ -71,9 +71,9 @@
 <line x1="689.6" y1="319.2976" x2="1070" y2="319.2976" stroke-width="1.6" class="staff-line"></line>
 <line x1="689.6" y1="337.5824" x2="1070" y2="337.5824" stroke-width="1.6" class="staff-line"></line>
 <line x1="689.6" y1="355.8688" x2="1070" y2="355.8688" stroke-width="1.6" class="staff-line"></line>
-<rect x="748" y="311.1136" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n5"></rect>
+<rect x="747.4" y="311.1136" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n5"></rect>
 <text x="755.2" y="319.2976" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n5">5</text>
-<rect x="860" y="292.8288" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="r1"></rect>
+<rect x="859.4" y="292.8288" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="r1"></rect>
 <text x="867.2" y="301.0112" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="r1">2</text>
 <line x1="1057.2" y1="128" x2="1057.2" y2="355.8688" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1062" y="128" width="8" height="227.8688" fill="currentColor" class="barline barline-final-thick"></rect>

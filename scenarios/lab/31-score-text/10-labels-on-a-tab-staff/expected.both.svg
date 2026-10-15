@@ -22,7 +22,7 @@
 <text x="36" y="371.2784" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="348.4224" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="394.136" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="216.8" y="408.8112" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<rect x="216.2" y="408.8112" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
 <text x="224" y="416.9936" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
 <line x1="320.8" y1="165.5648" x2="320.8" y2="416.9936" stroke-width="2.56" class="barline"></line>
 <text x="224" y="147.8368" font-size="64" text-anchor="middle" class="segno"></text>
@@ -40,7 +40,7 @@
 <line x1="320.8" y1="380.4224" x2="527.2" y2="380.4224" stroke-width="1.6" class="staff-line"></line>
 <line x1="320.8" y1="398.7072" x2="527.2" y2="398.7072" stroke-width="1.6" class="staff-line"></line>
 <line x1="320.8" y1="416.9936" x2="527.2" y2="416.9936" stroke-width="1.6" class="staff-line"></line>
-<rect x="423.2" y="408.8112" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e0.n0"></rect>
+<rect x="422.6" y="408.8112" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e0.n0"></rect>
 <text x="430.4" y="416.9936" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e0.n0">3</text>
 <line x1="527.2" y1="165.5648" x2="527.2" y2="416.9936" stroke-width="2.56" class="barline"></line>
 <line x1="527.2" y1="165.5648" x2="733.6" y2="165.5648" stroke-width="2.08" class="staff-line"></line>
@@ -57,7 +57,7 @@
 <line x1="527.2" y1="380.4224" x2="733.6" y2="380.4224" stroke-width="1.6" class="staff-line"></line>
 <line x1="527.2" y1="398.7072" x2="733.6" y2="398.7072" stroke-width="1.6" class="staff-line"></line>
 <line x1="527.2" y1="416.9936" x2="733.6" y2="416.9936" stroke-width="1.6" class="staff-line"></line>
-<rect x="629.6" y="390.5248" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
+<rect x="629" y="390.5248" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
 <text x="636.8" y="398.7072" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e0.n0">0</text>
 <line x1="733.6" y1="165.5648" x2="733.6" y2="416.9936" stroke-width="2.56" class="barline"></line>
 <text x="636.8" y="143.1648" font-size="25.6" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="fine">fine</text>
@@ -74,7 +74,7 @@
 <line x1="733.6" y1="380.4224" x2="940" y2="380.4224" stroke-width="1.6" class="staff-line"></line>
 <line x1="733.6" y1="398.7072" x2="940" y2="398.7072" stroke-width="1.6" class="staff-line"></line>
 <line x1="733.6" y1="416.9936" x2="940" y2="416.9936" stroke-width="1.6" class="staff-line"></line>
-<rect x="836" y="390.5248" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e0.n0"></rect>
+<rect x="835.4" y="390.5248" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e0.n0"></rect>
 <text x="843.2" y="398.7072" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e0.n0">2</text>
 <line x1="927.2" y1="165.5648" x2="927.2" y2="416.9936" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="932" y="165.5648" width="8" height="251.4288" fill="currentColor" class="barline barline-final-thick"></rect>

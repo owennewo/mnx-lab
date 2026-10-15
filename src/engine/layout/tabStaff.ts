@@ -89,7 +89,7 @@ const FRET_FONT_WEIGHT = 700;
  */
 /** Air the mask leaves either side of a fret's digits, as a fraction of one
  *  digit's width: the string line stops short of the ink instead of touching it. */
-const FRET_MASK_AIR = 0.1;
+const FRET_MASK_AIR = 0.15;
 
 const FRET_BG_HEIGHT_SP = Math.min(
   FRET_FONT_SIZE_SP * 0.85,
@@ -147,9 +147,12 @@ const TAB_TUPLET_BRACKET_THICKNESS_SP = 0.1;
 /** Bracket end hooks, pointing down at the staff. */
 const TAB_TUPLET_HOOK_SP = 0.5;
 const TAB_TUPLET_NUMBER_SIZE_SP = 1.1;
-/** The break in the bracket for the number: the number's own width plus air
- *  either side, a tenth of a digit more than the bracket once allowed. */
-const TAB_TUPLET_NUMBER_GAP_SP = 0.85 + 2 * 0.1 * TAB_TUPLET_NUMBER_SIZE_SP * 0.6;
+/** White either side of the number, where the bracket breaks for it — about
+ *  a third of the number's height, the proportion the notation staff's bracket
+ *  keeps around its larger number. */
+const TAB_TUPLET_NUMBER_AIR_SP = 0.35;
+/** The whole break: the number's estimated advance plus its air either side. */
+const TAB_TUPLET_NUMBER_GAP_SP = TAB_TUPLET_NUMBER_SIZE_SP * 0.6 + 2 * TAB_TUPLET_NUMBER_AIR_SP;
 
 // ---------- System header: capo + tuning instructions ----------
 
