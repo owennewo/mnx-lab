@@ -10,18 +10,18 @@
 <text x="36" y="125.7136" font-size="60.16" class="tab-clef"></text>
 <text x="88" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="88" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="114" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c0.n0"></rect>
+<rect x="112.8" y="108.3888" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c0.n0"></rect>
 <text x="120" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.c0.n0">0</text>
-<rect x="187.6" y="71.8176" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c2.n0"></rect>
+<rect x="186.4" y="71.8176" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c2.n0"></rect>
 <text x="193.6" y="80" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.c2.n0">0</text>
-<text x="156.8" y="46.4" font-size="17.6" text-anchor="middle" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tuplet-number">3</text>
-<line x1="120" y1="46.4" x2="150" y2="46.4" stroke-width="1.6" class="tuplet-bracket"></line>
-<line x1="163.6" y1="46.4" x2="193.6" y2="46.4" stroke-width="1.6" class="tuplet-bracket"></line>
-<line x1="120" y1="46.4" x2="120" y2="54.4" stroke-width="1.6" class="tuplet-bracket"></line>
-<line x1="193.6" y1="46.4" x2="193.6" y2="54.4" stroke-width="1.6" class="tuplet-bracket"></line>
-<rect x="253.2" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="156.8" y="59.2" font-size="17.6" text-anchor="middle" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tuplet-number">3</text>
+<line x1="120" y1="59.2" x2="148.944" y2="59.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<line x1="164.656" y1="59.2" x2="193.6" y2="59.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<line x1="120" y1="59.2" x2="120" y2="67.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<line x1="193.6" y1="59.2" x2="193.6" y2="67.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<rect x="252" y="108.3888" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
 <text x="259.2" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
-<rect x="365.2" y="126.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<rect x="364" y="126.6736" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
 <text x="371.2" y="134.8576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
 <line x1="449.2" y1="80" x2="449.2" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="454" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>

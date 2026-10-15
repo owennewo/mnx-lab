@@ -181,6 +181,8 @@ function buildGlobalMeasures(
     if (sectionText) measure.section = { label: sectionText };
 
     for (const automation of masterBar.tempoAutomations ?? []) {
+      // alphaTab states a GP3-5 file's opening tempo twice; it is one mark.
+      if (measure.tempos?.at(-1)?.bpm === automation.value) continue;
       measure.tempos = measure.tempos ?? [];
       measure.tempos.push({ bpm: automation.value, value: { base: 'quarter' } });
     }

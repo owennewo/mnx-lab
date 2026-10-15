@@ -21,6 +21,9 @@ import {
   emitTabStaffLines,
   emitTabSystemHeader,
   clearTabCapoTechniques,
+  liftTabTuplets,
+  tabTupletGroups,
+  SETUP_LABEL_TUPLET_CLEAR_SP,
   emitTabTimeSig,
   emitTabVoices,
   innerColumns
@@ -498,6 +501,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     const gm = mnx.global.measures[writtenIndex(plan, i)] ?? {};
     // The text clears THIS ROW's ink only; the row above is tightenRows' job.
     if (!context || context.globalLabels) {
+    // The setup label over the first bar's tuplet brackets BEFORE the score
+    // text is placed, so the tempo mark stacks on the label where it ends up
+    // rather than clearing the bracket the label then moves over.
+    if (i === 0) clearTabCapoTechniques(primitives, tabTupletGroups(primitives).flat(), plan.inkRatio, SETUP_LABEL_TUPLET_CLEAR_SP);
     const scoreTextStart = primitives.length;
     emitHarmonies({ gm, m, stdSequences, staffTop, scan: primitives.slice(rowStart[m.row]), primitives });
     const tempoTop = emitTempoMark({
@@ -566,6 +573,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // Before the frame is fitted: the marks are ink like any other, and both
   // `ensureTopMargin` and `tightenRows` measure ink to decide how much room a
   // row actually needs. Emitted after, a bend arrow would hang off the page.
+  let marks: Primitive[] = [];
   if (hasTechniqueSites(technique)) {
     qualifyTechniques(technique, plan);
     const techniqueStart = primitives.length;
@@ -576,9 +584,14 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       ink: plan.inkRatio,
       primitives
     });
-    const lift = clearTabCapoTechniques(primitives, primitives.slice(techniqueStart), plan.inkRatio);
-    if (lift) for (const p of openingScoreText) translatePrimitiveY(p, lift);
+    marks = primitives.slice(techniqueStart);
   }
+  // Tuplet brackets sit down by their digits unless a technique mark is under
+  // them; the setup text then clears both, so it never sits on a bracket.
+  const tuplets = liftTabTuplets(primitives, marks);
+  const lift = clearTabCapoTechniques(primitives, tuplets, plan.inkRatio, SETUP_LABEL_TUPLET_CLEAR_SP)
+    + clearTabCapoTechniques(primitives, marks, plan.inkRatio);
+  if (lift) for (const p of openingScoreText) translatePrimitiveY(p, lift);
 
   // Verse rows last, still before the frame is fitted: they are ink the fit
   // measures, and they sit under everything their staff hangs below itself,

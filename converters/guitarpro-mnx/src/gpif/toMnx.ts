@@ -238,6 +238,9 @@ function buildGlobalMeasures(
     }
 
     for (const bpm of doc.tempoAutomations.get(barIndex) ?? []) {
+      // A tempo the bar has just stated is the same mark again: files saved
+      // from an earlier reading carry the opening tempo twice (tempo-once.test.ts).
+      if (measure.tempos?.at(-1)?.bpm === bpm) continue;
       measure.tempos = measure.tempos ?? [];
       measure.tempos.push({ bpm, value: { base: 'quarter' } });
     }

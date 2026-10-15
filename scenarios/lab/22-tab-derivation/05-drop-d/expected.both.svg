@@ -34,13 +34,13 @@
 <text x="36" y="378.9136" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="356.0576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="401.7712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="174" y="416.4464" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<rect x="172.8" y="416.4464" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
 <text x="180" y="424.6288" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
-<rect x="286" y="398.16" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<rect x="284.8" y="398.16" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
 <text x="292" y="406.3424" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="398" y="379.8736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<rect x="396.8" y="379.8736" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
 <text x="404" y="388.0576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
-<rect x="528.4" y="379.8736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<rect x="527.2" y="379.8736" width="14.4" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
 <text x="534.4" y="388.0576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e3.n0">4</text>
 <line x1="590.4" y1="128" x2="590.4" y2="424.6288" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="595.2" y="128" width="8" height="296.6288" fill="currentColor" class="barline barline-final-thick"></rect>

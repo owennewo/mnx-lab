@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import source from '../../scenarios/lab/25-tab-techniques/03-hammer-pull-chain/document.mnx.json';
 import type { MnxStructure, MnxEvent } from '../../src/model/mnx.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
+import { SETUP_LABEL_CLEAR_SP } from '../../src/engine/layout/tabStaff.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { inkEdgesSp } from '../../src/engine/render/bounds.ts';
 import { renderSvgMarkup } from '../../src/engine/render/svg.ts';
@@ -32,7 +33,7 @@ describe('capo clearance over opening hammer-ons', () => {
         expect(arcs.length).toBeGreaterThan(0);
         // The first arc sits under the opening label. It must remain below it,
         // including at the non-square scales the corpus goldens cannot cover.
-        expect(inkEdgesSp(arcs[0]).top - box.bottom).toBeGreaterThanOrEqual(0.99);
+        expect(inkEdgesSp(arcs[0]).top - box.bottom).toBeGreaterThanOrEqual(SETUP_LABEL_CLEAR_SP - 0.01);
         if (view === 'tab') {
           const tempo = result.primitives.filter(p => p.className === 'tempo');
           expect(tempo.length).toBeGreaterThan(0);

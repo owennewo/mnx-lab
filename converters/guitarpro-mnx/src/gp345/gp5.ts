@@ -132,7 +132,7 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
   const notes = new Map<number, GpifNote>();
   const rhythms = new Map<number, GpifRhythm>();
   const ids = { voice: 0, beat: 0, note: 0, rhythm: 0 };
-  const tempoAutomations = new Map<number, number[]>([[0, [tempo, tempo]]]);
+  const tempoAutomations = new Map<number, number[]>([[0, [tempo]]]);
   const previousNotes = new Map<string, Map<number, { id: number; note: GpifNote }>>();
 
   for (let measureIndex = 0; measureIndex < measureCount; measureIndex++) {

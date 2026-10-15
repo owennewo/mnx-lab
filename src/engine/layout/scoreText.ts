@@ -99,16 +99,35 @@ export function inkTopAbove(
   return top;
 }
 
+/**
+ * How far score text stacks above a tab staff's setup label ("DADGAD Capo 4").
+ * The label is already text over the first bar, not the staff's own ink, so the
+ * tempo mark above it joins one stack rather than keeping a staff's distance.
+ * Near zero, measured: the label is `central` text, whose estimated box
+ * reaches ~0.45sp above its capitals (`render/bounds.ts`), so boxes all but
+ * touching leave about half a staff space of white. Not zero: the tempo's
+ * provisional bottom is itself an estimate, and the boxes must never overlap.
+ */
+export const SETUP_STACK_CLEAR_SP = 0.05;
+const isSetupLabel = (p: Primitive) =>
+  p.kind === 'text' && (p.className === 'tab-capo' || p.className === 'tab-tuning-letter');
+
 /** Where a piece of score text's BOTTOM ink goes: one cohesion clearance above
- *  the bar's ink, or the minimum rise above a clear staff. */
+ *  the bar's ink (a tighter one above a tab setup label), or the minimum rise
+ *  above a clear staff. */
 export function textBottomAbove(
   scan: readonly Primitive[],
   x0: number,
   x1: number,
   staffTop: number
 ): number {
-  const inkTop = inkTopAbove(scan, x0, x1, staffTop);
-  return inkTop === null ? staffTop - TEXT_MIN_RISE_SP : inkTop - COHESION_CLEAR_SP;
+  const inkTop = inkTopAbove(scan.filter(p => !isSetupLabel(p)), x0, x1, staffTop);
+  const labelTop = inkTopAbove(scan.filter(isSetupLabel), x0, x1, staffTop);
+  if (inkTop === null && labelTop === null) return staffTop - TEXT_MIN_RISE_SP;
+  return Math.min(
+    inkTop === null ? Infinity : inkTop - COHESION_CLEAR_SP,
+    labelTop === null ? Infinity : labelTop - SETUP_STACK_CLEAR_SP
+  );
 }
 
 /**

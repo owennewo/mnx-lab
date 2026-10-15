@@ -9,8 +9,7 @@ import {
   TabPositionContext
 } from '../tab/guitarPositions.ts';
 import { inkEdgesSp } from '../render/bounds.ts';
-import { COHESION_CLEAR_SP } from './scoreText.ts';
-import { Primitive, SpatialIndex } from '../primitives.ts';
+import { Primitive, SpatialIndex, translatePrimitiveY } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import {
   type AccidentalResolver,
@@ -88,6 +87,10 @@ const FRET_FONT_WEIGHT = 700;
  * string: if two masks on adjacent strings met, a chord would erase the staff
  * lines between its digits and the tab would read as broken.
  */
+/** Air the mask leaves either side of a fret's digits, as a fraction of one
+ *  digit's width: the string line stops short of the ink instead of touching it. */
+const FRET_MASK_AIR = 0.1;
+
 const FRET_BG_HEIGHT_SP = Math.min(
   FRET_FONT_SIZE_SP * 0.85,
   TAB_STRING_SPACING_SP - 0.12
@@ -127,27 +130,47 @@ const FRET_BG_FILL = 'var(--paper, oklch(0.985 0.006 85))';
 const GRACE_FRET_SCALE = 0.6;
 
 /**
- * How far above the top string line a tuplet bracket sits.
+ * How far above the top string line a tuplet bracket sits: its hooks just
+ * clear the fret digits on the top string, so the bracket reads as belonging
+ * to the notes rather than to the text above them.
  *
- * Clear of the technique lane (`tabTechniqueLaneY`, 0.4sp up), because a
- * hammer-on slur and a triplet bracket are both drawn above the staff and both
- * belong to the same notes — overlapping them would make each unreadable. The
- * row frame does not need widening for it: `tightenRows` measures the ink that
- * is actually there.
+ * Where a technique mark in the lane (`tabTechniqueLaneY`, 0.4sp up) — a
+ * hammer-on slur, say — lies under the bracket, `liftTabTuplets` raises that
+ * one bracket over it: both belong to the same notes, and overlapping them
+ * would make each unreadable. The row frame does not need widening for it:
+ * `tightenRows` measures the ink that is actually there.
  */
-const TAB_TUPLET_RISE_SP = 2.1;
+const TAB_TUPLET_RISE_SP = 1.3;
+/** Air between a lifted tuplet bracket and the technique mark under it. */
+const TAB_TUPLET_TECHNIQUE_CLEAR_SP = 0.3;
 const TAB_TUPLET_BRACKET_THICKNESS_SP = 0.1;
 /** Bracket end hooks, pointing down at the staff. */
 const TAB_TUPLET_HOOK_SP = 0.5;
 const TAB_TUPLET_NUMBER_SIZE_SP = 1.1;
-/** Gap either side of the number, where the bracket breaks for it. */
-const TAB_TUPLET_NUMBER_GAP_SP = 0.85;
+/** The break in the bracket for the number: the number's own width plus air
+ *  either side, a tenth of a digit more than the bracket once allowed. */
+const TAB_TUPLET_NUMBER_GAP_SP = 0.85 + 2 * 0.1 * TAB_TUPLET_NUMBER_SIZE_SP * 0.6;
 
 // ---------- System header: capo + tuning instructions ----------
 
 const CAPO_FONT_SIZE_SP = 1.1;
 const CAPO_RISE_SP = 1.5; // above the top string line
 const SETUP_LABEL_GAP_SP = 0.7;
+/**
+ * How far the setup label keeps above the marks it is lifted over. Tighter than
+ * the cohesion clearance text keeps above a staff's own ink: the label is part
+ * of one stack over the first bar, and a full staff space at each step read as
+ * three separate things.
+ *
+ * Measured clearances, and the two marks are measured differently. A technique
+ * slur is a path, measured exactly, so it gets the air itself. A tuplet's
+ * number is `central` text, whose estimated box reaches ~0.45sp above its ink
+ * (`render/bounds.ts` reads it as alphabetic), so a near-zero clearance there
+ * already leaves about half a staff space of white — and the 0.1 keeps a
+ * number-less bracket, whose line IS measured exactly, off the label.
+ */
+export const SETUP_LABEL_CLEAR_SP = 0.5;
+export const SETUP_LABEL_TUPLET_CLEAR_SP = 0.1;
 
 /** "D" / "C#" / "Eb" — the letter a tuning peg is set to (octave omitted,
  *  like every printed tuning legend). */
@@ -226,7 +249,7 @@ export function emitTabSystemHeader(
  * the lift so the standalone tab host can keep its existing score-text stack
  * above the capo; the combined host places score text after this pass. */
 export function clearTabCapoTechniques(
-  primitives: readonly Primitive[], marks: readonly Primitive[], ink: number
+  primitives: readonly Primitive[], marks: readonly Primitive[], ink: number, clear = SETUP_LABEL_CLEAR_SP
 ): number {
   let lift = 0;
   const rows = new Map<number, Array<Extract<Primitive, { kind: 'text' }>>>();
@@ -251,8 +274,8 @@ export function clearTabCapoTechniques(
         const edge = inkEdgesSp(mark);
         if (edge.right < left || edge.left > right) continue;
         const shiftedTop = top + bottom - initialBottom;
-        if (edge.bottom < shiftedTop - COHESION_CLEAR_SP || edge.top > bottom + COHESION_CLEAR_SP) continue;
-        bottom = Math.min(bottom, edge.top - COHESION_CLEAR_SP);
+        if (edge.bottom < shiftedTop - clear || edge.top > bottom + clear) continue;
+        bottom = Math.min(bottom, edge.top - clear);
       }
       if (bottom === previous) break;
     }
@@ -261,6 +284,54 @@ export function clearTabCapoTechniques(
     lift = Math.min(lift, dy);
   }
   return lift;
+}
+
+const isTabTupletInk = (p: Primitive) =>
+  (p.kind === 'text' && p.className === 'tuplet-number') || (p.kind === 'line' && p.className === 'tuplet-bracket');
+
+/**
+ * Each tuplet's number and bracket, as `emitTabTupletBracket` emitted them: one
+ * contiguous run per tuplet (its digits are drawn before it, so runs never
+ * touch), the number opening a new one.
+ */
+export function tabTupletGroups(primitives: readonly Primitive[]): Primitive[][] {
+  const groups: Primitive[][] = [];
+  let open = false;
+  for (const p of primitives) {
+    if (!isTabTupletInk(p)) { open = false; continue; }
+    if (!open || p.kind === 'text') groups.push([]);
+    groups.at(-1)!.push(p);
+    open = true;
+  }
+  return groups;
+}
+
+/**
+ * Raise each tuplet bracket over the technique marks beneath it, and only
+ * those: a bracket with nothing under it stays down by its digits. Returns the
+ * brackets' ink, which the setup text then clears like any other mark.
+ */
+export function liftTabTuplets(primitives: readonly Primitive[], marks: readonly Primitive[]): Primitive[] {
+  const groups = tabTupletGroups(primitives);
+  for (const group of groups) {
+    const boxes = group.map(inkEdgesSp);
+    const left = Math.min(...boxes.map(b => b.left)), right = Math.max(...boxes.map(b => b.right));
+    const top = Math.min(...boxes.map(b => b.top)), initialBottom = Math.max(...boxes.map(b => b.bottom));
+    let bottom = initialBottom;
+    for (let pass = 0; pass <= marks.length; pass++) {
+      const previous = bottom;
+      for (const mark of marks) {
+        const edge = inkEdgesSp(mark);
+        if (edge.right < left || edge.left > right) continue;
+        const shiftedTop = top + bottom - initialBottom;
+        if (edge.bottom < shiftedTop - TAB_TUPLET_TECHNIQUE_CLEAR_SP || edge.top > bottom + TAB_TUPLET_TECHNIQUE_CLEAR_SP) continue;
+        bottom = Math.min(bottom, edge.top - TAB_TUPLET_TECHNIQUE_CLEAR_SP);
+      }
+      if (bottom === previous) break;
+    }
+    if (bottom !== initialBottom) for (const p of group) translatePrimitiveY(p, bottom - initialBottom);
+  }
+  return groups.flat();
 }
 
 // ---------- Prefix emission ----------
@@ -756,11 +827,12 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // Background rect obscures the staff line under the digit. Its width
       // is drawn on the ink scale, so its left edge is placed on it too —
       // otherwise the mask and the digit come apart as the staff grows.
+      const maskWidthSp = charWidthSp + 2 * FRET_MASK_AIR * fontSize * 0.6;
       primitives.push({
         kind: 'rect',
-        x: eventX - (charWidthSp / 2) * ink,
+        x: eventX - (maskWidthSp / 2) * ink,
         y: stringY - bgHeight / 2,
-        w: charWidthSp,
+        w: maskWidthSp,
         h: bgHeight,
         fill: FRET_BG_FILL,
         className: 'fret-bg',
