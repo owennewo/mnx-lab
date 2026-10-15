@@ -75,9 +75,12 @@ export function inkEdgesSp(p: Primitive): InkEdgesSp {
       const w = p.text.length * p.size * TEXT_ADVANCE;
       const tx = p.x + (p.dx ?? 0);
       const left = p.anchor === 'middle' ? tx - w / 2 : p.anchor === 'end' ? tx - w : tx;
+      // `central` sits the em box's middle on y: the alphabetic baseline is
+      // (ascent - descent) / 2 below it, so the ink rides that much lower.
       const top =
         p.baseline === 'middle' ? p.y - p.size / 2
         : p.baseline === 'hanging' ? p.y
+        : p.baseline === 'central' ? p.y - p.size * (TEXT_ASCENT + TEXT_DESCENT) / 2
         : p.y - p.size * TEXT_ASCENT;
       return { left, top, right: left + w, bottom: top + p.size };
     }

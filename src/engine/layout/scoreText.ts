@@ -103,12 +103,11 @@ export function inkTopAbove(
  * How far score text stacks above a tab staff's setup label ("DADGAD Capo 4").
  * The label is already text over the first bar, not the staff's own ink, so the
  * tempo mark above it joins one stack rather than keeping a staff's distance.
- * Near zero, measured: the label is `central` text, whose estimated box
- * reaches ~0.45sp above its capitals (`render/bounds.ts`), so boxes all but
- * touching leave about half a staff space of white. Not zero: the tempo's
- * provisional bottom is itself an estimate, and the boxes must never overlap.
+ * Small, measured: the label's estimated box reaches above its capitals (the
+ * ascent covers lowercase ascenders), so this leaves about half a staff space
+ * of white.
  */
-export const SETUP_STACK_CLEAR_SP = 0.05;
+export const SETUP_STACK_CLEAR_SP = 0.25;
 const isSetupLabel = (p: Primitive) =>
   p.kind === 'text' && (p.className === 'tab-capo' || p.className === 'tab-tuning-letter');
 

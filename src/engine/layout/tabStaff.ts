@@ -166,11 +166,12 @@ const SETUP_LABEL_GAP_SP = 0.7;
  * three separate things.
  *
  * Measured clearances, and the two marks are measured differently. A technique
- * slur is a path, measured exactly, so it gets the air itself. A tuplet's
- * number is `central` text, whose estimated box reaches ~0.45sp above its ink
- * (`render/bounds.ts` reads it as alphabetic), so a near-zero clearance there
- * already leaves about half a staff space of white — and the 0.1 keeps a
- * number-less bracket, whose line IS measured exactly, off the label.
+ * slur is a path, measured exactly, so it gets the air itself. The label is
+ * text, measured as if it had descenders, which capitals do not — its box
+ * hangs ~0.2sp below the ink — and a tuplet number's box rises ~0.1sp above
+ * its digit, so a small clearance there already leaves about half a staff
+ * space of white; the 0.1 keeps a number-less bracket, whose line IS measured
+ * exactly, off the label.
  */
 export const SETUP_LABEL_CLEAR_SP = 0.5;
 export const SETUP_LABEL_TUPLET_CLEAR_SP = 0.1;
