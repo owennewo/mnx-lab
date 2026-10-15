@@ -26,7 +26,9 @@ to do — each is a gap to close.
 ## Open questions
 
 - A recording that departs from the score's order: which of the three options do owners
-  choose, and should the tool help edit the score's repeats?
+  choose, and should the tool help edit the score's repeats? Run 4: the owner chose to
+  restructure the score, once three recordings showed the score was the outlier; the edit
+  needed a hand-written script (gap 6 below), so yes, the tool should help.
 - A singer: Basic Pitch transcribes the voice too. Is pitch-class matching enough, or is a
   source-separation step needed?
 - Recordings longer than ~4 minutes: the search drops to 20 ms frames there; is that enough?
@@ -87,3 +89,65 @@ to do — each is a gap to close.
   detector) and a `transcription.json` beside `notes.json` saying which speed made it; the
   skill's Step 3 runs both on a fast or triplet-heavy piece and compares found − chance.
 - **Next**: the owner's fast song with triplets is the real test.
+
+## Run 4 — 2026-10-15 — Merrily Kissed The Quaker (three candidate recordings)
+
+- **Piece** `8ab33f9e192ee9de` — a GP transcription tagged Pierre Bensusan, DADGAD, capo 4,
+  4/4 at a marked 128 bpm in triplet eighths; 45 written bars, no repeats, 45 performed. In
+  content it is three 4-bar parts written A B C · A B C · A′ B′ · A B C (A′ and B′ an octave
+  down; bars 1–12 = 13–24 = 33–44 nearly note for note).
+- **Recording 1** YouTube `TuUnWQV-c8U` (Bensusan, *Merrily Kissed the Quaker/Cunla*, 257 s):
+  key +0, tuning +33 cents. 6–105 s is this tune played A A B B C C twice (83% found, 88% at
+  half speed); from 107 s it is another tune, *Cunla* (50–59%). Overall 67% / 36% chance,
+  44 weak bars, 104–121 bpm. **Owner rejected the pairing** — a medley is not a good pair.
+  Half speed, first 105 s: same order, bar lines median 0 / max 40 ms apart, weak bars
+  4 → 0, overall margin 31 → 28 points: a tie on what a listener hears; full speed kept.
+- **Recording 2** YouTube `eynTWo8xXGs` (Nik Davies, *Celtic Fingerstyle Guitar*, 119 s):
+  key +0, +33 cents; 80% / 77% exact against 37% chance, 2 weak bars, downbeats 6 ms,
+  116–123 bpm. Played A A B B C C · A′ A′ B′ B′ C C · A A (56 bars, octaves checked by exact
+  pitch: low bars 71–92% against their high twins' 12–43%), with first/second-time endings
+  that are the score's own pickup-less and pickup bars.
+- **Recording 3** YouTube `HhsCSPxFz0c` (Matthias Siegrist, same title): **key fit −2**
+  (capo 2 or a whole step down). Against the score shifted −2: 79% / 35%, 5 weak bars, the
+  same 56-bar form as Davies — the same arrangement two frets lower.
+- **Owner's choice**: Davies, with the score restructured to the doubled form. Written
+  as a checkpoint (version "Doubled form: A B C A′ B′ C A, each part repeated"): 32 written
+  bars, 57 performed, each part in repeats, voltas where the score had a pickup and a
+  pickup-less ending (one copy of bar 44 with fresh note ids); storage check `gains` only
+  (explicit `repeatEnd.times`). Bensusan recording removed (unsynced), Davies attached.
+- **Against the restructured score**: the free search followed the score's order for all
+  57 bars; 80% / 37%; downbeats median 6 ms, 90th percentile 24 ms; 113–123 bpm.
+- **Written**: 57 segments, 58 cuts (55 snapped), 0.38–114.57 s; piece revision 5.
+- **Owner**: "I think it lines up very well."
+- **Improvised** (each a gap to close):
+  1. **Assessing a candidate video not on the piece**: `fetch` only reads attached
+     recordings, so each candidate got its own run directory with `piece.json`'s
+     `external_id` swapped by hand. Wanted: `audio --video <url>` for assessment runs.
+  2. **Lookalike bars**: the DEPARTURES list (21 on recording 1, 8 on recording 2) was mostly
+     the search choosing between identical bars. I grouped bars by content (exact and by
+     pitch class) and mapped the found order to parts by hand. Wanted: the report names
+     lookalike bars and prints the order as content classes.
+  3. **Finding where a recording stops being this score**: the report has one overall found
+     figure. I computed found per stretch (83% / 59% / 50%) and a self-similarity check —
+     each later bar against the well-matched first 105 s (0.52–0.62, against 0.87 within the
+     first half and 0.49 for bars shifted half a beat). A wrong-key copy of the score as a
+     chance baseline **failed**: the search drifted to 32 bpm and is not comparable.
+  4. **Octave variants**: pitch class cannot tell A from A′; I compared exact-pitch found
+     against each variant per row.
+  5. **Assessing a recording at a different capo**: Step 4 says stop; to answer the owner's
+     "is it a closer match" I shifted a copy of the score −2 and searched that. Right for
+     assessment, never for a sync.
+  6. **Restructuring the score**: no tool. A scratchpad script rebuilt the global and part
+     measures from a plan of parts (repeats, voltas, a copied bar with renamed ids, slide
+     targets checked to stay within their bars), compiled the passes, ran
+     `checkStorage`, checked the stored `.gp` reads back in the same order, and posted a
+     checkpoint (`POST /pieces/:id/renditions`, tags from `projectPieceTags`). Dry run first.
+  7. **Swapping a recording's media**: the library refuses a media change on an existing
+     recording ("Attach a new recording to use different media"), so the swap is attach
+     (`PUT` with a new `studio-<uuid>` and `video`) then remove (`DELETE`), by hand with
+     curl. Claude Code's auto-mode classifier blocked both until the owner said to do them;
+     a removal needs the owner's explicit word, like `--replace`.
+- **Time**: one session; three candidates downloaded and transcribed.
+- **Next**: gaps 1 and 7 are small `align.ts` commands (`audio --video`, `attach`); gap 2
+  belongs in the report; gap 6 is the larger one (a plan-of-parts restructure that writes a
+  checkpoint) and earns its place when a second run needs it.
