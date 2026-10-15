@@ -518,6 +518,12 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[studio-recording-align.md](complete/studio-recording-align.md)** — **complete 2026-10-15**:
+  the `sync-recording` skill and `tools/recording-align/` — Basic Pitch, studio's performed
+  score, a free-order bar search reported against chance, the sync written in the sync bar's
+  format after the owner has seen it, and a reflection step that keeps RUNS.md and improves
+  the skill; `segmentsFromBarStarts` joins the sync model.
+
 - **[core-tab-rest-targets.md](complete/core-tab-rest-targets.md)** — **complete 2026-10-14**:
   a tab rest gets an invisible, selectable target where its digit would stand (viewer only,
   no golden moved), so the cursor stands on it, a press finds it and the enclosure wraps it;

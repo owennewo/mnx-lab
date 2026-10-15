@@ -292,3 +292,23 @@ export function decodeSyncSegments(input: unknown): SyncSegmentsResult {
   }
   return { ok: true, value: { version: 1, beat: [beat[0] as number, beat[1] as number], cuts: [...cuts] as number[], closed, segments: value } };
 }
+
+/**
+ * A sync from bar lines found in a recording (tools/recording-align): a cut on each bar's
+ * first beat and one where the last bar ends, each segment that bar's beats. The bars are
+ * the score's performed bars FROM THE FIRST (a sync's first cut is always performed bar 0),
+ * as written lengths in whole notes. The beat is the longest of a quarter, an eighth, a
+ * sixteenth or a 32nd that every bar holds a whole number of — 7/8 counts in eighths. Null
+ * when the cuts and bars do not pair up, or no such beat exists.
+ */
+export function segmentsFromBarStarts(cuts: readonly number[], barWholes: readonly number[], names?: readonly string[]): SyncSegments | null {
+  if (barWholes.length === 0 || cuts.length !== barWholes.length + 1) return null;
+  const whole = (x: number) => Math.abs(x - Math.round(x)) < 1e-6 && Math.round(x) >= 1;
+  const unit = [4, 8, 16, 32].find(den => barWholes.every(w => whole(w * den)));
+  if (unit === undefined) return null;
+  const decoded = decodeSyncSegments({
+    version: 1, beat: [1, unit], cuts: cuts.map(round), closed: true,
+    segments: barWholes.map((w, i) => ({ name: names?.[i]?.trim().slice(0, MAX_NAME) || `Bar ${i + 1}`, beats: Math.round(w * unit), bpm: null })),
+  });
+  return decoded.ok ? decoded.value : null;
+}

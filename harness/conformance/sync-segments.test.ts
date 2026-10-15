@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, moveCut, placeEnd, placeStart, removeCut,
-  renameSegment, segmentAt, segmentTempo, setBeats, setBpm, splitAt, syncpointsFromSegments, type SyncSegments,
+  renameSegment, segmentAt, segmentTempo, segmentsFromBarStarts, setBeats, setBpm, splitAt, syncpointsFromSegments, type SyncSegments,
 } from '../../src/model/syncSegments.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { createRecordingSync } from '../../src/audio/recordingSync.ts';
@@ -171,5 +171,27 @@ describe('sync segments: stored shape', () => {
     expect(defaultBeatUnit({ count: 4, unit: 4 })).toEqual([1, 4]); expect(defaultBeatUnit({ count: 12, unit: 8 })).toEqual([3, 8]);
     expect(defaultBeatUnit({ count: 6, unit: 8 })).toEqual([3, 8]); expect(defaultBeatUnit({ count: 3, unit: 8 })).toEqual([1, 8]);
     expect(defaultBeatUnit({ count: 2, unit: 2 })).toEqual([1, 2]); expect(defaultBeatUnit(undefined)).toEqual([1, 4]);
+  });
+});
+
+// tools/recording-align: bar lines found in a recording become the sync the sync bar edits.
+describe('sync segments: from bar starts', () => {
+  it('cuts each bar on its first beat, counts its beats, and derives the same bar tuples back', () => {
+    // 4/4, 6/4, 4/4 at a steady 120 bpm from 0.5 s: two seconds a 4/4 bar.
+    const bars = [1, 1.5, 1];
+    const doc = segmentsFromBarStarts([0.5, 2.5, 5.5, 7.5], bars, ['Bar 1', 'Bar 2', 'Bar 3'])!;
+    expect(doc).toMatchObject({ beat: [1, 4], closed: true, cuts: [0.5, 2.5, 5.5, 7.5] });
+    expect(doc.segments.map(s => s.beats)).toEqual([4, 6, 4]);
+    expect(syncpointsFromSegments(doc, bars.map(w => w * 4))).toEqual([[0, 0.5], [1, 2.5], [2, 5.5], [3, 7.5]]);
+  });
+  it('counts in eighths when a bar is not whole quarters, and names an unnamed bar by its place', () => {
+    const doc = segmentsFromBarStarts([0, 1.75, 3.5], [7 / 8, 7 / 8])!;
+    expect(doc.beat).toEqual([1, 8]);
+    expect(doc.segments).toEqual([{ name: 'Bar 1', beats: 7, bpm: null }, { name: 'Bar 2', beats: 7, bpm: null }]);
+  });
+  it('refuses cuts that do not pair with the bars, or do not increase', () => {
+    expect(segmentsFromBarStarts([0, 1], [1, 1])).toBeNull();
+    expect(segmentsFromBarStarts([0, 2, 1], [1, 1])).toBeNull();
+    expect(segmentsFromBarStarts([0], [])).toBeNull();
   });
 });
