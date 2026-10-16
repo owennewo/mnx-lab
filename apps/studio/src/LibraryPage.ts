@@ -81,6 +81,8 @@ export class LibraryPage extends LitElement {
     .search { flex: 1; display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 3px; padding: 0 10px; }
     .search input { flex: 1; min-width: 0; font: inherit; color: inherit; background: transparent; border: 0; padding: 7px 0; outline: none; }
     .search svg { color: var(--ink-dim); flex: none; }
+    .search .clear { border: 0; padding: 8px; margin-right: -8px; display: inline-flex; flex: none; color: var(--ink-dim); }
+    .search .clear:hover { color: var(--ink); }
     .sort { display: flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
     .sort button { border: 0; border-radius: 0; padding: 7px 12px; font-size: 13px; color: var(--ink-dim); }
     .sort button + button { border-left: 1px solid var(--line); }
@@ -270,6 +272,12 @@ export class LibraryPage extends LitElement {
     try { const { tags } = await this.client.tags(`${tag.dimension}:${tag.value}`); if (query === this.query) this.suggestions = tags; }
     catch { /* completion is a convenience */ }
   }
+  /** The × in the search box: one tap on a phone rather than a held backspace. A
+   *  keyboard user goes back to the box; a touch does not, so no keyboard springs up. */
+  private clearQuery = () => {
+    this.query = ''; this.suggestions = [];
+    if (!matchMedia('(pointer: coarse)').matches) this.renderRoot.querySelector<HTMLInputElement>('.search input')?.focus();
+  };
   private onSubmit(event: Event) {
     event.preventDefault();
     const tag = parseTag(this.query);
@@ -428,6 +436,7 @@ export class LibraryPage extends LitElement {
           <form class="search" @submit=${this.onSubmit}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4.2-4.2"></path></svg>
             <input aria-label="Search titles, artists and tags, or type a tag filter" placeholder="Search titles, artists, tags — or filter: capo:3, part:Ukulele" list="suggest" maxlength="512" .value=${this.query} @input=${this.onInput} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event)} />
+            ${this.query ? html`<button type="button" class="clear" aria-label="Clear search" title="Clear search" @click=${this.clearQuery}>${cross}</button>` : nothing}
             <datalist id="suggest">${this.suggestions.map(f => html`<option value=${tagOf(f.dimension, f.value)}>${f.pieces} piece${f.pieces === 1 ? '' : 's'}</option>`)}</datalist>
           </form>
           <button class="filters" aria-haspopup="dialog" aria-label=${this.filters.length ? `Filters, ${this.filters.length} on` : 'Filters'} @click=${() => (this.sheet = true)}>
