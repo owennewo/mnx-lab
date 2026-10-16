@@ -518,7 +518,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     if (!m.entry) emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitMeasureFermata({ gm, m, staffTop, staffHeight: STAFF_HEIGHT_SP, primitives });
     emitOccurrenceLabel(m, staffTop, primitives);
-    emitMeasureNumber(gm, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)]);
+    emitMeasureNumber(gm, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)], (m.entry?.ordinal ?? writtenIndex(plan, i)) === 0);
     emitScoreLabels({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]),
       clearAbove: swingTop ?? tempoTop, primitives

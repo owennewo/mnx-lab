@@ -2226,7 +2226,7 @@ function assembleSegment(
       staffHeight: STAFF_HEIGHT_SP,
       primitives
     });
-    emitMeasureNumber(mnx.global.measures[writtenIndex(plan, i)] ?? {}, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)]);
+    emitMeasureNumber(mnx.global.measures[writtenIndex(plan, i)] ?? {}, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)], (m.entry?.ordinal ?? writtenIndex(plan, i)) === 0);
     // The tempo mark and the label row are emitted after the loop — they are
     // placed one clearance above the bar's ink, and the beams, voltas and
     // ottava brackets that ink includes are drawn after the loop too.

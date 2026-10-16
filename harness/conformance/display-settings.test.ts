@@ -2,6 +2,7 @@ import { compilePerformance } from '../../src/audio/performance.ts';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { MnxPitch, MnxStructure } from '../../src/model/mnx.ts';
+import { linearizePasses } from '../../src/model/passes.ts';
 import { displayedMeasureNumbers, normalizeDisplayOptions } from '../../src/engine/displayOptions.ts';
 import { selectedLyricLineIds } from '../../src/engine/layout/lyricRuns.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
@@ -142,15 +143,23 @@ describe('displayed measure and instrument labels', () => {
       const mnx = score();
       for (const widthSp of [45, 90]) {
         const every = layout({ mnx, widthSp, display: { barNumbers: 'every-bar', instrumentNames: 'every-system' } });
-        expect(text(every, 'measure-number')).toHaveLength(12);
+        expect(text(every, 'measure-number').map(p => p.kind === 'text' ? p.text : '')).toEqual(['1', '2', '3', '20', '21', '22', '23', '24', '25', '26', '27']);
         expect(text(every, 'staff-label')).toHaveLength(every.rows.length);
         const first = layout({ mnx, widthSp, display: { barNumbers: 'every-system', instrumentNames: 'first-system' } });
-        expect(text(first, 'measure-number')).toHaveLength(first.rows.length);
+        expect(text(first, 'measure-number')).toHaveLength(first.rows.length - 1);
         expect(text(first, 'staff-label')).toHaveLength(1);
         const hidden = layout({ mnx, widthSp, display: { barNumbers: 'hide', instrumentNames: 'hide' } });
         expect(text(hidden, 'measure-number')).toHaveLength(0);
         expect(text(hidden, 'staff-label')).toHaveLength(0);
       }
+    });
+    it(`${name}: the opening bar is never numbered, a return to it unrolled is`, () => {
+      initSmufl();
+      const mnx = score();
+      mnx.global.measures[1] = { ...mnx.global.measures[1], repeatEnd: {} };
+      const entries = linearizePasses(mnx).entries;
+      const labels = layout({ mnx, widthSp: 400, entries, display: { barNumbers: 'every-bar' } });
+      expect(text(labels, 'measure-number').map(p => p.kind === 'text' ? p.text : '').slice(0, 4)).toEqual(['1', '0', '1', '2']);
     });
     it(`${name}: unnamed parts remain unlabeled`, () => {
       initSmufl();
@@ -193,7 +202,7 @@ describe('multi-part display systems and score blocks', () => {
       const every = layout({ mnx, widthSp: 80, display: { instrumentNames: 'every-system', barNumbers: 'every-system', lyrics: 'current' } });
       expect(every.rows.length).toBeGreaterThan(1);
       expect(texts(every, 'staff-label')).toHaveLength(every.rows.length * 2);
-      expect(texts(every, 'measure-number')).toHaveLength(every.rows.length);
+      expect(texts(every, 'measure-number')).toHaveLength(every.rows.length - 1);
       const first = layout({ mnx, widthSp: 80, display: { instrumentNames: 'first-system', lyrics: 'current' } });
       expect(texts(first, 'staff-label')).toHaveLength(2);
       expect([...first.index.keys()].some(key => key.startsWith('@p1.'))).toBe(true);
@@ -239,7 +248,7 @@ describe('multi-part display systems and score blocks', () => {
       const mnx = ensemble();
       mnx.scores = [{ multimeasureRests: [{ start: 'bar1', duration: 3 }] }];
       const result = layout({ mnx, widthSp: 100, display: { barNumbers: 'every-bar' } });
-      expect(texts(result, 'measure-number').map(p => p.kind === 'text' ? p.text : '')).toEqual(['0', '1', '4', '5', '6', '7']);
+      expect(texts(result, 'measure-number').map(p => p.kind === 'text' ? p.text : '')).toEqual(['1', '4', '5', '6', '7']);
       expect(result.primitives.some(p => p.className === 'multirest-bar')).toBe(true);
     });
     it(`${name}: display choices preserve audio timing and selection inputs`, () => {

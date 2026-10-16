@@ -135,6 +135,10 @@ export function emitSpanMarks({ leftInkX, yTop, yBottom, marks, fill, primitives
 // unasked would move every golden in the corpus. A declared `number` is the
 // author saying this bar reads N — so it reads N, small, at the bar's start,
 // tucked under where the tempo and the labels stack.
+//
+// A chosen mode (every bar / every system) never numbers the opening bar: the
+// first bar of the piece is obviously the first. A return to it later in an
+// unrolled performance is not the opening, so that one keeps its number.
 const MEASURE_NUMBER_SIZE_SP = 1.3;
 const MEASURE_NUMBER_RISE_SP = 0.9; // baseline above the top line
 const MEASURE_NUMBER_INSET_SP = 0.2;
@@ -145,9 +149,11 @@ export function emitMeasureNumber(
   staffTop: number,
   primitives: Primitive[],
   mode?: DisplayOptions['barNumbers'],
-  displayedNumber?: number
+  displayedNumber?: number,
+  opening = false
 ): void {
   if (mode === 'hide' || (mode === 'every-system' && !m.firstInSystem)) return;
+  if (mode && opening) return;
   const number = mode ? displayedNumber ?? gm.number : gm.number;
   if (number === undefined) return;
   primitives.push({
