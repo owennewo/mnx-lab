@@ -202,9 +202,16 @@ export class ScoreFrame extends LitElement {
         font-size: 14px;
         line-height: 1.4;
         color: var(--ink);
-        /* The library page's vocabulary: its grey ground and its bar. */
+        /* The library page's grey ground, and the strips' SAND: a warm bar
+           above and below the white paper, so the chrome reads as one frame
+           around the score (Studio tray & header canvas, 2026-10-16). The
+           tray's cells and the strips' hairlines take the same warmth;
+           --tray-cell is read by the slotted player's rail and value boxes. */
         --frame-ground: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
-        --frame-bar: light-dark(oklch(0.985 0.002 60 / 0.92), oklch(0.22 0.004 60 / 0.92));
+        --frame-bar: light-dark(oklch(0.948 0.012 75 / 0.94), oklch(0.245 0.008 70 / 0.94));
+        --frame-line: light-dark(oklch(0.86 0.016 75), oklch(0.36 0.008 70));
+        --frame-press: light-dark(oklch(0.905 0.016 75), oklch(0.3 0.008 70));
+        --tray-cell: light-dark(oklch(0.885 0.014 75), oklch(0.34 0.008 70));
         --frame-radius: 3px;
         --frame-shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
       }
@@ -332,11 +339,13 @@ export class ScoreFrame extends LitElement {
       .strip.top {
         /* Above the bottom strip, so an open pad paints over the tray. */
         z-index: 4;
-        border-bottom: 1px solid var(--line);
+        padding-block: 8px;
+        border-bottom: 1px solid var(--frame-line);
       }
 
       .strip.bottom {
-        border-top: 1px solid var(--line);
+        padding-block: 8px;
+        border-top: 1px solid var(--frame-line);
         align-items: flex-start;
       }
 
@@ -366,10 +375,13 @@ export class ScoreFrame extends LitElement {
         min-width: 0;
       }
 
+      /* One line, one baseline: the way back, the title and the artist read
+         as a breadcrumb rather than a small link beside a large heading. */
       .head h1 {
         margin: 0;
-        font-size: 1.4rem;
-        font-weight: 600;
+        font-size: 17px;
+        font-weight: 650;
+        letter-spacing: -0.005em;
         line-height: 1.2;
         white-space: nowrap;
         overflow: hidden;
@@ -381,7 +393,7 @@ export class ScoreFrame extends LitElement {
         overflow: hidden;
         text-overflow: ellipsis;
         color: var(--ink-3);
-        font-size: 13px;
+        font-size: 15px;
         white-space: nowrap;
       }
 
@@ -394,6 +406,9 @@ export class ScoreFrame extends LitElement {
         flex: none;
         width: 32px;
         height: 32px;
+        /* Not taller than the title's line: a 32px box would set the head's
+           height and lift the title off the way back's centre. */
+        margin-block: -6px;
         padding: 0;
         border-color: transparent;
         color: var(--ink-3);
@@ -414,7 +429,7 @@ export class ScoreFrame extends LitElement {
 
       .head ::slotted([slot='title-action'][aria-expanded='true']) {
         border-color: var(--line);
-        background: var(--frame-ground);
+        background: var(--frame-press);
         color: var(--ink);
       }
 
@@ -479,7 +494,7 @@ export class ScoreFrame extends LitElement {
          width — the frame is the container its slotted link queries. */
       @container (max-width: 480px) {
         .head h1 {
-          font-size: 1.2rem;
+          font-size: 16px;
         }
       }
 
@@ -524,7 +539,40 @@ export class ScoreFrame extends LitElement {
       }
 
       .btn.on {
-        background: var(--frame-ground);
+        background: var(--frame-press);
+      }
+
+      /* The score's own tools, named: a glyph and its word, borderless on the
+         sand, pressed when their pad is open. The word goes where the row is
+         short of room; the tooltip and the accessible name keep it. */
+      .btn.tool {
+        gap: 7px;
+        padding: 0 10px;
+        border-color: transparent;
+        color: var(--ink-2);
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .btn.tool:hover {
+        border-color: transparent;
+        background: var(--frame-press);
+        color: var(--ink);
+      }
+
+      .btn.tool.on {
+        color: var(--ink);
+      }
+
+      @container (max-width: 640px) {
+        .btn.tool {
+          width: 40px;
+          padding: 0;
+        }
+
+        .btn.tool .word {
+          display: none;
+        }
       }
 
       .btn:hover,
@@ -818,13 +866,14 @@ export class ScoreFrame extends LitElement {
   private static get play() { return ScoreFrame.glyph('M8 5l11 7-11 7z', 18); }
   private static get pause() { return ScoreFrame.glyph('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z', 18); }
 
-  /** The pads' own marks, so the buttons say what they open. */
-  private static get crosshair() {
-    return svg`<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2l4 4h-2.5v3h-3V6H8zM12 22l-4-4h2.5v-3h3v3H16zM2 12l4-4v2.5h3v3H6V16zM22 12l-4 4v-2.5h-3v-3h3V8z"></path></svg>`;
+  /** The pads' own marks, beside their words: a magnifier for Zoom (the
+   *  four arrows it replaced read as "move"), staff lines for View. */
+  private static get magnifier() {
+    return svg`<svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M20 20l-5-5M8 10.5h5M10.5 8v5"></path></svg>`;
   }
 
-  private static get gear() {
-    return svg`<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="3.4" stroke-dasharray="3.14 3.14" stroke-dashoffset="1.57"></circle><circle cx="12" cy="12" r="6.6" fill="none" stroke="currentColor" stroke-width="1.6"></circle><circle cx="12" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"></circle></svg>`;
+  private static get staffLines() {
+    return svg`<svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18M3 10h18M3 13h18M3 17.5h7M14 17.5h7"></path></svg>`;
   }
 
   // ── render ──────────────────────────────────────────────────────────────
@@ -897,8 +946,8 @@ export class ScoreFrame extends LitElement {
         ${this.pads
           ? html`
               <div class="anchor">
-                <button class="btn icon ${this.pad === 'zoom' ? 'on' : ''}" type="button" aria-label="Zoom" title="Zoom" aria-expanded=${this.pad === 'zoom'} @click=${() => this.togglePad('zoom')}>
-                  ${ScoreFrame.crosshair}
+                <button class="btn tool ${this.pad === 'zoom' ? 'on' : ''}" type="button" aria-label="Zoom" title="Zoom" aria-expanded=${this.pad === 'zoom'} @click=${() => this.togglePad('zoom')}>
+                  ${ScoreFrame.magnifier}<span class="word">Zoom</span>
                 </button>
                 ${this.pad === 'zoom'
                   ? html`<div class="popover">
@@ -914,8 +963,8 @@ export class ScoreFrame extends LitElement {
                   : nothing}
               </div>
               <div class="anchor">
-                <button class="btn icon ${this.pad === 'settings' ? 'on' : ''}" type="button" aria-label="Settings" title="Settings" aria-expanded=${this.pad === 'settings'} @click=${() => this.togglePad('settings')}>
-                  ${ScoreFrame.gear}
+                <button class="btn tool ${this.pad === 'settings' ? 'on' : ''}" type="button" aria-label="View" title="View" aria-expanded=${this.pad === 'settings'} @click=${() => this.togglePad('settings')}>
+                  ${ScoreFrame.staffLines}<span class="word">View</span>
                 </button>
                 ${this.pad === 'settings'
                   ? html`<div class="popover">

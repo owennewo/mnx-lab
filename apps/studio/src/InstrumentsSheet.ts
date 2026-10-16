@@ -190,7 +190,7 @@ export class InstrumentsSheet extends LitElement {
   render() {
     const visibleCount = this.parts.filter((p) => !this.hiddenParts.includes(p.index)).length;
     return html`
-      <header><b>Instruments</b><button class="plain" type="button" aria-label="Close instruments" @click=${() => this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }))}>${cross}</button></header>
+      <header><b>Parts</b><button class="plain" type="button" aria-label="Close parts" @click=${() => this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }))}>${cross}</button></header>
       <section>
         ${this.mixAvailable
           ? nothing

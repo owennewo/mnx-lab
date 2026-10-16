@@ -55,7 +55,7 @@ try {
   const options = `[...${select}.options].map(o => o.textContent.trim())`;
   const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
   const choose = value => c.evaluate(`{ const s = ${select}; s.value = ${JSON.stringify(value)}; s.dispatchEvent(new Event('change')); }`);
-  const openSheet = async () => { await c.evaluate(`${action('Instruments')}.click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
+  const openSheet = async () => { await c.evaluate(`${action('Parts')}.click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
   /** Play a moment and count the notes the host acknowledges as sounding. */
   const listen = () => c.evaluate(`(async () => {
     // From the top: the editor's cursor, past the notes typed, is where play would start.

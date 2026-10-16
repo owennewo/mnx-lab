@@ -491,7 +491,7 @@ try {
   check(state.frameRect && state.frameRect.width >= 380, `the frame really is phone-wide ${JSON.stringify(state.frameRect)}`);
   await cdp.evaluate(
     `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
-      ".find(b => b.getAttribute('aria-label') === 'Settings').click()"
+      ".find(b => b.getAttribute('aria-label') === 'View').click()"
   );
   await settle(cdp);
   state = await dump();

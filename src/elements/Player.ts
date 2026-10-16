@@ -49,10 +49,20 @@ function stacked(scope: string) {
       grid-row: 1;
       height: max(18px, var(--rail-cell, 14px));
     }
+    ${s} .rail {
+      align-self: stretch;
+    }
     ${s} .settings {
       display: flex;
       margin-left: auto;
       gap: 10px;
+    }
+    /* The control line holds the transport, the readout and both values. */
+    ${s} .field.rate .box {
+      min-width: 0;
+    }
+    ${s} .field.volume .box {
+      min-width: 76px;
     }
   `;
 }
@@ -168,11 +178,100 @@ export class Player extends LitElement {
     .youtube-panel p { max-width: 60ch; }
     .youtube-panel a { color: inherit; }
     .youtube-notice { max-width: 65ch; }
+    /* ONE GRAMMAR (Studio tray & header canvas, 2026-10-16): every block on
+       the line is the rail's shape — a 10px uppercase label over a value as
+       tall as the rail's cells — so the readout, rate and volume line up
+       with the section labels and the lanes instead of floating beside them
+       as boxed buttons. The line is bottom-aligned; --tray-line is the
+       cells' height, set from the rail. */
     .controls {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      align-items: flex-end;
+      gap: 12px;
       flex-wrap: wrap;
+      --tray-line: 30px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      flex: none;
+      height: auto;
+      padding: 0;
+      gap: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      text-align: left;
+    }
+    .field .lab,
+    .rail .lab {
+      font: 600 10px/1 var(--sans);
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 0 4px 4px;
+      border-left: 1px solid var(--line-strong);
+    }
+    .field .box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: var(--tray-line);
+      box-sizing: border-box;
+      margin-left: 2px;
+      padding: 0 8px;
+      font: 600 13px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+    }
+    /* The value you can change sits in a cell like the rail's. */
+    button.field .box {
+      justify-content: space-between;
+      background: var(--tray-cell, var(--line));
+    }
+    button.field:hover:not(:disabled) .box,
+    button.field.on .box {
+      box-shadow: inset 0 0 0 1px var(--ink-3);
+    }
+    button.field.on {
+      background: transparent;
+    }
+    button.field:focus-visible {
+      outline-offset: 0;
+    }
+    .field.rate .box {
+      min-width: 72px;
+    }
+    /* Volume: the level as a short run of cells, then the number. */
+    .field.volume .box {
+      background: transparent;
+      padding: 0;
+      min-width: 104px;
+    }
+    .meter {
+      display: flex;
+      gap: 2px;
+      flex: 1 1 auto;
+      align-self: stretch;
+    }
+    .meter > span {
+      flex: 1 1 0;
+      background: var(--tray-cell, var(--line));
+    }
+    .meter > span.lit {
+      background: var(--ink-2);
+    }
+    /* The readout stays a one-cell grid: the widest label it can print is
+       stacked under it, invisible, so the rail beside it never moves. */
+    .field.pos .box {
+      display: grid;
+      align-items: center;
+      padding-left: 6px;
+      font-size: 15px;
     }
     button,
     select,
@@ -204,6 +303,16 @@ export class Player extends LitElement {
       padding: 0;
       justify-content: center;
     }
+    /* Stop is a glyph beside Play, not a second box. */
+    button.stop {
+      width: 32px;
+      height: 44px;
+      border-color: transparent;
+    }
+    button.stop:hover:not(:disabled) {
+      border-color: transparent;
+      color: var(--accent);
+    }
     /* The host's own control beside the source switcher — studio's way into
        its recordings sheet, where the sources the switcher lists are managed.
        An empty slot is nothing; the workbench slots nothing. */
@@ -229,8 +338,8 @@ export class Player extends LitElement {
       border-color: var(--ink-3);
     }
     button.primary {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       background: var(--accent);
       border-color: var(--accent);
       color: #fff;
@@ -315,24 +424,15 @@ export class Player extends LitElement {
       outline: none; /* focusable so a click in it lets Space play; never reached by Tab, so no ring to draw */
       flex: 1 1 160px;
       min-width: 120px;
-      align-self: stretch;
+      align-self: flex-end;
       display: grid;
       gap: 0 var(--rail-gap, 2px);
       align-items: end;
-      padding: 2px 0;
+      padding: 0;
       box-sizing: border-box;
     }
     .rail .lab {
       grid-row: 1;
-      font: 600 10px/1 var(--sans);
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding: 0 0 4px 4px;
-      border-left: 1px solid var(--line-strong);
       pointer-events: none;
     }
     .rail .cell {
@@ -341,7 +441,7 @@ export class Player extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 2px;
-      height: var(--rail-cell, 14px);
+      height: var(--tray-line, 30px);
     }
     .rail .cell.first {
       box-shadow: -2px 0 0 var(--line-strong);
@@ -356,7 +456,7 @@ export class Player extends LitElement {
       padding: 0;
       border: 0;
       border-radius: 1px;
-      background: var(--line);
+      background: var(--tray-cell, var(--line));
     }
     .lane.partial {
       width: var(--w);
@@ -543,11 +643,20 @@ export class Player extends LitElement {
         width: 40px;
         height: 40px;
       }
-      button.value {
-        padding: 0 8px;
+      .field.rate .box {
+        min-width: 0;
       }
-      button.value.rate svg {
+      .field.rate .box svg {
         display: none;
+      }
+      .controls .field.volume .box {
+        min-width: 0;
+      }
+      .meter {
+        flex: 0 0 36px;
+      }
+      button.stop {
+        width: 24px;
       }
     }
   `
@@ -1009,8 +1118,10 @@ export class Player extends LitElement {
     const parts = this.positionParts;
     if (!parts) return this.positionLabel;
     const tail = parts.insertion ? ` · ${parts.insertion}` : '';
-    return html`<span class="place"><span>${placeLabel(parts)}</span><span class="widest" aria-hidden="true">${this.widestPlace}</span></span>${tail}`;
+    return html`<span class="place"><span>${Player.bare(placeLabel(parts))}</span><span class="widest" aria-hidden="true">${Player.bare(this.widestPlace)}</span></span>${tail}`;
   }
+  /** The readout sits under its BAR label, so it drops the `#` the rail's cards and the accessible name keep. */
+  private static bare(label: string) { return label.replace(/^# /, ''); }
 
   // ── the rail ────────────────────────────────────────────────────────────
   // One column per WRITTEN bar, one lane per visit to it, so the rail reads
@@ -1262,15 +1373,18 @@ export class Player extends LitElement {
       </div>
       <button
         type="button"
-        class=${open ? 'value rate on' : 'value rate'}
+        class=${open ? 'field rate on' : 'field rate'}
         aria-haspopup="dialog"
         aria-expanded=${open}
         aria-label=${`Change playback rate, ${this.rate.toFixed(2)}×`}
         title="Playback rate"
         @click=${() => (this.openPop = open ? null : 'rate')}
-      >${Player.stroke('M4.5 16.5a8.5 8.5 0 1 1 15 0M12 16.5l4-6')}<span>${this.rate.toFixed(2)}×</span></button>
+      ><span class="lab" aria-hidden="true">Rate</span><span class="box"><span>${this.rate.toFixed(2)}×</span>${Player.stroke(open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6', 10)}</span></button>
     </span>`;
   }
+
+  /** The volume field's cells: one lights per sixth of the level. */
+  private static readonly METER = [1, 2, 3, 4, 5, 6].map((i) => (i - 0.5) / 6);
 
   /** The level before a mute, so unmuting lands back where it was. */
   private volumeBeforeMute = 0.7;
@@ -1309,13 +1423,13 @@ export class Player extends LitElement {
       </div>
       <button
         type="button"
-        class=${open ? 'value on' : 'value'}
+        class=${open ? 'field volume on' : 'field volume'}
         aria-haspopup="dialog"
         aria-expanded=${open}
         aria-label=${`Change volume, ${Math.round(this.volume * 100)}`}
         title="Volume"
         @click=${() => (this.openPop = open ? null : 'volume')}
-      >${speaker}<span>${Math.round(this.volume * 100)}</span></button>
+      ><span class="lab" aria-hidden="true">${muted ? 'Muted' : 'Volume'}</span><span class="box"><span class="meter" aria-hidden="true">${Player.METER.map((step) => html`<span class=${this.volume >= step ? 'lit' : ''}></span>`)}</span><span>${Math.round(this.volume * 100)}</span></span></button>
     </span>`;
   }
 
@@ -1338,7 +1452,11 @@ export class Player extends LitElement {
     const playing = this.status?.wantsPlayback ?? false;
     const busy = this.syncEditable && this.sourceId !== 'synth'
       || this.sourceControl && (this.recordings.length > 0 || this.canAddRecording);
-    return html` <div class=${busy ? 'controls busy' : 'controls'}>
+    // The line's height is the rail's cells, never under 30px: a piece without
+    // repeats still gets values a finger can catch, and one with deep repeats
+    // thickens the whole line with its rail.
+    const line = Math.max(30, this.railModel?.cell ?? 0);
+    return html` <div class=${busy ? 'controls busy' : 'controls'} style=${`--tray-line: ${line}px;`}>
         <button
           class=${playing && this.status?.strained ? 'primary strained' : 'primary'}
           ?disabled=${!this.performance || (this.status?.needsStart && !this.status.alignmentIssue)}
@@ -1348,17 +1466,18 @@ export class Player extends LitElement {
         >
           ${playing ? Player.glyph('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z') : Player.glyph('M8 5l11 7-11 7z')}
         </button>
-        <button class="icon" ?disabled=${!this.performance} aria-label="Stop" title="Stop" @click=${() => this.stop()}>
-          ${Player.glyph('M6 6h12v12H6z', 18)}
+        <button class="icon stop" ?disabled=${!this.performance} aria-label="Stop" title="Stop" @click=${() => this.stop()}>
+          ${Player.glyph('M6 6h12v12H6z', 14)}
         </button>
-        <output aria-live="off" class=${this.performance ? '' : 'none'} aria-label=${this.performance ? this.positionLabel : nothing}
-          >${this.performance && this.syncMode
-            ? html`<span>${Player.mediaClock(this.status?.mediaTime ?? 0)}</span><span class="widest" aria-hidden="true">88:88.8</span>`
-            : this.performance
-            ? html`<span>${this.readout()}</span
-                ><span class="widest" aria-hidden="true">${this.widest}</span>`
-            : 'No performance available'}</output
-        >
+        ${this.performance
+          ? html`<div class="field pos"><span class="lab" aria-hidden="true">${this.syncMode ? 'Time' : 'Bar'}</span
+              ><output class="box" aria-live="off" aria-label=${this.positionLabel}
+              >${this.syncMode
+                ? html`<span>${Player.mediaClock(this.status?.mediaTime ?? 0)}</span><span class="widest" aria-hidden="true">88:88.8</span>`
+                : html`<span>${this.readout()}</span
+                    ><span class="widest" aria-hidden="true">${Player.bare(this.widest)}</span>`}</output
+            ></div>`
+          : html`<output aria-live="off" class="none">No performance available</output>`}
         ${this.syncToggle()}
         ${this.syncMode ? this.syncBar() : this.rail()}
         ${this.sourceControl && (this.recordings.length || this.canAddRecording) ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}

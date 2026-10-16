@@ -76,7 +76,7 @@ try {
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.getAttribute('aria-label') === 'Zoom').click()`);
   await wait(`!!${frame}.querySelector('mnx-zoom-pad[pinned]')`);
   assert.equal(await c.evaluate(`!!${frame}.querySelector('mnx-zoom-pad').shadowRoot.querySelector('.focus-toggle, .spacing-toggle')`), false);
-  await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.getAttribute('aria-label') === 'Settings').click()`);
+  await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.getAttribute('aria-label') === 'View').click()`);
   await wait(`!${frame}.querySelector('mnx-zoom-pad') && !!${frame}.querySelector('mnx-settings-pad[pinned]')?.shadowRoot?.querySelector('.card')`);
   const pad = `${frame}.querySelector('mnx-settings-pad[pinned]').shadowRoot`;
   await wait(`${pad}.querySelector('button[data-row=systemAlignment] .word')?.textContent === 'Fill width'`);
@@ -144,7 +144,7 @@ try {
   // carries no Sound selector here — the sheet chooses each part's sound.
   const player = `${piece}.querySelector('mnx-player')`;
   assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback sound"]')`), false);
-  await c.evaluate(`[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.getAttribute('aria-label') === 'Instruments · 1').click()`);
+  await c.evaluate(`[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.getAttribute('aria-label') === 'Parts · 1').click()`);
   const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
   await wait(`${instruments}?.querySelectorAll('.part').length === 1`);
   // A lone part cannot leave the score; a mute and a sound reach the player's
@@ -160,7 +160,7 @@ try {
   await c.evaluate(`${instruments}.querySelector('button[aria-label^="Unmute"]').click()`);
   await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = s.options[0].value; s.dispatchEvent(new Event('change')); }`);
   await wait(`${player}.partMix[0]?.muted === false && ${player}.partMix[0]?.instrument?.kind === 'design'`);
-  await c.evaluate(`${instruments}.querySelector('button[aria-label="Close instruments"]').click()`);
+  await c.evaluate(`${instruments}.querySelector('button[aria-label="Close parts"]').click()`);
   await wait(`!${piece}.querySelector('mnx-studio-instruments')`);
   // The Source sheet: the tools row names what plays, the tray has no source
   // control, and the sheet lists Synth (checked) with Add recording.

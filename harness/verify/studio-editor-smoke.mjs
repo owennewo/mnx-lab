@@ -99,7 +99,7 @@ try {
   await key('KeyZ', { ctrl: true });
   await wait(`JSON.parse(${frets}).some(f => f.endsWith(':3')) && window.__auditions.length === 5`);
   // Switched off in the Instruments sheet, the arrows are silent.
-  await c.evaluate(`${action('Instruments')}.click()`);
+  await c.evaluate(`${action('Parts')}.click()`);
   const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
   await wait(`!!${instruments}?.querySelector('.audition input')`);
   await c.evaluate(`${instruments}.querySelector('.audition input').click()`);

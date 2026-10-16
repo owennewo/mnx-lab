@@ -84,7 +84,9 @@ import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACIN
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
-const mixerGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v5M6 13v7M12 4v11M12 19v1M18 4v1M18 9v11"></path><circle cx="6" cy="11" r="2"></circle><circle cx="12" cy="17" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg>`;
+/** Parts: the score's layers, one per part — what the sheet hides, mutes and voices. */
+const partsGlyph = html`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l8 4-8 4-8-4z"></path><path d="M4 12l8 4 8-4"></path><path d="M4 16l8 4 8-4"></path></svg>`;
+const chevronDown = html`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>`;
 const keysGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8"></path></svg>`;
 const saveGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-7.97A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"></path></svg>`;
 /** Cut and copied selections, for this tab: a bar copied in one piece can be pasted into the next. */
@@ -291,11 +293,119 @@ export class PiecePage extends LitElement {
       width: 15px;
       height: 15px;
     }
+    /* The way back as a breadcrumb: "Library /" on the title's line, in the
+       artist's grey, so the two read as one path rather than a small link
+       beside a large heading. Where the title takes a line of its own the
+       slash has nothing to lead into and the arrow says "back" instead. */
+    a[slot='back'] {
+      gap: 10px;
+      padding: 0 2px 0 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-3);
+    }
+    a[slot='back']:hover {
+      color: var(--ink);
+    }
+    a[slot='back'] svg {
+      display: none;
+    }
+    a[slot='back'] .crumb {
+      color: var(--ink-faint);
+      font-weight: 400;
+    }
+    @container (max-width: 820px) {
+      a[slot='back'] svg {
+        display: block;
+      }
+      a[slot='back'] .crumb {
+        display: none;
+      }
+    }
     /* The frame's narrowest header: the way back is its arrow alone, beside
        the tools; aria-label keeps its name when the word is hidden. */
     @container (max-width: 360px) {
-      a[slot='back'] span {
+      a[slot='back'] .word {
         display: none;
+      }
+    }
+    /* The sound tools, after the frame's score tools and a rule. The SOURCE
+       is a chip — boxed on the paper, a dot for "this is what sounds", the
+       name of what plays — so it never reads as a sibling of Parts, which is
+       a plain tool like Zoom and View (option 4 on the canvas, 2026-10-16). */
+    span.rule[slot='actions'] {
+      align-self: center;
+      width: 1px;
+      height: 22px;
+      margin: 0 2px;
+      background: var(--frame-line, var(--line));
+    }
+    button.source[slot='actions'] {
+      height: 34px;
+      align-self: center;
+      gap: 8px;
+      max-width: 240px;
+      padding: 0 10px 0 12px;
+      border: 1px solid var(--ink);
+      background: var(--paper, #fff);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    button.source[slot='actions']:hover,
+    button.source[slot='actions'][aria-pressed='true'] {
+      border-color: var(--ink);
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+    button.source .dot {
+      flex: none;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    button.source .name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    button.source svg {
+      flex: none;
+    }
+    button.tool[slot='actions'] {
+      gap: 7px;
+      padding: 0 10px;
+      border-color: transparent;
+      color: var(--ink-2);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    button.tool[slot='actions']:hover,
+    button.tool[slot='actions'][aria-pressed='true'] {
+      border-color: transparent;
+      background: var(--frame-press, var(--hover));
+      color: var(--ink);
+    }
+    button.tool .count {
+      font-family: var(--mono);
+      color: var(--ink-3);
+    }
+    /* Keys is for the editor's few: the faintest thing on the row. */
+    button.keys[slot='actions'] {
+      border-color: transparent;
+      color: var(--ink-faint);
+    }
+    button.keys[slot='actions']:hover,
+    button.keys[slot='actions'][aria-pressed='true'] {
+      border-color: transparent;
+      background: var(--frame-press, var(--hover));
+      color: var(--ink);
+    }
+    @container (max-width: 640px) {
+      button.tool .word {
+        display: none;
+      }
+      button.source[slot='actions'] {
+        max-width: 140px;
       }
     }
     /* Where the editor's surfaces hang: over the whole score pane, passing every pointer through. */
@@ -1026,9 +1136,10 @@ export class PiecePage extends LitElement {
     const routing = this.instrumentsOpen && this.doc ? this.hostRouting(this.doc) : null;
     const activeId = this.selectedRecordingId ?? 'synth';
     const activeRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
-    // The tools row is icons alone; these are the words its tooltips carry.
+    // The accessible names (and tooltips) — fuller than the words on the buttons.
     const sourceLabel = `Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}`;
-    const instrumentsLabel = `Instruments · ${this.doc?.mnxJson.parts.length ?? 0}`;
+    const partCount = this.doc?.mnxJson.parts.length ?? 0;
+    const partsLabel = `Parts · ${partCount}`;
     const playable = this.snapshot?.recordings.filter(r => this.recordings.some(s => s.id === r.id)) ?? [];
     return html`
       <mnx-score-frame
@@ -1057,20 +1168,24 @@ export class PiecePage extends LitElement {
         @zoom-change=${this.onZoomChange}
         @spacing-mode-change=${this.onSpacingModeChange}
       >
-        <a slot="back" aria-label="Library" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
+        <a slot="back" aria-label="Library" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span class="word">Library</span><span class="crumb" aria-hidden="true">/</span></a>
         ${this.doc
           ? html`<button slot="title-action" class="edit-piece" type="button" aria-label="Edit piece"
               aria-expanded=${this.editOpen} @click=${() => this.openPanel(this.editOpen ? null : 'edit')}>${pencilGlyph}</button>
-            <button slot="actions" class="icon" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
+            <span slot="actions" class="rule" aria-hidden="true"></span>
+            <button slot="actions" class="source" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
               aria-label=${sourceLabel} title=${sourceLabel} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
-              ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}
+              <span class="dot" aria-hidden="true"></span>
+              ${activeRecording ? sourceGlyph(activeRecording.kind === 'youtube' ? 'youtube' : 'audio', 16) : nothing}
+              <span class="name">${activeRecording?.name ?? 'Synth'}</span>${chevronDown}
             </button>
-            <button slot="actions" class="icon" type="button" aria-pressed=${this.instrumentsOpen}
-              aria-label=${instrumentsLabel} title=${instrumentsLabel} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
-              ${mixerGlyph}
+            <button slot="actions" class="tool" type="button" aria-pressed=${this.instrumentsOpen}
+              aria-label=${partsLabel} title=${partsLabel} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
+              ${partsGlyph}<span class="word">Parts</span><span class="count">${partCount}</span>
             </button>
             ${this.save && !this.playOnly
-              ? html`<button slot="actions" class="icon" type="button" aria-label="Keys" title="Keys" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
+              ? html`<span slot="actions" class="rule" aria-hidden="true"></span>
+                <button slot="actions" class="icon keys" type="button" aria-label="Keys" title="Keys" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
                   ${keysGlyph}
                 </button>`
               : nothing}`
