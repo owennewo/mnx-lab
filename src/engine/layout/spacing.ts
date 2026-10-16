@@ -153,7 +153,9 @@ const MULTIREST_WIDTH_SP = 10;     // content width of a collapsed H-bar measure
 // 0.524em a character over a real lyric (Archivo, the old face, 0.497 against
 // the old 0.56); scaled alike.
 const LYRIC_CHAR_WIDTH_SP = LYRIC_SIZE_SP * 0.59;
-const LYRIC_SIDE_PAD_SP = DEFAULT_COLUMNS.lyricSidePad; // air either side of a syllable
+// A syllable that a hyphen joins to the next needs room for the hyphen too:
+// its own ink (a third of an em) and air either side of it.
+const LYRIC_HYPHEN_ROOM_SP = LYRIC_SIZE_SP * 0.8;
 const ONSET_EPS = 1e-6;            // float tolerance for metric positions
 /** Ideal space after a quarter note, in staff spaces, at the default Space —
  *  and the DEFINITION of the Space unit: Space `x` IS the air after a quarter
@@ -1298,16 +1300,18 @@ export function resolveStaffVoices(spec: PlanStaff, measureIndex: number): Resol
   return gathered;
 }
 
-/** Column width a syllable needs (the widest of the event's lyric lines). */
-function lyricCoreSp(event: { lyrics?: { lines?: Record<string, { text: string }> } }, selected: readonly string[] | undefined, columns: ColumnGeometry): number {
+/** The event's drawn syllables, one per verse line: ink width (sp at ink 1)
+ *  and whether a hyphen follows. They price no column of their own — see
+ *  `lyricEdges`. */
+function syllablesOf(event: { lyrics?: { lines?: Record<string, { text: string; type?: string }> } }, selected: readonly string[] | undefined): Syllable[] | undefined {
   const lines = event.lyrics?.lines;
-  if (!lines) return 0;
-  let w = 0;
-  for (const [id, line] of Object.entries(lines)) {
-    if (selected && !selected.includes(id)) continue;
-    w = Math.max(w, line.text.length * LYRIC_CHAR_WIDTH_SP + 2 * columns.lyricSidePad);
+  if (!lines) return undefined;
+  const out: Syllable[] = [];
+  for (const [line, { text, type }] of Object.entries(lines)) {
+    if (selected && !selected.includes(line)) continue;
+    out.push({ line, w: text.length * LYRIC_CHAR_WIDTH_SP, continues: type === 'start' || type === 'middle' });
   }
-  return w;
+  return out.length ? out : undefined;
 }
 
 /** Merges rhythm-aligned sequences into one chorded sequence, or null. */
@@ -1423,6 +1427,15 @@ export interface PlanOptions {
   minMeasures?: number;
 }
 
+interface Syllable {
+  /** Verse line id: syllables only collide with their own line's neighbours. */
+  line: string;
+  /** Estimated ink width, sp at ink 1. */
+  w: number;
+  /** A hyphen follows it to the next syllable. */
+  continues: boolean;
+}
+
 interface EventMetrics {
   leading: number; // rigid: mid-measure clefs + accidental columns
   core: number;    // rigid: notehead/fret + dots
@@ -1442,6 +1455,8 @@ interface EventMetrics {
   /** Mid-measure clefs drawn immediately before this event's column,
    *  referencing the measure's clefTimeline by index. */
   midClefs?: { timelineIndex: number; clef: ActiveClef }[];
+  /** The verse syllables hung on this event (`lyricEdges`). */
+  syllables?: Syllable[];
 }
 
 interface MeasureMetrics {
@@ -1547,8 +1562,8 @@ function halfCoreSp(e: EventMetrics, ink: number, columns: ColumnGeometry): numb
   return ((e.graceCount ? columns.grace : columns.core) * ink) / 2;
 }
 
-/** Null when fewer than two voices carry entries — the legacy walk owns the
- *  single-voice case, floats and all. */
+/** Null when fewer than two voices carry entries and no syllable is hung —
+ *  the legacy walk owns that case, floats and all. */
 function mergedModelOf(staves: EventMetrics[][][], ink: number, columns: ColumnGeometry): MergedModel | null {
   const voices: MergedVoice[] = [];
   staves.forEach((staff, staffIndex) =>
@@ -1556,7 +1571,8 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number, columns: ColumnG
       if (entries.length > 0) voices.push({ staff: staffIndex, voice: voiceIndex, entries });
     })
   );
-  if (voices.length < 2) return null;
+  const versed = voices.some(v => v.entries.some(e => e.syllables));
+  if (voices.length < 2 && !versed) return null;
 
   // Shared columns: the distinct onsets, EPS-grouped.
   const allOnsets = voices
@@ -1646,6 +1662,7 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number, columns: ColumnG
     const last = nodeOnsets.length - 1;
     edges.push({ from: last, to: endNode, rigid: maxPost[last], air: maxPostAir[last], spring: 0 });
   }
+  if (versed) edges.push(...lyricEdges(voices, entryNode, endNode, ink, columns));
 
   // Longest path by relaxation over (rigid, spring) PAIRS compared at one
   // stretch: the graph is a DAG (edges follow onset and entry order) and
@@ -1704,10 +1721,79 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number, columns: ColumnG
       state = relax(stretch);
       if (settled) break;
     }
+    const at = (s: { rigidAt: number[]; springAt: number[] }, k: number) => s.rigidAt[endNode] + s.springAt[endNode] * k;
+    if (at(state, stretch) < width - 1e-9) {
+      // Stuck below: the binding path at this stretch has no spring — verse
+      // edges (`lyricEdges`) are rigid, and at stretch 0 a row of words can be
+      // the longest path while the notes under it still have room to grow.
+      // Approach from ABOVE instead: the binding path's line never exceeds the
+      // true (convex) width, so solving it for `width` lands at or above the
+      // answer and each step moves down onto it — exactly, in finitely many.
+      let hi = Math.max(1, stretch);
+      while (at(relax(hi), hi) < width && hi < 1e6) hi *= 2;
+      stretch = hi;
+      state = relax(stretch);
+      for (let iter = 0; iter < 64; iter++) {
+        const rigid = state.rigidAt[endNode];
+        const spring = state.springAt[endNode];
+        if (spring <= 1e-12) break;
+        const next = Math.max(0, (width - rigid) / spring);
+        const settled = Math.abs(next - stretch) < 1e-12;
+        stretch = next;
+        state = relax(stretch);
+        if (settled) break;
+      }
+    }
     return anchorsFrom(state.rigidAt, state.springAt, stretch);
   };
 
   return { solve, solveFor, voices };
+}
+
+/**
+ * Verse constraints, the Soundslice rule (measured 2026-10-16): a syllable may
+ * hang over neighbouring notes that carry none, so the notes keep the spacing
+ * their rhythm asks for; it may not come closer than the word gap to the next
+ * syllable on its OWN verse line (two `lyricSidePad`s — half an em, Soundslice's
+ * tightest white — plus room for a hyphen between the two), and it stays inside
+ * its bar's content, which keeps words clear across barlines and system edges.
+ * All rigid, no spring: once the notes stand far enough apart the edges stop
+ * binding. Per staff, since each staff draws its own verse rows.
+ */
+function lyricEdges(
+  voices: readonly MergedVoice[],
+  entryNode: readonly number[][],
+  endNode: number,
+  ink: number,
+  columns: ColumnGeometry
+): MergedEdge[] {
+  const rows = new Map<string, { node: number; w: number; continues: boolean }[]>();
+  voices.forEach((v, vi) =>
+    v.entries.forEach((e, k) => {
+      for (const syl of e.syllables ?? []) {
+        const key = `${v.staff}:${syl.line}`;
+        const row = rows.get(key) ?? [];
+        row.push({ node: entryNode[vi][k], w: syl.w * ink, continues: syl.continues });
+        rows.set(key, row);
+      }
+    })
+  );
+  const pad = columns.lyricSidePad;
+  const edges: MergedEdge[] = [];
+  for (const row of rows.values()) {
+    row.sort((a, b) => a.node - b.node);
+    edges.push({ from: -1, to: row[0].node, rigid: row[0].w / 2 + pad, air: pad, spring: 0 });
+    for (let i = 1; i < row.length; i++) {
+      const a = row[i - 1];
+      const b = row[i];
+      if (a.node === b.node) continue;
+      const hyphen = a.continues ? LYRIC_HYPHEN_ROOM_SP * ink : 0;
+      edges.push({ from: a.node, to: b.node, rigid: (a.w + b.w) / 2 + 2 * pad + hyphen, air: 2 * pad, spring: 0 });
+    }
+    const last = row[row.length - 1];
+    edges.push({ from: last.node, to: endNode, rigid: last.w / 2 + pad, air: pad, spring: 0 });
+  }
+  return edges;
 }
 
 /** The merged natural (rigid, spring-at-1) pair — what packing must reserve
@@ -2083,33 +2169,24 @@ export function planHorizontal(
                 return withColumnExtras(placeholder());
               }
               onset += durationValue(event.duration);
-              // A syllable is CENTRED on the note, but the anchor sits a
-              // fixed half-core from the column start — so lyric width added
-              // only to `core` lands entirely to the RIGHT of the note, and
-              // the centred text spills back over the previous column
-              // (found on "extraordinarily"). Split the requirement around
-              // the anchor instead: half into leading, half into core — the
-              // same total rigid width, redistributed, so bar widths and
-              // wrapping cannot move; only the wide event's own anchor does.
-              const lyricW = lyricCoreSp(event, lyricLineIds, columns);
+              // Syllables price no width in their own column: a word may hang
+              // over a neighbour that carries none, the way a singer's line
+              // reads (Soundslice, measured 2026-10-16). What they need is
+              // room from the NEXT syllable on their line — `lyricEdges`.
+              const syllables = syllablesOf(event, lyricLineIds);
               // A rolled chord's wave sits left of its ink; without room it
               // lands on the previous column.
               const arpeggio = (event.notes ?? []).some(n => n.id !== undefined && arpeggioStarts.has(n.id));
               const accidentalLeading = accidentalLeadingSp(event.notes ?? [], accidentalOf, columns);
               const dots = event.duration.dots ?? 0;
               const headCore = columns.core + dots * columns.dot;
-              // The air the column carries: a governing syllable's two side
-              // pads replace the head's own air (the re-pricing follows the
-              // winner, the same approximation the governing voice makes).
-              const lyricGoverns = lyricW > headCore;
               return withColumnExtras({
-                leading: accidentalLeading + (arpeggio ? ARPEGGIO_ROOM_SP : 0) + Math.max(0, (lyricW - columns.core) / 2),
-                core: Math.max(headCore, (columns.core + lyricW) / 2),
-                air: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0)
-                  + (lyricGoverns ? 2 * LYRIC_SIDE_PAD_SP : CORE_AIR_SP + dots * DOT_AIR_SP),
-                airPre: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0)
-                  + (lyricGoverns ? LYRIC_SIDE_PAD_SP : CORE_AIR_SP / 2),
-                spring: springSp(durationValue(event.duration))
+                leading: accidentalLeading + (arpeggio ? ARPEGGIO_ROOM_SP : 0),
+                core: headCore,
+                air: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP + dots * DOT_AIR_SP,
+                airPre: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP / 2,
+                spring: springSp(durationValue(event.duration)),
+                ...(syllables ? { syllables } : {})
               });
             } catch (e) {
               issues.push((e as Error).message);

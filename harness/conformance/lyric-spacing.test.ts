@@ -1,11 +1,12 @@
-// Wide syllables must not occlude their neighbours — the lyric column split.
+// Wide syllables must not occlude their neighbours.
 //
-// A syllable is centred on its note, but a column's anchor sits a fixed
-// half-core from the column start; lyric width priced only into `core` lands
-// entirely to the right of the anchor, so a wide word's left half reached
-// back over the previous word (found on "extraordinarily"). spacing.ts now
-// splits the requirement around the anchor. This test measures the drawn
-// text with the same font metrics the viewport crop uses, on both layouts.
+// A syllable is centred on its note, so a wide word reaches both ways — once,
+// when its width was priced into the column's core alone, its left half ran
+// back over the previous word (found on "extraordinarily"). Syllables now hang
+// free over bare notes and are kept apart by verse edges between neighbours on
+// a line (spacing.ts `lyricEdges`; lyric-overhang.test.ts). This test measures
+// the drawn text with the same font metrics the viewport crop uses, on both
+// layouts.
 import { describe, it, expect } from 'vitest';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';

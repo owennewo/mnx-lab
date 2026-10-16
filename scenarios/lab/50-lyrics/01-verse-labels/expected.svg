@@ -11,13 +11,13 @@
 <line x1="215.16" y1="208" x2="246.84" y2="208" stroke-width="2.56" class="ledger-line"></line>
 <text x="221.56" y="208" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
 <line x1="240.44" y1="152" x2="240.44" y2="205.312" stroke-width="1.92" class="stem"></line>
-<text x="442.64" y="200" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="461.52" y1="144" x2="461.52" y2="197.312" stroke-width="1.92" class="stem"></line>
+<text x="445" y="200" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="463.88" y1="144" x2="463.88" y2="197.312" stroke-width="1.92" class="stem"></line>
 <line x1="566.16" y1="128" x2="566.16" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="570.96" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="231" y="252.112" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">Shine</text>
-<text x="452.08" y="252.112" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">bright</text>
+<text x="454.44" y="252.112" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">bright</text>
 <text x="231" y="278.512" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">Morn</text>
-<text x="341.5392" y="278.512" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
-<text x="452.08" y="278.512" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ing</text>
+<text x="342.72" y="278.512" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="454.44" y="278.512" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ing</text>
 </svg>

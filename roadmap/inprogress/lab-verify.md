@@ -1687,3 +1687,32 @@ stack over a bar reads, from the staff up: navigation sign, `[A] Riff`, tempo �
 tempo is now the top line. Lyrics under notation (`spec/lyrics-*`) are in the serif,
 larger, and their verse rows sit closer together without descenders touching the next
 row's capitals.
+
+## Words hang over bare notes; the stretch solver reaches its width — 2026-10-16
+
+Owner: no roadmap doc — the owner asked, measuring Soundslice's *Suzanne*: its eighths
+stay 28.2px apart under any word, and only two words that would touch push their notes
+apart, to half an em of white. Ours priced every syllable's whole width into its own
+note's column, so the rhythm spread unevenly under words (27–54px for the same eighths)
+and fewer bars fitted a system. Now (`spacing.ts` `lyricEdges`):
+
+- A syllable prices nothing in its own column. Verse edges in the onset-merged model keep
+  each syllable `2 × lyricSidePad` (0.7sp, ≈ Soundslice's half em) clear of the next
+  syllable on its own verse line, plus 0.8em when a hyphen joins them, and inside its
+  bar's content. Bars with words always run through the merged model; bars where no
+  edge binds keep the legacy positions.
+- **The merged stretch solver now always reaches the width it is given.** It iterated up
+  from stretch 0 along the binding path and stopped after 12 steps or on a spring-less
+  path, leaving a justified bar's notes crammed into its left part. It now finishes from
+  above when that happens. This was latent before words were involved: `spec/grand-staff`
+  and `spec/organ-layout` (no lyrics) had their second bar crammed and are corrected here.
+
+Seven goldens moved, none verified: `lab/50-lyrics/01-verse-labels`, `02-tab-verses`,
+`spec/lyric-line-metadata`, `spec/lyrics-basic`, `spec/lyrics-multi-line`,
+`spec/grand-staff`, `spec/organ-layout`.
+
+**What a reviewer should look for.** Under words the notes keep their rhythm's spacing;
+a long word may hang over a neighbour that carries no syllable but never touches the next
+word on its line or crosses a barline, and a hyphen sits clear of both syllables it
+joins. In `spec/grand-staff` and `spec/organ-layout` the second bar's notes now spread
+across the whole bar instead of bunching at its start.

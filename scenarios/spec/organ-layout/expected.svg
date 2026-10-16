@@ -37,22 +37,22 @@
 <text x="187.2" y="446.368" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="187.2" y="478.368" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <text x="298.0688" y="142.272" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.v0.e0"></text>
-<text x="330.8688" y="142.272" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.v0.e1"></text>
-<text x="345.4288" y="158.272" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
-<text x="369.4288" y="166.272" font-size="64" class="accidental"></text>
-<text x="387.8288" y="166.272" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
-<text x="411.8288" y="150.272" font-size="64" class="accidental"></text>
-<text x="430.2288" y="150.272" font-size="64" class="notehead" data-source-id="@m0.v0.e4.n0"></text>
+<text x="413.2688" y="142.272" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.v0.e1"></text>
+<text x="473.4288" y="158.272" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
+<text x="543.0288" y="166.272" font-size="64" class="accidental"></text>
+<text x="561.4288" y="166.272" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
+<text x="631.0288" y="150.272" font-size="64" class="accidental"></text>
+<text x="649.4288" y="150.272" font-size="64" class="notehead" data-source-id="@m0.v0.e4.n0"></text>
 <text x="298.0688" y="142.272" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.v1.e0"></text>
-<text x="330.8688" y="142.272" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.v1.e1"></text>
-<line x1="339.0288" y1="190.272" x2="370.7088" y2="190.272" stroke-width="2.56" class="ledger-line"></line>
-<text x="345.4288" y="198.272" font-size="64" class="notehead" data-source-id="@m0.v1.e2.n0"></text>
-<line x1="381.4288" y1="190.272" x2="413.1088" y2="190.272" stroke-width="2.56" class="ledger-line"></line>
-<line x1="381.4288" y1="206.272" x2="413.1088" y2="206.272" stroke-width="2.56" class="ledger-line"></line>
-<text x="369.4288" y="206.272" font-size="64" class="accidental"></text>
-<text x="387.8288" y="206.272" font-size="64" class="notehead" data-source-id="@m0.v1.e3.n0"></text>
-<line x1="423.8288" y1="190.272" x2="455.5088" y2="190.272" stroke-width="2.56" class="ledger-line"></line>
-<text x="430.2288" y="190.272" font-size="64" class="notehead" data-source-id="@m0.v1.e4.n0"></text>
+<text x="413.2688" y="142.272" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.v1.e1"></text>
+<line x1="467.0288" y1="190.272" x2="498.7088" y2="190.272" stroke-width="2.56" class="ledger-line"></line>
+<text x="473.4288" y="198.272" font-size="64" class="notehead" data-source-id="@m0.v1.e2.n0"></text>
+<line x1="555.0288" y1="190.272" x2="586.7088" y2="190.272" stroke-width="2.56" class="ledger-line"></line>
+<line x1="555.0288" y1="206.272" x2="586.7088" y2="206.272" stroke-width="2.56" class="ledger-line"></line>
+<text x="543.0288" y="206.272" font-size="64" class="accidental"></text>
+<text x="561.4288" y="206.272" font-size="64" class="notehead" data-source-id="@m0.v1.e3.n0"></text>
+<line x1="643.0288" y1="190.272" x2="674.7088" y2="190.272" stroke-width="2.56" class="ledger-line"></line>
+<text x="649.4288" y="190.272" font-size="64" class="notehead" data-source-id="@m0.v1.e4.n0"></text>
 <text x="298.0688" y="334.368" font-size="64" text-anchor="middle" class="rest" data-source-id="@m0.s2.v0.e0"></text>
 <text x="309.2688" y="326.368" font-size="64" class="dot"></text>
 <text x="288.6288" y="454.368" font-size="64" class="notehead" data-source-id="@m0.s3.v0.e0.n0"></text>
@@ -62,13 +62,13 @@
 <rect x="698.4688" y="110.272" width="8" height="256.096" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="693.6688" y1="430.368" x2="693.6688" y2="494.368" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="698.4688" y="430.368" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="364.3088" y1="155.584" x2="364.3088" y2="114.272" stroke-width="1.92" class="stem"></line>
-<line x1="406.7088" y1="163.584" x2="406.7088" y2="112.272" stroke-width="1.92" class="stem"></line>
-<line x1="449.1088" y1="147.584" x2="449.1088" y2="110.272" stroke-width="1.92" class="stem"></line>
-<line x1="363.3488" y1="114.272" x2="450.0688" y2="110.272" stroke-width="8" class="beam"></line>
-<line x1="345.4288" y1="200.96" x2="345.4288" y2="246.272" stroke-width="1.92" class="stem"></line>
-<line x1="387.8288" y1="208.96" x2="387.8288" y2="246.272" stroke-width="1.92" class="stem"></line>
-<line x1="430.2288" y1="192.96" x2="430.2288" y2="246.272" stroke-width="1.92" class="stem"></line>
-<line x1="344.4688" y1="246.272" x2="431.1888" y2="246.272" stroke-width="8" class="beam"></line>
+<line x1="492.3088" y1="155.584" x2="492.3088" y2="114.272" stroke-width="1.92" class="stem"></line>
+<line x1="580.3088" y1="163.584" x2="580.3088" y2="112.272" stroke-width="1.92" class="stem"></line>
+<line x1="668.3088" y1="147.584" x2="668.3088" y2="110.272" stroke-width="1.92" class="stem"></line>
+<line x1="491.3488" y1="114.272" x2="669.2688" y2="110.272" stroke-width="8" class="beam"></line>
+<line x1="473.4288" y1="200.96" x2="473.4288" y2="246.272" stroke-width="1.92" class="stem"></line>
+<line x1="561.4288" y1="208.96" x2="561.4288" y2="246.272" stroke-width="1.92" class="stem"></line>
+<line x1="649.4288" y1="192.96" x2="649.4288" y2="246.272" stroke-width="1.92" class="stem"></line>
+<line x1="472.4688" y1="246.272" x2="650.3888" y2="246.272" stroke-width="8" class="beam"></line>
 <path d="M 311.6688 445.568 C 317.9088 436.2613, 326.2288 436.2613, 332.4688 445.568 C 326.2288 438.3947, 317.9088 438.3947, 311.6688 445.568 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 </svg>
