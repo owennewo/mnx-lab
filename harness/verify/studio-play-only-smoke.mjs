@@ -94,8 +94,8 @@ try {
   assert.match(await c.evaluate(`${chip}.getAttribute('aria-label')`), /Play only on this device/, 'the save chip does not say the device plays only');
   const row = await c.evaluate(actions);
   assert.ok(!row.some(label => label.includes('Keys')), `the tools row offers a Keys sheet with nothing bound: ${row.join(' · ')}`);
-  for (const kept of ['Source', 'Parts'])
-    assert.ok(row.some(label => label.includes(kept)), `the tools row lost ${kept}, which touch keeps`);
+  // What plays and the mix are the tray's on every device: its Mix field opens the panel.
+  assert.ok(await c.evaluate(`!!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.field.mix')`), 'the tray lost its Mix field, which touch keeps');
 
   await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);

@@ -13,6 +13,8 @@ export interface PartMixEntry {
   /** 0–1 within the master volume; default 1. */
   readonly volume?: number;
   readonly muted?: boolean;
+  /** Soloed: while any part is, only soloed parts sound (a muted one stays muted). */
+  readonly solo?: boolean;
   /** What the part plays on the synth. Absent: the part router's default (hostSetup.ts). */
   readonly instrument?: PartInstrument;
 }

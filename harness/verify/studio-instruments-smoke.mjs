@@ -50,12 +50,14 @@ try {
   const viewer = `${piece}?.querySelector('mnx-document-viewer')`;
   const player = `${piece}?.querySelector('mnx-player')`;
   const backend = `${player}?.session?.backend`;
-  const sheet = `${piece}?.querySelector('mnx-studio-instruments')?.shadowRoot`;
+  const sheet = `${piece}?.querySelector('mnx-studio-mix')?.shadowRoot`;
   const select = `${sheet}?.querySelector('select[aria-label$="instrument"]')`;
   const options = `[...${select}.options].map(o => o.textContent.trim())`;
   const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
   const choose = value => c.evaluate(`{ const s = ${select}; s.value = ${JSON.stringify(value)}; s.dispatchEvent(new Event('change')); }`);
-  const openSheet = async () => { await c.evaluate(`${action('Parts')}.click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
+  // The Mix panel opens from the tray's Mix field; the synth's own settings hang behind the Synth row.
+  const openSheet = async () => { await c.evaluate(`${sheet} || ${player}.shadowRoot.querySelector('.field.mix').click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
+  const openSettings = async () => { await c.evaluate(`${sheet}.querySelector('.pop') || ${sheet}.querySelector('[data-settings]').click()`); await wait(`!!${sheet}.querySelector('.pop .quality')`); };
   /** Play a moment and count the notes the host acknowledges as sounding. */
   const listen = () => c.evaluate(`(async () => {
     // From the top: the editor's cursor, past the notes typed, is where play would start.
@@ -85,6 +87,7 @@ try {
   for (const expected of ['Clear steel', 'Bridge electric', 'Basic keys', 'Import rig…'])
     assert.ok(offered.includes(expected), `the sheet does not offer ${expected}: ${offered.join(' · ')}`);
   assert.equal(await c.evaluate(`${select}.value`), 'design:clear-steel', 'a guitar part does not default to Clear steel');
+  await openSettings();
   assert.match(await c.evaluate(`${sheet}.querySelector('.synth-link').textContent`), /Export part/);
   assert.equal(await c.evaluate(`${sheet}.querySelector('.synth-link a').getAttribute('href')`), '/synth/');
 
@@ -120,6 +123,7 @@ try {
   // ── Light sound: the synth at 32 kHz, kept on this device ───────────────────
   const soundButton = name => `[...${sheet}.querySelectorAll('.quality button')].find(b => b.querySelector('b').textContent === ${JSON.stringify(name)})`;
   const rate = `${backend}?.port?.context?.sampleRate`;
+  await openSettings();
   await c.evaluate(`${soundButton('Light')}.click()`);
   await wait(`${soundButton('Light')}.getAttribute('aria-checked') === 'true'`);
   assert.ok(await listen() >= 1, 'Light played nothing');
@@ -127,6 +131,7 @@ try {
   await c.send('Page.reload');
   await wait(`(${player}?.performance?.sounding.length ?? 0) >= 3`);
   await openSheet();
+  await openSettings();
   await wait(`${soundButton('Light')}.getAttribute('aria-checked') === 'true'`);
   assert.ok(await listen() >= 1, 'Light played nothing after a reload');
   assert.equal(await c.evaluate(rate), 32000, 'Light was not kept across a reload');

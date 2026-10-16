@@ -37,17 +37,18 @@ apps/studio/
 Piece URLs carry the library's piece id. On a piece the page IS the score frame
 ([roadmap/inprogress/core-score-frame.md](../../roadmap/inprogress/core-score-frame.md)):
 the library page's tools row above the score (the way back, the title, Zoom, Settings,
-Tags, Source, Instruments, the theme toggle) and the player's tray below it, which carries
-only transport, readout, rail, rate and volume; one focus mark on the score's top-right
+Tags, the theme toggle) and the player's tray below it, which carries transport,
+readout, rail, rate and the **Mix · <what plays>** field; one focus mark on the score's top-right
 corner, faded until hovered, hides and shows both together and takes the browser into
 and out of fullscreen with them (a tap, not the remembered choice — fullscreen needs
-the gesture). **Source · <what plays>** opens the Source sheet in the frame's side slot: Synth and
-each recording, choose one, edit or add a recording in the same slot
-([docs/studio-recordings.md](../../docs/studio-recordings.md)). The Instruments sheet sits in the frame's side slot,
-between the strips, and lists the parts: hide one from the score (it keeps playing), mute
-it, set its level beneath the tray's master volume and choose its sound — which is why the
-tray carries no Sound selector here. The mix is synth-only; while a recording plays only
-hiding works. Hidden parts, the mix and the source last played are remembered per piece in the LIBRARY (`piece_views.prefs`, docs/studio-storage.md), so they hold across devices; `mnx-studio.parts.<id>` stays as the local cache that paints the sheet before the snapshot lands. The staff view is the settings card's STAFF row alone (the frame's
+the gesture). The Mix field opens the Mix panel (`MixSheet.ts`) in the frame's side slot, tall
+and narrow: **Play from** at the top — Synth and each recording; choose one, edit or add a
+recording in the same slot ([docs/studio-recordings.md](../../docs/studio-recordings.md)) —
+and the mix at the bottom, by the tray: one row per part (hide it from the score while it
+keeps playing, its instrument, level, mute, solo) over the **Master**, which is the tray's
+volume. A recording plays as one sound, so with one playing the parts only show or hide.
+The synth's device settings (Full/Light, sounding notes as you select) sit behind a button
+on the Synth row. Hidden parts, the mix and the source last played are remembered per piece in the LIBRARY (`piece_views.prefs`, docs/studio-storage.md), so they hold across devices; `mnx-studio.parts.<id>` stays as the local cache that paints the sheet before the snapshot lands. The staff view is the settings card's STAFF row alone (the frame's
 segmented control is off here), the piece's own values are the Edit piece panel's, and sign-out is the
 library page's — a piece is not where you leave. A tap on the score is never a chrome
 toggle. The staff view, the display settings, zoom and spacing, the theme, and whether

@@ -64,6 +64,9 @@ export function hostSetup(performance: Performance, document: MnxStructure, mix:
   const diagnostics: HostSetup['diagnostics'] = [];
   const indices = [...new Set(performance.voices.map(v => v.partIndex))].sort((a, b) => a - b);
   const routed: RoutedPart[] = [], parts: Part[] = [];
+  // Solo is resolved here rather than sent: while any part is soloed, every other part's
+  // strip is muted, so the engine needs no solo rule of its own.
+  const soloing = indices.some(i => mix[i]?.solo === true);
   for (const partIndex of indices) {
     const voices = performance.voices.filter(v => v.partIndex === partIndex);
     const source = document.parts[partIndex], ext = source?._x?.mnxLab, id = `part${partIndex}`;
@@ -107,7 +110,7 @@ export function hostSetup(performance: Performance, document: MnxStructure, mix:
       : { room: kind === 'plucked' ? 0.3 : 0.15 };
     parts.push({
       id, name, instrument: { kind, design, ...(kind === 'plucked' && layout ? { layout } : {}) }, chain,
-      strip: { levelDb: clampDb((rigStrip.levelDb ?? 0) + levelDb(entry?.volume)), pan: rigStrip.pan ?? 0, mute: entry?.muted === true, solo: false, sends },
+      strip: { levelDb: clampDb((rigStrip.levelDb ?? 0) + levelDb(entry?.volume)), pan: rigStrip.pan ?? 0, mute: entry?.muted === true || (soloing && entry?.solo !== true), solo: false, sends },
     });
     const designId = typeof design === 'string' ? design : typeof (design as { id?: unknown }).id === 'string' ? (design as { id: string }).id : undefined;
     routed.push({ partIndex, id, kind, source: from, pluckable, kit, ...(designId ? { design: designId } : {}), ...(rigName ? { rig: rigName } : {}) });

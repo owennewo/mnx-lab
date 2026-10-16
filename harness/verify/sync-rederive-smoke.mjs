@@ -75,11 +75,11 @@ try {
    await delay(600);
    check(saves.length===2,'the echo of the write-back caused another write: '+saves.length);
    check(player.sourceId===rows[0].id,'the echo re-cued the source');
-   // The Source sheet says which imported sync to distrust.
-   [...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.getAttribute('aria-label')?.includes('Source')).click();
-   await until(()=>page.shadowRoot.querySelector('mnx-studio-source')?.shadowRoot?.querySelectorAll('.source').length===4,'no Source sheet');
-   const sheet=page.shadowRoot.querySelector('mnx-studio-source').shadowRoot;
-   const sub=name=>[...sheet.querySelectorAll('.source')].find(s=>s.textContent.includes(name)).querySelector('.sub').textContent;
+   // The Mix panel's list of what plays says which imported sync to distrust.
+   player.shadowRoot.querySelector('.field.mix').click();
+   await until(()=>page.shadowRoot.querySelector('mnx-studio-mix')?.shadowRoot?.querySelectorAll('.source').length===4,'no Mix panel');
+   const sheet=page.shadowRoot.querySelector('mnx-studio-mix').shadowRoot;
+   const sub=name=>[...sheet.querySelectorAll('.source')].find(s=>s.textContent.includes(name)).textContent;
    check(sub('Studio take').includes('follows the whole score'),'Studio take: '+sub('Studio take'));
    check(sub('Imported, never opened').includes('follows the whole score'),'never opened: '+sub('Imported, never opened'));
    check(sub('Imported, other bars').includes('may be out of date'),'other bars: '+sub('Imported, other bars'));

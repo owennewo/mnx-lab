@@ -96,3 +96,12 @@ it('stored choices survive normalisation; damaged ones are dropped', () => {
   expect(normalizeInstrument({ kind: 'bogus' })).toBeUndefined();
   expect(JSON.stringify(guitarRig()).length, 'a rig fits the library’s preferences many times over').toBeLessThan(64 * 1024 / 8);
 });
+
+it('a soloed part mutes every other part, and a muted solo stays muted', () => {
+  const { document, performance } = blues(), gi = guitarIndex(document), ki = keysIndex(document);
+  const strip = (mix: Parameters<typeof hostSetup>[2], index: number) => hostSetup(performance, document, mix).setup.parts.find(p => p.id === `part${index}`)!.strip!;
+  expect([strip({}, gi).mute, strip({}, ki).mute]).toEqual([false, false]);
+  expect([strip({ [gi]: { solo: true } }, gi).mute, strip({ [gi]: { solo: true } }, ki).mute]).toEqual([false, true]);
+  expect(strip({ [gi]: { solo: true, muted: true } }, gi).mute).toBe(true);
+  expect([strip({ [gi]: { solo: true }, [ki]: { solo: true } }, gi).mute, strip({ [gi]: { solo: true }, [ki]: { solo: true } }, ki).mute]).toEqual([false, false]);
+});

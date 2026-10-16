@@ -46,7 +46,10 @@ reports the keystroke as `transport-toggle` — the two-finger tap's event — a
 `toggle()`. The two scopes are disjoint, so nothing fires twice, and the editor keeps `N` for
 note entry rather than Space (`src/edit/keymap.ts`). The Source select (and the host's
 `source-tools` slot beside it) shows unless `sourceControl = false`; studio chooses what
-plays in its Source sheet and calls `selectSource()`, which behaves the same either way.
+plays in its Mix panel and calls `selectSource()`, which behaves the same either way. A host
+with a mixer of its own sets `mixer = { label, open }`: the volume field becomes its handle,
+"Mix · <label>", and a click fires `mixer-toggle` instead of opening the volume overlay; the
+host's Master drives `setMasterVolume()` / `toggleMasterMute()` and follows `volume-changed`.
 
 ## The part mix
 

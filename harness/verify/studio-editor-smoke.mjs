@@ -98,13 +98,15 @@ try {
   // Undone, the note is back at fret 3 — a change of sound like any other, so it sounds.
   await key('KeyZ', { ctrl: true });
   await wait(`JSON.parse(${frets}).some(f => f.endsWith(':3')) && window.__auditions.length === 5`);
-  // Switched off in the Instruments sheet, the arrows are silent.
-  await c.evaluate(`${action('Parts')}.click()`);
-  const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
-  await wait(`!!${instruments}?.querySelector('.audition input')`);
-  await c.evaluate(`${instruments}.querySelector('.audition input').click()`);
+  // Switched off in the Mix panel's synth settings, the arrows are silent.
+  await c.evaluate(`${player}.shadowRoot.querySelector('.field.mix').click()`);
+  const mix = `${piece}.querySelector('mnx-studio-mix[slot=side]')?.shadowRoot`;
+  await wait(`!!${mix}?.querySelector('[data-settings]')`);
+  await c.evaluate(`${mix}.querySelector('[data-settings]').click()`);
+  await wait(`!!${mix}.querySelector('.pop input[type=checkbox]')`);
+  await c.evaluate(`${mix}.querySelector('.pop input[type=checkbox]').click()`);
   await wait(`${player}.auditionNotes === false && localStorage.getItem('mnx-studio.audition-notes') === 'off'`);
-  await c.evaluate(`${instruments}.querySelector('header button').click()`);
+  await c.evaluate(`${mix}.querySelector('button[aria-label="Close mix"]').click()`);
   await c.evaluate(`${viewer}.focus()`);
   await key('ArrowRight'); await key('ArrowLeft');
   await new Promise(r => setTimeout(r, 600));

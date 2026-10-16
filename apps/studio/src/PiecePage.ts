@@ -68,14 +68,13 @@ import { readTheme, setTheme, type ThemeSetting } from './theme.ts';
 import { isKitPart, type PartMix } from '../../../src/audio/partMix.ts';
 import './EditPieceSheet.ts';
 import './RecordingsSheet.ts';
-import './InstrumentsSheet.ts';
-import { sourceGlyph } from './SourceSheet.ts';
+import './MixSheet.ts';
 import './SaveSheet.ts';
 import { BUILD, COMMIT } from './build.ts';
 import { pieceFilename } from '../../../src/storage/pieceSaveContext.ts';
 import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
 import type { EditPieceSnapshot } from './EditPieceSheet.ts';
-import type { InstrumentPart } from './InstrumentsSheet.ts';
+import type { MixPart } from './MixSheet.ts';
 import { hostSetup } from '../../../src/audio/hostSetup.ts';
 import type { FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import { loadFactoryDesigns } from '../../../src/audio/native/hostPort.ts';
@@ -84,9 +83,6 @@ import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACIN
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
-/** Parts: the score's layers, one per part — what the sheet hides, mutes and voices. */
-const partsGlyph = html`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l8 4-8 4-8-4z"></path><path d="M4 12l8 4 8-4"></path><path d="M4 16l8 4 8-4"></path></svg>`;
-const chevronDown = html`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>`;
 const keysGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8"></path></svg>`;
 const saveGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-7.97A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"></path></svg>`;
 /** Cut and copied selections, for this tab: a bar copied in one piece can be pasted into the next. */
@@ -111,8 +107,10 @@ export class PiecePage extends LitElement {
   @state() private editOpen = false;
   /** The recording editor (edit or add), in the side slot. */
   @state() private recordingsOpen = false;
-  @state() private sourceOpen = false;
-  @state() private instrumentsOpen = false;
+  /** The Mix panel: what plays and how it sounds, opened from the tray. */
+  @state() private mixOpen = false;
+  /** The player's master volume, mirrored for the Mix panel's Master row. */
+  @state() private masterVolume = 0.7;
   @state() private saveOpen = false;
   @state() private keysOpen = false;
   /** What a copy, cut or paste did, or why it did not; it names the last outcome and leaves. */
@@ -195,7 +193,6 @@ export class PiecePage extends LitElement {
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
   private generation = 0;
-  private sourceChoice = 0;
   /** The sync bar's latest unsaved edit; saves are debounced and serial. */
   private pendingSync: (SyncEdit & { piece: string }) | null = null;
   private syncTimer: ReturnType<typeof setTimeout> | undefined;
@@ -329,65 +326,14 @@ export class PiecePage extends LitElement {
         display: none;
       }
     }
-    /* The sound tools, after the frame's score tools and a rule. The SOURCE
-       is a chip — boxed on the paper, a dot for "this is what sounds", the
-       name of what plays — so it never reads as a sibling of Parts, which is
-       a plain tool like Zoom and View (option 4 on the canvas, 2026-10-16). */
+    /* Keys, after a rule at the end of the frame's tools. What plays and how it
+       sounds moved to the tray's Mix field and its panel (2026-10-16). */
     span.rule[slot='actions'] {
       align-self: center;
       width: 1px;
       height: 22px;
       margin: 0 2px;
       background: var(--frame-line, var(--line));
-    }
-    button.source[slot='actions'] {
-      height: 34px;
-      align-self: center;
-      gap: 8px;
-      max-width: 240px;
-      padding: 0 10px 0 12px;
-      border: 1px solid var(--ink);
-      background: var(--paper, #fff);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    button.source[slot='actions']:hover,
-    button.source[slot='actions'][aria-pressed='true'] {
-      border-color: var(--ink);
-      box-shadow: inset 0 0 0 1px var(--ink);
-    }
-    button.source .dot {
-      flex: none;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-    button.source .name {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    button.source svg {
-      flex: none;
-    }
-    button.tool[slot='actions'] {
-      gap: 7px;
-      padding: 0 10px;
-      border-color: transparent;
-      color: var(--ink-2);
-      font-size: 13px;
-      font-weight: 500;
-    }
-    button.tool[slot='actions']:hover,
-    button.tool[slot='actions'][aria-pressed='true'] {
-      border-color: transparent;
-      background: var(--frame-press, var(--hover));
-      color: var(--ink);
-    }
-    button.tool .count {
-      font-family: var(--mono);
-      color: var(--ink-3);
     }
     /* Keys is for the editor's few: the faintest thing on the row. */
     button.keys[slot='actions'] {
@@ -399,14 +345,6 @@ export class PiecePage extends LitElement {
       border-color: transparent;
       background: var(--frame-press, var(--hover));
       color: var(--ink);
-    }
-    @container (max-width: 640px) {
-      button.tool .word {
-        display: none;
-      }
-      button.source[slot='actions'] {
-        max-width: 140px;
-      }
     }
     /* Where the editor's surfaces hang: over the whole score pane, passing every pointer through. */
     .editor-overlay {
@@ -517,6 +455,7 @@ export class PiecePage extends LitElement {
     let fresh = false;
     if (!this.binding && this.player && this.viewer) {
       this.binding = bindPlayback(this, this.viewer, this.player);
+      this.masterVolume = this.player.masterVolume;
       fresh = true;
     }
     if (this.binding && this.doc && (fresh || changed.has('doc'))) this.present(this.doc);
@@ -539,7 +478,7 @@ export class PiecePage extends LitElement {
     this.doc = null;
     this.error = '';
     this.loading = true;
-    this.editOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
+    this.editOpen = false; this.recordingsOpen = false; this.mixOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
     this.videoDividerPercent = null;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
@@ -984,26 +923,16 @@ export class PiecePage extends LitElement {
 
   // ── the side panels: one at a time ──────────────────────────────────────
 
-  private openPanel(which: 'edit' | 'source' | 'instruments' | 'recording' | 'save' | 'keys' | null) {
+  private openPanel(which: 'edit' | 'mix' | 'recording' | 'save' | 'keys' | null) {
     this.keysOpen = which === 'keys';
     this.saveOpen = which === 'save';
     this.editOpen = which === 'edit';
-    this.sourceOpen = which === 'source';
-    this.instrumentsOpen = which === 'instruments';
+    this.mixOpen = which === 'mix';
     this.recordingsOpen = which === 'recording';
   }
-  /**
-   * A pick from the source sheet closes it once the source has loaded — unless
-   * the pick is a recording with a sync warning, which studio shows only on that
-   * recording's row. Synth's row has no warning to show, so Synth always closes.
-   */
-  private async chooseSource(id: string, warning: boolean) {
-    const choice = ++this.sourceChoice;
+  /** A pick in the Mix panel plays from there; the panel stays open, since what you mix depends on it. */
+  private async chooseSource(id: string) {
     await this.player?.selectSource(id);
-    await this.updateComplete;
-    if (choice !== this.sourceChoice || !this.sourceOpen) return;
-    if (id !== 'synth' && (warning || this.recordingWarning?.id === id)) return;
-    this.openPanel(null);
   }
   /** The editor on one recording, read fresh so its revision is current. */
   private async editRecording(id: string) {
@@ -1110,7 +1039,7 @@ export class PiecePage extends LitElement {
     }
     return hostSetup(performance, doc.mnxJson, this.partMix);
   }
-  private instrumentParts(doc: MnxDocument): InstrumentPart[] {
+  private instrumentParts(doc: MnxDocument): MixPart[] {
     const performance = this.player?.performance ?? null;
     return doc.mnxJson.parts.map((part, index) => {
       const lab = part._x?.mnxLab;
@@ -1133,13 +1062,11 @@ export class PiecePage extends LitElement {
     const title = this.doc ? (fromDocument ? documentTitle(this.doc.mnxJson) ?? sidecar('title') : this.tag('title')) ?? this.doc.name : '';
     const artist = this.doc ? (fromDocument ? documentArtist(this.doc.mnxJson) ?? sidecar('artist') : this.tag('artist') ?? documentArtist(this.doc.mnxJson)) ?? '' : '';
     const chip = this.save ? saveChip(this.save, this.now) : null;
-    const routing = this.instrumentsOpen && this.doc ? this.hostRouting(this.doc) : null;
+    const routing = this.mixOpen && this.doc ? this.hostRouting(this.doc) : null;
     const activeId = this.selectedRecordingId ?? 'synth';
     const activeRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
-    // The accessible names (and tooltips) — fuller than the words on the buttons.
-    const sourceLabel = `Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}`;
-    const partCount = this.doc?.mnxJson.parts.length ?? 0;
-    const partsLabel = `Parts · ${partCount}`;
+    // What the tray's Mix field names: what plays.
+    const mixLabel = activeRecording?.name ?? 'Synth';
     const playable = this.snapshot?.recordings.filter(r => this.recordings.some(s => s.id === r.id)) ?? [];
     return html`
       <mnx-score-frame
@@ -1172,17 +1099,6 @@ export class PiecePage extends LitElement {
         ${this.doc
           ? html`<button slot="title-action" class="edit-piece" type="button" aria-label="Edit piece"
               aria-expanded=${this.editOpen} @click=${() => this.openPanel(this.editOpen ? null : 'edit')}>${pencilGlyph}</button>
-            <span slot="actions" class="rule" aria-hidden="true"></span>
-            <button slot="actions" class="source" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
-              aria-label=${sourceLabel} title=${sourceLabel} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
-              <span class="dot" aria-hidden="true"></span>
-              ${activeRecording ? sourceGlyph(activeRecording.kind === 'youtube' ? 'youtube' : 'audio', 16) : nothing}
-              <span class="name">${activeRecording?.name ?? 'Synth'}</span>${chevronDown}
-            </button>
-            <button slot="actions" class="tool" type="button" aria-pressed=${this.instrumentsOpen}
-              aria-label=${partsLabel} title=${partsLabel} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
-              ${partsGlyph}<span class="word">Parts</span><span class="count">${partCount}</span>
-            </button>
             ${this.save && !this.playOnly
               ? html`<span slot="actions" class="rule" aria-hidden="true"></span>
                 <button slot="actions" class="icon keys" type="button" aria-label="Keys" title="Keys" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
@@ -1249,6 +1165,9 @@ export class PiecePage extends LitElement {
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffSp = e.detail.staffSp)}
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
+          .mixer=${this.doc ? { label: mixLabel, open: this.mixOpen || this.recordingsOpen } : null}
+          @mixer-toggle=${() => this.openPanel(this.mixOpen ? null : 'mix')}
+          @volume-changed=${(e: CustomEvent<{ volume: number }>) => (this.masterVolume = e.detail.volume)}
           .partMix=${this.partMix} .sampleRate=${soundRate(this.sound)} .auditionNotes=${this.auditionNotes} .sourceControl=${false}
           .syncEditable=${!!this.snapshot} @sync-edit=${this.onSyncEdit} @sync-refresh=${this.onSyncEdit}
           @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
@@ -1262,29 +1181,16 @@ export class PiecePage extends LitElement {
             this.schedulePrefs();
           }}>
         </mnx-player>
-        ${this.sourceOpen && this.doc
-          ? html`<mnx-studio-source slot="side"
-              .recordings=${playable}
-              .document=${this.doc}
-              .activeId=${activeId}
-              .syncWarning=${this.recordingWarning?.id === activeId ? this.recordingWarning.message : ''}
-              .canAdd=${!!this.snapshot}
-              .scoreShape=${this.scoreShape}
-              @source-choose=${(e: CustomEvent<{ id: string; warning: boolean }>) => void this.chooseSource(e.detail.id, e.detail.warning)}
-              @recording-edit=${(e: CustomEvent<{ id: string }>) => void this.editRecording(e.detail.id)}
-              @recording-add=${() => this.addRecording()}
-              @close=${() => (this.sourceOpen = false)}></mnx-studio-source>`
-          : nothing}
         ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.editingRecordingId, html`<mnx-studio-recordings slot="side" .syncWarning=${!this.addingRecording && this.recordingWarning?.id === this.editingRecordingId ? this.recordingWarning.message : ''} .recordingId=${this.addingRecording ? null : this.editingRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
           @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); }}
           @recording-saved=${async (e: CustomEvent<{ id: string }>) => { if (!this.snapshot?.recordings.some(r => r.id === e.detail.id)) return; this.addingRecording = false; this.editingRecordingId = e.detail.id; this.selectedRecordingId = e.detail.id; await this.updateComplete; await this.player?.updateComplete; await this.player?.selectSource(e.detail.id); }}
           @recording-deleted=${() => {
             // Back to the list; playback falls back to Synth only when the deleted recording was playing.
             const wasPlaying = this.editingRecordingId !== null && this.editingRecordingId === this.selectedRecordingId;
-            this.addingRecording = false; this.editingRecordingId = null; this.openPanel('source');
+            this.addingRecording = false; this.editingRecordingId = null; this.openPanel('mix');
             if (wasPlaying) { this.selectedRecordingId = null; void this.player?.selectSource('synth'); }
           }}
-          @back=${() => this.openPanel('source')}
+          @back=${() => this.openPanel('mix')}
           @close=${() => (this.recordingsOpen = false)}></mnx-studio-recordings>`) : nothing}
         ${this.editOpen && this.doc
           ? html`<mnx-studio-edit-piece slot="side"
@@ -1329,8 +1235,14 @@ export class PiecePage extends LitElement {
               @discard-mine=${() => void this.discardMine()}
               @close=${() => (this.saveOpen = false)}></mnx-studio-save>`
           : nothing}
-        ${this.instrumentsOpen && this.doc
-          ? html`<mnx-studio-instruments slot="side"
+        ${this.mixOpen && this.doc
+          ? html`<mnx-studio-mix slot="side"
+              .recordings=${playable}
+              .document=${this.doc}
+              .activeId=${activeId}
+              .syncWarning=${this.recordingWarning?.id === activeId ? this.recordingWarning.message : ''}
+              .canAdd=${!!this.snapshot}
+              .scoreShape=${this.scoreShape}
               .parts=${this.instrumentParts(this.doc)}
               .routing=${routing?.parts ?? []}
               .routingNotes=${routing?.diagnostics ?? []}
@@ -1338,14 +1250,19 @@ export class PiecePage extends LitElement {
               .hiddenParts=${this.hiddenParts}
               .mix=${this.partMix}
               .mixAvailable=${!this.playbackKind || this.playbackKind === 'synth'}
-              .sourceName=${this.recordings.find(r => r.id === this.player?.sourceId)?.name ?? ''}
+              .master=${this.masterVolume}
+              .sound=${this.sound}
+              .auditionNotes=${this.auditionNotes}
+              @source-choose=${(e: CustomEvent<{ id: string }>) => void this.chooseSource(e.detail.id)}
+              @recording-edit=${(e: CustomEvent<{ id: string }>) => void this.editRecording(e.detail.id)}
+              @recording-add=${() => this.addRecording()}
               @hidden-change=${(e: CustomEvent<number[]>) => this.setParts(e.detail, this.partMix)}
               @mix-change=${(e: CustomEvent<PartMix>) => this.setParts(this.hiddenParts, e.detail)}
-              .sound=${this.sound}
+              @master-change=${(e: CustomEvent<number>) => this.player?.setMasterVolume(e.detail)}
+              @master-mute=${() => this.player?.toggleMasterMute()}
               @sound-change=${(e: CustomEvent<'full' | 'light'>) => { this.sound = e.detail; write(SOUND_KEY, this.sound === 'light' ? 'light' : null); }}
-              .auditionNotes=${this.auditionNotes}
               @audition-change=${(e: CustomEvent<boolean>) => { this.auditionNotes = e.detail; write(AUDITION_KEY, e.detail ? null : 'off'); }}
-              @close=${() => (this.instrumentsOpen = false)}></mnx-studio-instruments>`
+              @close=${() => (this.mixOpen = false)}></mnx-studio-mix>`
           : nothing}
       </mnx-score-frame>
     `;

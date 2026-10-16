@@ -64,6 +64,9 @@ function stacked(scope: string) {
     ${s} .field.volume .box {
       min-width: 76px;
     }
+    ${s} .field.mix {
+      width: 120px;
+    }
   `;
 }
 
@@ -92,6 +95,10 @@ export class Player extends LitElement {
   @property({ attribute: false }) sourceControl = true;
   @property({ attribute: false }) writtenBarDurations: readonly Rational[] | undefined;
   @property({ attribute: false }) recordings: readonly RecordingSource[] = [];
+  /** A host with a mixer of its own (studio's Mix panel): the tray's volume field becomes its
+   *  handle — "Mix · <what plays>" — and a click asks the host to open it (`mixer-toggle`)
+   *  instead of opening the volume overlay. `open` presses the field. */
+  @property({ attribute: false }) mixer: { label: string; open: boolean } | null = null;
   /** Host supplies recording management; standalone players omit the add action. */
   @property({ type: Boolean }) canAddRecording = false;
   /** A host recording panel owns score-alignment warnings. */
@@ -251,6 +258,21 @@ export class Player extends LitElement {
       background: transparent;
       padding: 0;
       min-width: 104px;
+    }
+    /* The mix handle: as wide as a name can be, the name ellipsized in its label. */
+    .field.mix {
+      width: 150px;
+    }
+    .field.mix .box {
+      background: transparent;
+      padding: 0 6px 0 4px;
+    }
+    /* Inset, so the pressed outline is never painted over by a lit cell. */
+    .field.mix .meter {
+      margin: 4px 0;
+    }
+    .field.mix.on .lab {
+      color: var(--ink);
     }
     .meter {
       display: flex;
@@ -654,6 +676,9 @@ export class Player extends LitElement {
       }
       .meter {
         flex: 0 0 36px;
+      }
+      .controls .field.mix {
+        width: 96px;
       }
       button.stop {
         width: 24px;
@@ -1395,14 +1420,36 @@ export class Player extends LitElement {
     try {
       localStorage.setItem('mnx-player-volume', String(this.volume));
     } catch {}
+    this.dispatchEvent(new CustomEvent<{ volume: number }>('volume-changed', { detail: { volume: this.volume }, bubbles: true, composed: true }));
   }
+
+  /** The master volume, 0–1 — what a host's mixer shows as its Master. */
+  get masterVolume() { return this.volume; }
+  /** A host's mixer setting the master; the tray follows, and `volume-changed` reports it. */
+  setMasterVolume(value: number) { this.setVolume(value); }
+  /** Mute everything, or bring it back to where it was. */
+  toggleMasterMute() { this.toggleMute(); }
 
   private toggleMute() {
     if (this.volume > 0) { this.volumeBeforeMute = this.volume; this.setVolume(0); }
     else this.setVolume(this.volumeBeforeMute || 0.7);
   }
 
+  /** The volume field as a host mixer's handle: what plays, and the master level. */
+  private mixerControl(mixer: { label: string; open: boolean }) {
+    const level = Math.round(this.volume * 100);
+    return html`<button
+      type="button"
+      class=${mixer.open ? 'field mix on' : 'field mix'}
+      aria-expanded=${mixer.open}
+      aria-label=${`Mix: ${mixer.label}, master ${level}`}
+      title="Mix"
+      @click=${() => this.dispatchEvent(new CustomEvent('mixer-toggle', { bubbles: true, composed: true }))}
+    ><span class="lab" aria-hidden="true">Mix · ${mixer.label}</span><span class="box"><span class="meter" aria-hidden="true">${Player.METER.map((step) => html`<span class=${this.volume >= step ? 'lit' : ''}></span>`)}</span><span>${level}</span>${Player.stroke(mixer.open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6', 10)}</span></button>`;
+  }
+
   private volumeControl() {
+    if (this.mixer) return this.mixerControl(this.mixer);
     const open = this.openPop === 'volume';
     const muted = this.volume === 0;
     const speaker = muted

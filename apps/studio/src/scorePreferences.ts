@@ -107,11 +107,12 @@ export function normalizeParts(raw: unknown): PartsPreference {
     const index = Number(key);
     if (!Number.isInteger(index) || index < 0 || !value || typeof value !== 'object') continue;
     // A `sound` (the retired sink's sample packs) is dropped: the part plays its default.
-    const { volume, muted } = value as Record<string, unknown>;
+    const { volume, muted, solo } = value as Record<string, unknown>;
     const instrument = normalizeInstrument((value as Record<string, unknown>).instrument);
     mix[index] = {
       ...(typeof volume === 'number' && volume >= 0 && volume <= 1 ? { volume } : {}),
       ...(muted === true ? { muted } : {}),
+      ...(solo === true ? { solo } : {}),
       ...(instrument ? { instrument } : {}),
     };
   }
