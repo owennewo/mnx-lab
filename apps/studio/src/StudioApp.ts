@@ -85,6 +85,10 @@ export function returnToLibrary(event: MouseEvent) {
   history.back();
 }
 
+// The header's glyphs, drawn like the theme ring: on a phone they stand alone.
+const PLUS = html`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>`;
+const EXIT = html`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4H6v16h8M10 12h10M16.5 8.5 20 12l-3.5 3.5"></path></svg>`;
+
 @customElement('mnx-studio')
 export class StudioApp extends LitElement {
   private readonly client = new LibraryClient();
@@ -173,10 +177,14 @@ export class StudioApp extends LitElement {
       border-color: var(--ink-dim);
     }
     button.theme {
+      text-transform: capitalize;
+    }
+    header button,
+    header a.button {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      text-transform: capitalize;
+      white-space: nowrap;
     }
     a.button {
       border: 1px solid var(--line);
@@ -211,12 +219,13 @@ export class StudioApp extends LitElement {
         display: none;
       }
     }
-    /* The glyph alone still says which theme; the title carries the word. */
+    /* A phone: the glyphs alone, so the header stays one line; each control's
+       label carries the word. */
     @media (max-width: 480px) {
       header {
         gap: 8px;
       }
-      button.theme span {
+      header .word {
         display: none;
       }
     }
@@ -270,11 +279,11 @@ export class StudioApp extends LitElement {
               : nothing}
             <span class="title"></span>
             ${this.route.page === 'aliases' || this.route.page === 'new' || this.route.page === 'deleted' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
-            ${this.route.page === 'library' && email ? html`<a class="button" href=${newPieceHref}>New piece</a>` : nothing}
-            <button class="theme" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>${themeGlyph(this.theme)}<span>${this.theme}</span></button>
+            ${this.route.page === 'library' && email ? html`<a class="button" href=${newPieceHref} aria-label="New piece" title="New piece">${PLUS}<span class="word">New piece</span></a>` : nothing}
+            <button class="theme" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>${themeGlyph(this.theme)}<span class="word">${this.theme}</span></button>
             ${email ? html`<span class="who">${email}</span>` : nothing}
             ${email || this.session?.kind === 'not-permitted'
-              ? html`<button @click=${this.signOut}>Sign out</button>`
+              ? html`<button aria-label="Sign out" title="Sign out" @click=${this.signOut}>${EXIT}<span class="word">Sign out</span></button>`
               : nothing}
           </header>`}
       <main class=${onPiece ? 'piece' : ''}>${this.renderPage()}</main>

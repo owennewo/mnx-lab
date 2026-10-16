@@ -267,6 +267,12 @@ export default defineConfig(async ({ command }) => {
     ],
     build: {
       target: 'es2022',
+      // Browsers with native light-dark(). Left to follow `target`, the CSS
+      // minifier lowers light-dark() in document stylesheets to a
+      // prefers-color-scheme switch, which ignores the color-scheme a pinned
+      // studio or workbench theme sets on <html>: a light pick on a dark
+      // machine painted a dark ground under light-theme ink.
+      cssTarget: ['chrome123', 'edge123', 'firefox120', 'safari17.5'],
       sourcemap: true
     },
     environments: {
