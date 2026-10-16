@@ -145,7 +145,7 @@
         "y1": 5,
         "x2": 27.05,
         "y2": 5,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -154,7 +154,7 @@
         "y1": 6.1429,
         "x2": 27.05,
         "y2": 6.1429,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -163,7 +163,7 @@
         "y1": 7.2857,
         "x2": 27.05,
         "y2": 7.2857,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -172,7 +172,7 @@
         "y1": 8.4286,
         "x2": 27.05,
         "y2": 8.4286,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -181,7 +181,7 @@
         "y1": 9.5714,
         "x2": 27.05,
         "y2": 9.5714,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -190,7 +190,7 @@
         "y1": 10.7143,
         "x2": 27.05,
         "y2": 10.7143,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {

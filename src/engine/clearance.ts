@@ -52,6 +52,9 @@ export function clearanceSpacing(level?: number, densityPad?: number | null) {
      *  from. The tight end all but touches: a verse must read as its own
      *  system's, never the next one's. */
     lyricInk: gap(1, 0.2, 0.5, 3),
+    /** Extra inter-system air over a system whose verses stand ABOVE its
+     *  staff (the tab view), so the block reads as the next staff's heading. */
+    versesAbove: gap(1.5, 0.5, 0.5),
     /** Preserve the old reserved margin at 2; remove only its spare air at 0. */
     verticalMargin(reserved: number, inkReach: number): number {
       const normal = Math.max(inkReach + 0.5, reserved);

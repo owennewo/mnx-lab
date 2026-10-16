@@ -54,6 +54,18 @@ export const notationTokens = css`
       --mnx-paper-line,
       light-dark(oklch(0.52 0.006 60), oklch(0.68 0.012 85))
     );
+    /* Staff lines are drawn in the INK, not the muted rule colour: a grey staff
+       under black digits read faint beside a black one (set by eye against
+       Soundslice, 2026-10-16). Its own hook, so a host can still mute them. */
+    --staff-line: var(--mnx-staff-line, var(--paper-ink));
+    /* The SCORE's lettering — not the interface's, which stays "set entirely
+       in Archivo" (--sans). Fret digits in a wide geometric bold that reads at
+       a glance; lyrics in a book serif, which tells the words apart from the
+       digits beneath them. Both are bundled by the app faces (@fontsource,
+       latin only); the embed cannot load them, so each stack ends in a system
+       face, as --sans does. Chosen 2026-10-16 against Soundslice. */
+    --score-font-fret: var(--mnx-font-fret, 'Montserrat', 'Helvetica Neue', Helvetica, system-ui, sans-serif);
+    --score-font-lyric: var(--mnx-font-lyric, 'Lora', Georgia, 'Times New Roman', serif);
   }
 `;
 

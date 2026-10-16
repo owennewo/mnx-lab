@@ -1,6 +1,6 @@
 {
   "title": "Two verses under a tab part, across two systems",
-  "description": "Four bars of quarters on a six-string guitar part (staffKind both) with two verse lines, split words in both. Sized to wrap into two systems at the harness viewport, which pins the thing a one-bar version could not: each row explicitly reserves the verse block below its strings (the notation layout's lyricExtraSp rule, applied to the tab frame), so the system below starts clear of the words. Also pins syllables centred under fret digits, derived hyphens on every staff kind, and the both view carrying the verses once, between the staves.",
+  "description": "Four bars of quarters on a six-string guitar part (staffKind both) with two verse lines, split words in both. Sized to wrap into two systems at the harness viewport, which pins the thing a one-bar version could not: each row reserves the verse block that stands over its strings on the standalone tab view (2026-10-16), so the words clear the system above and read as heading their own. Also pins syllables centred over fret digits, derived hyphens on every staff kind, and the both view carrying the verses once, between the staves.",
   "bars": 4,
   "tags": [
     "lyrics",

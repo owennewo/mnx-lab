@@ -249,7 +249,7 @@
         "y1": 5.225,
         "x2": 27.05,
         "y2": 5.225,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -258,7 +258,7 @@
         "y1": 6.3679,
         "x2": 27.05,
         "y2": 6.3679,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -267,7 +267,7 @@
         "y1": 7.5107,
         "x2": 27.05,
         "y2": 7.5107,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -276,7 +276,7 @@
         "y1": 8.6536,
         "x2": 27.05,
         "y2": 8.6536,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -285,7 +285,7 @@
         "y1": 9.7964,
         "x2": 27.05,
         "y2": 9.7964,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -294,7 +294,7 @@
         "y1": 10.9393,
         "x2": 27.05,
         "y2": 10.9393,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -332,9 +332,9 @@
       },
       {
         "kind": "rect",
-        "x": 11.1375,
+        "x": 11.0907,
         "y": 6.9993,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -345,8 +345,8 @@
         "text": "7",
         "x": 11.625,
         "y": 7.5107,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -355,9 +355,9 @@
       },
       {
         "kind": "rect",
-        "x": 20.8875,
+        "x": 20.8407,
         "y": 6.9993,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -368,8 +368,8 @@
         "text": "7",
         "x": 21.375,
         "y": 7.5107,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -398,19 +398,19 @@
         "kind": "curve",
         "points": [
           {
-            "x": 12.25,
+            "x": 12.286,
             "y": 7.5107
           },
           {
-            "x": 14.45,
+            "x": 14.486,
             "y": 7.5107
           },
           {
-            "x": 16.25,
+            "x": 16.286,
             "y": 5.2498
           },
           {
-            "x": 16.25,
+            "x": 16.286,
             "y": 3.7426
           }
         ],
@@ -420,7 +420,7 @@
       {
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
-        "x": 16.25,
+        "x": 16.286,
         "y": 3.7426,
         "scale": 0.6,
         "anchor": "middle",
@@ -429,7 +429,7 @@
       {
         "kind": "text",
         "text": "full",
-        "x": 16.25,
+        "x": 16.286,
         "y": 2.675,
         "font": "body",
         "size": 0.9,
@@ -439,9 +439,9 @@
       },
       {
         "kind": "line",
-        "x1": 22,
+        "x1": 22.036,
         "y1": 7.5107,
-        "x2": 22,
+        "x2": 22.036,
         "y2": 3.7426,
         "thickness": 0.12,
         "className": "technique-bend technique-bend-prebend"
@@ -449,7 +449,7 @@
       {
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
-        "x": 22,
+        "x": 22.036,
         "y": 3.7426,
         "scale": 0.6,
         "anchor": "middle",
@@ -458,7 +458,7 @@
       {
         "kind": "text",
         "text": "full",
-        "x": 22,
+        "x": 22.036,
         "y": 2.675,
         "font": "body",
         "size": 0.9,
@@ -468,9 +468,9 @@
       },
       {
         "kind": "line",
-        "x1": 22,
+        "x1": 22.036,
         "y1": 3.025,
-        "x2": 23.925,
+        "x2": 23.943,
         "y2": 3.025,
         "thickness": 0.12,
         "className": "technique-bend technique-bend-hold"
@@ -479,11 +479,11 @@
         "kind": "curve",
         "points": [
           {
-            "x": 23.925,
+            "x": 23.943,
             "y": 3.025
           },
           {
-            "x": 24.9838,
+            "x": 24.9919,
             "y": 3.025
           },
           {

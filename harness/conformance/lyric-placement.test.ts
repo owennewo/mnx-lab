@@ -6,6 +6,10 @@
 // too close when down-stems reached past it. A verse now sits `lyricInk` below
 // the deepest ink its own staff carries in that system, one level baseline per
 // system, and that air is the clearance control's to set.
+//
+// Over a standalone tab staff the verses stand ABOVE it (2026-10-16): the same
+// rule mirrored — `lyricInk` over the highest ink under the verse block's own
+// span, nearer its own staff than the system above.
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
@@ -36,15 +40,47 @@ const hangY = (p: Primitive) =>
   p.kind === 'line' ? Math.min(p.y1, p.y2) : p.kind === 'curve' ? Math.min(...p.points.map(q => q.y)) : p.y;
 
 interface SystemVerses {
-  /** Verse ink top minus the deepest ink (or bottom line) of the owning staff. */
-  airAbove: number;
-  /** The next system's topmost ink minus the verses' ink bottom. */
-  airBelow: number;
+  /** Air between the verses and their own staff's nearest ink (or line). */
+  airOwn: number;
+  /** Air between the verses and the neighbouring system's nearest ink. */
+  airAway: number;
   baselines: number[];
   lyrics: Primitive[];
 }
 
-function versesBySystem(layout: LayoutResult): SystemVerses[] {
+/** Verses stood over their staff: the tab view. */
+function versesAboveBySystem(layout: LayoutResult): SystemVerses[] {
+  const rows = layout.rows;
+  const lyrics = layout.primitives.filter(isLyric);
+  const ink = layout.primitives.filter(p => !FRAME.test(p.className ?? ''));
+  const out: SystemVerses[] = [];
+  rows.forEach((row, r) => {
+    const prev = rows[r - 1];
+    if (!prev) return;
+    const mine = lyrics.filter(l => l.y < row.staffTop && l.y > prev.staffBottom);
+    if (!mine.length) return;
+    const edges = mine.map(inkEdgesSp);
+    const lyricTop = Math.min(...edges.map(e => e.top));
+    const lyricBottom = Math.max(...edges.map(e => e.bottom));
+    const x0 = Math.min(...edges.map(e => e.left)) - 0.5;
+    const x1 = Math.max(...edges.map(e => e.right)) + 0.5;
+    const under = ink.map(inkEdgesSp).filter(e =>
+      e.right >= x0 && e.left <= x1 && e.top < row.staffTop && e.top >= lyricBottom && e.bottom <= row.staffBottom);
+    const ownTop = Math.min(row.staffTop, ...under.map(e => e.top));
+    const prevInk = ink.filter(p => hangY(p) >= prev.staffTop && inkEdgesSp(p).bottom <= lyricTop);
+    const prevBottom = Math.max(prev.staffBottom, ...prevInk.map(p => inkEdgesSp(p).bottom));
+    out.push({
+      airOwn: ownTop - lyricBottom,
+      airAway: lyricTop - prevBottom,
+      baselines: [...new Set(mine.map(l => l.y))].sort((a, b) => a - b),
+      lyrics: mine
+    });
+  });
+  return out;
+}
+
+function versesBySystem(layout: LayoutResult, view: string): SystemVerses[] {
+  if (view === 'tab') return versesAboveBySystem(layout);
   const rows = layout.rows;
   const lyrics = layout.primitives.filter(isLyric);
   const ink = layout.primitives.filter(p => !FRAME.test(p.className ?? ''));
@@ -60,8 +96,8 @@ function versesBySystem(layout: LayoutResult): SystemVerses[] {
     const nextInk = ink.filter(p => hangY(p) > lyricBottom && hangY(p) < next.staffBottom);
     const nextTop = Math.min(next.staffTop, ...nextInk.map(p => inkEdgesSp(p).top));
     out.push({
-      airAbove: lyricTop - deepest,
-      airBelow: nextTop - lyricBottom,
+      airOwn: lyricTop - deepest,
+      airAway: nextTop - lyricBottom,
       baselines: [...new Set(mine.map(l => l.y))].sort((a, b) => a - b),
       lyrics: mine
     });
@@ -84,18 +120,18 @@ describe('lyric placement hugs the system that owns it', () => {
 
   for (const [docName, rel] of Object.entries(DOCS)) {
     for (const [viewName, layout] of Object.entries(VIEWS)) {
-      it(`${docName}, ${viewName}: each verse sits lyricInk under its own staff's deepest ink, at every level`, () => {
+      it(`${docName}, ${viewName}: each verse sits lyricInk from its own staff's nearest ink, at every level`, () => {
         initSmufl();
         const doc = read(rel);
         let systems = 0;
         for (const clearance of LEVELS) {
           const lyricInk = clearanceSpacing(clearance).lyricInk;
           const result = layout({ mnx: doc, widthSp: WIDTH_SP, display: { clearance } } as never) as LayoutResult;
-          for (const sys of versesBySystem(result)) {
+          for (const sys of versesBySystem(result, viewName)) {
             systems++;
-            expect(sys.airAbove).toBeCloseTo(lyricInk, 6);
-            // The words read as their own system's: nearer it than the next one.
-            expect(sys.airAbove).toBeLessThan(sys.airBelow);
+            expect(sys.airOwn).toBeCloseTo(lyricInk, 6);
+            // The words read as their own system's: nearer it than its neighbour.
+            expect(sys.airOwn).toBeLessThan(sys.airAway);
             // Verse rows stack at a fixed pitch from one level first baseline.
             for (let k = 1; k < sys.baselines.length; k++) {
               expect(sys.baselines[k] - sys.baselines[k - 1]).toBeCloseTo(LYRIC_LINE_SPACING_SP, 6);
@@ -109,7 +145,7 @@ describe('lyric placement hugs the system that owns it', () => {
         initSmufl();
         const result = layout({ mnx: read(rel), widthSp: WIDTH_SP, display: { clearance: 0 } } as never) as LayoutResult;
         const ink = result.primitives.filter(p => !FRAME.test(p.className ?? ''));
-        for (const sys of versesBySystem(result)) {
+        for (const sys of versesBySystem(result, viewName)) {
           for (const syllable of sys.lyrics) {
             const hit = ink.find(p => overlaps(syllable, p));
             expect(hit, `"${(syllable as { text?: string }).text}" overlaps ${hit?.kind}:${hit?.className}`).toBeUndefined();

@@ -114,6 +114,10 @@ export interface TightenRowsArgs {
    *  close up. Which row emitted a primitive is a fact, not a measurement, so
    *  the fixed-point loop settles it once and carries it. */
   owners?: ReadonlyMap<Primitive, number>;
+  /** Extra air above each row, on top of the system clearance — the tab view
+   *  gives it to a system whose verses stand over its staff, so the words
+   *  read as heading the staff below them rather than trailing the one above. */
+  airAboveSp?: readonly number[];
 }
 
 /** A layout whose rows have moved. */
@@ -211,7 +215,8 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
     const ink =
       (inkBottom[r] - rows[r].staffBottom) +
       (rows[r + 1].staffTop - inkTop[r + 1]) +
-      clearance.systemInk;
+      clearance.systemInk +
+      (args.airAboveSp?.[r + 1] ?? 0);
     offsets.push(offsets[r] + (ink - gap));
   }
 
@@ -325,11 +330,14 @@ export function ensureTopMargin(
  *  content stays with the row it hangs from. ONE rule, used by tightenRows
  *  and by the conformance measurement that checks its identity — the two
  *  diverging is exactly the bug the reservation exists to prevent. */
-export function rowBoundariesSp(rows: readonly RowBandSp[], reservedBelowSp = 0): number[] {
+export function rowBoundariesSp(rows: readonly RowBandSp[], reservedBelowSp = 0, reservedAboveSp = 0): number[] {
   const boundaries: number[] = [];
   for (let r = 0; r + 1 < rows.length; r++) {
     const mid = (rows[r].staffBottom + rows[r + 1].staffTop) / 2;
-    boundaries.push(Math.min(rows[r + 1].staffTop, Math.max(mid, rows[r].staffBottom + reservedBelowSp)));
+    // A reservation ABOVE (verses stood over a tab staff) pulls the boundary
+    // up past the block, so it stays with the staff it heads.
+    const pulled = Math.min(Math.max(mid, rows[r].staffBottom + reservedBelowSp), rows[r + 1].staffTop - reservedAboveSp);
+    boundaries.push(Math.min(rows[r + 1].staffTop, Math.max(rows[r].staffBottom, pulled)));
   }
   return boundaries;
 }

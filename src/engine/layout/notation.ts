@@ -4,7 +4,7 @@ import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, TITLE_SYSTEM_INK_SP, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import { measureHeadingX, ONSET_TEXT_LEAD_SP, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
-import { LYRIC_SIZE_SP, selectedLyricLineIds } from './lyricRuns.ts';
+import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
@@ -333,9 +333,10 @@ const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff l
 // typing them: a rehearsal mark reads as the outermost index, the section name
 // sits under it, and part-level text sits closest to the notes. Nothing in the
 // document says so.
-// Free text reads at the words' size, the lyric's: "Verse 1-4" or "let ring"
-// is an instruction beside the music, not a heading over it.
-const DIRECTION_SIZE_SP = LYRIC_SIZE_SP;
+// Free text reads at the old words' size: "Verse 1-4" or "let ring" is an
+// instruction beside the music, not a heading over it. (It once borrowed
+// LYRIC_SIZE_SP; the lyrics grew with their serif face, the instructions did not.)
+const DIRECTION_SIZE_SP = 1.25;
 const DIRECTION_RISE_SP = 2.4; // baseline above the staff's top line, where no row ink is given to clear
 const DIRECTION_DROP_SP = 4.2; // baseline below the staff's bottom line, clearing a ledger note
 const DIRECTION_STACK_SP = 1.9; // extra offset per coincident direction
@@ -2337,16 +2338,16 @@ function assembleSegment(
     );
     for (const emit of aboveDirections[i] ?? []) emit(scan());
     emitHarmonies({ gm, m, stdSequences: topSequences, staffTop, scan: scan(), primitives });
+    // The section marker sits over the staff and the tempo over the marker
+    // (scoreText.ts, "Emission ORDER"): labels first, then the tempo scans them.
+    emitScoreLabels({ gm, m, staffTop, scan: scan(), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: scan(), primitives,
       onsetXs: measureOnsetXs(topSequences, m.voices)
     });
-    const swingTop = emitSwingMark({
+    emitSwingMark({
       swing: swingTimeline[writtenIndex(plan, i)], m, staffTop, scan: scan(),
       clearAbove: tempoTop, primitives
-    });
-    emitScoreLabels({
-      gm, m, staffTop, scan: scan(), clearAbove: swingTop ?? tempoTop, primitives
     });
     emitOccurrenceLabel(m, staffTop, primitives);
   }

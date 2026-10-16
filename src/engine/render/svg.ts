@@ -10,6 +10,14 @@ import { glyphCodepoint } from '../smufl/smufl.ts';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const FONT_FAMILY_BODY = 'var(--font-family-sans)';
+/** The score's own lettering (elements/tokens.ts names the faces). Each falls
+ *  back to the body font, so a standalone SVG with no tokens renders as before. */
+const FONT_FAMILY: Record<TextPrim['font'], string> = {
+  body: FONT_FAMILY_BODY,
+  bodyItalic: FONT_FAMILY_BODY,
+  fret: `var(--score-font-fret, ${FONT_FAMILY_BODY})`,
+  lyric: `var(--score-font-lyric, ${FONT_FAMILY_BODY})`
+};
 
 /**
  * MINIMUM DRAWN INK — a hairline is never allowed below one device pixel.
@@ -332,7 +340,7 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): string {
 function emitText(p: TextPrim, kx: number, ky: number): string {
   // Body text is the exception to the glyph font, so it says so inline
   // (see KIND_DEFAULTS for why an attribute could not).
-  let style = `font-family:${FONT_FAMILY_BODY}`;
+  let style = `font-family:${FONT_FAMILY[p.font]}`;
   if (p.fill !== undefined && p.fill !== 'currentColor') style += `;fill:${escapeXml(p.fill)}`;
   let attrs =
     ` x="${n(drawnX(p.x, p.dx, kx, ky))}" y="${n(p.y * ky)}"` +

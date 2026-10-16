@@ -20,6 +20,7 @@ import { describe, it, expect } from 'vitest';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
+import { TAB_STAFF_LINE_THICKNESS_SP } from '../../src/engine/layout/tabStaff.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
 import { MAX_STAFF_SP, MIN_STAFF_SP } from '../../src/engine/render/scale.ts';
 import { planHorizontal, packSystems } from '../../src/engine/layout/spacing.ts';
@@ -371,19 +372,18 @@ describe('minimum drawn ink — a line is always at least a line', () => {
     }
   });
 
-  it('and that is not vacuous: unfloored, the smallest staff draws 0.4px hairlines', () => {
+  it('and that is not vacuous: unfloored, the smallest staff draws sub-pixel hairlines', () => {
     initSmufl();
-    // The reported case. A tab staff line and a tab barline are both 0.1sp,
-    // and at Staff 0.4sp the drawn scale is 4px/sp.
-    expect(0.1 * MIN_STAFF_SP * 10).toBeCloseTo(0.4, 6);
-    expect(0.1 * MIN_STAFF_SP * 10).toBeLessThan(MIN_INK_PX);
+    // The reported case was a 0.1sp tab staff line at Staff 0.4sp (4px/sp):
+    // 0.4px. The line is 0.13sp now (2026-10-16), still well under a pixel there.
+    expect(TAB_STAFF_LINE_THICKNESS_SP * MIN_STAFF_SP * 10).toBeCloseTo(0.52, 6);
+    expect(TAB_STAFF_LINE_THICKNESS_SP * MIN_STAFF_SP * 10).toBeLessThan(MIN_INK_PX);
     // The floor is what closes that gap, and only there. At Staff 0.4sp the
-    // thinnest stroke comes out exactly at the floor; at Staff 1sp a tab hairline is
-    // already exactly a pixel on its own (0.1sp × 10px/sp), which is a neat
-    // reminder of how close to the edge the default sits; and by Staff 4sp the
-    // floor is nowhere near firing.
+    // thinnest stroke comes out exactly at the floor; at Staff 1sp a tab staff
+    // line is 1.3px on its own (0.13sp × 10px/sp); and by Staff 4sp the floor
+    // is nowhere near firing.
     expect(Math.min(...strokeWidths(blues(), 10, MIN_STAFF_SP * 10))).toBe(MIN_INK_PX);
-    expect(Math.min(...strokeWidths(blues(), 10, 10))).toBe(MIN_INK_PX);
+    expect(Math.min(...strokeWidths(blues(), 10, 10))).toBeCloseTo(TAB_STAFF_LINE_THICKNESS_SP * 10, 6);
     expect(Math.min(...strokeWidths(blues(), 10, MAX_STAFF_SP * 10))).toBeGreaterThan(
       MIN_INK_PX * 3
     );

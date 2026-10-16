@@ -83,6 +83,17 @@ first-part Tab path and the corpus's byte-identical default output. Public
 bindings and the workbench's explicit defaults are documented in
 [core-viewer-surface.md](core-viewer-surface.md#score-display-preferences).
 
+Verses stand where the reader's eye is: under a notation staff, as engraving
+has always set them, and OVER a standalone tab staff — above its bar numbers and
+section marks, clearing only the ink under their own span, with extra system air
+over a versed staff so the words head the staff below them rather than trail the
+one above (`lyricRuns.ts`, `clearance.versesAbove`). Over the staff the stack is
+fixed, nearest first: bar number and section marker, then the tempo, then the
+verses (`scoreText.ts` "Emission ORDER"). The score letters in its own faces —
+Montserrat Bold for fret digits, Lora for verses (`--score-font-*` in
+`elements/tokens.ts`) — while every other text keeps the interface's Archivo;
+the staff lines are drawn in the ink. All set against Soundslice on 2026-10-16.
+
 Section headings, the swing marking and capo advice share the measure-start tempo
 anchor, including when no tempo is printed. Section/rehearsal pairs stay together;
 a standalone rehearsal mark retains its barline inset. Tuning letters stay beside

@@ -68,6 +68,8 @@ const isNav = (p: Primitive) => NAV_CLASSES.has(cls(p));
 // A swing marking after a tempo is one same-baseline heading statement; when
 // no tempo prints it remains its own score-text run.
 const isSwing = (p: Primitive) => cls(p) === 'swing';
+// Verses stood over a tab staff are placed last, over all of the score text.
+const isLyric = (p: Primitive) => /lyric/.test(p.className ?? '');
 /** `measureHeadingX`'s lead: how far left of its content a heading mark starts. */
 const HEADING_LEAD_SP = 1.5;
 
@@ -222,23 +224,25 @@ function checkLayout(layout: LayoutResult): Checked {
           out.clear++;
         }
       };
+      // The stack, nearest the staff first: label, then tempo (and its swing)
+      // over it, then verses over everything (scoreText.ts "Emission ORDER").
       if (labels.length) {
         out.labels++;
-        assertGroup(labels, prims.filter(p => !isLabel(p)));
+        assertGroup(labels, prims.filter(p => !isLabel(p) && !isTempo(p) && !isSwing(p) && !isLyric(p)));
       }
       if (tempos.length && swings.length) {
         out.tempos++;
         out.swings++;
         assertGroup(
           [...tempos, ...swings],
-          prims.filter(p => !isTempo(p) && !isLabel(p) && !isNav(p) && !isSwing(p))
+          prims.filter(p => !isTempo(p) && !isNav(p) && !isSwing(p) && !isLyric(p))
         );
       } else if (tempos.length) {
         out.tempos++;
-        assertGroup(tempos, prims.filter(p => !isTempo(p) && !isLabel(p) && !isNav(p)));
+        assertGroup(tempos, prims.filter(p => !isTempo(p) && !isNav(p) && !isLyric(p)));
       } else if (swings.length) {
         out.swings++;
-        assertGroup(swings, prims.filter(p => !isSwing(p) && !isLabel(p) && !isNav(p)));
+        assertGroup(swings, prims.filter(p => !isSwing(p) && !isNav(p) && !isLyric(p)));
       }
     }
   });

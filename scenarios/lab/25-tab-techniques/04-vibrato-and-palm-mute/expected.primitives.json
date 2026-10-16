@@ -326,7 +326,7 @@
         "y1": 5,
         "x2": 32.675,
         "y2": 5,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -335,7 +335,7 @@
         "y1": 6.1429,
         "x2": 32.675,
         "y2": 6.1429,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -344,7 +344,7 @@
         "y1": 7.2857,
         "x2": 32.675,
         "y2": 7.2857,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -353,7 +353,7 @@
         "y1": 8.4286,
         "x2": 32.675,
         "y2": 8.4286,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -362,7 +362,7 @@
         "y1": 9.5714,
         "x2": 32.675,
         "y2": 9.5714,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -371,7 +371,7 @@
         "y1": 10.7143,
         "x2": 32.675,
         "y2": 10.7143,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -409,9 +409,9 @@
       },
       {
         "kind": "rect",
-        "x": 11.1375,
+        "x": 11.0907,
         "y": 5.6314,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -422,8 +422,8 @@
         "text": "3",
         "x": 11.625,
         "y": 6.1429,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -432,9 +432,9 @@
       },
       {
         "kind": "rect",
-        "x": 20.8875,
+        "x": 20.8407,
         "y": 10.2029,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -445,8 +445,8 @@
         "text": "0",
         "x": 21.375,
         "y": 10.7143,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -455,9 +455,9 @@
       },
       {
         "kind": "rect",
-        "x": 27.8875,
+        "x": 27.8407,
         "y": 10.2029,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -468,8 +468,8 @@
         "text": "0",
         "x": 28.375,
         "y": 10.7143,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -497,105 +497,105 @@
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 12.25,
+        "x": 12.286,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 12.858,
+        "x": 12.894,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 13.466,
+        "x": 13.502,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 14.074,
+        "x": 14.11,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 14.682,
+        "x": 14.718,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 15.29,
+        "x": 15.326,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 15.898,
+        "x": 15.934,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 16.506,
+        "x": 16.542,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 17.114,
+        "x": 17.15,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 17.722,
+        "x": 17.758,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 18.33,
+        "x": 18.366,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 18.938,
+        "x": 18.974,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 19.546,
+        "x": 19.582,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "glyph",
         "glyph": "guitarVibratoStroke",
-        "x": 20.154,
+        "x": 20.19,
         "y": 4.6,
         "className": "technique-vibrato"
       },
       {
         "kind": "text",
         "text": "P.M.",
-        "x": 21,
+        "x": 20.964,
         "y": 3.565,
         "font": "body",
         "size": 0.9,
@@ -605,7 +605,7 @@
       },
       {
         "kind": "line",
-        "x1": 23.41,
+        "x1": 23.374,
         "y1": 3.295,
         "x2": 32.425,
         "y2": 3.295,

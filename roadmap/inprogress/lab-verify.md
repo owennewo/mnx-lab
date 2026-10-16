@@ -1650,3 +1650,40 @@ updates the same pending batch in `lab/score-text/labels-with-navigation`,
 `spec/jumps-ds-al-fine`. Review that captions and nearby destination signs read
 as one row without touching the staff, and that labels stacked above them retain
 their clearance.
+
+## The Soundslice pass: score faces, inked staff, verses over the tab — 2026-10-16
+
+Owner: no roadmap doc — the owner compared studio's *Suzanne* side by side with
+Soundslice's and chose each setting by eye in a live restyle demo, then asked for it
+built. Engine changes, all at once:
+
+- **Fret digits** in Montserrat Bold (`--score-font-fret`), 1.25sp → **1.37sp** (1.2
+  string gaps, Soundslice's proportion). The text primitive has two new font kinds,
+  `fret` and `lyric`, so every tab golden's digits now name their own family.
+- **Tab staff lines** 0.1sp → **0.13sp**, the notation staff's weight; drawn in the ink
+  (`--staff-line`) rather than the muted rule colour — that part is viewer CSS and no
+  golden sees it.
+- **Lyrics** in Lora (`--score-font-lyric`), 1.25sp → **1.5sp**, verse pitch 2.2sp →
+  **1.1 ems (1.65sp)**, priced at 0.59em a character for spacing. Applies under
+  notation staves too.
+- **Verses stand over a standalone tab staff** — above its bar numbers and section
+  marks, clearing only the ink under their own span, with `clearance.versesAbove`
+  (1.5sp at default) of extra system air over a versed staff.
+- **The section marker sits over the staff and the tempo over the marker** — the
+  reverse of before — in tab and notation alike.
+- Direction text stays at 1.25sp (it had borrowed the lyric size).
+
+37 goldens moved, none verified, so nothing was demoted: every `lab/20`–`26` tab
+scenario, `lab/00-document/02-empty-tab-canvas`, `lab/11-rhythm/05-swing-feel`,
+`lab/31-score-text/09` and `10`, `lab/40-navigation/02` and `06`, `lab/50-lyrics/01`
+and `02`, and `spec/lyric-line-metadata`, `spec/lyrics-basic`, `spec/lyrics-multi-line`.
+
+**What a reviewer should look for.** On every tab view the digits are visibly bolder
+and wider and still sit inside their masks without the string line showing through a
+`0` or a `4`; grace digits stay 0.6 of their neighbours. In `lab/50-lyrics/02-tab-verses`
+the verses stand over each tab system, nearer their own staff than the system above,
+the bar number between the words and the staff. In `lab/31-score-text/09` and `10` the
+stack over a bar reads, from the staff up: navigation sign, `[A] Riff`, tempo — the
+tempo is now the top line. Lyrics under notation (`spec/lyrics-*`) are in the serif,
+larger, and their verse rows sit closer together without descenders touching the next
+row's capitals.

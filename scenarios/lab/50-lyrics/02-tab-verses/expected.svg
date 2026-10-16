@@ -1,104 +1,104 @@
-<svg width="1280" height="565.664" viewBox="0 0 1280 565.664" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="552.064" viewBox="0 0 1280 552.064" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="128" x2="525.8672" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="144" x2="525.8672" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="160" x2="525.8672" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="176" x2="525.8672" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="192" x2="525.8672" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="128" x2="716.6" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="716.6" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="716.6" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="716.6" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="716.6" y2="192" stroke-width="2.08" class="staff-line"></line>
 <text x="36" y="176" font-size="64" class="clef"></text>
 <text x="104" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<text x="161.7936" y="192" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<line x1="180.6736" y1="136" x2="180.6736" y2="189.312" stroke-width="1.92" class="stem"></line>
-<text x="256.2608" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="275.1408" y1="120" x2="275.1408" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="356.3264" y="168" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
-<line x1="375.2064" y1="112" x2="375.2064" y2="165.312" stroke-width="1.92" class="stem"></line>
-<text x="456.3936" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
-<line x1="475.2736" y1="120" x2="475.2736" y2="173.312" stroke-width="1.92" class="stem"></line>
-<line x1="525.8672" y1="128" x2="525.8672" y2="192" stroke-width="2.56" class="barline"></line>
-<line x1="525.8672" y1="128" x2="881.3328" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="525.8672" y1="144" x2="881.3328" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="525.8672" y1="160" x2="881.3328" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="525.8672" y1="176" x2="881.3328" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="525.8672" y1="192" x2="881.3328" y2="192" stroke-width="2.08" class="staff-line"></line>
-<text x="562.0592" y="192" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<line x1="580.9392" y1="136" x2="580.9392" y2="189.312" stroke-width="1.92" class="stem"></line>
-<text x="639.7264" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
-<line x1="658.6064" y1="120" x2="658.6064" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="722.9936" y="168" font-size="64" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
-<line x1="741.8736" y1="112" x2="741.8736" y2="165.312" stroke-width="1.92" class="stem"></line>
-<text x="811.8592" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e3.n0"></text>
-<line x1="830.7392" y1="120" x2="830.7392" y2="173.312" stroke-width="1.92" class="stem"></line>
-<line x1="881.3328" y1="128" x2="881.3328" y2="192" stroke-width="2.56" class="barline"></line>
-<line x1="881.3328" y1="128" x2="1248" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="881.3328" y1="144" x2="1248" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="881.3328" y1="160" x2="1248" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="881.3328" y1="176" x2="1248" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="881.3328" y1="192" x2="1248" y2="192" stroke-width="2.08" class="staff-line"></line>
-<text x="928.7264" y="192" font-size="64" class="notehead" data-source-id="@m2.v0.e0.n0"></text>
-<line x1="947.6064" y1="136" x2="947.6064" y2="189.312" stroke-width="1.92" class="stem"></line>
-<text x="1017.5936" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e1.n0"></text>
-<line x1="1036.4736" y1="120" x2="1036.4736" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="1106.4608" y="168" font-size="64" class="notehead" data-source-id="@m2.v0.e2.n0"></text>
-<line x1="1125.3408" y1="112" x2="1125.3408" y2="165.312" stroke-width="1.92" class="stem"></line>
-<text x="1189.7264" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e3.n0"></text>
-<line x1="1208.6064" y1="120" x2="1208.6064" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="185.2656" y="192" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="204.1456" y1="136" x2="204.1456" y2="189.312" stroke-width="1.92" class="stem"></line>
+<text x="326.6752" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="345.5552" y1="120" x2="345.5552" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="475.1648" y="168" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
+<line x1="494.0448" y1="112" x2="494.0448" y2="165.312" stroke-width="1.92" class="stem"></line>
+<text x="623.6544" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
+<line x1="642.5344" y1="120" x2="642.5344" y2="173.312" stroke-width="1.92" class="stem"></line>
+<line x1="716.6" y1="128" x2="716.6" y2="192" stroke-width="2.56" class="barline"></line>
+<line x1="716.6" y1="128" x2="1248" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="716.6" y1="144" x2="1248" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="716.6" y1="160" x2="1248" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="716.6" y1="176" x2="1248" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="716.6" y1="192" x2="1248" y2="192" stroke-width="2.08" class="staff-line"></line>
+<text x="773.3056" y="192" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
+<line x1="792.1856" y1="136" x2="792.1856" y2="189.312" stroke-width="1.92" class="stem"></line>
+<text x="893.4752" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
+<line x1="912.3552" y1="120" x2="912.3552" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="1020.7248" y="168" font-size="64" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
+<line x1="1039.6048" y1="112" x2="1039.6048" y2="165.312" stroke-width="1.92" class="stem"></line>
+<text x="1155.0544" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e3.n0"></text>
+<line x1="1173.9344" y1="120" x2="1173.9344" y2="173.312" stroke-width="1.92" class="stem"></line>
 <line x1="1248" y1="128" x2="1248" y2="192" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="349.664" x2="463.4672" y2="349.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="365.664" x2="463.4672" y2="365.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="381.664" x2="463.4672" y2="381.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="397.664" x2="463.4672" y2="397.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="413.664" x2="463.4672" y2="413.664" stroke-width="2.08" class="staff-line"></line>
-<text x="36" y="397.664" font-size="64" class="clef"></text>
-<text x="121.7936" y="413.664" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
-<line x1="140.6736" y1="357.664" x2="140.6736" y2="410.976" stroke-width="1.92" class="stem"></line>
-<text x="216.2608" y="397.664" font-size="64" class="notehead" data-source-id="@m3.v0.e1.n0"></text>
-<line x1="235.1408" y1="341.664" x2="235.1408" y2="394.976" stroke-width="1.92" class="stem"></line>
-<text x="299.5264" y="389.664" font-size="64" class="notehead" data-source-id="@m3.v0.e2.n0"></text>
-<line x1="318.4064" y1="333.664" x2="318.4064" y2="386.976" stroke-width="1.92" class="stem"></line>
-<text x="388.3936" y="397.664" font-size="64" class="notehead" data-source-id="@m3.v0.e3.n0"></text>
-<line x1="407.2736" y1="341.664" x2="407.2736" y2="394.976" stroke-width="1.92" class="stem"></line>
-<line x1="450.6672" y1="349.664" x2="450.6672" y2="413.664" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="455.4672" y="349.664" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="171.2336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Sun</text>
-<text x="265.7008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">did</text>
-<text x="365.7664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">glide</text>
-<text x="465.8336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">down</text>
-<text x="571.4992" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">on</text>
-<text x="649.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">the</text>
-<text x="732.4336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">riv</text>
-<text x="776.8672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="821.3008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">er</text>
-<text x="938.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">wa</text>
-<text x="982.6" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1027.0336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ter</text>
-<text x="1115.9008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">car</text>
-<text x="1157.5328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1199.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ry</text>
-<text x="131.2336" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
-<text x="225.7008" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">safe</text>
-<text x="267.3328" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="308.9664" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
-<text x="397.8336" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">home</text>
-<text x="171.2336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Moon</text>
-<text x="265.7008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">will</text>
-<text x="365.7664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">drift</text>
-<text x="465.8336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">by</text>
-<text x="571.4992" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">un</text>
-<text x="610.3328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="649.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">der</text>
-<text x="732.4336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">wil</text>
-<text x="776.8672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="821.3008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">lows</text>
-<text x="938.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">shad</text>
-<text x="982.6" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1027.0336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ows</text>
-<text x="1115.9008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">soft</text>
-<text x="1157.5328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1199.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
-<text x="131.2336" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sing</text>
-<text x="225.7008" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
-<text x="308.9664" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">to</text>
-<text x="397.8336" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sleep</text>
+<line x1="32" y1="344.864" x2="619.96" y2="344.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="360.864" x2="619.96" y2="360.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="376.864" x2="619.96" y2="376.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="392.864" x2="619.96" y2="392.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="408.864" x2="619.96" y2="408.864" stroke-width="2.08" class="staff-line"></line>
+<text x="36" y="392.864" font-size="64" class="clef"></text>
+<text x="145.2656" y="408.864" font-size="64" class="notehead" data-source-id="@m2.v0.e0.n0"></text>
+<line x1="164.1456" y1="352.864" x2="164.1456" y2="406.176" stroke-width="1.92" class="stem"></line>
+<text x="279.5952" y="392.864" font-size="64" class="notehead" data-source-id="@m2.v0.e1.n0"></text>
+<line x1="298.4752" y1="336.864" x2="298.4752" y2="390.176" stroke-width="1.92" class="stem"></line>
+<text x="413.9248" y="384.864" font-size="64" class="notehead" data-source-id="@m2.v0.e2.n0"></text>
+<line x1="432.8048" y1="328.864" x2="432.8048" y2="382.176" stroke-width="1.92" class="stem"></line>
+<text x="541.1744" y="392.864" font-size="64" class="notehead" data-source-id="@m2.v0.e3.n0"></text>
+<line x1="560.0544" y1="336.864" x2="560.0544" y2="390.176" stroke-width="1.92" class="stem"></line>
+<line x1="619.96" y1="344.864" x2="619.96" y2="408.864" stroke-width="2.56" class="barline"></line>
+<line x1="619.96" y1="344.864" x2="1193.84" y2="344.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="619.96" y1="360.864" x2="1193.84" y2="360.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="619.96" y1="376.864" x2="1193.84" y2="376.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="619.96" y1="392.864" x2="1193.84" y2="392.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="619.96" y1="408.864" x2="1193.84" y2="408.864" stroke-width="2.08" class="staff-line"></line>
+<text x="690.8256" y="408.864" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
+<line x1="709.7056" y1="352.864" x2="709.7056" y2="406.176" stroke-width="1.92" class="stem"></line>
+<text x="832.2352" y="392.864" font-size="64" class="notehead" data-source-id="@m3.v0.e1.n0"></text>
+<line x1="851.1152" y1="336.864" x2="851.1152" y2="390.176" stroke-width="1.92" class="stem"></line>
+<text x="959.4848" y="384.864" font-size="64" class="notehead" data-source-id="@m3.v0.e2.n0"></text>
+<line x1="978.3648" y1="328.864" x2="978.3648" y2="382.176" stroke-width="1.92" class="stem"></line>
+<text x="1093.8144" y="392.864" font-size="64" class="notehead" data-source-id="@m3.v0.e3.n0"></text>
+<line x1="1112.6944" y1="336.864" x2="1112.6944" y2="390.176" stroke-width="1.92" class="stem"></line>
+<line x1="1181.04" y1="344.864" x2="1181.04" y2="408.864" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="1185.84" y="344.864" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="194.7056" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">Sun</text>
+<text x="336.1152" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">did</text>
+<text x="484.6048" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">glide</text>
+<text x="633.0944" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">down</text>
+<text x="782.7456" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">on</text>
+<text x="902.9152" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">the</text>
+<text x="1030.1648" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">riv</text>
+<text x="1097.3296" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="1164.4944" y="266.192" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">er</text>
+<text x="154.7056" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">wa</text>
+<text x="221.8704" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="289.0352" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ter</text>
+<text x="423.3648" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">car</text>
+<text x="486.9904" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="550.6144" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ry</text>
+<text x="700.2656" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">me</text>
+<text x="841.6752" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">safe</text>
+<text x="905.2992" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="968.9248" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ly</text>
+<text x="1103.2544" y="483.056" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">home</text>
+<text x="194.7056" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">Moon</text>
+<text x="336.1152" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">will</text>
+<text x="484.6048" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">drift</text>
+<text x="633.0944" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">by</text>
+<text x="782.7456" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">un</text>
+<text x="842.8304" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="902.9152" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">der</text>
+<text x="1030.1648" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">wil</text>
+<text x="1097.3296" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="1164.4944" y="292.592" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">lows</text>
+<text x="154.7056" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">shad</text>
+<text x="221.8704" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="289.0352" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ows</text>
+<text x="423.3648" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">soft</text>
+<text x="486.9904" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric-hyphen">-</text>
+<text x="550.6144" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">ly</text>
+<text x="700.2656" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">sing</text>
+<text x="841.6752" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">me</text>
+<text x="968.9248" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">to</text>
+<text x="1103.2544" y="509.456" font-size="24" text-anchor="middle" style="font-family:var(--score-font-lyric, var(--font-family-sans))" class="lyric">sleep</text>
 </svg>

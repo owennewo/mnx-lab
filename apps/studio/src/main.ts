@@ -3,13 +3,16 @@
 // framework-neutral surfaces — elements/ and below, plus the typed library
 // client — never src/workbench/ (dependency-cruiser makes that a red build).
 //
-// Same single webfont as the workbench, same four latin-only files, for the
-// same reason (src/entries/main.ts): one interface voice, and 700 is the
-// score's weight, not the chrome's.
+// Same interface webfont as the workbench, same four latin-only files, for the
+// same reason (src/entries/main.ts): one interface voice. The score's own
+// lettering (fret digits, verses) follows below.
 import '@fontsource/archivo/latin-400.css';
 import '@fontsource/archivo/latin-500.css';
 import '@fontsource/archivo/latin-600.css';
 import '@fontsource/archivo/latin-700.css';
+// The score's lettering (elements/tokens.ts --score-font-*; src/entries/main.ts).
+import '@fontsource/montserrat/latin-700.css';
+import '@fontsource/lora/latin-400.css';
 
 import '../studio.css';
 import { applyTheme, readTheme } from './theme.ts';

@@ -42,11 +42,11 @@
 <text x="829.696" y="253.5648" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
 <line x1="927.2" y1="165.5648" x2="927.2" y2="229.5648" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="932" y="165.5648" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="214.4" y="78.2976" font-size="35.2" class="tempo"></text>
-<text x="229.2864" y="78.2976" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 96</text>
-<rect x="206.4" y="8" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="214.4" y="31.68" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
-<text x="245.28" y="31.68" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Riff</text>
+<rect x="206.4" y="53.1808" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="214.4" y="76.8608" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
+<text x="245.28" y="76.8608" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Riff</text>
+<text x="214.4" y="32.2176" font-size="35.2" class="tempo"></text>
+<text x="229.2864" y="32.2176" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 96</text>
 <rect x="619.2" y="77.8848" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
 <text x="627.2" y="101.5648" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
 <text x="658.08" y="101.5648" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>

@@ -145,10 +145,12 @@ export function textBottomAbove(
  * system) and by the standalone `tab.ts` — the same arrangement `tabStaff.ts`
  * has for staff drawing, and for the same reason: two copies would drift.
  *
- * Emission ORDER is load-bearing and the callers must keep it: tempo, then
- * navigation, then labels last. `emitScoreLabels` scans what is already above
- * this measure and stacks above it, so a caller that draws the label first
- * gets a label with a tempo mark on top of it.
+ * Emission ORDER is load-bearing and the callers must keep it: the fixed marks
+ * (navigation, bar number), then labels, then tempo and its swing. Each piece of score text scans what
+ * already stands over this measure and stacks above it, so what is drawn first
+ * sits nearest the staff: the section marker on the staff, the tempo over the
+ * marker (reversed 2026-10-16 — "[A] Intro" names the bar it stands on, and a
+ * tempo on top reads as the line's heading, as Soundslice sets it).
  */
 
 // ---------- Metric-position anchoring (dynamics, segno/fine/jump) ----------
@@ -329,14 +331,6 @@ export interface EmitScoreLabelsArgs {
    *  the page (the twelve-bar-blues "Turnaround over bar 1" bug); clearance
    *  from the row above is `tightenRows`' job, not the label's. */
   scan: readonly Primitive[];
-  /**
-   * The box of ink this row's own text pass already placed over the bar —
-   * `emitTempoMark`'s return. Handed over explicitly because a tempo mark
-   * lifted over a stem can stand taller than the row pad, where a geometric scan took it
-   * for the system above and the label would land on top of it. Honoured
-   * only where the footprints overlap, like everything else.
-   */
-  clearAbove?: BoundsSp | null;
   primitives: Primitive[];
 }
 
@@ -349,7 +343,7 @@ export interface EmitScoreLabelsArgs {
  * needs no typography at all.
  */
 export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
-  const { gm, m, staffTop, scan, clearAbove, primitives } = args;
+  const { gm, m, staffTop, scan, primitives } = args;
   if (!gm.rehearsal && !gm.section) return;
 
   // Share the tempo heading edge, clear of the clef and system-start barline.
@@ -357,9 +351,9 @@ export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
 
   const capH = SCORE_LABEL_SIZE_SP * SCORE_LABEL_CAP_RATIO;
 
-  // A score-wide label goes above everything under its footprint — tempo
-  // marks, navigation marks, part directions, stems, voltas — because it
-  // labels the bar as a whole; and it goes exactly one cohesion clearance
+  // A score-wide label goes above everything drawn under its footprint so
+  // far — part directions, stems, voltas — because it labels the bar as a
+  // whole (the tempo is drawn after, and stands over it); and it goes exactly one cohesion clearance
   // above that ink, because it labels THIS bar. Drawn at a provisional
   // baseline of 0 and placed once its real extent is known; the box, when
   // there is one, is the label's bottom ink.
@@ -424,7 +418,7 @@ export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     });
   }
 
-  placeTextRun(primitives, firstNew, 0, staffTop, scan, clearAbove);
+  placeTextRun(primitives, firstNew, 0, staffTop, scan, null);
 }
 
 
@@ -486,7 +480,7 @@ export interface EmitTempoMarkArgs {
  * beams and brackets — the mark has to see the stems it must clear.
  *
  * Returns the box of the ink it drew (null when there is no tempo), for the
- * label pass to clear explicitly — see `EmitScoreLabelsArgs.clearAbove`.
+ * swing mark to sit beside — see `EmitSwingMarkArgs.clearAbove`.
  */
 export function emitTempoMark(args: EmitTempoMarkArgs): TempoRun | null {
   const { gm, m, staffTop, scan, primitives, onsetXs } = args;

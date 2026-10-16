@@ -152,7 +152,7 @@
         "y1": 5,
         "x2": 27.05,
         "y2": 5,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -161,7 +161,7 @@
         "y1": 6.1429,
         "x2": 27.05,
         "y2": 6.1429,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -170,7 +170,7 @@
         "y1": 7.2857,
         "x2": 27.05,
         "y2": 7.2857,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -179,7 +179,7 @@
         "y1": 8.4286,
         "x2": 27.05,
         "y2": 8.4286,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -188,7 +188,7 @@
         "y1": 9.5714,
         "x2": 27.05,
         "y2": 9.5714,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -197,7 +197,7 @@
         "y1": 10.7143,
         "x2": 27.05,
         "y2": 10.7143,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -235,9 +235,9 @@
       },
       {
         "kind": "rect",
-        "x": 10.0125,
+        "x": 9.8577,
         "y": 10.2029,
-        "w": 3.225,
+        "w": 3.5346,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -248,8 +248,8 @@
         "text": "<12>",
         "x": 11.625,
         "y": 10.7143,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -258,9 +258,9 @@
       },
       {
         "kind": "rect",
-        "x": 19.7625,
+        "x": 19.6077,
         "y": 9.06,
-        "w": 3.225,
+        "w": 3.5346,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -271,8 +271,8 @@
         "text": "<12>",
         "x": 21.375,
         "y": 9.5714,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,

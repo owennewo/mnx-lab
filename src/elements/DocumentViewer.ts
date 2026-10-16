@@ -539,7 +539,7 @@ export class DocumentViewer extends LitElement {
       }
 
       #projection-container svg .staff-line {
-        stroke: var(--paper-line);
+        stroke: var(--staff-line);
       }
 
       #projection-container svg .notehead {

@@ -66,7 +66,10 @@ export const TAB_STRING_SPACING_SP =
 /** Top string to bottom string. */
 export const TAB_STAFF_HEIGHT_SP = (TAB_STAFF_LINES - 1) * TAB_STRING_SPACING_SP;
 
-export const TAB_STAFF_LINE_THICKNESS_SP = 0.1;
+/** The notation staff's own weight (notation.ts STAFF_LINE_THICKNESS_SP,
+ *  Bravura's `staffLineThickness`): a `both` system reads as one ruling, and
+ *  the 0.1 hairline it replaced read faint under bold digits (2026-10-16). */
+export const TAB_STAFF_LINE_THICKNESS_SP = 0.13;
 
 /** Bravura's natural TAB clef is 6.048sp tall against our 5.714sp six-line
  * staff. Scale it to the staff rather than letting the letters dominate it. */
@@ -75,9 +78,9 @@ export const TAB_CLEF_SCALE = 0.94;
 /**
  * Fret digits are the tab staff's ONLY musical content — the reader's eye goes
  * to them and nothing else — so they carry the boldest weight in the engine.
- * 700 is a real bundled face (`@fontsource/archivo/latin-700` in
- * src/entries/main.ts), not a synthesized one; the rest of the engine's `bold`
- * text resolves to the same face.
+ * They are set in the score's fret face (`--score-font-fret`, Montserrat), and
+ * 700 is a real bundled weight of it (`@fontsource/montserrat/latin-700` in the
+ * app entries), not a synthesized one.
  */
 const FRET_FONT_WEIGHT = 700;
 
@@ -850,7 +853,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         text: fretStr,
         x: eventX,
         y: stringY,
-        font: 'body',
+        font: 'fret',
         size: fontSize,
         anchor: 'middle',
         baseline: 'central',

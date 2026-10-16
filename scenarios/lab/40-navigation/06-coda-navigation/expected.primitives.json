@@ -632,7 +632,7 @@
         "y1": 7.224,
         "x2": 13.55,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -641,7 +641,7 @@
         "y1": 8.3669,
         "x2": 13.55,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -650,7 +650,7 @@
         "y1": 9.5097,
         "x2": 13.55,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -659,7 +659,7 @@
         "y1": 10.6526,
         "x2": 13.55,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -668,7 +668,7 @@
         "y1": 11.7954,
         "x2": 13.55,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -677,7 +677,7 @@
         "y1": 12.9383,
         "x2": 13.55,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -744,7 +744,7 @@
         "y1": 7.224,
         "x2": 20.95,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -753,7 +753,7 @@
         "y1": 8.3669,
         "x2": 20.95,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -762,7 +762,7 @@
         "y1": 9.5097,
         "x2": 20.95,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -771,7 +771,7 @@
         "y1": 10.6526,
         "x2": 20.95,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -780,7 +780,7 @@
         "y1": 11.7954,
         "x2": 20.95,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -789,7 +789,7 @@
         "y1": 12.9383,
         "x2": 20.95,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -817,7 +817,7 @@
         "y1": 7.224,
         "x2": 28.35,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -826,7 +826,7 @@
         "y1": 8.3669,
         "x2": 28.35,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -835,7 +835,7 @@
         "y1": 9.5097,
         "x2": 28.35,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -844,7 +844,7 @@
         "y1": 10.6526,
         "x2": 28.35,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -853,7 +853,7 @@
         "y1": 11.7954,
         "x2": 28.35,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -862,7 +862,7 @@
         "y1": 12.9383,
         "x2": 28.35,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -888,7 +888,7 @@
         "y1": 7.224,
         "x2": 35.75,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -897,7 +897,7 @@
         "y1": 8.3669,
         "x2": 35.75,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -906,7 +906,7 @@
         "y1": 9.5097,
         "x2": 35.75,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -915,7 +915,7 @@
         "y1": 10.6526,
         "x2": 35.75,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -924,7 +924,7 @@
         "y1": 11.7954,
         "x2": 35.75,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -933,7 +933,7 @@
         "y1": 12.9383,
         "x2": 35.75,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -961,7 +961,7 @@
         "y1": 7.224,
         "x2": 43.15,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -970,7 +970,7 @@
         "y1": 8.3669,
         "x2": 43.15,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -979,7 +979,7 @@
         "y1": 9.5097,
         "x2": 43.15,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -988,7 +988,7 @@
         "y1": 10.6526,
         "x2": 43.15,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -997,7 +997,7 @@
         "y1": 11.7954,
         "x2": 43.15,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1006,7 +1006,7 @@
         "y1": 12.9383,
         "x2": 43.15,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1034,7 +1034,7 @@
         "y1": 7.224,
         "x2": 50.55,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1043,7 +1043,7 @@
         "y1": 8.3669,
         "x2": 50.55,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1052,7 +1052,7 @@
         "y1": 9.5097,
         "x2": 50.55,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1061,7 +1061,7 @@
         "y1": 10.6526,
         "x2": 50.55,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1070,7 +1070,7 @@
         "y1": 11.7954,
         "x2": 50.55,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1079,7 +1079,7 @@
         "y1": 12.9383,
         "x2": 50.55,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1105,7 +1105,7 @@
         "y1": 7.224,
         "x2": 57.95,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1114,7 +1114,7 @@
         "y1": 8.3669,
         "x2": 57.95,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1123,7 +1123,7 @@
         "y1": 9.5097,
         "x2": 57.95,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1132,7 +1132,7 @@
         "y1": 10.6526,
         "x2": 57.95,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1141,7 +1141,7 @@
         "y1": 11.7954,
         "x2": 57.95,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1150,7 +1150,7 @@
         "y1": 12.9383,
         "x2": 57.95,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1178,7 +1178,7 @@
         "y1": 7.224,
         "x2": 65.35,
         "y2": 7.224,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1187,7 +1187,7 @@
         "y1": 8.3669,
         "x2": 65.35,
         "y2": 8.3669,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1196,7 +1196,7 @@
         "y1": 9.5097,
         "x2": 65.35,
         "y2": 9.5097,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1205,7 +1205,7 @@
         "y1": 10.6526,
         "x2": 65.35,
         "y2": 10.6526,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1214,7 +1214,7 @@
         "y1": 11.7954,
         "x2": 65.35,
         "y2": 11.7954,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -1223,7 +1223,7 @@
         "y1": 12.9383,
         "x2": 65.35,
         "y2": 12.9383,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {

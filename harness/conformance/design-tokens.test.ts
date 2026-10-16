@@ -148,6 +148,10 @@ describe('design tokens', () => {
           '--mnx-playback-2',
           '--mnx-playback-3',
           '--mnx-playback-4',
+          // The score's ruling and lettering (docs/core-viewer-surface.md).
+          '--mnx-staff-line',
+          '--mnx-font-fret',
+          '--mnx-font-lyric',
         ])
       );
     });

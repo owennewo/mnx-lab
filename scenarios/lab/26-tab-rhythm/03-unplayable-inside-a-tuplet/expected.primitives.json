@@ -350,7 +350,7 @@
         "y1": 5,
         "x2": 28.875,
         "y2": 5,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -359,7 +359,7 @@
         "y1": 6.1429,
         "x2": 28.875,
         "y2": 6.1429,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -368,7 +368,7 @@
         "y1": 7.2857,
         "x2": 28.875,
         "y2": 7.2857,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -377,7 +377,7 @@
         "y1": 8.4286,
         "x2": 28.875,
         "y2": 8.4286,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -386,7 +386,7 @@
         "y1": 9.5714,
         "x2": 28.875,
         "y2": 9.5714,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -395,7 +395,7 @@
         "y1": 10.7143,
         "x2": 28.875,
         "y2": 10.7143,
-        "thickness": 0.1,
+        "thickness": 0.13,
         "className": "staff-line"
       },
       {
@@ -433,9 +433,9 @@
       },
       {
         "kind": "rect",
-        "x": 7.0125,
+        "x": 6.9657,
         "y": 6.7743,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -446,8 +446,8 @@
         "text": "0",
         "x": 7.5,
         "y": 7.2857,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -456,9 +456,9 @@
       },
       {
         "kind": "rect",
-        "x": 11.6125,
+        "x": 11.5657,
         "y": 4.4886,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -469,8 +469,8 @@
         "text": "0",
         "x": 12.1,
         "y": 5,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -526,9 +526,9 @@
       },
       {
         "kind": "rect",
-        "x": 15.7125,
+        "x": 15.6657,
         "y": 6.7743,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -539,8 +539,8 @@
         "text": "2",
         "x": 16.2,
         "y": 7.2857,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
@@ -549,9 +549,9 @@
       },
       {
         "kind": "rect",
-        "x": 22.7125,
+        "x": 22.6657,
         "y": 7.9171,
-        "w": 0.975,
+        "w": 1.0686,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -562,8 +562,8 @@
         "text": "0",
         "x": 23.2,
         "y": 8.4286,
-        "font": "body",
-        "size": 1.25,
+        "font": "fret",
+        "size": 1.37,
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,

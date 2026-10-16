@@ -121,7 +121,8 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
       page.append(slice); doc.body.append(page);
       y = cut; first = false;
     }
-    await Promise.all([doc.fonts.load('16px Bravura'), doc.fonts.load('16px Archivo')]);
+    await Promise.all([doc.fonts.load('16px Bravura'), doc.fonts.load('16px Archivo'),
+      doc.fonts.load('700 16px Montserrat'), doc.fonts.load('16px Lora')]);
     await doc.fonts.ready;
     // Own the handler in the preview, so a Studio reload cannot strand it.
     await new Promise<void>((resolve, reject) => {

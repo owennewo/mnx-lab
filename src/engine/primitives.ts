@@ -126,8 +126,10 @@ export interface TextPrim extends PrimitiveBase {
   /** Ink offset from `x` — see PrimitiveBase's note. */
   dx?: number;
   y: number;
-  /** `body` and `bodyItalic` map to project body font via CSS. */
-  font: 'body' | 'bodyItalic';
+  /** `body` and `bodyItalic` map to the project body font via CSS; `fret`
+   *  (tab digits) and `lyric` (verse syllables) are the score's own lettering,
+   *  each with its own family token and the body font as fallback. */
+  font: 'body' | 'bodyItalic' | 'fret' | 'lyric';
   /** Em size in staff spaces (so font-size in px = size * pxPerSp). */
   size: number;
   anchor?: 'start' | 'middle' | 'end';

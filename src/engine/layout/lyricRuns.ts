@@ -5,20 +5,30 @@
 // rules, extracted here so the views cannot drift. (The `both` view needs
 // nothing: its lyrics anchor to the notation staff, which already draws
 // them between the staves.)
+//
+// WHERE the verses go differs by staff. Under a notation staff, as engraving
+// has always set them. Over a standalone tab staff (2026-10-16, against
+// Soundslice): a tab reader's eye sits on the digits, and words stacked over
+// the staff — above its bar numbers and section marks — read as the line's
+// heading, where words under the digits read as the next system's.
 import type { MnxStructure } from '../../model/mnx.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
-import type { Primitive, RowBandSp } from '../primitives.ts';
+import type { Primitive, RowBandSp, TextPrim } from '../primitives.ts';
 import { inkEdgesSp } from '../render/bounds.ts';
-import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 
 // The FRAME's first-verse drop: what a system provisionally reserves below its
 // staff before any ink exists. Where a verse actually lands is measured —
 // `emitLyricRuns` places it under the ink its staff carries.
 export const LYRIC_FIRST_BASELINE_DROP_SP = 4.5;
-export const LYRIC_LINE_SPACING_SP = 2.2;
-// The fret digit's size: words and digits read at one weight, and both are
-// staff spaces, so a staff-scale change grows them together.
-export const LYRIC_SIZE_SP = FRET_FONT_SIZE_SP;
+// Set in the score's lyric face (Lora, `--score-font-lyric`): a book serif
+// wants more size than a grotesque to read at the same weight, and 1.5sp is
+// where it matched the fret digits by eye (2026-10-16). Staff spaces, so a
+// staff-scale change grows words and digits together.
+export const LYRIC_SIZE_SP = 1.5;
+// 1.1 ems, baseline to baseline: verses stacked tight read as one block that
+// belongs to one staff. Lora's descenders still clear the next verse's
+// capitals here; at 1.05 they began to touch.
+export const LYRIC_LINE_SPACING_SP = 1.1 * LYRIC_SIZE_SP;
 export const LYRIC_DESCENDER_PAD_SP = 0.8;
 // Air between the last verse row's descenders and a native tab staff below it
 // (the both view's content-driven inter-staff gap).
@@ -63,6 +73,9 @@ export interface LyricSyllable {
   staffTop: number;
   staffBottom: number;
   bandBottom: number;
+  /** How far ABOVE its staff its own ink can reach (halfway to the system
+   *  above) — read only when the verses stand over the staff. */
+  bandTop?: number;
   text: string;
   /** start/middle syllables reach for the next one with a hyphen. */
   continues: boolean;
@@ -80,8 +93,12 @@ export function orderedLyricLineIds(mnx: MnxStructure, used: ReadonlySet<string>
 
 // A verse's ink top above its baseline and reach below it — the same text
 // metrics the row fit measures with (render/bounds.ts), so air here is air there.
-const LYRIC_PROBE: Primitive = { kind: 'text', text: 'x', x: 0, y: 0, font: 'body', size: LYRIC_SIZE_SP, anchor: 'middle' };
+const LYRIC_PROBE: TextPrim = { kind: 'text', text: 'x', x: 0, y: 0, font: 'lyric', size: LYRIC_SIZE_SP, anchor: 'middle' };
 const LYRIC_ASCENT_SP = -inkEdgesSp(LYRIC_PROBE).top;
+const LYRIC_DESCENT_SP = inkEdgesSp(LYRIC_PROBE).bottom;
+/** Verses over a staff clear the ink under their own span, widened by this —
+ *  the same locality score text keeps (scoreText.ts TEXT_SIDE_CLEAR_SP). */
+const LYRIC_SIDE_CLEAR_SP = 0.5;
 
 // A staff's frame — lines, barlines, a group's brace or bracket — and the
 // verses themselves never push a verse down. Whole class tokens only: a
@@ -121,12 +138,16 @@ function hangY(p: Primitive): number {
 export function emitLyricRuns(
   runs: Iterable<LyricSyllable[]>,
   primitives: Primitive[],
-  airSp: number
+  airSp: number,
+  /** Stand the verses OVER their staff instead (the tab view). `verseCount`
+   *  is the document's verse-row count: rows are global, so the last verse
+   *  sits nearest the staff in every system, whichever verses it carries. */
+  above?: { verseCount: number }
 ): Map<Primitive, number> {
   const all = [...runs];
   const owners = new Map<Primitive, number>();
-  const firstBaseline = new Map<number, number>();
-  for (const run of all) {
+  const firstBaseline = above ? baselinesAbove(all, primitives, airSp, above.verseCount) : new Map<number, number>();
+  for (const run of above ? [] : all) {
     for (const syl of run) {
       if (firstBaseline.has(syl.staffBottom)) continue;
       let deepest = syl.staffBottom;
@@ -147,7 +168,7 @@ export function emitLyricRuns(
         text: syl.text,
         x: syl.x,
         y,
-        font: 'body',
+        font: 'lyric',
         size: LYRIC_SIZE_SP,
         anchor: 'middle',
         className: 'lyric'
@@ -161,7 +182,7 @@ export function emitLyricRuns(
           text: '-',
           x: (syl.x + next.x) / 2,
           y,
-          font: 'body',
+          font: 'lyric',
           size: LYRIC_SIZE_SP,
           anchor: 'middle',
           className: 'lyric-hyphen'
@@ -172,6 +193,50 @@ export function emitLyricRuns(
     });
   }
   return owners;
+}
+
+/**
+ * First-verse baselines for verses stood OVER their staff, keyed like the
+ * below case by the staff's bottom line. Each staff's verse block clears the
+ * highest ink under its own span — bar numbers, section marks, tempo, voltas,
+ * technique, the top string's digits — by `airSp`, measured from the last
+ * verse's descenders. One baseline per staff per system, so a verse reads
+ * level; the block's span, not the system's, so words over the end of a line
+ * do not climb over a label at its start.
+ */
+function baselinesAbove(
+  runs: readonly LyricSyllable[][],
+  primitives: readonly Primitive[],
+  airSp: number,
+  verseCount: number
+): Map<number, number> {
+  const staffs = new Map<number, { syl: LyricSyllable; x0: number; x1: number }>();
+  for (const run of runs) {
+    for (const syl of run) {
+      const ink = inkEdgesSp({ ...LYRIC_PROBE, text: syl.text, x: syl.x });
+      const seen = staffs.get(syl.staffBottom);
+      staffs.set(syl.staffBottom, {
+        syl,
+        x0: Math.min(seen?.x0 ?? Infinity, ink.left - LYRIC_SIDE_CLEAR_SP),
+        x1: Math.max(seen?.x1 ?? -Infinity, ink.right + LYRIC_SIDE_CLEAR_SP)
+      });
+    }
+  }
+  const first = new Map<number, number>();
+  for (const [staffBottom, { syl, x0, x1 }] of staffs) {
+    const bandTop = syl.bandTop ?? -Infinity;
+    let ceiling = syl.staffTop;
+    for (const p of primitives) {
+      if (NOT_HANGING_INK.test(p.className ?? '')) continue;
+      const e = inkEdgesSp(p);
+      if (e.right < x0 || e.left > x1) continue;
+      if (e.top >= syl.staffTop || e.bottom > staffBottom || e.bottom <= bandTop) continue;
+      ceiling = Math.min(ceiling, e.top);
+    }
+    const lastBaseline = ceiling - airSp - LYRIC_DESCENT_SP;
+    first.set(staffBottom, lastBaseline - (Math.max(1, verseCount) - 1) * LYRIC_LINE_SPACING_SP);
+  }
+  return first;
 }
 
 /**
@@ -187,6 +252,22 @@ export function lyricReachBelowRows(primitives: readonly Primitive[], rows: read
     while (r + 1 < rows.length && rows[r + 1].staffBottom < p.y) r++;
     if (r < 0 || (r + 1 < rows.length && p.y > rows[r + 1].staffTop)) continue;
     reach = Math.max(reach, inkEdgesSp(p).bottom - rows[r].staffBottom);
+  }
+  return reach;
+}
+
+/**
+ * How far any verse stood over its staff reaches above that staff's top line —
+ * the mirror of `lyricReachBelowRows`, for a layout that sets verses above
+ * (the tab view), so the row split files them with the staff they head.
+ */
+export function lyricReachAboveRows(primitives: readonly Primitive[], rows: readonly RowBandSp[]): number {
+  let reach = 0;
+  for (const p of primitives) {
+    if (p.kind !== 'text' || !/lyric/.test(p.className ?? '')) continue;
+    const r = rows.findIndex(row => p.y < row.staffTop);
+    if (r < 0) continue;
+    reach = Math.max(reach, rows[r].staffTop - inkEdgesSp(p).top);
   }
   return reach;
 }

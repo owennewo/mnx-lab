@@ -21,39 +21,39 @@
 <line x1="454.16" y1="240" x2="485.84" y2="240" stroke-width="2.56" class="ledger-line"></line>
 <text x="460.56" y="248" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
 <line x1="479.44" y1="192" x2="479.44" y2="245.312" stroke-width="1.92" class="stem"></line>
-<line x1="32" y1="321.76" x2="538.8" y2="321.76" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="340.0464" x2="538.8" y2="340.0464" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="358.3312" x2="538.8" y2="358.3312" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="376.6176" x2="538.8" y2="376.6176" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="394.9024" x2="538.8" y2="394.9024" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="413.1888" x2="538.8" y2="413.1888" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="321.76" x2="538.8" y2="321.76" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="340.0464" x2="538.8" y2="340.0464" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="358.3312" x2="538.8" y2="358.3312" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="376.6176" x2="538.8" y2="376.6176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="394.9024" x2="538.8" y2="394.9024" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="413.1888" x2="538.8" y2="413.1888" stroke-width="2.08" class="staff-line"></line>
 <text x="36" y="367.4736" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="344.6176" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="390.3312" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="194.2" y="331.8624" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="202" y="340.0464" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
-<rect x="350.2" y="405.0064" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
-<text x="358" y="413.1888" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="462.2" y="405.0064" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="470" y="413.1888" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
+<rect x="193.4512" y="331.8624" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="202" y="340.0464" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
+<rect x="349.4512" y="405.0064" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="358" y="413.1888" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
+<rect x="461.4512" y="405.0064" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="470" y="413.1888" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
 <line x1="526" y1="128" x2="526" y2="413.1888" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="530.8" y="128" width="8" height="285.1888" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="212" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="221.728" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="231.456" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="241.184" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="250.912" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="260.64" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="270.368" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="280.096" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="289.824" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="299.552" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="309.28" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="319.008" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="328.736" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="338.464" y="315.36" font-size="64" class="technique-vibrato"></text>
-<text x="352" y="298.8" font-size="14.4" style="font-family:var(--font-family-sans)" class="technique-palm-mute">P.M.</text>
-<line x1="390.56" y1="294.48" x2="534.8" y2="294.48" stroke-width="1.92" stroke-dasharray="4,4" class="technique-palm-mute-line"></line>
+<text x="212.576" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="222.304" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="232.032" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="241.76" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="251.488" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="261.216" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="270.944" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="280.672" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="290.4" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="300.128" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="309.856" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="319.584" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="329.312" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="339.04" y="315.36" font-size="64" class="technique-vibrato"></text>
+<text x="351.424" y="298.8" font-size="14.4" style="font-family:var(--font-family-sans)" class="technique-palm-mute">P.M.</text>
+<line x1="389.984" y1="294.48" x2="534.8" y2="294.48" stroke-width="1.92" stroke-dasharray="4,4" class="technique-palm-mute-line"></line>
 <text x="215.44" y="108.8" font-size="64" class="technique-vibrato"></text>
 <text x="225.168" y="108.8" font-size="64" class="technique-vibrato"></text>
 <text x="234.896" y="108.8" font-size="64" class="technique-vibrato"></text>

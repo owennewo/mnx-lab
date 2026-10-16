@@ -105,6 +105,13 @@ surface — shadow DOM admits no other seam. `--mnx-accent`, `--mnx-paper`,
 `--mnx-surface`, `--mnx-focus-ring`. They work in an embed as of 2026-08-14;
 before that the vars reading them lived in a block the element did not carry.
 
+Three more (2026-10-16) reach the score's own lettering and ruling:
+`--mnx-staff-line` (the staff lines' stroke — the ink by default, where it was
+the muted `--mnx-paper-line` before), `--mnx-font-fret` (tab digits —
+Montserrat by default) and `--mnx-font-lyric` (verses — Lora). The app faces
+bundle both fonts; an embed gets them only if its host page loads them, and
+otherwise falls to the system faces at the end of each stack.
+
 `--mnx-paper-width` (2026-08-15) is the one that is not a colour: the paper
 **fills its container** by default, so the engine gets every pixel the host
 gave it and lays out more bars per system on a wider one. It used to be capped

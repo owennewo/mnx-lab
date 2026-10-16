@@ -13,19 +13,19 @@
 <line x1="192.56" y1="146.688" x2="192.56" y2="200" stroke-width="1.92" class="stem"></line>
 <text x="348.56" y="144" font-size="64" class="notehead" data-source-id="b2"></text>
 <line x1="348.56" y1="146.688" x2="348.56" y2="200" stroke-width="1.92" class="stem"></line>
-<line x1="32" y1="284.56" x2="448.8" y2="284.56" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="302.8464" x2="448.8" y2="302.8464" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="321.1312" x2="448.8" y2="321.1312" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="339.4176" x2="448.8" y2="339.4176" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="357.7024" x2="448.8" y2="357.7024" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="375.9888" x2="448.8" y2="375.9888" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="284.56" x2="448.8" y2="284.56" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="302.8464" x2="448.8" y2="302.8464" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="321.1312" x2="448.8" y2="321.1312" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="339.4176" x2="448.8" y2="339.4176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="357.7024" x2="448.8" y2="357.7024" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="375.9888" x2="448.8" y2="375.9888" stroke-width="2.08" class="staff-line"></line>
 <text x="36" y="330.2736" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="307.4176" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="353.1312" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="194.2" y="312.9488" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b1"></rect>
-<text x="202" y="321.1312" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="b1">7</text>
-<rect x="350.2" y="312.9488" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b2"></rect>
-<text x="358" y="321.1312" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="b2">7</text>
+<rect x="193.4512" y="312.9488" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b1"></rect>
+<text x="202" y="321.1312" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="b1">7</text>
+<rect x="349.4512" y="312.9488" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b2"></rect>
+<text x="358" y="321.1312" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="b2">7</text>
 <line x1="448.8" y1="128" x2="448.8" y2="375.9888" stroke-width="2.56" class="barline"></line>
 <line x1="448.8" y1="128" x2="783.2" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="448.8" y1="144" x2="783.2" y2="144" stroke-width="2.08" class="staff-line"></line>
@@ -36,44 +36,44 @@
 <line x1="526.96" y1="146.688" x2="526.96" y2="200" stroke-width="1.92" class="stem"></line>
 <text x="682.96" y="144" font-size="64" class="notehead" data-source-id="b4"></text>
 <line x1="682.96" y1="146.688" x2="682.96" y2="200" stroke-width="1.92" class="stem"></line>
-<line x1="448.8" y1="284.56" x2="783.2" y2="284.56" stroke-width="1.6" class="staff-line"></line>
-<line x1="448.8" y1="302.8464" x2="783.2" y2="302.8464" stroke-width="1.6" class="staff-line"></line>
-<line x1="448.8" y1="321.1312" x2="783.2" y2="321.1312" stroke-width="1.6" class="staff-line"></line>
-<line x1="448.8" y1="339.4176" x2="783.2" y2="339.4176" stroke-width="1.6" class="staff-line"></line>
-<line x1="448.8" y1="357.7024" x2="783.2" y2="357.7024" stroke-width="1.6" class="staff-line"></line>
-<line x1="448.8" y1="375.9888" x2="783.2" y2="375.9888" stroke-width="1.6" class="staff-line"></line>
-<rect x="528.6" y="312.9488" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b3"></rect>
-<text x="536.4" y="321.1312" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="b3">7</text>
-<rect x="684.6" y="312.9488" width="15.6" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b4"></rect>
-<text x="692.4" y="321.1312" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="b4">7</text>
+<line x1="448.8" y1="284.56" x2="783.2" y2="284.56" stroke-width="2.08" class="staff-line"></line>
+<line x1="448.8" y1="302.8464" x2="783.2" y2="302.8464" stroke-width="2.08" class="staff-line"></line>
+<line x1="448.8" y1="321.1312" x2="783.2" y2="321.1312" stroke-width="2.08" class="staff-line"></line>
+<line x1="448.8" y1="339.4176" x2="783.2" y2="339.4176" stroke-width="2.08" class="staff-line"></line>
+<line x1="448.8" y1="357.7024" x2="783.2" y2="357.7024" stroke-width="2.08" class="staff-line"></line>
+<line x1="448.8" y1="375.9888" x2="783.2" y2="375.9888" stroke-width="2.08" class="staff-line"></line>
+<rect x="527.8512" y="312.9488" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b3"></rect>
+<text x="536.4" y="321.1312" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="b3">7</text>
+<rect x="683.8512" y="312.9488" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="b4"></rect>
+<text x="692.4" y="321.1312" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="b4">7</text>
 <line x1="770.4" y1="128" x2="770.4" y2="375.9888" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="775.2" y="128" width="8" height="247.9888" fill="currentColor" class="barline barline-final-thick"></rect>
-<path d="M 212 321.1312 C 229.6 321.1312, 244 284.9568, 244 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
-<text x="244" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<text x="244" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">full</text>
-<path d="M 244 249.36 C 261.6 249.36, 276 264.0032, 276 273.7648" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
-<text x="276" y="285.2464" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<text x="276" y="268.1648" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
-<path d="M 368 321.1312 C 376.4704 321.1312, 383.4 284.9568, 383.4 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
-<text x="383.4" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<text x="383.4" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
-<path d="M 383.4 249.36 C 391.8704 249.36, 398.8 285.5344, 398.8 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
-<text x="398.8" y="321.1312" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<path d="M 398.8 321.1312 C 407.2704 321.1312, 414.2 284.9568, 414.2 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
-<text x="414.2" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<text x="414.2" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
-<path d="M 414.2 249.36 C 422.6704 249.36, 429.6 285.5344, 429.6 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 212.576 321.1312 C 230.176 321.1312, 244.576 284.9568, 244.576 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
+<text x="244.576" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<text x="244.576" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">full</text>
+<path d="M 244.576 249.36 C 262.176 249.36, 276.576 264.0032, 276.576 273.7648" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<text x="276.576" y="285.2464" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<text x="276.576" y="268.1648" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
+<path d="M 368.576 321.1312 C 376.9664 321.1312, 383.832 284.9568, 383.832 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
+<text x="383.832" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<text x="383.832" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
+<path d="M 383.832 249.36 C 392.2224 249.36, 399.088 285.5344, 399.088 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<text x="399.088" y="321.1312" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<path d="M 399.088 321.1312 C 407.4784 321.1312, 414.344 284.9568, 414.344 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
+<text x="414.344" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<text x="414.344" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
+<path d="M 414.344 249.36 C 422.7344 249.36, 429.6 285.5344, 429.6 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="429.6" y="321.1312" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<path d="M 546.4 321.1312 C 555.2 321.1312, 562.4 284.9568, 562.4 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
-<text x="562.4" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<text x="562.4" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
-<line x1="562.4" y1="249.36" x2="594.4" y2="249.36" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
-<path d="M 594.4 249.36 C 603.2 249.36, 610.4 285.5344, 610.4 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
-<text x="610.4" y="321.1312" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<path d="M 702.4 321.1312 C 710.8704 321.1312, 717.8 284.9568, 717.8 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
-<text x="717.8" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
-<text x="717.8" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">full</text>
-<path d="M 717.8 249.36 C 743.2096 249.36, 764 285.5344, 764 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 546.976 321.1312 C 555.776 321.1312, 562.976 284.9568, 562.976 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
+<text x="562.976" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<text x="562.976" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">1/2</text>
+<line x1="562.976" y1="249.36" x2="594.976" y2="249.36" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
+<path d="M 594.976 249.36 C 603.776 249.36, 610.976 285.5344, 610.976 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<text x="610.976" y="321.1312" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<path d="M 702.976 321.1312 C 711.3664 321.1312, 718.232 284.9568, 718.232 260.8416" fill="none" stroke-width="1.92" class="technique-bend"></path>
+<text x="718.232" y="260.8416" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
+<text x="718.232" y="243.76" font-size="14.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="technique-bend-label">full</text>
+<path d="M 718.232 249.36 C 743.4048 249.36, 764 285.5344, 764 309.6496" fill="none" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="764" y="321.1312" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>
 <path d="M 215.44 144 C 233.04 144, 247.44 112.4896, 247.44 91.4816" fill="none" stroke-width="1.92" class="technique-bend"></path>
 <text x="247.44" y="91.4816" font-size="38.4" text-anchor="middle" class="technique-bend-arrow"></text>

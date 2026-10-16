@@ -149,8 +149,10 @@ export const REPEAT_START_WIDTH_SP = 2.0; // |: cluster after the prefix glyphs
 export const REPEAT_END_EXTRA_SP = 1.4;   // room for the :| dots before the end barline
 const MULTIREST_WIDTH_SP = 10;     // content width of a collapsed H-bar measure
 // Syllable width estimate per character, as a fraction of the lyric em — so
-// the column tracks the drawn text when the lyric size moves.
-const LYRIC_CHAR_WIDTH_SP = LYRIC_SIZE_SP * 0.56;
+// the column tracks the drawn text when the lyric size moves. Lora averages
+// 0.524em a character over a real lyric (Archivo, the old face, 0.497 against
+// the old 0.56); scaled alike.
+const LYRIC_CHAR_WIDTH_SP = LYRIC_SIZE_SP * 0.59;
 const LYRIC_SIDE_PAD_SP = DEFAULT_COLUMNS.lyricSidePad; // air either side of a syllable
 const ONSET_EPS = 1e-6;            // float tolerance for metric positions
 /** Ideal space after a quarter note, in staff spaces, at the default Space —
