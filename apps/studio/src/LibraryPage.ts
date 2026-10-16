@@ -1,7 +1,8 @@
 // #/ — the library, Option A (roadmap: studio-library-navigation): a rail where
 // every dimension is one line reading `Artist: All` until opened, values with
 // counts from the facets route, the chosen value held on the line; sort as one
-// click beside the search; rows with the chips a person scans by.
+// click beside the search; rows with the chips a person scans by. On a phone the
+// rail has no room, so its lines open as a bottom sheet from a Filters button.
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibraryFacet, type LibraryPiece, type LibrarySort } from '../../../src/storage/libraryClient.ts';
@@ -45,7 +46,12 @@ export class LibraryPage extends LitElement {
   @state() private suggestions: LibraryFacet[] = [];
   @state() private exporting: string | null = null;
   @state() private exportNotice = '';
+  /** A phone's rail: the same lines in a bottom sheet, opened from Filters. */
+  @state() private sheet = false;
   private generation = 0;
+  private readonly narrow = typeof matchMedia === 'function' ? matchMedia('(max-width: 720px)') : null;
+  /** Widening past a phone puts the rail back, so the sheet has nothing to say. */
+  private readonly onNarrowChange = () => { if (!this.narrow?.matches) this.sheet = false; };
 
   static styles = css`
     :host { display: flex; min-height: 100%; }
@@ -103,10 +109,27 @@ export class LibraryPage extends LitElement {
     .columns { text-align: right; padding-right: 4px; color: var(--ink-dim); font-size: 12px; }
     .columns span { display: inline-block; width: 130px; text-align: left; }
     .error { color: #b91c1c; }
-    /* A phone: no rail, and each row folds to two lines — title, artist and
-       when over chips and Export — so the title keeps the width. */
+    .filters { display: none; align-items: center; gap: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500; }
+    .filters svg { flex: none; }
+    .badge { min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: var(--ink); color: light-dark(oklch(0.985 0.002 60), oklch(0.22 0.004 60)); font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+    /* The sheet is the rail's lines with room for a thumb. */
+    dialog.sheet { margin: auto 0 0; width: 100%; max-width: 100%; max-height: 85dvh; padding: 0; border: 0; border-radius: 12px 12px 0 0; background: light-dark(oklch(0.985 0.002 60), oklch(0.22 0.004 60)); color: var(--ink); box-shadow: 0 -8px 24px oklch(0 0 0 / 0.16); }
+    dialog.sheet[open] { display: flex; flex-direction: column; }
+    dialog.sheet::backdrop { background: oklch(0.15 0.004 60 / 0.45); }
+    .sheet-head { display: flex; align-items: center; gap: 8px; padding: 10px 8px 10px 20px; border-bottom: 1px solid var(--line); }
+    .sheet-head h2 { flex: 1; margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .sheet-head button { border: 0; min-height: 44px; color: var(--ink-dim); }
+    .sheet-head .close { min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .sheet-body { flex: 1; min-height: 0; overflow: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+    .sheet-body .line, .sheet-body .option, .sheet-body .foot { min-height: 44px; }
+    .sheet-body .foot.first { margin-top: 8px; border-top: 1px solid var(--line); }
+    .sheet-foot { padding: 12px 16px max(16px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+    .sheet-foot button { width: 100%; min-height: 46px; border: 0; background: var(--ink); color: light-dark(oklch(0.985 0.002 60), oklch(0.22 0.004 60)); font-weight: 500; }
+    /* A phone: the rail folds into the Filters sheet, and each row folds to two
+       lines — title, artist and when over chips and Export — so the title keeps the width. */
     @media (max-width: 720px) {
       .rail { display: none; }
+      .filters { display: inline-flex; }
       .main { padding: 52px 16px 24px; gap: 12px; }
       .tools { flex-wrap: wrap; gap: 8px; }
       .search { flex-basis: 100%; }
@@ -145,10 +168,12 @@ export class LibraryPage extends LitElement {
     }
     window.addEventListener('hashchange', this.onHashChange);
     this.scroller?.addEventListener('scroll', this.onScroll, { passive: true });
+    this.narrow?.addEventListener('change', this.onNarrowChange);
   }
 
   disconnectedCallback() {
     window.removeEventListener('hashchange', this.onHashChange);
+    this.narrow?.removeEventListener('change', this.onNarrowChange);
     this.scroller?.removeEventListener('scroll', this.onScroll);
     super.disconnectedCallback();
   }
@@ -165,6 +190,16 @@ export class LibraryPage extends LitElement {
     rememberLibraryHref(href);
     if (parseHash(location.hash).page === 'library' && (location.hash || '#/') !== href) history.replaceState(history.state, '', href);
     kept = { href, pieces: this.pieces, next: this.next, facets: this.facets, total: this.total, scroll: kept?.href === href ? kept.scroll : 0 };
+    // The sheet is in the DOM only while it is wanted; modal, so the list behind is inert.
+    const sheet = this.renderRoot.querySelector<HTMLDialogElement>('dialog.sheet');
+    if (sheet && !sheet.open) sheet.showModal();
+  }
+
+  /** Every way out of the sheet (Show, ×, Escape, the backdrop) lands back on Filters. */
+  private closeSheet() {
+    if (!this.sheet) return;
+    this.sheet = false;
+    void this.updateComplete.then(() => this.renderRoot.querySelector<HTMLButtonElement>('.filters')?.focus());
   }
 
   private href(): string { return libraryViewHref({ filters: this.filters, sort: this.sort, query: this.query }); }
@@ -333,11 +368,10 @@ export class LibraryPage extends LitElement {
     return this.pieces.filter(p => [p.title, p.artist, ...p.chips.map(c => chipText(c.dimension, c.value))].some(text => (text ?? '').toLowerCase().includes(words)));
   }
 
-  render() {
+  /** The rail's lines: the wide page's left column, and a phone's Filters sheet. */
+  private railLines() {
     const favouriteOn = this.filters.includes(tagOf(FAVOURITE.dimension, FAVOURITE.value));
-    const shown = this.visible();
     return html`
-      <nav class="rail" aria-label="Browse">
         <button class="line" @click=${() => this.choose(FAVOURITE.dimension, favouriteOn ? null : FAVOURITE.value)}>
           <span class="icon">${star(favouriteOn)}</span><span class="val">Favourites</span><span class="count">${this.count(FAVOURITE.dimension, FAVOURITE.value) || ''}</span>
           ${favouriteOn ? html`<span class="icon">${cross}</span>` : nothing}
@@ -361,8 +395,29 @@ export class LibraryPage extends LitElement {
         <a class="foot" href=${aliasesHref}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 12h16M4 17h8"></path></svg>
           <span>Tag aliases</span>
-        </a>
-      </nav>
+        </a>`;
+  }
+
+  private renderSheet() {
+    const label = this.query ? 'Done' : `Show ${this.total} piece${this.total === 1 ? '' : 's'}`;
+    return html`<dialog class="sheet" aria-labelledby="sheet-title"
+        @cancel=${() => this.closeSheet()} @close=${() => this.closeSheet()}
+        @click=${(event: Event) => { if (event.target === event.currentTarget) this.closeSheet(); }}>
+      <div class="sheet-head">
+        <h2 id="sheet-title">Filters</h2>
+        <button ?disabled=${!this.filters.length} @click=${() => this.setFilters([])}>Clear all</button>
+        <button class="close" aria-label="Close filters" @click=${() => this.closeSheet()}>${cross}</button>
+      </div>
+      <nav class="sheet-body" aria-label="Browse">${this.railLines()}</nav>
+      <div class="sheet-foot"><button class="show" @click=${() => this.closeSheet()}>${label}</button></div>
+    </dialog>`;
+  }
+
+  render() {
+    const shown = this.visible();
+    return html`
+      <nav class="rail" aria-label="Browse">${this.railLines()}</nav>
+      ${this.sheet ? this.renderSheet() : nothing}
       <div class="main">
         ${this.justDeleted ? html`<div class="undo" role="status">
           <span>Deleted “${this.justDeleted.title}”.</span>
@@ -375,6 +430,10 @@ export class LibraryPage extends LitElement {
             <input aria-label="Search titles, artists and tags, or type a tag filter" placeholder="Search titles, artists, tags — or filter: capo:3, part:Ukulele" list="suggest" maxlength="512" .value=${this.query} @input=${this.onInput} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event)} />
             <datalist id="suggest">${this.suggestions.map(f => html`<option value=${tagOf(f.dimension, f.value)}>${f.pieces} piece${f.pieces === 1 ? '' : 's'}</option>`)}</datalist>
           </form>
+          <button class="filters" aria-haspopup="dialog" aria-label=${this.filters.length ? `Filters, ${this.filters.length} on` : 'Filters'} @click=${() => (this.sheet = true)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+            Filters${this.filters.length ? html`<span class="badge">${this.filters.length}</span>` : nothing}
+          </button>
           <div class="sort" role="group" aria-label="Sort">${SORTS.map(s => html`<button class=${this.sort === s.id ? 'on' : ''} @click=${() => this.setSort(s.id)}>${s.label}</button>`)}</div>
         </div>
         <div class="head">

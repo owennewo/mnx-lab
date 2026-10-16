@@ -200,6 +200,26 @@ try {
   await wait(`${library}.querySelector('li .star').getAttribute('aria-pressed') === 'true'`);
   await wait(`[...${library}.querySelectorAll('.line')].some(l => l.textContent.includes('Favourites') && l.textContent.includes('1'))`);
   const railShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-library.png',Buffer.from(railShot.result.data,'base64'));
+  // A phone has no room for the rail: Filters opens the same lines as a sheet,
+  // the links that live only there included, and choosing in it narrows the list.
+  await c.send('Emulation.setDeviceMetricsOverride',{width:412,height:915,deviceScaleFactor:2,mobile:true});
+  const badge = `${library}.querySelector('button.filters .badge')?.textContent`;
+  await wait(`getComputedStyle(${library}.querySelector('.rail')).display === 'none' && ${badge} === '1'`);
+  await c.evaluate(`${library}.querySelector('button.filters').click()`);
+  const filterSheet = `${library}.querySelector('dialog.sheet')`;
+  await wait(`${filterSheet}?.open && !!${filterSheet}.querySelector('a.foot[href*="deleted"]') && !!${filterSheet}.querySelector('a.foot[href*="aliases"]')`);
+  const sheetList = `[...${filterSheet}.querySelectorAll('.line')].find(l => l.textContent.includes('List:'))`;
+  await c.evaluate(`${sheetList}.click()`);
+  await wait(`${badge} === undefined && ${sheetList}?.textContent.includes('All') && ${filterSheet}.open`);
+  await c.evaluate(`${sheetList}.click()`);
+  await wait(`!!${filterSheet}.querySelector('.group')`);
+  await c.evaluate(`[...${filterSheet}.querySelectorAll('.option')].find(o => o.textContent.includes('Studio collection')).click()`);
+  await wait(`${badge} === '1' && ${filterSheet}.querySelector('.show').textContent.trim() === 'Show 1 piece'`);
+  const sheetShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-library-sheet.png',Buffer.from(sheetShot.result.data,'base64'));
+  await c.evaluate(`${filterSheet}.querySelector('.show').click()`);
+  await wait(`!${filterSheet} && ${library}.activeElement?.classList.contains('filters') && ${library}.querySelectorAll('li').length === 1`);
+  await c.send('Emulation.clearDeviceMetricsOverride');
+  await wait(`getComputedStyle(${library}.querySelector('.rail')).display !== 'none'`);
   await c.evaluate(`[...${library}.querySelectorAll('.sort button')].find(b => b.textContent === 'Title').click()`);
   await wait(`${library}.querySelector('.sort button.on').textContent === 'Title' && ${library}.querySelectorAll('li').length === 1`);
   // The alias page lists what the panel set — the reading it corrected.
@@ -230,6 +250,6 @@ try {
   await c.send('Page.navigate',{url:origin+'/studio/#/piece/soundslice%3ANoSuchPiece'});
   await wait(`${piece}?.textContent.includes('Could not open this piece')`);
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Studio smoke piece') || v.includes('local@example.test'))`),false);
-  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, alias page, build stamp + Update after a newer deploy, missing piece, no private localStorage.');
+  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, the phone Filters sheet, alias page, build stamp + Update after a newer deploy, missing piece, no private localStorage.');
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }
