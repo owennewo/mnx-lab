@@ -85,6 +85,28 @@ describe('a syllable hangs over neighbours that carry none', () => {
     }
   });
 
+  it('two words keep a word space between them even at Space 0', () => {
+    // The gap's air follows Space down to zero; a word space of it does not
+    // — "Once upon", never "Onceupon" (a phone at Space 0, 2026-10-17).
+    initSmufl();
+    for (const layout of [layoutTab, layoutNotation]) {
+      for (const densityH of [0, 1, undefined]) {
+        const words: Words = ['Once', 'upon', 'a', 'time', 'you', 'dressed', 'so', 'fine'];
+        const result = layout({ mnx: bars(2, words), widthSp: WIDTH_SP, densityH });
+        const rows = new Map<number, Extract<Primitive, { kind: 'text' }>[]>();
+        for (const t of ofClass(result, 'lyric')) rows.set(t.y, [...(rows.get(t.y) ?? []), t]);
+        for (const texts of rows.values()) {
+          texts.sort((a, b) => a.x - b.x);
+          for (let i = 1; i < texts.length; i++) {
+            const gap = box(texts[i]).x - (box(texts[i - 1]).x + box(texts[i - 1]).w);
+            expect(gap, `Space ${densityH}: "${texts[i - 1].text}" ${gap.toFixed(2)}sp from "${texts[i].text}"`)
+              .toBeGreaterThanOrEqual(0.3);
+          }
+        }
+      }
+    }
+  });
+
   it('words stay inside their bar', () => {
     initSmufl();
     const words: Words = ['Sing', null, null, null, null, null, null, 'everywhere'];

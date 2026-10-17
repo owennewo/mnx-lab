@@ -103,6 +103,11 @@ const GRACE_RIGHT_PAD_SP = 0.3;    // air between a grace group and its principa
 const MID_CLEF_WIDTH_SP = 2.4;     // rigid column for a mid-measure clef change
 const MID_CLEF_LEFT_PAD_SP = 0.3;  // air between the previous column and the clef
 const DYNAMIC_SIDE_PAD_SP = 0.3;   // air either side of a dynamic mark
+// The white two words keep at ANY Space: a word space, ink rather than air, so
+// the gap's air (`lyricSidePad`, either side) can follow Space down to zero
+// without running "Once upon" into "Onceupon". Half of it holds a word off its
+// bar's content edge, so words in neighbouring bars keep the whole space.
+const LYRIC_WORD_SPACE_SP = LYRIC_SIZE_SP * 0.3;
 
 /** The column geometry the plan priced at, carried on the plan for every
  *  reader that walks a column (tuplet inner notes, grace runs, accidental
@@ -127,7 +132,7 @@ export const DEFAULT_COLUMNS: ColumnGeometry = {
   graceRightPad: GRACE_RIGHT_PAD_SP,
   midClefLeftPad: MID_CLEF_LEFT_PAD_SP,
   dynamicSidePad: DYNAMIC_SIDE_PAD_SP,
-  lyricSidePad: 0.35
+  lyricSidePad: 0.35 - LYRIC_WORD_SPACE_SP / 2
 };
 
 /** The geometry at a column-air factor (`SpacePolicy.columnAir`): ink plus
@@ -1754,8 +1759,9 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number, columns: ColumnG
  * Verse constraints, the Soundslice rule (measured 2026-10-16): a syllable may
  * hang over neighbouring notes that carry none, so the notes keep the spacing
  * their rhythm asks for; it may not come closer than the word gap to the next
- * syllable on its OWN verse line (two `lyricSidePad`s — half an em, Soundslice's
- * tightest white — plus room for a hyphen between the two), and it stays inside
+ * syllable on its OWN verse line (a word space plus two `lyricSidePad`s — half
+ * an em at the default Space, Soundslice's tightest white, and never less than
+ * the word space — plus room for a hyphen between the two), and it stays inside
  * its bar's content, which keeps words clear across barlines and system edges.
  * All rigid, no spring: once the notes stand far enough apart the edges stop
  * binding. Per staff, since each staff draws its own verse rows.
@@ -1778,20 +1784,25 @@ function lyricEdges(
       }
     })
   );
+  // Rigid widths are priced at this Space's geometry; `air` is the default's,
+  // like every other edge's, for `packingAtSpace` to re-price.
   const pad = columns.lyricSidePad;
+  const air = DEFAULT_COLUMNS.lyricSidePad;
+  const edge = LYRIC_WORD_SPACE_SP / 2 * ink;
+  const gap = LYRIC_WORD_SPACE_SP * ink;
   const edges: MergedEdge[] = [];
   for (const row of rows.values()) {
     row.sort((a, b) => a.node - b.node);
-    edges.push({ from: -1, to: row[0].node, rigid: row[0].w / 2 + pad, air: pad, spring: 0 });
+    edges.push({ from: -1, to: row[0].node, rigid: row[0].w / 2 + edge + pad, air, spring: 0 });
     for (let i = 1; i < row.length; i++) {
       const a = row[i - 1];
       const b = row[i];
       if (a.node === b.node) continue;
       const hyphen = a.continues ? LYRIC_HYPHEN_ROOM_SP * ink : 0;
-      edges.push({ from: a.node, to: b.node, rigid: (a.w + b.w) / 2 + 2 * pad + hyphen, air: 2 * pad, spring: 0 });
+      edges.push({ from: a.node, to: b.node, rigid: (a.w + b.w) / 2 + gap + 2 * pad + hyphen, air: 2 * air, spring: 0 });
     }
     const last = row[row.length - 1];
-    edges.push({ from: last.node, to: endNode, rigid: last.w / 2 + pad, air: pad, spring: 0 });
+    edges.push({ from: last.node, to: endNode, rigid: last.w / 2 + edge + pad, air, spring: 0 });
   }
   return edges;
 }
