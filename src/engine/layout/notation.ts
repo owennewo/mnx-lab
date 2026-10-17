@@ -60,8 +60,7 @@ import {
   TREMOLO_NOTE_ADVANCE_SP,
   type ColumnGeometry,
   tremoloDuration,
-  tupletDuration,
-  tupletColumns
+  tupletDuration
 } from './spacing.ts';
 import {
   resolveBeamGroups,
@@ -1953,7 +1952,7 @@ function assembleSegment(
               emitTupletGroup({
                 beamSlantSp,
                 tuplet: event,
-                firstX: slot.x,
+                xs: slot.inner ?? [],
                 ink: plan.inkRatio,
                 columns: plan.columns,
                 staffTop: staffTops[s],
@@ -2095,7 +2094,6 @@ function assembleSegment(
           technique: td.technique,
           // The notation staff above draws the bracket over the same columns.
           showTupletBrackets: false,
-          accidentalOf,
           ties: tabTies,
           spanMarks
         });
@@ -4034,9 +4032,9 @@ const TUPLET_NUMBER_GAP_SP = 1.1;  // bracket gap either side of the number
 
 interface EmitTupletGroupArgs {
   tuplet: MnxTuplet;
-  /** Centre of the first inner column's core (the plan reserved
-   *  tupletColumns() widths for the whole group). */
-  firstX: number;
+  /** Each inner event's column centre, as the plan placed it
+   *  (`EventSlot.inner`). */
+  xs: readonly number[];
   /** The plan's ink ratio: every glyph-relative x offset in the cluster
    *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
   ink: number;
@@ -4057,17 +4055,16 @@ interface EmitTupletGroupArgs {
 }
 
 /**
- * Draws an MNX tuplet: its inner events at the plan's pre-scaled columns,
+ * Draws an MNX tuplet: its inner events at the columns the plan placed them in,
  * beamed among themselves when every member is beamable (eighths or shorter)
  * — in which case the number sits on the beam and no bracket draws — else
  * flagged individually under a hooked bracket below the group with the
  * `inner.multiple` number in a gap, as in the spec's reference engraving.
  */
 function emitTupletGroup(args: EmitTupletGroupArgs): void {
-  const { tuplet, firstX, ink, columns, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
-  const cols = tupletColumns(tuplet, accidentalOf, columns);
+  const { tuplet, xs, ink, columns, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
   const events = tuplet.content;
-  if (events.length === 0) return;
+  if (events.length === 0 || xs.length < events.length) return;
 
   const fullyBeamed =
     events.length >= 2 &&
@@ -4090,15 +4087,10 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
   }
   const beamStems: InnerStem[] = [];
   let lowestY = staffTop + STAFF_HEIGHT_SP; // bracket clearance (max y seen)
-  // The inner columns are rigid ink, priced by the plan at the same ratio —
-  // the walk here has to agree with it term for term.
-  let colStart = firstX - (columns.core / 2) * ink;
-  let lastX = firstX;
+  let lastX = xs[0];
 
   events.forEach((event, j) => {
-    const col = cols[j] ?? { leading: 0, advance: columns.core, air: 0 };
-    const x = colStart + col.leading * ink + (columns.core / 2) * ink;
-    colStart += col.advance * ink;
+    const x = xs[j];
     lastX = x;
     if (!isTimedEvent(event)) return;
 
@@ -4249,7 +4241,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
   // Bracketed group: hooked bracket below (clear of noteheads and stems),
   // number in a gap at its centre — per the reference engraving.
   if (tuplet.bracket === 'no') return;
-  const x1 = firstX - 1.0;
+  const x1 = xs[0] - 1.0;
   const x2 = lastX + 1.0;
   const y = lowestY + 1.4;
   const midX = (x1 + x2) / 2;

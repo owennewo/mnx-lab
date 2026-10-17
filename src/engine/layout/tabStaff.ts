@@ -12,11 +12,9 @@ import { inkEdgesSp } from '../render/bounds.ts';
 import { Primitive, SpatialIndex, translatePrimitiveY } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import {
-  type AccidentalResolver,
   type ColumnGeometry,
   DEFAULT_COLUMNS,
-  EventSlot,
-  tupletColumns
+  EventSlot
 } from './spacing.ts';
 import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 import {
@@ -500,16 +498,6 @@ export interface EmitTabVoicesArgs {
    * it twice is how one gesture starts reading as two.
    */
   showTupletBrackets: boolean;
-  /**
-   * The measure's accidental resolver — the plan's `accidentalOf`.
-   *
-   * Purely notation ink, and a tab staff draws none of it, but the PLAN priced
-   * each of a tuplet's inner columns with an accidental slot where the notation
-   * staff will need one. Walking those columns with a different context would
-   * come out a slot narrower and slide every digit after it out of column with
-   * the notation staff above.
-   */
-  accidentalOf: AccidentalResolver;
   /** Tie continuations, shared by every measure the layout walks. */
   ties: TabTies;
   /** Arpeggio / non-arpeggio by the note id that starts the span — the same
@@ -536,45 +524,26 @@ export interface TabTies {
 /**
  * Where a container's inner events sit, in absolute x.
  *
- * The plan reserved ONE column for the whole container and `slot.x` is the
- * centre of its FIRST inner core; everything after that is a walk over the
- * same rigid widths the plan priced. `spacing.ts` owns those widths
- * (`tupletColumns` for a tuplet, `GRACE_NOTE_ADVANCE_SP` per grace), so this
- * reads them rather than restating them — the notation layout walks the very
- * same numbers, and a walk that disagreed by one term would slide the tab out
- * of column from that note onward.
+ * A tuplet's inner events are columns of their own in the plan, which lists
+ * where each landed on the item's slot (`EventSlot.inner`) — the notation
+ * layout reads the very same list, so the two staves cannot drift apart. A
+ * grace run is one rigid column; its notes are a walk of `columns.grace`.
  *
  * `endX` is the next inner column, or the container's own end: a bend curve
  * drawn across a tuplet member must stop at the next member, not at the bar.
  */
 export function innerColumns(
   container: MnxGrace | MnxTuplet,
-  firstX: number,
+  slot: EventSlot,
   ink: number,
-  accidentalOf: AccidentalResolver,
   columns: ColumnGeometry = DEFAULT_COLUMNS
 ): { event: MnxEvent; x: number; endX: number }[] {
   const events = container.content;
   // Nested tuplet geometry is not supported; do not invent child coordinates.
   if (events.some(event => !isTimedEvent(event))) return [];
-  const xs: number[] = [];
-
-  if (isTuplet(container)) {
-    // The inner columns are rigid ink, priced by the plan at this ratio — so
-    // the accidental leading and the core half-width are both scaled, term for
-    // term as `emitTupletGroup` scales them.
-    const cols = tupletColumns(container, accidentalOf, columns);
-    let colStart = firstX - (columns.core / 2) * ink;
-    for (let j = 0; j < events.length; j++) {
-      const col = cols[j] ?? { leading: 0, advance: columns.core, air: 0 };
-      xs.push(colStart + col.leading * ink + (columns.core / 2) * ink);
-      colStart += col.advance * ink;
-    }
-  } else {
-    for (let j = 0; j < events.length; j++) {
-      xs.push(firstX + j * columns.grace * ink);
-    }
-  }
+  const xs = isTuplet(container)
+    ? slot.inner ?? []
+    : events.map((_, j) => slot.x + j * columns.grace * ink);
 
   return events.map((event, j) => ({
     event: event as MnxEvent,
@@ -650,7 +619,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
     voices, slots, staffTop, ink, columns, measureIndex, positionContext,
     activeNoteIds, selectedNoteIds, durationSpans, synthesizeKeys, primitives, index, onIssue,
-    row, measureEndX, technique: techniqueSites, showTupletBrackets, accidentalOf, ties
+    row, measureEndX, technique: techniqueSites, showTupletBrackets, ties
   } = args;
   const laneY = tabTechniqueLaneY(staffTop);
 
@@ -919,7 +888,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // `emitGraceGroup`), because both staves read the one plan and a walk
       // that disagreed with it by a term would slide the tab out of column.
       if (isGrace(item) || isTuplet(item)) {
-        const inner = innerColumns(item, slot.x, ink, accidentalOf, columns);
+        const inner = innerColumns(item, slot, ink, columns);
         inner.forEach(({ event, x, endX }, containerIndex) => {
           try {
             drawEvent({

@@ -26,8 +26,9 @@ interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff e
 (lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
 the standalone tab layout and the native staff — extend it there, never fork it. See
 [roadmap/complete/core-both-view-single-system.md](../roadmap/complete/core-both-view-single-system.md). Tuplets and grace notes draw on tab
-too: containers are walked from `spacing.ts`'s own column widths so both staves stay in
-column, grace digits are small (0.6), and a tuplet bracket is drawn **once per system** —
+too: a tuplet's inner events are plan columns of their own (springs and all), listed on
+the item's slot as `EventSlot.inner`, and a grace run is walked from `spacing.ts`'s own
+column widths, so both staves stay in column; grace digits are small (0.6), and a tuplet bracket is drawn **once per system** —
 the standalone tab view draws its own, the `both` view lets the notation staff carry it
 (`showTupletBrackets`). Fret/string assignment uses
 the derivation ladder in `src/engine/tab/guitarPositions.ts` (MNX pitch is

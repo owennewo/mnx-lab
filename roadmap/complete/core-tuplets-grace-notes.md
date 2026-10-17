@@ -163,6 +163,12 @@ separate gap it always had.
   into the justified line, so a quarter triplet reads narrower than the plain quarters
   beside it. Inherited from the notation layout, not decided here — but tab is where it is
   most visible, because there are no beams or stems to distract from the spacing.
+  **Answered 2026-10-17:** nothing musical made them rigid — the plan saw a tuplet as one
+  column and the renderers walked its inside. A row of all-triplet bars then could not
+  reach the margin (Merrily Kissed the Quaker), Space did not reach triplets, and a bar
+  opening with one had no lead-in. Inner events are now plan columns with springs for the
+  time they take, folded back onto the item's slot as `EventSlot.inner`; `tupletColumns`
+  is gone (`harness/conformance/tuplet-spacing.test.ts`).
 - **A tab grace has no slash.** The notation staff draws one; the tab staff draws a small
   digit and nothing else, there being no stem to slash. Whether a tab reader wants some
   other mark is untested.

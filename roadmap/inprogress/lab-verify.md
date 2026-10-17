@@ -1716,3 +1716,25 @@ a long word may hang over a neighbour that carries no syllable but never touches
 word on its line or crosses a barline, and a hyphen sits clear of both syllables it
 joins. In `spec/grand-staff` and `spec/organ-layout` the second bar's notes now spread
 across the whole bar instead of bunching at its start.
+
+## Tuplet notes stretch like any notes — 2026-10-17
+
+Owner: no roadmap doc — the owner asked why a full-width system of *Merrily Kissed the
+Quaker* (every bar triplets) stopped short of the right margin, and then why anything is
+"non-stretchable". The answer recorded in
+[core-tuplets-grace-notes.md](../complete/core-tuplets-grace-notes.md) (open question
+"A rigid triplet beside a stretched neighbour", now answered): nothing musical — the plan
+saw a tuplet as one rigid column, and the renderers walked its inside. Now each inner
+event is a plan column of its own with a spring for the time it takes (written value ×
+ratio), listed on the item's slot as `EventSlot.inner`; `tupletColumns` is gone.
+
+Four goldens moved, none verified: `spec/tuplets`, `lab/11-rhythm/02-tuplet-number-hidden`,
+`lab/26-tab-rhythm/01-triplets-on-tab`, `lab/26-tab-rhythm/03-unplayable-inside-a-tuplet`.
+
+**What a reviewer should look for.** Triplet notes are spaced by their duration like
+their neighbours: a triplet eighth takes slightly less room than a plain eighth, a
+quarter triplet slightly less than a plain quarter, and in a justified bar the triplets
+stretch along with everything else instead of staying bunched. A bar that opens with a
+triplet has the same air after its barline as one opening with a plain note. In the
+`both` views the tab digits stay exactly under their noteheads; brackets and numbers
+still span their groups.

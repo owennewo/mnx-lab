@@ -8,7 +8,7 @@ import { buildScoreJobs, layoutNotation } from './notation.ts';
 import { translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
-import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, NO_ACCIDENTALS, tieOrigins } from './spacing.ts';
+import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, tieOrigins } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
@@ -312,9 +312,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     const partMeasure = part.measures[writtenIndex(plan, i)] ?? { sequences: [] };
     const m = plan.measures[i];
     if (m.hidden) continue;
-    // The tab-only plan priced no accidental room (spacing.ts NO_ACCIDENTALS);
-    // walking tuplet columns with any other resolver would slide digits out of it.
-    const accidentalOf = NO_ACCIDENTALS;
     const measurePrimitiveStart = primitives.length;
     if (rowStart[m.row] === undefined) {
       rowStart[m.row] = primitives.length;
@@ -419,7 +416,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
           const slot = m.voices[voiceIndex]?.[eventIndex];
           if (!slot) return;
           if (isGrace(item) || isTuplet(item)) {
-            innerColumns(item, slot.x, plan.inkRatio, accidentalOf, plan.columns)
+            innerColumns(item, slot, plan.inkRatio, plan.columns)
               .forEach(({ event, x }) => addSyllables(event, x));
             return;
           }
@@ -468,9 +465,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         technique,
         // The standalone view has no notation staff to carry them.
         showTupletBrackets: true,
-        // The plan priced this measure's tuplet columns with this; the walk
-        // over them has to agree term for term.
-        accidentalOf,
         ties,
         spanMarks
       });

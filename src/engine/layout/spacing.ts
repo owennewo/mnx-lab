@@ -16,6 +16,7 @@ import {
   isTuplet,
   isTimedEvent,
   sequenceItemKind,
+  type MnxEvent,
   type MnxGlobalMeasure,
   type MnxPartMeasure
 } from '../../model/mnx.ts';
@@ -1135,45 +1136,6 @@ export function tieOrigins(mnx: MnxStructure): Map<string, string> {
   return origins;
 }
 
-// ---------- Tuplet columns (shared with the notation renderer) ----------
-
-export interface TupletColumn {
-  /** Accidental room before the notehead. */
-  leading: number;
-  /** Full column width: leading + core (+ dots) + scaled duration space. */
-  advance: number;
-  /** The column AIR inside `advance` at the default geometry (for re-pricing). */
-  air: number;
-}
-
-/**
- * Column geometry of a tuplet's inner events — all rigid (the duration space
- * is pre-scaled by outer/inner, so a quarter inside a triplet still gets more
- * room than its eighths). The renderer places inner notes with the same
- * columns; keep the two in lockstep by computing them only here.
- */
-export function tupletColumns(t: MnxTuplet, accidentalOf: AccidentalResolver, columns: ColumnGeometry = DEFAULT_COLUMNS): TupletColumn[] {
-  const innerSum = t.content.reduce(
-    (sum, e) => sum + (isTimedEvent(e) ? durationValue(e.duration) : 0),
-    0
-  );
-  const scale = innerSum > 0 ? tupletDuration(t) / innerSum : 1;
-  return t.content.map(e => {
-    if (!isTimedEvent(e)) return { leading: 0, advance: columns.core, air: CORE_AIR_SP };
-    const leading = accidentalLeadingSp(e.notes ?? [], accidentalOf, columns);
-    const dots = e.duration.dots ?? 0;
-    return {
-      leading,
-      advance:
-        leading +
-        columns.core +
-        dots * columns.dot +
-        springSp(durationValue(e.duration) * scale),
-      air: (leading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP + dots * DOT_AIR_SP
-    };
-  });
-}
-
 // ---------- The plan ----------
 
 export interface ActiveClef {
@@ -1198,8 +1160,13 @@ export interface ActiveClef {
 }
 
 export interface EventSlot {
-  /** Notehead / fret-column centre, absolute x in sp. */
+  /** Notehead / fret-column centre, absolute x in sp. For a tuplet, its first
+   *  inner event's. */
   x: number;
+  /** A tuplet's inner events, one centre per item of its `content`, in order.
+   *  The plan spaces them as columns of their own, so a renderer reads them
+   *  here rather than walking widths. */
+  inner?: number[];
 }
 
 /** A clef taking effect mid-measure, at metric onset `t` (whole-note fraction). */
@@ -1478,6 +1445,10 @@ interface EventMetrics {
   onset?: number;
   /** Set on grace containers: number of inner notes (all rigid, no spring). */
   graceCount?: number;
+  /** A tuplet member: the member count on the tuplet's first column, -1 on
+   *  the rest. Members are ordinary columns to the plan; only the slot fold
+   *  (`EventSlot.inner`) tells them apart. */
+  tuplet?: number;
   /** Mid-measure clefs drawn immediately before this event's column,
    *  referencing the measure's clefTimeline by index. */
   midClefs?: { timelineIndex: number; clef: ActiveClef }[];
@@ -2116,7 +2087,9 @@ export function planHorizontal(
           let onset = 0; // metric position within the bar, in whole-note fractions
           let nextMidClef = 0;
           let nextDynamic = 0;
-          return seq.content.map((event): EventMetrics => {
+          // What the column starting at the current onset gains: a mid-measure
+          // clef taking effect there, a dynamic hung under it, and its onset.
+          const columnExtras = (): ((m: EventMetrics) => EventMetrics) => {
             // A mid-measure clef takes effect before the first event at/after
             // its onset — that event's column gains the clef's rigid width.
             const midHere: NonNullable<EventMetrics['midClefs']> = [];
@@ -2145,18 +2118,46 @@ export function planHorizontal(
               if (out.graceCount === undefined) out = { ...out, onset: columnOnset };
               return out;
             };
+            return withColumnExtras;
+          };
+          // A timed event's column: its head, the room before it and the
+          // space its duration buys. `scale` is a tuplet's ratio (outer ÷ inner);
+          // a plain event's is 1.
+          const timedColumn = (event: MnxEvent, scale: number): EventMetrics => {
+            // Syllables price no width in their own column: a word may hang
+            // over a neighbour that carries none, the way a singer's line
+            // reads (Soundslice, measured 2026-10-16). What they need is
+            // room from the NEXT syllable on their line — `lyricEdges`.
+            const syllables = syllablesOf(event, lyricLineIds);
+            // A rolled chord's wave sits left of its ink; without room it
+            // lands on the previous column.
+            const arpeggio = (event.notes ?? []).some(n => n.id !== undefined && arpeggioStarts.has(n.id));
+            const accidentalLeading = accidentalLeadingSp(event.notes ?? [], accidentalOf, columns);
+            const dots = event.duration.dots ?? 0;
+            const headCore = columns.core + dots * columns.dot;
+            return {
+              leading: accidentalLeading + (arpeggio ? ARPEGGIO_ROOM_SP : 0),
+              core: headCore,
+              air: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP + dots * DOT_AIR_SP,
+              airPre: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP / 2,
+              spring: springSp(durationValue(event.duration) * scale),
+              ...(syllables ? { syllables } : {})
+            };
+          };
+          return seq.content.flatMap((event): EventMetrics[] => {
+            const withColumnExtras = columnExtras();
             try {
               if (isGrace(event)) {
                 // Grace notes are un-timed: an all-rigid run of small columns
                 // glued to the following event.
-                return withColumnExtras({
+                return [withColumnExtras({
                   leading: 0,
                   core: event.content.length * columns.grace + columns.graceRightPad,
                   air: event.content.length * GRACE_AIR_SP + GRACE_RIGHT_PAD_SP,
                   airPre: GRACE_AIR_SP / 2,
                   spring: 0,
                   graceCount: event.content.length
-                });
+                })];
               }
               if (isTremolo(event)) {
                 // Two written notes share one column (first head at the
@@ -2168,7 +2169,7 @@ export function planHorizontal(
                   .flatMap(e => e.notes ?? [])
                   .filter(n => accidentalOf(n) !== null)
                   .length;
-                return withColumnExtras({
+                return [withColumnExtras({
                   leading: accidentals
                     ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + columns.accidentalRightPad
                     : 0,
@@ -2176,21 +2177,33 @@ export function planHorizontal(
                   air: (accidentals ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP,
                   airPre: (accidentals ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP / 2,
                   spring: springSp(dur)
-                });
+                })];
               }
               if (isTuplet(event)) {
                 if (event.content.some(child => !isTimedEvent(child))) issues.push('nested tuplet content — child geometry not rendered');
-                // Inner events get rigid columns with pre-scaled duration
-                // space (tupletColumns); the real metric time is `outer`.
-                onset += tupletDuration(event);
-                const inner = tupletColumns(event, accidentalOf, columns);
-                return withColumnExtras({
-                  leading: 0,
-                  core: inner.reduce((sum, c) => sum + c.advance, 0),
-                  air: inner.reduce((sum, c) => sum + c.air, 0),
-                  airPre: CORE_AIR_SP / 2,
-                  spring: 0
+                // Each inner event is a column of its own, at its own onset,
+                // with a spring for the time it really takes (written value ×
+                // the ratio) — so a tuplet stretches, justifies and follows
+                // Space like any other run of notes. The slot folds them back
+                // into one item, its inner columns listed (`EventSlot.inner`).
+                const start = onset;
+                const innerSum = event.content.reduce(
+                  (sum, e) => sum + (isTimedEvent(e) ? durationValue(e.duration) : 0),
+                  0
+                );
+                const scale = innerSum > 0 ? tupletDuration(event) / innerSum : 1;
+                const members = event.content.map((child, j): EventMetrics => {
+                  const extras = j === 0 ? withColumnExtras : columnExtras();
+                  // Nested content keeps a bare column and no time.
+                  const column = isTimedEvent(child)
+                    ? timedColumn(child, scale)
+                    : { leading: 0, core: columns.core, air: CORE_AIR_SP, airPre: CORE_AIR_SP / 2, spring: 0 };
+                  if (isTimedEvent(child)) onset += durationValue(child.duration) * scale;
+                  return { ...extras(column), tuplet: j === 0 ? event.content.length : -1 };
                 });
+                onset = start + tupletDuration(event);
+                // An empty tuplet still holds its item's slot.
+                return members.length ? members : [withColumnExtras({ leading: 0, core: 0, air: 0, airPre: 0, spring: 0 })];
               }
               if (sequenceItemKind(event) === 'unknown') {
                 const t = (event as { type?: string }).type;
@@ -2198,32 +2211,14 @@ export function planHorizontal(
                   t ? `unsupported content type "${t}" — not rendered` : 'unrecognized content item — not rendered'
                 );
                 onset += 0.25; // placeholder occupies a nominal quarter
-                return withColumnExtras(placeholder());
+                return [withColumnExtras(placeholder())];
               }
               onset += durationValue(event.duration);
-              // Syllables price no width in their own column: a word may hang
-              // over a neighbour that carries none, the way a singer's line
-              // reads (Soundslice, measured 2026-10-16). What they need is
-              // room from the NEXT syllable on their line — `lyricEdges`.
-              const syllables = syllablesOf(event, lyricLineIds);
-              // A rolled chord's wave sits left of its ink; without room it
-              // lands on the previous column.
-              const arpeggio = (event.notes ?? []).some(n => n.id !== undefined && arpeggioStarts.has(n.id));
-              const accidentalLeading = accidentalLeadingSp(event.notes ?? [], accidentalOf, columns);
-              const dots = event.duration.dots ?? 0;
-              const headCore = columns.core + dots * columns.dot;
-              return withColumnExtras({
-                leading: accidentalLeading + (arpeggio ? ARPEGGIO_ROOM_SP : 0),
-                core: headCore,
-                air: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP + dots * DOT_AIR_SP,
-                airPre: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP / 2,
-                spring: springSp(durationValue(event.duration)),
-                ...(syllables ? { syllables } : {})
-              });
+              return [withColumnExtras(timedColumn(event, 1))];
             } catch (e) {
               issues.push((e as Error).message);
               onset += 0.25;
-              return withColumnExtras(placeholder());
+              return [withColumnExtras(placeholder())];
             }
           });
         })
@@ -2608,8 +2603,8 @@ export function planHorizontal(
       }
 
       const staves = m.staves.map((staffVoices, s) =>
-        staffVoices.map((voice, v) =>
-          voice.map((e, k): EventSlot => {
+        staffVoices.map((voice, v) => {
+          voice.forEach((e, k) => {
             const placed = chosen[s][v][k];
             (e.midClefs ?? []).forEach((mc, j) => {
               const key = `${s}:${mc.timelineIndex}`;
@@ -2621,9 +2616,20 @@ export function planHorizontal(
                 });
               }
             });
-            return { x: placed.x };
-          })
-        )
+          });
+          // Back to one slot per sequence item: a tuplet's members fold into
+          // its slot, which lists where each of them landed.
+          const slots: EventSlot[] = [];
+          voice.forEach((e, k) => {
+            if (e.tuplet === -1) return;
+            const x = chosen[s][v][k].x;
+            slots.push(e.tuplet === undefined ? { x } : {
+              x,
+              inner: Array.from({ length: e.tuplet }, (_, j) => chosen[s][v][k + j].x)
+            });
+          });
+          return slots;
+        })
       );
 
       measures[i] = {

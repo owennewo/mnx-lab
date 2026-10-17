@@ -1,34 +1,34 @@
 <svg width="1280" height="251.4288" viewBox="0 0 1280 251.4288" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="80" x2="462" y2="80" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="98.2864" x2="462" y2="98.2864" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="116.5712" x2="462" y2="116.5712" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="134.8576" x2="462" y2="134.8576" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="153.1424" x2="462" y2="153.1424" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="171.4288" x2="462" y2="171.4288" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="80" x2="535.6" y2="80" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="98.2864" x2="535.6" y2="98.2864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="116.5712" x2="535.6" y2="116.5712" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="134.8576" x2="535.6" y2="134.8576" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="153.1424" x2="535.6" y2="153.1424" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="171.4288" x2="535.6" y2="171.4288" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="80" x2="32" y2="171.4288" stroke-width="2.56" class="barline barline-start"></line>
 <text x="36" y="125.7136" font-size="60.16" class="tab-clef"></text>
 <text x="88" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="88" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="111.4512" y="108.3888" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c0.n0"></rect>
-<text x="120" y="116.5712" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e0.c0.n0">0</text>
-<rect x="185.0512" y="71.8176" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c2.n0"></rect>
-<text x="193.6" y="80" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e0.c2.n0">0</text>
-<text x="156.8" y="59.2" font-size="17.6" text-anchor="middle" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tuplet-number">3</text>
-<line x1="120" y1="59.2" x2="145.92" y2="59.2" stroke-width="1.6" class="tuplet-bracket"></line>
-<line x1="167.68" y1="59.2" x2="193.6" y2="59.2" stroke-width="1.6" class="tuplet-bracket"></line>
-<line x1="120" y1="59.2" x2="120" y2="67.2" stroke-width="1.6" class="tuplet-bracket"></line>
-<line x1="193.6" y1="59.2" x2="193.6" y2="67.2" stroke-width="1.6" class="tuplet-bracket"></line>
-<rect x="250.6512" y="108.3888" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="259.2" y="116.5712" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
-<rect x="362.6512" y="126.6736" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
-<text x="371.2" y="134.8576" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
-<line x1="449.2" y1="80" x2="449.2" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="454" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
-<rect x="111.2" y="190.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
+<rect x="127.4512" y="108.3888" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c0.n0"></rect>
+<text x="136" y="116.5712" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e0.c0.n0">0</text>
+<rect x="239.4512" y="71.8176" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c2.n0"></rect>
+<text x="248" y="80" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e0.c2.n0">0</text>
+<text x="192" y="59.2" font-size="17.6" text-anchor="middle" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tuplet-number">3</text>
+<line x1="136" y1="59.2" x2="181.12" y2="59.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<line x1="202.88" y1="59.2" x2="248" y2="59.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<line x1="136" y1="59.2" x2="136" y2="67.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<line x1="248" y1="59.2" x2="248" y2="67.2" stroke-width="1.6" class="tuplet-bracket"></line>
+<rect x="324.2512" y="108.3888" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="332.8" y="116.5712" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
+<rect x="436.2512" y="126.6736" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<text x="444.8" y="134.8576" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
+<line x1="522.8" y1="80" x2="522.8" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="527.6" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<rect x="127.2" y="190.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
 <title>validation — E1 is not playable on the declared strings (reachable range E2–E6)</title></rect>
-<text x="120" y="199.4288" font-size="14.4" text-anchor="middle" dominant-baseline="central" font-weight="bold" style="font-family:var(--font-family-sans);fill:#fff" class="diagnostic-marker diagnostic-validation">!<title>validation — E1 is not playable on the declared strings (reachable range E2–E6)</title></text>
-<rect x="221.6" y="190.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
+<text x="136" y="199.4288" font-size="14.4" text-anchor="middle" dominant-baseline="central" font-weight="bold" style="font-family:var(--font-family-sans);fill:#fff" class="diagnostic-marker diagnostic-validation">!<title>validation — E1 is not playable on the declared strings (reachable range E2–E6)</title></text>
+<rect x="295.2" y="190.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
 <title>validation — C6 is not playable on string 3 (derived fret 29 is outside 0–24)</title></rect>
-<text x="230.4" y="199.4288" font-size="14.4" text-anchor="middle" dominant-baseline="central" font-weight="bold" style="font-family:var(--font-family-sans);fill:#fff" class="diagnostic-marker diagnostic-validation">!<title>validation — C6 is not playable on string 3 (derived fret 29 is outside 0–24)</title></text>
+<text x="304" y="199.4288" font-size="14.4" text-anchor="middle" dominant-baseline="central" font-weight="bold" style="font-family:var(--font-family-sans);fill:#fff" class="diagnostic-marker diagnostic-validation">!<title>validation — C6 is not playable on string 3 (derived fret 29 is outside 0–24)</title></text>
 </svg>
