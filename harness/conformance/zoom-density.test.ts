@@ -273,16 +273,18 @@ describe('zoom / density', () => {
       initSmufl();
       // The evidence ruling 1 of core-zoom-density-pad.md asked for before
       // touching this constant: the floor must buy packing, or it is bounding
-      // the CONTROL rather than legibility. Zero takes systems out of the
-      // score and packs more bars onto the first one; on this score at 80sp
-      // it packs all twelve onto one system.
+      // the CONTROL rather than legibility. Zero packs more bars onto the
+      // first system; on this score at 80sp, eleven of the twelve. (It took
+      // all twelve while zero was airless — the character of air a bar's
+      // edges now keep at zero costs the last one.)
       const rows = (densityH: number) => planHorizontal(twelveBars(), 80, { densityH }).rowCount;
       const firstRow = (densityH: number) =>
         planHorizontal(twelveBars(), 80, { densityH }).measures.filter(m => m.row === 0).length;
       expect(rows(1.1)).toBeLessThanOrEqual(rows(SPACE_DEFAULT_SP));
-      expect(rows(MIN_SPACE_SP)).toBeLessThan(rows(1.1));
+      expect(rows(MIN_SPACE_SP)).toBeLessThanOrEqual(rows(1.1));
       expect(firstRow(MIN_SPACE_SP)).toBeGreaterThan(firstRow(0.33));
-      expect(rows(MIN_SPACE_SP)).toBe(1);
+      expect(firstRow(0.33)).toBeGreaterThan(firstRow(1.1));
+      expect(firstRow(MIN_SPACE_SP)).toBe(11);
     });
 
     it('uses a stable lower bound rather than a score-dependent packing limit', () => {
@@ -711,11 +713,17 @@ describe('the fit answers about the score, not about the density knob', () => {
 
   it('a bar never gets narrower as the reader asks for more space', () => {
     initSmufl();
+    // Within a justified row a bar's share may drift by a fraction of a
+    // pixel: below the default its edges hold still while the column air
+    // inside every bar grows, so a bar with fewer columns cedes a hair of
+    // the row to its neighbours (0.34px of 160 between 0.65 and 1.1 here).
+    // What this guards is a bar VISIBLY shrinking, which the fit once did.
+    const SUBPIXEL = 0.5;
     for (let i = 1; i < LADDER.length; i++) {
       expect(
         bar1Px(LADDER[i], true),
         `SPACE ${LADDER[i]}sp should not be tighter than ${LADDER[i - 1]}sp`
-      ).toBeGreaterThanOrEqual(bar1Px(LADDER[i - 1], true) - 1e-9);
+      ).toBeGreaterThanOrEqual(bar1Px(LADDER[i - 1], true) - SUBPIXEL);
     }
     // …and it genuinely moves across the range, so the claim is not trivially
     // satisfied by a knob that does nothing.
@@ -764,17 +772,25 @@ describe('Space in staff spaces', () => {
     expect(clampSpace(Number.NaN)).toBe(SPACE_DEFAULT_SP);
   });
 
-  it('zero is the intercept vector — today, no air at all', () => {
+  it('zero is the intercept vector over its floors — the music airless, its frame not', () => {
     const at = spacePolicy(0);
     expect(at.spring).toBe(SPACE_LINES.spring.atZero);
-    expect(at.horizontalMargin).toBe(SPACE_LINES.margin.atZero);
-    for (const kind of PADS) expect(at.pad(kind)).toBe(SPACE_LINES[kind].atZero);
-    // The calibrated zero engraving is currently airless everywhere. A
-    // consumer that keeps a floor at zero is a calibration decision recorded
-    // in SPACE_LINES, and this assertion is the place it gets noticed.
+    expect(at.horizontalMargin).toBe(Math.max(SPACE_LINES.margin.atZero, SPACE_LINES.margin.floor ?? 0));
+    for (const kind of PADS) expect(at.pad(kind)).toBe(Math.max(SPACE_LINES[kind].atZero, SPACE_LINES[kind].floor ?? 0));
+    // A consumer that keeps a floor at zero is a calibration decision recorded
+    // in SPACE_LINES, and this assertion is the place it gets noticed. Since
+    // 2026-10-17 the springs still reach zero, but the page edge keeps one
+    // character (a fret digit, 0.8sp) and a bar's edge pads keep their default.
     expect(at.spring).toBe(0);
-    expect(at.horizontalMargin).toBe(0);
-    for (const kind of PADS) expect(at.pad(kind)).toBe(0);
+    expect(at.horizontalMargin).toBe(0.8);
+    for (const kind of PADS) expect(at.pad(kind)).toBe(SPACE_LINES[kind].atDefault);
+  });
+
+  it('a floor never reaches the default, so the default engraving is the line\'s', () => {
+    for (const line of Object.values(SPACE_LINES)) {
+      expect(line.floor ?? 0).toBeLessThanOrEqual(line.atDefault);
+      expect(spaceLineAt(line, SPACE_DEFAULT_SP)).toBe(line.atDefault);
+    }
   });
 
   it('a line is clamped at zero, so a consumer may run out before the springs do', () => {
@@ -805,12 +821,12 @@ describe('Space in staff spaces', () => {
     expect(gapAfterBarline(0)).toBeLessThan(gapAfterBarline(SPACE_DEFAULT_SP));
   });
 
-  it('at zero the margin is gone and the first column sits against the barline', () => {
+  it('at zero the system keeps one character from the pane edge', () => {
     initSmufl();
     for (const staffKind of ['notation', 'tab'] as const) {
       const plan = planHorizontal(blues(), 80, { densityH: 0, staffKind });
-      // The system starts at the pane edge …
-      expect(plan.measures[0].x).toBe(0);
+      // The system starts a character in from the pane edge …
+      expect(plan.measures[0].x).toBe(SPACE_LINES.margin.floor);
       // … and every coordinate is a real number: nothing divided by Space.
       for (const m of plan.measures) {
         expect(Number.isFinite(m.x) && Number.isFinite(m.width)).toBe(true);
@@ -820,7 +836,7 @@ describe('Space in staff spaces', () => {
     }
   });
 
-  it('at zero fill-width systems still reach the canvas edges', () => {
+  it('at zero fill-width systems still reach their margins', () => {
     initSmufl();
     for (const staffKind of ['notation', 'tab'] as const) {
       const plan = planHorizontal(blues(), 20, {
@@ -828,9 +844,24 @@ describe('Space in staff spaces', () => {
         spacingMode: 'fill',
         staffKind
       });
-      expect(plan.measures[0].x).toBe(0);
+      const margin = SPACE_LINES.margin.floor!;
+      expect(plan.measures[0].x).toBe(margin);
+      const last = plan.measures.filter(m => m.row === 0).at(-1)!;
+      expect(last.x + last.width).toBeCloseTo(20 - margin, 6);
       expect(plan.usedWidthSp).toBeCloseTo(20, 6);
     }
+  });
+
+  it('at zero a system that opens without a clef holds its first note off the line like any bar', () => {
+    initSmufl();
+    const plan = planHorizontal(blues(), 80, {
+      densityH: 0,
+      staffKind: 'tab',
+      display: { clefs: 'hide', timeSignatures: 'hide' }
+    });
+    const [first, second] = plan.measures;
+    expect(first.contentStartX - first.x).toBeCloseTo(second.contentStartX - second.x, 9);
+    expect(first.contentStartX - first.x).toBeGreaterThan(SYSTEM_START_PAD_SP);
   });
 
   it('zero survives ink pricing — the divide-by-Space the old snapshot carried is gone', () => {

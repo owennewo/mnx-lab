@@ -139,13 +139,22 @@ export function emitSpanMarks({ leftInkX, yTop, yBottom, marks, fill, primitives
 // A chosen mode (every bar / every system) never numbers the opening bar: the
 // first bar of the piece is obviously the first. A return to it later in an
 // unrolled performance is not the opening, so that one keeps its number.
-const MEASURE_NUMBER_SIZE_SP = 1.3;
+//
+// It is centred on its barline (2026-10-17): at the left of the bar it reached
+// over the first note, and a tuplet bracket there ran through it once Space
+// drew the note in. Centred, half of it sits over the barline and the bar's
+// content-left pad holds the first note's column clear of the rest. Where a
+// system opens with its clef, the number stays over the clef, set in from
+// the system's edge — half of it would otherwise hang into the margin.
+// It is the size of a tuplet number, smaller than a fret digit: reference
+// text, not something to play.
+const MEASURE_NUMBER_SIZE_SP = 1.1;
 const MEASURE_NUMBER_RISE_SP = 0.9; // baseline above the top line
 const MEASURE_NUMBER_INSET_SP = 0.2;
 
 export function emitMeasureNumber(
   gm: MnxGlobalMeasure,
-  m: { x: number; firstInSystem?: boolean },
+  m: { x: number; firstInSystem?: boolean; showClef?: boolean; showTimeSig?: boolean },
   staffTop: number,
   primitives: Primitive[],
   mode?: DisplayOptions['barNumbers'],
@@ -156,14 +165,15 @@ export function emitMeasureNumber(
   if (mode && opening) return;
   const number = mode ? displayedNumber ?? gm.number : gm.number;
   if (number === undefined) return;
+  const overPrefix = m.firstInSystem && (m.showClef || m.showTimeSig);
   primitives.push({
     kind: 'text',
     text: `${number}`,
-    x: m.x + MEASURE_NUMBER_INSET_SP,
+    x: overPrefix ? m.x + MEASURE_NUMBER_INSET_SP : m.x,
     y: staffTop - MEASURE_NUMBER_RISE_SP,
     font: 'body',
     size: MEASURE_NUMBER_SIZE_SP,
-    anchor: 'start',
+    anchor: overPrefix ? 'start' : 'middle',
     className: 'measure-number'
   });
 }

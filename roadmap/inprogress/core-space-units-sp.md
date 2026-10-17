@@ -206,8 +206,25 @@ historical 1.1sp total so the structural change did not move goldens, then visua
 calibration set the fixed gap to 0.25sp. That calibration is tracked in the
 [verification ledger](lab-verify.md#system-start-prefix-at-025sp--2026-09-16).
 
-**Open — the calibration pass.** The intercept vector is all zeros: Space 0 is
-airless everywhere, including note-to-note. Whether some rhythm proportion should
+**Second calibration decision (2026-10-17): the frame keeps a character.** At
+Space 0 with bar numbers on, a bar's number ran through the tuplet bracket over
+its first note (Merrily Kissed the Quaker, clefs hidden). The owner's direction:
+"We can have a minimum for zero spacing … 1. left/right system is at least one
+character from margin. 2. the first/last note in a bar is at least one character
+from the bar start/end", combined with centring the number over its barline —
+"I think 0sp is a little too tight btw". Built as a `floor` on a line
+(`max(floor, m·x + c)`), not a raised intercept: a floor at most `atDefault` leaves
+the default and everything above it on the line, so no golden and no high-Space
+engraving moves. One character is a fret digit, 0.8sp; the margin keeps it, and
+the bar-edge pads (content-left/right, the clef/key/time tails) keep their default,
+which is the same character of white to the ink. A system that opens with no
+glyph (clefs and time hidden) takes the content-left pad, not the clef's 0.25sp.
+The bar number is centred on its barline at 1.1sp (it stays over the clef at a
+system start that draws one). Springs still reach zero. The one moved golden,
+`40-navigation/03-numbered-bars`, was already unverified.
+
+**Open — the calibration pass.** Space 0 keeps the frame above and is airless
+note-to-note. Whether some rhythm proportion should
 survive at zero (`spring.atZero > 0`), where the margin should run out
 (`margin.atZero < 0`), and whether the default should stay at 2.2sp are decisions
 to make by looking, in the workbench, one number at a time. Staff is untouched and

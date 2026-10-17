@@ -134,7 +134,7 @@ describe('measure numbers', () => {
     emitMeasureNumber(d.global.measures[0], { x: 20 }, 8, primitives);
     emitMeasureNumber({}, { x: 20 }, 8, primitives);
     expect(primitives).toEqual([
-      { kind: 'text', text: '12', x: 20.2, y: 7.1, font: 'body', size: 1.3, anchor: 'start', className: 'measure-number' }
+      { kind: 'text', text: '12', x: 20, y: 7.1, font: 'body', size: 1.1, anchor: 'middle', className: 'measure-number' }
     ]);
     d = applyOp(d, { type: 'removeMeasureAttribute', measureIndex: 0, kind: 'number' });
     expect(d.global.measures[0].number).toBeUndefined();

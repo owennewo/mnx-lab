@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
+import { spacePolicy } from '../../src/engine/layout/spacing.ts';
 import type { LayoutResult, Primitive } from '../../src/engine/primitives.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
@@ -78,6 +79,7 @@ describe('system bookends', () => {
     expect(layout.displays?.length).toBeGreaterThan(1);
     const staffRight = Math.max(...layout.primitives.flatMap(p =>
       p.kind === 'line' && p.className === 'staff-line' ? [p.x1, p.x2] : []));
-    expect(staffRight).toBeCloseTo(layout.usedWidthSp);
+    // Space 0 keeps one character of margin on each side of the system.
+    expect(staffRight).toBeCloseTo(layout.usedWidthSp - spacePolicy(0).horizontalMargin);
   });
 });

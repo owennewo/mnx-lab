@@ -208,7 +208,7 @@ export function tupletDuration(t: MnxTuplet): number {
  * `x` is the air after a quarter note. The default is `QUARTER_SPRING_SP`
  * (2.2sp), the floor is a true zero, and the ceiling is a calibration choice
  * (see the ladder notes below). Every horizontal consumer of Space is one
- * CLAMPED LINE in `x`, `max(0, m·x + c)`, written here as the pair
+ * CLAMPED LINE in `x`, `max(floor, m·x + c)` (floor 0 unless set), written here as the pair
  * `{ atZero, atDefault }` — what remains at `x = 0` and what the consumer is at
  * the default — because the intercept vector IS the zero engraving, and that is
  * the thing calibration starts from. A negative `atZero` is a consumer that
@@ -221,7 +221,10 @@ export function tupletDuration(t: MnxTuplet): number {
  * make two glyphs overlap; at zero they simply abut. Its earlier life as a
  * multiplier with a 0.01 floor made the springs effectively zero already; what
  * kept "as tight as possible" out of reach was a 1sp margin floor and a 0.15sp
- * pad floor, both gone with the root curves they lived in.
+ * pad floor, both gone with the root curves they lived in. Airless turned out
+ * to be past tight: the zero engraving now keeps one character at the page
+ * edge and a bar's edges (`ONE_CHARACTER_SP`): a `floor` under the line, which
+ * only the bottom of the range reaches.
  *
  * The other cost at the bottom is *proportional* notation: springs carry
  * duration, so squeezing them squeezes the difference between a quarter's
@@ -248,15 +251,30 @@ export interface SpaceLine {
   atZero: number;
   /** The value at `x = SPACE_DEFAULT_SP`. */
   atDefault: number;
+  /** What the zero engraving keeps: the line never falls below it. At most
+   *  `atDefault`, so the default and everything above it stay on the line. */
+  floor?: number;
 }
 
-/** `max(0, m·x + c)` for the line through the two points. Written so that the
+/** `max(floor, m·x + c)` for the line through the two points. Written so that the
  *  default evaluates to `atDefault` EXACTLY in floating point when `atZero` is
  *  0 — the ratio `x / SPACE_DEFAULT_SP` is 1 there, not 0.999…, which is what
  *  lets the calibrated default keep byte-stable goldens. */
 export function spaceLineAt(line: SpaceLine, x: number): number {
-  return Math.max(0, line.atZero + (line.atDefault - line.atZero) * (x / SPACE_DEFAULT_SP));
+  return Math.max(line.floor ?? 0, line.atZero + (line.atDefault - line.atZero) * (x / SPACE_DEFAULT_SP));
 }
+
+/**
+ * The zero engraving's floor (2026-10-17, the owner: "0sp is a little too
+ * tight"; a system "at least one character from margin", a bar's first and
+ * last note "at least one character from the bar start/end"). One character is
+ * a fret digit's advance — `FRET_FONT_SIZE_SP` at about 0.6em — the smallest
+ * thing a tab staff prints. The margin keeps it outright. A bar's edge pads
+ * keep their default, which is the same white to the ink: the content-left
+ * 0.6 plus the ~0.2 a single digit leaves either side of its 1.2sp column on
+ * the way in, and that ~0.2 plus the content-right 0.8 on the way out.
+ */
+const ONE_CHARACTER_SP = 0.8;
 
 /** The pads that follow Space. Glyph SLOTS are rigid and are not here. */
 export type PadKind =
@@ -283,13 +301,16 @@ export const SPACE_LINES: { spring: SpaceLine; columnAir: SpaceLine; paperPad: S
   spring: { atZero: 0, atDefault: 1 },
   columnAir: { atZero: 0, atDefault: 1 },
   paperPad: { atZero: 0, atDefault: 1 },
-  margin: { atZero: 0, atDefault: 2 },
-  contentLeft: { atZero: 0, atDefault: CONTENT_LEFT_PAD_SP },
-  keySigRight: { atZero: 0, atDefault: KEY_SIG_RIGHT_PAD_SP },
-  contentRight: { atZero: 0, atDefault: CONTENT_RIGHT_PAD_SP },
-  clefTail: { atZero: 0, atDefault: CLEF_TAIL_SP },
-  tabClefTail: { atZero: 0, atDefault: TAB_CLEF_TAIL_SP },
-  timeTail: { atZero: 0, atDefault: TIME_SIG_TAIL_SP }
+  margin: { atZero: 0, atDefault: 2, floor: ONE_CHARACTER_SP },
+  // A bar's frame holds its default below it, like a system's opening
+  // (`SYSTEM_START_PAD_SP`): under the default, Space takes air from inside
+  // the bar and never from its edges. Above it the pads grow as before.
+  contentLeft: { atZero: 0, atDefault: CONTENT_LEFT_PAD_SP, floor: CONTENT_LEFT_PAD_SP },
+  keySigRight: { atZero: 0, atDefault: KEY_SIG_RIGHT_PAD_SP, floor: KEY_SIG_RIGHT_PAD_SP },
+  contentRight: { atZero: 0, atDefault: CONTENT_RIGHT_PAD_SP, floor: CONTENT_RIGHT_PAD_SP },
+  clefTail: { atZero: 0, atDefault: CLEF_TAIL_SP, floor: CLEF_TAIL_SP },
+  tabClefTail: { atZero: 0, atDefault: TAB_CLEF_TAIL_SP, floor: TAB_CLEF_TAIL_SP },
+  timeTail: { atZero: 0, atDefault: TIME_SIG_TAIL_SP, floor: TIME_SIG_TAIL_SP }
 };
 
 /** What Space resolves to at `x`: the spring factor, the page margin, each
@@ -2310,13 +2331,21 @@ export function planHorizontal(
     );
   };
 
+  /** Whether a system's opening draws a glyph for its fixed pad to hold off.
+   *  Without one (clefs and time signatures hidden) the pad leads straight to
+   *  the first note, and that is a bar start like any other. */
+  const opensWithGlyph = (m: MeasureMetrics) =>
+    (display.clefs !== 'hide') ||
+    (display.timeSignatures !== 'hide' && m.timeSigShow) ||
+    m.hasRepeatStart;
+
   // Use the same padding decision in packing and final placement.
   const prefixLeftPad = (m: MeasureMetrics, firstInSystem: boolean, index: number) =>
     // A bar opening a system has the previous bar's barline a row away, so
     // only a mid-system neighbour can contest the space.
     bareRepeat(m, firstInSystem) && (firstInSystem || !previousClosesWithInk(index))
       ? 0
-      : firstInSystem ? clearance.systemStartPad : contentLeftPad;
+      : firstInSystem && opensWithGlyph(m) ? clearance.systemStartPad : contentLeftPad;
 
   // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
   // ratio (the packing snapshot is updated after ink pricing).
@@ -2340,7 +2369,7 @@ export function planHorizontal(
       pads: [
         // A system's opening pad is fixed (`SYSTEM_START_PAD_SP`), so only a
         // mid-system bar carries a content-left pad to re-price.
-        ...(first || (bareRepeat(m, first) && !previousClosesWithInk(index))
+        ...((first && opensWithGlyph(m)) || (bareRepeat(m, first) && (first || !previousClosesWithInk(index)))
           ? [] : ['contentLeft' as const]),
         ...(keySigGlyphs(m, first) ? ['keySigRight' as const] : []),
         // The glyph slots' spare tails are air too (`clefSlot`/`timeSlot`).
