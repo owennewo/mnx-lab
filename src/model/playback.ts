@@ -57,8 +57,11 @@ export function activeIteration(state: PlaybackPositionState): number {
   return state.followPlayback && state.ordinal !== null && state.playbackIteration !== null
     ? state.playbackIteration : state.inspectionIteration;
 }
+/** Pass N sings verse N; a pass past the last written verse sings the first
+ *  (a verse written once under a repeat). One answer for the shown verse and
+ *  the lit word, so the two cannot disagree. */
 export function verseForIteration(orderedVerseIds: readonly string[], state: PlaybackPositionState): string | undefined {
-  return orderedVerseIds[activeIteration(state) - 1];
+  return orderedVerseIds[activeIteration(state) - 1] ?? orderedVerseIds[0];
 }
 /**
  * Where ←/→ WHILE PLAYING are taking the playhead (core-single-cursor.md):

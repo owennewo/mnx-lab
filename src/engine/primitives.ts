@@ -143,8 +143,6 @@ export interface TextPrim extends PrimitiveBase {
   /** The verse a syllable belongs to (its lyric line id), beside `playbackId`
    *  and under the same flag: the paint lights the verse the pass sings. */
   lyricLine?: string;
-  /** Every word in the syllable's bar is on its line, so every pass sings it. */
-  lyricSoleLine?: boolean;
 }
 
 export interface RectPrim extends PrimitiveBase {

@@ -85,8 +85,6 @@ export interface LyricSyllable {
   playbackId?: string;
   /** Its lyric line id, carried with `playbackId` (viewer layouts only). */
   lyricLine?: string;
-  /** Its bar's words are all on this one line, carried with `lyricLine`. */
-  lyricSoleLine?: boolean;
   /** No word: a sounding note's empty place on this verse row, so the eye can
    *  follow the playhead along the row before a word comes in (viewer only). */
   gap?: boolean;
@@ -232,8 +230,7 @@ export function emitLyricRuns(
         anchor: 'middle',
         className: 'lyric',
         ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
-        ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine }),
-        ...(syl.lyricSoleLine ? { lyricSoleLine: true } : {})
+        ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
       };
       primitives.push(syllable);
       owners.set(syllable, syl.row);
@@ -335,7 +332,7 @@ export function lyricReachAboveRows(primitives: readonly Primitive[], rows: read
 }
 
 /** The lyric line ids with words in these sequences, through event containers. */
-export function writtenLyricLineIds(sequences: readonly unknown[], used = new Set<string>()): Set<string> {
+function writtenLyricLineIds(sequences: readonly unknown[], used = new Set<string>()): Set<string> {
   const visit = (item: unknown): void => {
     if (!item || typeof item !== 'object') return;
     const record = item as { content?: unknown[]; lyrics?: { lines?: Record<string, { text?: string }> } };

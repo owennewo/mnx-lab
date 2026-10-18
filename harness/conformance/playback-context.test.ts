@@ -88,7 +88,7 @@ it('cycles the structural domain, including iterations on which a bar never soun
 it('clears an unavailable verse, falls back to inspection when stopped, and does not persist IDs', () => {
   const inspected = inspectIteration(initialPlaybackPosition(),2);
   expect(verseForIteration(['verse-a','verse-b'],inspected)).toBe('verse-b');
-  expect(verseForIteration(['verse-a'],inspected)).toBeUndefined();
+  expect(verseForIteration(['verse-a'],inspected)).toBe('verse-a');
   const live = withPlaybackOrdinal(followPlayback(inspected),simple(),0);
   expect(verseForIteration(['verse-a','verse-b'],live)).toBe('verse-a');
   expect(verseForIteration([],live)).toBeUndefined();

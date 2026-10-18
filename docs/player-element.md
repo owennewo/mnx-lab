@@ -216,13 +216,12 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   measured from the drawn text, in the fret mask's tint — and removes it after; the
   word keeps its ink. Of stacked verses, the one the pass sings lights — pass N sings
   verse N (`verseForIteration`, the viewer's `selectedVerse`; syllables carry
-  `data-lyric-line` beside their key). A note with no word on that verse lights a
-  word only if its bar is written on that word's line alone (`data-lyric-sole-line`:
-  text written once, sung every pass); in a bar of several lines, the other lines'
-  words belong to other passes. A sounding note the pass sings no word on lights its
-  EMPTY place on the pass's verse row instead (`rect.lyric-gap`, laid out on each verse
-  row a note has no word on, only where its staff carries words in that system), so the
-  eye can ride the row up to where the words come in (an experiment, 2026-10-18).
+  `data-lyric-line` beside their key; a pass past the last verse sings the first).
+  That is the whole rule: lyric ink lights only on the pass's row, and nothing guesses
+  what another row "really" means. A sounding note with no word on that row lights its
+  EMPTY place there instead (`rect.lyric-gap`, laid out on each verse row a note has no
+  word on, only where its staff carries words in that system), so the eye can ride the
+  row up to where the words come in.
   `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.

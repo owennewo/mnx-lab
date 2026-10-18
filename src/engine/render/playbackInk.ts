@@ -62,43 +62,20 @@ export function paintPlaybackInk(
   /** The verse the current pass sings (`verseForIteration`), if any. */
   verse?: string
 ): void {
-  const sung = new Map<string, { ink: SVGElement; voice: number }[]>();
-  const gaps: SVGElement[] = [];
   for (const ink of root.querySelectorAll<SVGElement>('[data-source-id], [data-playback-id]')) {
     if (ink.classList.contains('tab-rest')) continue;
-    if (ink.classList.contains('lyric-gap')) { gaps.push(ink); continue; }
     const key = ink.getAttribute('data-source-id') ?? ink.getAttribute('data-playback-id') ?? '';
-    const voice = ink.classList.contains('unperformed')
+    // Lyric ink — a word, or a note's empty place on a verse row — lights only
+    // on the row this pass sings: pass N sings verse N, and nothing else.
+    const line = ink.getAttribute('data-lyric-line');
+    const voice = ink.classList.contains('unperformed') || (line !== null && line !== verse)
       ? undefined
       : sounding.get(key);
     ink.classList.toggle('playback-ink', voice !== undefined);
     if (voice === undefined) ink.removeAttribute('data-playback-voice');
     else ink.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice)));
     if (ink.classList.contains('fret-bg')) stretchMask(ink, voice !== undefined);
-    else if (ink.classList.contains('lyric')) {
-      if (voice === undefined) lightSyllable(ink, undefined);
-      else sung.set(key, [...(sung.get(key) ?? []), { ink, voice }]);
-    }
-  }
-  const wordless = new Set(sounding.keys());
-  // Stacked verses share their note: light the one this pass sings. A note with
-  // no word on that verse lights its word only when its bar is written on one
-  // line (text written once and sung every pass). In a bar of several lines the
-  // other lines' words belong to other passes, even on a note of its own.
-  for (const words of sung.values()) {
-    const current = words.filter(({ ink }) => ink.getAttribute('data-lyric-line') === verse);
-    const lit = current.length ? current : words.filter(({ ink }) => ink.getAttribute('data-lyric-sole-line') !== null);
-    for (const { ink, voice } of words) lightSyllable(ink, lit.some(w => w.ink === ink) ? voice : undefined);
-    if (lit.length) wordless.delete(words[0].ink.getAttribute('data-playback-id') ?? '');
-  }
-  // A sounding note this pass sings no word on lights its empty place on the
-  // pass's verse row, so the eye can ride the row until the words come in.
-  for (const gap of gaps) {
-    const key = gap.getAttribute('data-playback-id') ?? '';
-    const voice = gap.getAttribute('data-lyric-line') === verse && wordless.has(key) ? sounding.get(key) : undefined;
-    gap.classList.toggle('playback-ink', voice !== undefined);
-    if (voice === undefined) gap.removeAttribute('data-playback-voice');
-    else gap.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice)));
+    else if (ink.classList.contains('lyric')) lightSyllable(ink, voice);
   }
 }
 
