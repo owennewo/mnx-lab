@@ -179,6 +179,23 @@ describe('displayed measure and instrument labels', () => {
         expect(meet, `${a.text} meets ${b.text}`).toBe(false);
       }
     });
+    it(`${name}: a jump reaching back over its own bar's number stacks above it`, () => {
+      initSmufl();
+      const mnx = score();
+      mnx.global.measures[2] = { ...mnx.global.measures[2], _x: { mnxLab: { navigation: {
+        jumps: [{ type: 'dalSegnoAlCoda', text: 'D.S.S. al Coda e poi la Coda', location: { fraction: [1, 1] } }]
+      } } } };
+      for (const widthSp of [45, 90, 400]) {
+        const labels = layout({ mnx, widthSp, display: { barNumbers: 'every-bar' } });
+        const jump = labels.primitives.find(p => p.kind === 'text' && p.className === 'jump')!;
+        const jumpBox = computeBoundsSp([jump])!;
+        for (const n of text(labels, 'measure-number')) {
+          const b = computeBoundsSp([n])!;
+          const meet = jumpBox.x < b.x + b.w && b.x < jumpBox.x + jumpBox.w && jumpBox.y < b.y + b.h && b.y < jumpBox.y + jumpBox.h;
+          expect(meet, `jump meets ${n.kind === 'text' ? n.text : ''} at ${widthSp}`).toBe(false);
+        }
+      }
+    });
     it(`${name}: unnamed parts remain unlabeled`, () => {
       initSmufl();
       const mnx = score();

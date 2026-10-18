@@ -10,7 +10,10 @@
  * - the repeat count stays put, nearest the barline it counts;
  * - a jump or "fine" stacks above a repeat count it would cover;
  * - the bar number steps off the barline to the bar's own side, where it reads
- *   as the start of its bar, rather than climbing over either.
+ *   as the start of its bar, rather than climbing over either;
+ * - a jump long enough to reach back over its own bar's number (a narrow bar's
+ *   "D.S.S. al Coda") stacks above that number — the number marks where the
+ *   bar starts, the jump only where it ends.
  *
  * Boxes are compared whole (x AND y), so a full-document scan cannot mistake
  * the row above for this one: after a wrap the x-range repeats, the y does not.
@@ -52,4 +55,9 @@ export function settleJumpText(jump: Primitive, drawn: readonly Primitive[]): vo
 /** A repeat count just drawn: any jump or "fine" it meets moves above it. */
 export function settleRepeatTimes(times: Primitive, drawn: readonly Primitive[]): void {
   for (const q of drawn) if (q !== times && isClass(q, ['jump', 'fine'])) stackAbove(q, times);
+}
+
+/** A bar number just drawn: any jump or "fine" it still meets moves above it. */
+export function settleMeasureNumber(number: Primitive, drawn: readonly Primitive[]): void {
+  for (const q of drawn) if (q !== number && isClass(q, ['jump', 'fine'])) stackAbove(q, number);
 }

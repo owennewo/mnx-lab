@@ -7,7 +7,7 @@ import type { DisplayOptions } from '../displayOptions.ts';
 // three lines.
 import type { MnxArpeggio, MnxGlobalMeasure, MnxNonArpeggio } from '../../model/mnx.ts';
 import type { Primitive } from '../primitives.ts';
-import { meetsBarlineText } from './barlineText.ts';
+import { meetsBarlineText, settleMeasureNumber } from './barlineText.ts';
 
 export interface SpanMarks {
   arpeggio?: MnxArpeggio;
@@ -184,4 +184,5 @@ export function emitMeasureNumber(
     text.anchor = 'start';
   }
   primitives.push(text);
+  settleMeasureNumber(text, primitives);
 }
