@@ -216,9 +216,10 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   measured from the drawn text, in the fret mask's tint — and removes it after; the
   word keeps its ink. Of stacked verses, the one the pass sings lights — pass N sings
   verse N (`verseForIteration`, the viewer's `selectedVerse`; syllables carry
-  `data-lyric-line` beside their key). A note with no word on that verse lights its
-  word if it has only one (text written once, sung every pass) and none of several,
-  since which one the pass sings is not written. `revealOccurrence({noteKey, ordinal})` is public; it shares the
+  `data-lyric-line` beside their key). A note with no word on that verse lights a
+  word only if its bar is written on that word's line alone (`data-lyric-sole-line`:
+  text written once, sung every pass); in a bar of several lines, the other lines'
+  words belong to other passes. `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.
 

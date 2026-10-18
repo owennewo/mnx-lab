@@ -4,7 +4,7 @@ import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, TITLE_SYSTEM_INK_SP, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import { measureHeadingX, ONSET_TEXT_LEAD_SP, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
-import { selectedLyricLineIds } from './lyricRuns.ts';
+import { selectedLyricLineIds, writtenLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
@@ -1855,6 +1855,7 @@ function assembleSegment(
       // Forced stems (layout sources) win; multiple stem-less voices rank by
       // pitch (upper voice up, rest down); lone voices auto-stem per event.
       const defaultStems = rankVoiceStems(staffVoices, m.clefTimelines[s][0].clef);
+      const soleLyricLine = durationSpans ? writtenLyricLineIds(staffVoices.map(v => v.seq)).size === 1 : false;
       staffVoices.forEach(({ seq: sequence }, voiceIndex) => {
         const stemOverride: 1 | -1 | null = defaultStems[voiceIndex];
         let onset = 0; // metric position within the bar, in whole-note fractions
@@ -2035,7 +2036,7 @@ function assembleSegment(
                   bandBottom: lyricBandBottom(m.row, s),
                   text: line.text,
                   continues: line.type === 'start' || line.type === 'middle',
-                  ...(playbackId === undefined ? {} : { playbackId, lyricLine: lineId })
+                  ...(playbackId === undefined ? {} : { playbackId, lyricLine: lineId, lyricSoleLine: soleLyricLine })
                 });
                 lyricRuns.set(key, run);
               }

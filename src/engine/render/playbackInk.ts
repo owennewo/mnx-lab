@@ -79,12 +79,12 @@ export function paintPlaybackInk(
     }
   }
   // Stacked verses share their note: light the one this pass sings. A note with
-  // no word on that verse lights its word if it has only one (text written once
-  // and sung every pass), and nothing if it has several: which of them this
-  // pass sings is not written, and lighting them all reads as singing both.
+  // no word on that verse lights its word only when its bar is written on one
+  // line (text written once and sung every pass). In a bar of several lines the
+  // other lines' words belong to other passes, even on a note of its own.
   for (const words of sung.values()) {
     const current = words.filter(({ ink }) => ink.getAttribute('data-lyric-line') === verse);
-    const lit = current.length ? current : words.length === 1 ? words : [];
+    const lit = current.length ? current : words.filter(({ ink }) => ink.getAttribute('data-lyric-sole-line') !== null);
     for (const { ink, voice } of words) lightSyllable(ink, lit.some(w => w.ink === ink) ? voice : undefined);
   }
 }

@@ -261,11 +261,22 @@ describe('lyric syllables', () => {
         const found = syllables(primitives), keys = noteKeys(primitives);
         expect(found).toHaveLength(entries ? 8 : 4);
         for (const syllable of found) expect(keys, `${syllable.text} → ${syllable.playbackId}`).toContain(syllable.playbackId);
-        expect(found.every(p => p.lyricLine === '1')).toBe(true);
+        expect(found.every(p => p.lyricLine === '1' && p.lyricSoleLine === true)).toBe(true);
         expect(new Set(found.map(p => p.playbackId)).size).toBe(found.length);
       }
     });
   }
+
+  it('a bar written on two lines marks neither as sole, though each note has one word', () => {
+    // Bar 11 of One Of These Things First: "or" on line 1, "lover" on line 3.
+    const split = structuredClone(doc) as unknown as { parts: { measures: { sequences: { content: { lyrics: { lines: Record<string, unknown> } }[] }[] }[] }[] };
+    const last = split.parts[0].measures[1].sequences[0].content[1].lyrics;
+    last.lines = { '3': last.lines['1'] };
+    for (const layout of Object.values(layouts)) {
+      const found = syllables(layout({ mnx: split as unknown as MnxStructure, widthSp: WIDTH_SP, durationSpans: true }).primitives);
+      expect(found.map(p => [p.text, p.lyricSoleLine ?? false])).toEqual([['hey', true], ['there', true], ['you', false], ['all', false]]);
+    }
+  });
 
   it('the emitter surfaces the name as data-playback-id', () => {
     const layout = layoutTab({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true });
@@ -284,7 +295,9 @@ class FakeSyllable extends FakeNode {
       return lamp;
     }
   };
-  constructor(key: string, line: string) { super({ 'data-playback-id': key, 'data-lyric-line': line }, ['lyric']); }
+  constructor(key: string, line: string, sole = false) {
+    super({ 'data-playback-id': key, 'data-lyric-line': line, ...(sole ? { 'data-lyric-sole-line': '' } : {}) }, ['lyric']);
+  }
   getBBox() { return { x: 0, y: 0, width: 20, height: 10 }; }
   before(lamp: FakeNode & { remove(): void }) { this.previousElementSibling = lamp; }
   get lit() { return this.previousElementSibling !== null; }
@@ -302,17 +315,24 @@ describe('the sung word', () => {
     expect([one.lit, two.lit]).toEqual([false, false]);
   });
 
-  it('a note with no word on the pass\'s verse lights its only word, and none of several', () => {
-    // Bars 10–12 of One Of These Things First: rows 1 and 3 under a 4× repeat,
-    // so passes 2 and 4 have no word written there.
-    const one = new FakeSyllable('n1', '1'), three = new FakeSyllable('n1', '3'), solo = new FakeSyllable('n2', '1');
-    const root = new FakeRoot([one, three, solo]) as unknown as ParentNode;
-    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '2');
-    expect([one.lit, three.lit, solo.lit]).toEqual([false, false, true]);
-    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), undefined); // a pass past the last verse
-    expect([one.lit, three.lit, solo.lit]).toEqual([false, false, true]);
-    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '3');
-    expect([one.lit, three.lit, solo.lit]).toEqual([false, true, true]);
+  it('a note with no word on the pass\'s verse lights nothing, unless its bar is written on one line', () => {
+    // One Of These Things First under its 4× repeat: bar 10 has lines 1 and 3 on
+    // a shared note; bar 11 has "or" (line 1) and "lover" (line 3) on notes of
+    // their own; bar 13 is written on line 2 alone and sung every pass.
+    const could = new FakeSyllable('n1', '1'), real = new FakeSyllable('n1', '3');
+    const or = new FakeSyllable('n2', '1'), lover = new FakeSyllable('n3', '3');
+    const sign = new FakeSyllable('n4', '2', true);
+    const root = new FakeRoot([could, real, or, lover, sign]) as unknown as ParentNode;
+    const all = new Map([['n1', 1], ['n2', 1], ['n3', 1], ['n4', 1]]);
+    const lit = () => [could, real, or, lover, sign].map(w => w.lit);
+    paintPlaybackInk(root, all, '1');
+    expect(lit()).toEqual([true, false, true, false, true]);
+    paintPlaybackInk(root, all, '2');
+    expect(lit()).toEqual([false, false, false, false, true]);
+    paintPlaybackInk(root, all, '3');
+    expect(lit()).toEqual([false, true, false, true, true]);
+    paintPlaybackInk(root, all, undefined); // a pass past the last verse
+    expect(lit()).toEqual([false, false, false, false, true]);
   });
 });
 

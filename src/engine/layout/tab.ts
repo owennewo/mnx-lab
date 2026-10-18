@@ -9,7 +9,7 @@ import { translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, tieOrigins } from './spacing.ts';
-import { selectedLyricLineIds } from './lyricRuns.ts';
+import { selectedLyricLineIds, writtenLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
@@ -393,6 +393,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     // event↔slot pairing emitTabVoices walks, containers through the same
     // innerColumns the digits use, so words sit exactly under their frets.
     if (lyricLineIds.length > 0) {
+      const soleLyricLine = opts.durationSpans ? writtenLyricLineIds(stdSequences).size === 1 : false;
       const addSyllables = (event: MnxEvent, x: number, voiceIndex: number, eventIndex: number, containerIndex?: number) => {
         // Keyed as emitTabVoices keys this bar's digits (synthesizeKeys: true, below).
         const playbackId = opts.durationSpans
@@ -416,7 +417,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
             bandTop: lyricBandTop(m.row),
             text: line.text,
             continues: line.type === 'start' || line.type === 'middle',
-            ...(playbackId === undefined ? {} : { playbackId, lyricLine: lineId })
+            ...(playbackId === undefined ? {} : { playbackId, lyricLine: lineId, lyricSoleLine: soleLyricLine })
           });
           lyricRuns.set(lineId, run);
         }

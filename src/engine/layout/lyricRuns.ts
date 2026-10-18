@@ -85,6 +85,8 @@ export interface LyricSyllable {
   playbackId?: string;
   /** Its lyric line id, carried with `playbackId` (viewer layouts only). */
   lyricLine?: string;
+  /** Its bar's words are all on this one line, carried with `lyricLine`. */
+  lyricSoleLine?: boolean;
 }
 
 /**
@@ -206,7 +208,8 @@ export function emitLyricRuns(
         anchor: 'middle',
         className: 'lyric',
         ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
-        ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
+        ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine }),
+        ...(syl.lyricSoleLine ? { lyricSoleLine: true } : {})
       };
       primitives.push(syllable);
       owners.set(syllable, syl.row);
@@ -307,9 +310,8 @@ export function lyricReachAboveRows(primitives: readonly Primitive[], rows: read
   return reach;
 }
 
-/** Traverse event containers without changing the document or its verse IDs. */
-export function documentLyricLineIds(mnx: MnxStructure): string[] {
-  const used = new Set<string>();
+/** The lyric line ids with words in these sequences, through event containers. */
+export function writtenLyricLineIds(sequences: readonly unknown[], used = new Set<string>()): Set<string> {
   const visit = (item: unknown): void => {
     if (!item || typeof item !== 'object') return;
     const record = item as { content?: unknown[]; lyrics?: { lines?: Record<string, { text?: string }> } };
@@ -318,8 +320,15 @@ export function documentLyricLineIds(mnx: MnxStructure): string[] {
     }
     for (const child of record.content ?? []) visit(child);
   };
+  for (const sequence of sequences) visit(sequence);
+  return used;
+}
+
+/** Traverse event containers without changing the document or its verse IDs. */
+export function documentLyricLineIds(mnx: MnxStructure): string[] {
+  const used = new Set<string>();
   for (const part of mnx.parts ?? []) for (const measure of part.measures ?? []) {
-    for (const sequence of measure.sequences ?? []) visit(sequence);
+    writtenLyricLineIds(measure.sequences ?? [], used);
   }
   return orderedLyricLineIds(mnx, used);
 }
