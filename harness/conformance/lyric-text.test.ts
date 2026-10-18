@@ -132,7 +132,7 @@ describe('parse', () => {
 
 describe('serialize', () => {
   it('projects the verse-labels scenario: stacking order, labels stay in metadata', () => {
-    expect(serializeLyricText(verseLabelsDoc(), 0)).toBe('Shine bright\nMorn-ing');
+    expect(serializeLyricText(verseLabelsDoc(), 0)).toBe('1.1| Shine bright\n1.1| 2: Morn-ing');
   });
 
   it('round-trips: parse(serialize(doc)) diffs to nothing', () => {
@@ -146,7 +146,7 @@ describe('serialize', () => {
 
   it('spells bar checks between texted bars and holds melisma with underscores', () => {
     const doc = appliedSongDoc();
-    expect(serializeLyricText(doc, 0)).toBe('Twin-kle lit- | -tle star_ you~are');
+    expect(serializeLyricText(doc, 0)).toBe('1.1| Twin-kle lit- | -tle star_ you~are');
   });
 });
 
@@ -250,4 +250,159 @@ describe('performance lyric text', () => {
     expect(parsed.diagnostics).toEqual([]);
     expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
   });
+});
+
+function bars(count: number, notes = 2): MnxStructure {
+  return {
+    mnx: { version: 1 }, global: { measures: Array.from({ length: count }, () => ({})) },
+    parts: [{ measures: Array.from({ length: count }, (_, bar) => ({ sequences: [{ content:
+      Array.from({ length: notes }, (_, n) => ({ duration: { base: 'quarter' },
+        notes: [{ id: `b${bar}n${n}`, pitch: { step: 'C', octave: 4 } }] }))
+    }] })) }]
+  } as MnxStructure;
+}
+function put(doc: MnxStructure, bar: number, row: string, text: string, note = 0) {
+  const entry = lyricEventWalk(doc, 0).filter(e => e.measureIndex === bar - 1)[note]!;
+  ((entry.event.lyrics ??= {}).lines ??= {})[row] = { text };
+}
+function unchanged(doc: MnxStructure) {
+  const text = serializeLyricText(doc, 0);
+  const parsed = parseLyricText(doc, 0, text);
+  expect(parsed.diagnostics).toEqual([]);
+  expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
+  return text;
+}
+
+describe('performance anchors and canonical wrapping', () => {
+  it('finishes all four visits to bars 9–12 before bar 13', () => {
+    const doc = bars(14);
+    doc.global.measures[8]!.repeatStart = {};
+    doc.global.measures[11]!.repeatEnd = { times: 4 };
+    put(doc, 9, '1', 'first'); put(doc, 12, '1', 'end');
+    put(doc, 9, '2', 'second'); put(doc, 10, '3', 'third'); put(doc, 9, '4', 'fourth');
+    put(doc, 13, '1', 'after');
+    expect(unchanged(doc)).toBe('9.1| first | | | end\n9.2| second\n10.3| third\n9.4| fourth\n13.1| after');
+  });
+
+  it('bare pipes advance across empty bars and an all-rest bar', () => {
+    const doc = bars(4);
+    doc.parts[0]!.measures[1]!.sequences[0]!.content = [{ duration: { base: 'whole' }, rest: {} }];
+    const parsed = parseLyricText(doc, 0, '1.1| one | | three | four');
+    expect(parsed.diagnostics).toEqual([]);
+    expect(parsed.lines[0]!.syllables.size).toBe(3);
+    expect(planLyricEdits(doc, 0, parsed).map(e => 'noteKey' in e ? e.noteKey : '')).toEqual(['b0n0', 'b2n0', 'b3n0']);
+  });
+
+  it('wraps at four bars and at 80 characters, preserving cross-line syllables', () => {
+    const doc = bars(6);
+    for (let bar = 1; bar <= 6; bar++) put(doc, bar, '1', `word${bar}`);
+    expect(unchanged(doc)).toBe('1.1| word1 | word2 | word3 | word4\n5.1| word5 | word6');
+    put(doc, 1, '1', 'x'.repeat(70));
+    expect(unchanged(doc).split('\n')[1]).toMatch(/^2\.1\|/);
+    const walk = lyricEventWalk(doc, 0);
+    walk[6]!.event.lyrics!.lines!['1'] = { text: 'begin', type: 'start' };
+    walk[8]!.event.lyrics!.lines!['1'] = { text: 'end', type: 'end' };
+    unchanged(doc);
+  });
+
+  it('counts D.S. visits continuously but writes them back to the existing verse', () => {
+    const doc = bars(3);
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[0]!.segno = { location: { fraction: [0, 1] } };
+    doc.global.measures[1]!.repeatEnd = {};
+    doc.global.measures[1]!.fine = { location: { fraction: [1, 1] } };
+    doc.global.measures[2]!.jump = { type: 'dsalfine', location: { fraction: [1, 1] } };
+    put(doc, 1, '1', 'first'); put(doc, 1, '2', 'second');
+    expect(unchanged(doc)).toBe('1.1| first\n1.2| second\n1.3| first');
+    const parsed = parseLyricText(doc, 0, '1.1| changed\n1.2| second\n1.3| changed');
+    expect(planLyricEdits(doc, 0, parsed)).toMatchObject([{ line: '1', text: 'changed' }]);
+    const conflict = parseLyricText(doc, 0, '1.1| changed\n1.3| different');
+    expect(conflict.diagnostics[0]!.message).toContain('share a stored syllable');
+    expect(planLyricEdits(doc, 0, conflict)).toEqual([]);
+  });
+
+  it('first visit to a second ending maps to verse two, not verse one', () => {
+    const doc = bars(3);
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[1]!.ending = { numbers: [1], duration: 1 };
+    doc.global.measures[1]!.repeatEnd = {};
+    doc.global.measures[2]!.ending = { numbers: [2], duration: 1 };
+    put(doc, 1, '1', 'first'); put(doc, 3, '2', 'ending');
+    expect(unchanged(doc)).toContain('3.1| ending');
+  });
+
+  it('accepts phrase newlines and maps caret offsets back to the original buffer', () => {
+    const doc = bars(2);
+    const text = '1.1| one\ntwo |\nthree';
+    const parsed = parseLyricText(doc, 0, text);
+    expect(parsed.diagnostics).toEqual([]);
+    expect(parsed.tokens.map(t => [text.slice(t.from, t.to), t.entryIndex])).toEqual([['one', 0], ['two', 1], ['three', 2]]);
+  });
+
+  it('mints separate verse rows when pasting into a repeated score without lyrics', () => {
+    const doc = bars(2);
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[1]!.repeatEnd = {};
+    const parsed = parseLyricText(doc, 0, '1.1| first\n1.2| second');
+    expect(parsed.lines.map(l => l.lineId)).toEqual(['1', '2']);
+  });
+
+  it('rejects nonexistent occurrences and overflow without offering destructive edits', () => {
+    const doc = bars(2);
+    for (const text of ['1.0| word', '1.2| word', '0.1| word', '3.1| word', '1.1| a b c 2.1| d']) {
+      const parsed = parseLyricText(doc, 0, text);
+      expect(parsed.diagnostics.length).toBeGreaterThan(0);
+      expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
+    }
+    expect(parseLyricText(doc, 0, '1.1| a b c | d').diagnostics[0]!.message).toContain('too many syllables');
+  });
+
+  it('preserves translations and explicit hymn rows', () => {
+    const doc = verseLabelsDoc();
+    doc.global.lyrics!.lineMetadata!['verse2']!.lang = 'nl';
+    expect(unchanged(doc)).toBe('1.1| Shine bright\n1.1| nl: Morn-ing');
+  });
+});
+
+it('keeps only events inside a partial-bar navigation visit', () => {
+  const doc = bars(2, 4);
+  doc.global.measures[0]!.segno = { location: { fraction: [1, 2] } };
+  doc.global.measures[1]!.jump = { type: 'segno', location: { fraction: [1, 1] } };
+  put(doc, 1, '1', 'before'); put(doc, 1, '1', 'after', 2);
+  expect(unchanged(doc)).toBe('1.1| before_ after\n1.2| after');
+});
+
+it('wraps a hyphenated word across canonical lines without treating the wrap as a word end', () => {
+  const doc = bars(5);
+  for (let bar = 1; bar <= 5; bar++) put(doc, bar, '1', 'word');
+  const walk = lyricEventWalk(doc, 0);
+  walk[6]!.event.lyrics!.lines!['1'] = { text: 'be', type: 'start' };
+  walk[8]!.event.lyrics!.lines!['1'] = { text: 'yond', type: 'end' };
+  expect(unchanged(doc)).toBe('1.1| word | word | word | be-\n5.1| -yond');
+});
+
+it('rejects ambiguous or malformed numbered markers in anchored text', () => {
+  for (const text of ['1.1| one 2| two', '1.1| one 2.x| two']) {
+    expect(parseLyricText(bars(2), 0, text).diagnostics.length).toBeGreaterThan(0);
+  }
+});
+
+it('retains the ordinal of a newly entered sparse verse and arbitrary existing row ids', () => {
+  for (const existing of [false, true]) {
+    const doc = bars(2);
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[1]!.repeatEnd = {};
+    if (existing) put(doc, 1, 'verse-first', 'old');
+    const session = new EditorSession(doc);
+    const parsed = parseLyricText(doc, 0, `${existing ? '1.1| old\n' : ''}1.2| 2: new`);
+    expect(parsed.diagnostics).toEqual([]);
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, parsed) });
+    expect(unchanged(session.doc)).toContain('1.2| new');
+  }
+});
+
+it('escapes header-shaped lyric text in canonical output', () => {
+  const doc = bars(1);
+  put(doc, 1, '1', 'nl:');
+  expect(unchanged(doc)).toBe('1.1| \\nl:');
 });

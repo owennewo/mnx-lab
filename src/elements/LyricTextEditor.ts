@@ -29,7 +29,7 @@ import {
 } from '../edit/lyricText.ts';
 
 const LEGEND =
-  'split - · hold fant--as · extend day__ · skip _ · join you~are · bars | 6| · header nl 2: · Ctrl+Enter applies';
+  'split - · hold fant--as · extend day__ · skip _ · join you~are · bars 9.1| (bar.visit), | next · optional nl 2: · Ctrl+Enter applies';
 
 @customElement('mnx-lyric-text-editor')
 export class LyricTextEditor extends LitElement {

@@ -440,7 +440,7 @@ try {
     ly = JSON.parse(await cdp.evaluate(LYRIC));
     // The canonical form may add bar checks the typed text lacked; the honest
     // assertions are that the verse landed and the buffer diffs to nothing.
-    if (!ly.text?.startsWith('Hush')) fail(`reopening reads “${ly.text}” — the verse did not land in the document`);
+    if (!/^1\.1\| Hush/.test(ly.text ?? '')) fail(`reopening reads “${ly.text}” — the verse did not land in the document`);
     else if (ly.applyDisabled !== true) fail('the reopened buffer diffs against its own document — the round trip is broken');
     else pass(`reopened on the document’s own serialization (“${ly.text}”) — the round trip holds`);
     await press('Escape', 'Escape', 27);

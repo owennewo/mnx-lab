@@ -118,3 +118,6 @@ rail over the written bars with a lane per pass, and the sound, rate and volume 
 their overlays) sits under the score and goes with the tools row when the score is focused. The host keeps playback context separate from editor selection, stops/recompiles on
 edits, and accepts an optional zero-based `at=` ordinal in scenario links.
 [Player element and lifecycle](player-element.md).
+
+**Lyric entry** opens on Shift+L. Its [text format](lyric-text.md) follows
+performance order with `bar.occurrence|` anchors and canonical bar-boundary wrapping.

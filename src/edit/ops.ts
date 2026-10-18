@@ -438,7 +438,7 @@ export type EditOp =
   // key on the document. Two owners, so two pairs — item 7's test.
   | { type: 'setSyllable'; noteKey: string; line: string; text: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
   | { type: 'removeSyllable'; noteKey: string; line: string }
-  | { type: 'setLyricLine'; line: string; label?: string; lang?: string }
+  | { type: 'setLyricLine'; line: string; label?: string; lang?: string; lineOrder?: string[] }
   | { type: 'removeLyricLine'; line: string }
   // Tab technique + fingering (campaign item 9,
   // roadmap/complete/core-element-ops-technique.md). Both live under the
@@ -1793,6 +1793,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     }
     case 'setLyricLine': {
       const lyrics = ((next.global as { lyrics?: MnxStructure['global']['lyrics'] }).lyrics ??= {});
+      if (op.lineOrder) lyrics.lineOrder = [...op.lineOrder];
       const metadata = (lyrics.lineMetadata ??= {});
       metadata[op.line] = {
         ...(op.label !== undefined ? { label: op.label } : {}),

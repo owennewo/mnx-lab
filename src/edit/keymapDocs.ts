@@ -456,7 +456,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyL', shift: true }],
     group: 'setup',
     meaning: {
-      all: 'lyrics… (text editor: a part’s whole lyric as paste-and-tweak text — `-` splits, `--`/`__` hold, `_` skips, `~` joins, `|`/`6|` bar checks, `nl 2:` verse headers)'
+      all: 'lyrics… (text editor: a part’s whole lyric as paste-and-tweak text — `-` splits, `--`/`__` hold, `_` skips, `~` joins, `9.1|` bar.visit anchors, `|` next bar, optional `nl 2:` language/verse headers)'
     }
   },
   {
