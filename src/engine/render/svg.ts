@@ -373,6 +373,7 @@ function emitRect(p: RectPrim, kx: number, ky: number): string {
   if (p.radius !== undefined) attrs += ` rx="${n(p.radius * ky)}" ry="${n(p.radius * ky)}"`;
   if (p.spanEndX !== undefined) attrs += ` data-span-end="${n(drawnX(p.spanEndX, p.spanEndDx, kx, ky))}"`;
   if (p.playbackId !== undefined) attrs += ` data-playback-id="${escapeXml(p.playbackId)}"`;
+  if (p.lyricLine !== undefined) attrs += ` data-lyric-line="${escapeXml(p.lyricLine)}"`;
   if (p.stroke) {
     // A zero thickness means "no border" and stays that way — the floor
     // makes a hairline legible, it does not invent one.

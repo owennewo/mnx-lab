@@ -757,6 +757,16 @@ export class DocumentViewer extends LitElement {
       :host #projection-container svg .lyric-lamp[data-playback-voice="2"] { --playback-voice: var(--playback-2); }
       :host #projection-container svg .lyric-lamp[data-playback-voice="3"] { --playback-voice: var(--playback-3); }
       :host #projection-container svg .lyric-lamp[data-playback-voice="4"] { --playback-voice: var(--playback-4); }
+      /* A sounding note's EMPTY place on the verse row (experiment): the word
+         lamp's tint with no word in it, so the eye can ride the row through
+         a gap and see the words coming. Laid out, never painted until lit. */
+      :host #projection-container svg .lyric-gap { pointer-events: none; }
+      :host #projection-container svg .lyric-gap.playback-ink {
+        fill: light-dark(
+          color-mix(in oklab, var(--playback-voice) 22%, var(--paper, oklch(0.985 0.006 85))),
+          color-mix(in oklab, var(--playback-voice) 40%, var(--paper, oklch(0.235 0.008 80)))
+        );
+      }
 
       /* THE TAB STAFF'S REST PILL. Tab draws no rest, so a reader following
          a performance on the fingerboard has nothing to follow through one —

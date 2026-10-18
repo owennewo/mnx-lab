@@ -219,7 +219,11 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   `data-lyric-line` beside their key). A note with no word on that verse lights a
   word only if its bar is written on that word's line alone (`data-lyric-sole-line`:
   text written once, sung every pass); in a bar of several lines, the other lines'
-  words belong to other passes. `revealOccurrence({noteKey, ordinal})` is public; it shares the
+  words belong to other passes. A sounding note the pass sings no word on lights its
+  EMPTY place on the pass's verse row instead (`rect.lyric-gap`, laid out on each verse
+  row a note has no word on, only where its staff carries words in that system), so the
+  eye can ride the row up to where the words come in (an experiment, 2026-10-18).
+  `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.
 

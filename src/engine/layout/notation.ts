@@ -2014,14 +2014,25 @@ function assembleSegment(
             });
             if (beamRun && stem) beamRun.stems.set(`${i}:${s}:${voiceIndex}:${eventIndex}`, stem);
             const lyricLines = event.lyrics?.lines;
+            const synth = synthesizePartForStaff[s];
+            const playbackId = durationSpans && lyricLineIds.length
+              ? syllablePlaybackKey(event, {
+                  partIndex: synth?.partIndex ?? 0, measureIndex: writtenIndex(plan, i),
+                  staffIndex: synth?.staffIndex ?? 1, voiceIndex, eventIndex
+                }, synth !== null, m.entry?.ordinal)
+              : undefined;
+            if (playbackId !== undefined) {
+              lyricLineIds.forEach((lineId, verse) => {
+                if (lyricLines?.[lineId]?.text?.trim()) return;
+                const key = `${s}:${lineId}`;
+                lyricRuns.set(key, [...(lyricRuns.get(key) ?? []), {
+                  x: slot.x, verse, row: m.row, staffTop: staffTops[s], staffBottom: staffBottoms[s],
+                  bandBottom: lyricBandBottom(m.row, s), text: '', continues: false,
+                  playbackId, lyricLine: lineId, gap: true
+                }]);
+              });
+            }
             if (lyricLines) {
-              const synth = synthesizePartForStaff[s];
-              const playbackId = durationSpans
-                ? syllablePlaybackKey(event, {
-                    partIndex: synth?.partIndex ?? 0, measureIndex: writtenIndex(plan, i),
-                    staffIndex: synth?.staffIndex ?? 1, voiceIndex, eventIndex
-                  }, synth !== null, m.entry?.ordinal)
-                : undefined;
               for (const [lineId, line] of Object.entries(lyricLines)) {
                 const verse = lyricLineIds.indexOf(lineId);
                 if (verse < 0) continue;

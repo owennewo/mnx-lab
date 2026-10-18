@@ -87,6 +87,9 @@ export interface LyricSyllable {
   lyricLine?: string;
   /** Its bar's words are all on this one line, carried with `lyricLine`. */
   lyricSoleLine?: boolean;
+  /** No word: a sounding note's empty place on this verse row, so the eye can
+   *  follow the playhead along the row before a word comes in (viewer only). */
+  gap?: boolean;
 }
 
 /**
@@ -134,6 +137,10 @@ const LYRIC_DESCENT_SP = inkEdgesSp(LYRIC_PROBE).bottom;
 /** Verses over a staff clear the ink under their own span, widened by this —
  *  the same locality score text keeps (scoreText.ts TEXT_SIDE_CLEAR_SP). */
 const LYRIC_SIDE_CLEAR_SP = 0.5;
+/** An empty place's lamp: the word lamp's vertical air (render/playbackInk.ts
+ *  LAMP_PAD_Y), a little wider than tall. */
+const GAP_PAD_Y = 0.04;
+const GAP_ASPECT = 1.2;
 
 // A staff's frame — lines, barlines, a group's brace or bracket — and the
 // verses themselves never push a verse down. Whole class tokens only: a
@@ -179,7 +186,12 @@ export function emitLyricRuns(
    *  sits nearest the staff in every system, whichever verses it carries. */
   above?: { verseCount: number }
 ): Map<Primitive, number> {
-  const all = [...runs];
+  // Gaps stand on rows the words already placed, and only where their staff
+  // carries words in that system: they never move a row nor make one.
+  const given = [...runs];
+  const all = given.map(run => run.filter(syl => !syl.gap)).filter(run => run.length);
+  const worded = new Set(all.flat().map(syl => syl.staffBottom));
+  const gaps = given.flat().filter(syl => syl.gap && worded.has(syl.staffBottom));
   const owners = new Map<Primitive, number>();
   const firstBaseline = above ? baselinesAbove(all, primitives, airSp, above.verseCount) : new Map<number, number>();
   for (const run of above ? [] : all) {
@@ -194,6 +206,18 @@ export function emitLyricRuns(
       }
       firstBaseline.set(syl.staffBottom, deepest + airSp + LYRIC_ASCENT_SP);
     }
+  }
+  for (const syl of gaps) {
+    const y = firstBaseline.get(syl.staffBottom)! + syl.verse * LYRIC_LINE_SPACING_SP;
+    const h = (LYRIC_ASCENT_SP + LYRIC_DESCENT_SP) * (1 + 2 * GAP_PAD_Y), w = h * GAP_ASPECT;
+    const gap: Primitive = {
+      kind: 'rect', x: syl.x - w / 2, y: y - LYRIC_ASCENT_SP - h * GAP_PAD_Y, w, h, radius: h * 0.2,
+      fill: 'none', className: 'lyric-gap',
+      ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
+      ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
+    };
+    primitives.push(gap);
+    owners.set(gap, syl.row);
   }
   for (const run of all) {
     run.forEach((syl, k) => {

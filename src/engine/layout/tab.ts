@@ -421,6 +421,16 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
           });
           lyricRuns.set(lineId, run);
         }
+        if (playbackId !== undefined) {
+          lyricLineIds.forEach((lineId, verse) => {
+            if (event.lyrics?.lines?.[lineId]?.text?.trim()) return;
+            lyricRuns.set(lineId, [...(lyricRuns.get(lineId) ?? []), {
+              x, verse, row: m.row, staffTop, staffBottom,
+              bandBottom: lyricBandBottom(m.row), bandTop: lyricBandTop(m.row),
+              text: '', continues: false, playbackId, lyricLine: lineId, gap: true
+            }]);
+          });
+        }
       };
       stdSequences.forEach((sequence, voiceIndex) => {
         sequence.content.forEach((item, eventIndex) => {

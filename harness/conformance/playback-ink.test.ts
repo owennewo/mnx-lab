@@ -274,7 +274,26 @@ describe('lyric syllables', () => {
     last.lines = { '3': last.lines['1'] };
     for (const layout of Object.values(layouts)) {
       const found = syllables(layout({ mnx: split as unknown as MnxStructure, widthSp: WIDTH_SP, durationSpans: true }).primitives);
-      expect(found.map(p => [p.text, p.lyricSoleLine ?? false])).toEqual([['hey', true], ['there', true], ['you', false], ['all', false]]);
+      expect([...found].sort((a, b) => a.x - b.x).map(p => [p.text, p.lyricSoleLine ?? false])).toEqual([['hey', true], ['there', true], ['you', false], ['all', false]]);
+    }
+  });
+
+  it('a note with no word gets an empty place on each verse row, keyed like its note; an unasked layout gets none', () => {
+    const quiet = structuredClone(doc) as unknown as { parts: { measures: { sequences: { content: { lyrics?: unknown }[] }[] }[] }[] };
+    delete quiet.parts[0].measures[1].sequences[0].content[1].lyrics;
+    const mnx = quiet as unknown as MnxStructure;
+    const gaps = (primitives: readonly Primitive[]) =>
+      primitives.filter((p): p is Rect => p.kind === 'rect' && p.className === 'lyric-gap');
+    for (const layout of Object.values(layouts)) {
+      expect(gaps(layout({ mnx, widthSp: WIDTH_SP }).primitives)).toEqual([]);
+      const { primitives } = layout({ mnx, widthSp: WIDTH_SP, durationSpans: true });
+      const found = gaps(primitives);
+      expect(found.map(g => [g.playbackId, g.lyricLine])).toEqual([['n3', '1']]);
+      expect(noteKeys(primitives)).toContain('n3');
+      // On the words' row, under its note.
+      const you = syllables(primitives).find(p => p.text === 'you')!;
+      expect(found[0].y).toBeLessThan(you.y);
+      expect(found[0].y + found[0].h).toBeGreaterThan(you.y);
     }
   });
 
@@ -333,6 +352,28 @@ describe('the sung word', () => {
     expect(lit()).toEqual([false, true, false, true, true]);
     paintPlaybackInk(root, all, undefined); // a pass past the last verse
     expect(lit()).toEqual([false, false, false, false, true]);
+  });
+});
+
+describe('the empty place', () => {
+  const gap = (key: string, line: string) => new FakeNode({ 'data-playback-id': key, 'data-lyric-line': line }, ['lyric-gap']);
+  it('lights on the pass\'s verse row while its note sounds and no word of it is lit', () => {
+    const quiet1 = gap('n1', '1'), quiet2 = gap('n1', '2');
+    const word = new FakeSyllable('n2', '1'), wordGap = gap('n2', '2');
+    const root = new FakeRoot([quiet1, quiet2, word, wordGap]) as unknown as ParentNode;
+    const lit = () => [quiet1, quiet2, word, wordGap].map(n => n instanceof FakeSyllable ? n.lit : n.classes.has('playback-ink'));
+    paintPlaybackInk(root, new Map([['n1', 2]]), '2');
+    expect(lit()).toEqual([false, true, false, false]);
+    expect(quiet2.getAttribute('data-playback-voice')).toBe('2');
+    // A word lit for the note: no empty place beside it.
+    paintPlaybackInk(root, new Map([['n2', 1]]), '1');
+    expect(lit()).toEqual([false, false, true, false]);
+    // The pass sings nothing on n2 (verse 2): its empty place lights instead.
+    paintPlaybackInk(root, new Map([['n2', 1]]), '2');
+    expect(lit()).toEqual([false, false, false, true]);
+    paintPlaybackInk(root, new Map(), '2');
+    expect(lit()).toEqual([false, false, false, false]);
+    expect(quiet2.getAttribute('data-playback-voice')).toBeNull();
   });
 });
 

@@ -160,6 +160,8 @@ export interface RectPrim extends PrimitiveBase {
   radius?: number;
   fill?: string;
   stroke?: string;
+  /** A lyric gap's verse row (lyric line id), as on `TextPrim`. */
+  lyricLine?: string;
   /** Stroke thickness in staff spaces (only meaningful when `stroke` is set). */
   thickness?: number;
   /**
