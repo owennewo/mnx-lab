@@ -238,3 +238,16 @@ describe('the plan and its application', () => {
     expect(session.handleIntent({ type: 'applyLyricPlan', edits: [] })).toBe(false);
   });
 });
+
+
+describe('performance lyric text', () => {
+  it('opening and applying a sparse lyric does not move words across empty bars', () => {
+    const doc = makeSongDoc();
+    const walk = lyricEventWalk(doc, 0);
+    walk[0]!.event.lyrics = { lines: { '1': { text: 'first' } } };
+    walk[7]!.event.lyrics = { lines: { '1': { text: 'last' } } };
+    const parsed = parseLyricText(doc, 0, serializeLyricText(doc, 0));
+    expect(parsed.diagnostics).toEqual([]);
+    expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
+  });
+});
