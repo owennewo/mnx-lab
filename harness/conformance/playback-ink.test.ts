@@ -11,8 +11,9 @@ import {
   PLAYBACK_VOICE_COLOURS
 } from '../../src/engine/render/playbackInk.ts';
 import { forEachNoteAddress } from '../../src/model/noteWalk.ts';
+import { engravingEntries } from '../../src/engine/layout/unrolled.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
-import type { RectPrim as Rect } from '../../src/engine/primitives.ts';
+import type { Primitive, RectPrim as Rect, TextPrim } from '../../src/engine/primitives.ts';
 
 /**
  * PLAYBACK INK — the sounding notes on the page, by voice and for as long as
@@ -213,6 +214,62 @@ describe('the tab rest pill', () => {
     const plain = layoutTab({ mnx: doc, widthSp: WIDTH_SP });
     expect(renderSvgToString({ primitives: plain.primitives, widthSp: plain.widthSp, heightSp: plain.heightSp, pxPerSp: 16 }))
       .not.toContain('data-playback-id');
+  });
+});
+
+/** A sung word lights with its note: each syllable is named for the playhead
+ *  by the key its event's first note is drawn with, so the one lookup that
+ *  lights the note finds the word too (render/playbackInk.ts lightSyllable). */
+describe('lyric syllables', () => {
+  initSmufl();
+  const sung = (id: string | undefined, text: string) => {
+    const event = note(id ?? 'x', 1, 'half');
+    if (id === undefined) delete (event.notes[0] as { id?: string }).id;
+    return { ...event, lyrics: { lines: { '1': { text, type: 'whole' } } } };
+  };
+  /** Two bars repeated: a note with an id, and one without (a positional key). */
+  const doc = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 }, repeatStart: {} }, { repeatEnd: {} }] },
+    parts: [{
+      id: 'guitar',
+      _x: { mnxLab: { strings: STRINGS, tab: { staffKind: 'both' } } },
+      measures: [
+        { clefs: [{ clef: { sign: 'G', staffPosition: -2, octave: -1 } }], sequences: [{ content: [sung('n1', 'hey'), sung(undefined, 'there')] }] },
+        { sequences: [{ content: [sung('n2', 'you'), sung('n3', 'all')] }] }
+      ]
+    }]
+  } as unknown as MnxStructure;
+  const syllables = (primitives: readonly Primitive[]) =>
+    primitives.filter((p): p is TextPrim => p.kind === 'text' && p.className === 'lyric');
+  const noteKeys = (primitives: readonly Primitive[]) =>
+    new Set(primitives.filter(p => /notehead|fret-bg/.test(p.className ?? '')).map(p => p.sourceId));
+  const layouts = { notation: layoutNotation, tab: layoutTab, both: layoutBothSystem };
+
+  it('an unasked layout names none — the goldens never see it', () => {
+    for (const layout of Object.values(layouts)) {
+      const found = syllables(layout({ mnx: doc, widthSp: WIDTH_SP }).primitives);
+      expect(found.length).toBeGreaterThan(0);
+      expect(found.every(p => p.playbackId === undefined)).toBe(true);
+    }
+  });
+
+  for (const [name, layout] of Object.entries(layouts)) {
+    it(`${name}: every syllable carries the key its note is drawn with, written and unrolled`, () => {
+      for (const entries of [undefined, engravingEntries(doc, true)]) {
+        const { primitives } = layout({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true, ...(entries ? { entries } : {}) });
+        const found = syllables(primitives), keys = noteKeys(primitives);
+        expect(found).toHaveLength(entries ? 8 : 4);
+        for (const syllable of found) expect(keys, `${syllable.text} → ${syllable.playbackId}`).toContain(syllable.playbackId);
+        expect(new Set(found.map(p => p.playbackId)).size).toBe(found.length);
+      }
+    });
+  }
+
+  it('the emitter surfaces the name as data-playback-id', () => {
+    const layout = layoutTab({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true });
+    const svg = renderSvgToString({ primitives: layout.primitives, widthSp: layout.widthSp, heightSp: layout.heightSp, pxPerSp: 16 });
+    expect(svg).toMatch(/<text[^>]*data-playback-id="n1"[^>]*class="lyric"/);
   });
 });
 

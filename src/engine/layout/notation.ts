@@ -21,6 +21,7 @@ import {
   emitLyricRuns,
   lyricBlockSpFor,
   orderedLyricLineIds,
+  syllablePlaybackKey,
   type LyricSyllable
 } from './lyricRuns.ts';
 import { timeSigDigitDx } from './tabStaff.ts';
@@ -2013,6 +2014,13 @@ function assembleSegment(
             if (beamRun && stem) beamRun.stems.set(`${i}:${s}:${voiceIndex}:${eventIndex}`, stem);
             const lyricLines = event.lyrics?.lines;
             if (lyricLines) {
+              const synth = synthesizePartForStaff[s];
+              const playbackId = durationSpans
+                ? syllablePlaybackKey(event, {
+                    partIndex: synth?.partIndex ?? 0, measureIndex: writtenIndex(plan, i),
+                    staffIndex: synth?.staffIndex ?? 1, voiceIndex, eventIndex
+                  }, synth !== null, m.entry?.ordinal)
+                : undefined;
               for (const [lineId, line] of Object.entries(lyricLines)) {
                 const verse = lyricLineIds.indexOf(lineId);
                 if (verse < 0) continue;
@@ -2026,7 +2034,8 @@ function assembleSegment(
                   staffBottom: staffBottoms[s],
                   bandBottom: lyricBandBottom(m.row, s),
                   text: line.text,
-                  continues: line.type === 'start' || line.type === 'middle'
+                  continues: line.type === 'start' || line.type === 'middle',
+                  ...(playbackId === undefined ? {} : { playbackId })
                 });
                 lyricRuns.set(key, run);
               }

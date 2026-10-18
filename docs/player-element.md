@@ -207,7 +207,15 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   under a moving melody shows each string's own length. The stretched mask is padded
   (0.3× its height on the left, 0.1× above and below — enough that a chord's masks on
   adjacent strings meet, an accepted trade), and its tint is stronger on dark paper
-  (40%) than on white (22%), where a lighter mix already reads. `revealOccurrence({noteKey, ordinal})` is public; it shares the
+  (40%) than on white (22%), where a lighter mix already reads.
+- **The word being sung.** A lyric syllable is named for the playhead by its event's
+  first note key (`TextPrim.playbackId`, `data-playback-id`, again only under
+  `durationSpans`; in the unrolled view the key is occurrence-qualified where the
+  syllable is collected, since syllables are emitted after `qualifyMeasure` has run).
+  While that note sounds the paint puts a lamp behind the word — a rounded rect
+  measured from the drawn text, in the fret mask's tint — and removes it after; the
+  word keeps its ink. Every verse under the note lights: which verse a pass sings is
+  not modelled. `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.
 

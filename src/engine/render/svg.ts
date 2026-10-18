@@ -358,6 +358,7 @@ function emitText(p: TextPrim, kx: number, ky: number): string {
     textPlacement(p.anchor, p.baseline);
   if (p.font === 'bodyItalic') attrs += ` font-style="italic"`;
   if (p.weight !== undefined) attrs += ` font-weight="${p.weight}"`;
+  if (p.playbackId !== undefined) attrs += ` data-playback-id="${escapeXml(p.playbackId)}"`;
   attrs += ` style="${style}"`;
   return element('text', attrs + identity(p), escapeXml(p.text), p);
 }

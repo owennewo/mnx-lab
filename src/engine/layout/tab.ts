@@ -33,6 +33,7 @@ import {
   lyricReachAboveRows,
   lyricBlockSpFor,
   orderedLyricLineIds,
+  syllablePlaybackKey,
   type LyricSyllable
 } from './lyricRuns.ts';
 import type { HideableFeature } from './notation.ts';
@@ -392,7 +393,15 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     // event↔slot pairing emitTabVoices walks, containers through the same
     // innerColumns the digits use, so words sit exactly under their frets.
     if (lyricLineIds.length > 0) {
-      const addSyllables = (event: MnxEvent, x: number) => {
+      const addSyllables = (event: MnxEvent, x: number, voiceIndex: number, eventIndex: number, containerIndex?: number) => {
+        // Keyed as emitTabVoices keys this bar's digits (synthesizeKeys: true, below).
+        const playbackId = opts.durationSpans
+          ? syllablePlaybackKey(event, {
+              partIndex: context ? mnx.parts.indexOf(part) : 0, measureIndex: writtenIndex(plan, i),
+              staffIndex: context?.staffIndex ?? 1, voiceIndex, eventIndex,
+              ...(containerIndex === undefined ? {} : { containerIndex })
+            }, true, m.entry?.ordinal)
+          : undefined;
         for (const [lineId, line] of Object.entries(event.lyrics?.lines ?? {})) {
           const verse = lyricLineIds.indexOf(lineId);
           if (verse < 0) continue;
@@ -406,7 +415,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
             bandBottom: lyricBandBottom(m.row),
             bandTop: lyricBandTop(m.row),
             text: line.text,
-            continues: line.type === 'start' || line.type === 'middle'
+            continues: line.type === 'start' || line.type === 'middle',
+            ...(playbackId === undefined ? {} : { playbackId })
           });
           lyricRuns.set(lineId, run);
         }
@@ -417,10 +427,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
           if (!slot) return;
           if (isGrace(item) || isTuplet(item)) {
             innerColumns(item, slot, plan.inkRatio, plan.columns)
-              .forEach(({ event, x }) => addSyllables(event, x));
+              .forEach(({ event, x }, containerIndex) => addSyllables(event, x, voiceIndex, eventIndex, containerIndex));
             return;
           }
-          if (isTimedEvent(item)) addSyllables(item as MnxEvent, slot.x);
+          if (isTimedEvent(item)) addSyllables(item as MnxEvent, slot.x, voiceIndex, eventIndex);
         });
       });
     }

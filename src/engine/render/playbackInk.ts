@@ -12,6 +12,8 @@
  *   `data-span-end` in px) and this paint widens the rect to it while the
  *   note sounds, restoring the original geometry when it stops. Each string
  *   of a chord shows its own length.
+ * - A lyric syllable's lamp: a tinted box behind the word sung on the
+ *   sounding note (`lightSyllable`).
  *
  * DOM-only functions; nothing runs at module load, so `engine/` stays
  * importable from Node.
@@ -65,7 +67,39 @@ export function paintPlaybackInk(root: ParentNode, sounding: ReadonlyMap<string,
     if (voice === undefined) ink.removeAttribute('data-playback-voice');
     else ink.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice)));
     if (ink.classList.contains('fret-bg')) stretchMask(ink, voice !== undefined);
+    else if (ink.classList.contains('lyric')) lightSyllable(ink, voice);
   }
+}
+
+/** Air around a lit syllable's box, as fractions of its height. */
+const LAMP_PAD_X = 0.18;
+const LAMP_PAD_Y = 0.04;
+
+/**
+ * Light a lyric syllable while its note sounds: a tinted, rounded box behind
+ * the word, so a singer sees which word is due as well as which note. The word
+ * keeps its own ink — a coloured word on white is harder to read than a black
+ * one on a tint. The box is made on first light and removed when the note
+ * stops, so an unlit score carries nothing extra; its geometry is measured from
+ * the drawn text (`getBBox`), so it fits whatever face and size the word wears.
+ */
+export function lightSyllable(text: SVGElement, voice: number | undefined): void {
+  const previous = text.previousElementSibling;
+  const lamp = previous?.classList.contains('lyric-lamp') ? previous : null;
+  if (voice === undefined) { lamp?.remove(); return; }
+  if (lamp) { lamp.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice))); return; }
+  const box = (text as SVGGraphicsElement).getBBox?.();
+  if (!box || !box.width) return;
+  const padX = box.height * LAMP_PAD_X, padY = box.height * LAMP_PAD_Y;
+  const rect = text.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('class', 'lyric-lamp');
+  rect.setAttribute('x', String(box.x - padX));
+  rect.setAttribute('y', String(box.y - padY));
+  rect.setAttribute('width', String(box.width + 2 * padX));
+  rect.setAttribute('height', String(box.height + 2 * padY));
+  rect.setAttribute('rx', String(box.height * 0.2));
+  rect.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice)));
+  text.before(rect);
 }
 
 /**

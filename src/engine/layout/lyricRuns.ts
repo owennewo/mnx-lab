@@ -11,7 +11,9 @@
 // Soundslice): a tab reader's eye sits on the digits, and words stacked over
 // the staff — above its bar numbers and section marks — read as the line's
 // heading, where words under the digits read as the next system's.
-import type { MnxStructure } from '../../model/mnx.ts';
+import type { MnxEvent, MnxStructure } from '../../model/mnx.ts';
+import { noteKeyAt } from '../../model/noteWalk.ts';
+import { occurrenceKey, syntheticEventKey, type ContainerIndex } from '../../model/noteKeys.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
 import type { Primitive, RowBandSp, TextPrim } from '../primitives.ts';
 import { inkEdgesSp } from '../render/bounds.ts';
@@ -79,6 +81,35 @@ export interface LyricSyllable {
   text: string;
   /** start/middle syllables reach for the next one with a hyphen. */
   continues: boolean;
+  /** The playhead's name for the syllable (`syllablePlaybackKey`), viewer layouts only. */
+  playbackId?: string;
+}
+
+/**
+ * The key the playhead lights a syllable by: its event's first note — the key
+ * that note's own ink carries, so the word lights exactly while it sounds — or,
+ * on a rest, the rest's key. Positional keys only where the layout synthesizes
+ * them for its notes too; elsewhere an id or nothing.
+ */
+export function syllablePlaybackKey(
+  event: MnxEvent,
+  at: { partIndex: number; measureIndex: number; staffIndex: number; voiceIndex: number; eventIndex: number; containerIndex?: ContainerIndex },
+  synthesize: boolean,
+  /** The bar's performed occurrence in the unrolled view. Syllables are emitted
+   *  after every bar, past `qualifyMeasure`'s reach, so they are qualified here. */
+  ordinal?: number
+): string | undefined {
+  const key = writtenKey();
+  return key === undefined || ordinal === undefined ? key : occurrenceKey(key, ordinal);
+  function writtenKey() {
+    const note = event.notes?.[0];
+    if (note) {
+      if (!synthesize) return note.id;
+      return noteKeyAt(note, at.measureIndex, at.voiceIndex, at.eventIndex, 0, at.containerIndex, at.partIndex, at.staffIndex);
+    }
+    if (event.id !== undefined || !synthesize) return event.id;
+    return syntheticEventKey(at);
+  }
 }
 
 /** The verse-row order for a set of used line ids: global `lineOrder` first,
@@ -171,7 +202,8 @@ export function emitLyricRuns(
         font: 'lyric',
         size: LYRIC_SIZE_SP,
         anchor: 'middle',
-        className: 'lyric'
+        className: 'lyric',
+        ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId })
       };
       primitives.push(syllable);
       owners.set(syllable, syl.row);

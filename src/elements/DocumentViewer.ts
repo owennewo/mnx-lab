@@ -744,6 +744,20 @@ export class DocumentViewer extends LitElement {
         rx: 3px;
       }
 
+      /* A sung word's lamp (render/playbackInk.ts lightSyllable): the fret
+         mask's tint behind the syllable on the sounding note, so the word due
+         is as easy to find as the note. The word itself stays in ink. */
+      :host #projection-container svg .lyric-lamp {
+        fill: light-dark(
+          color-mix(in oklab, var(--playback-voice) 22%, var(--paper, oklch(0.985 0.006 85))),
+          color-mix(in oklab, var(--playback-voice) 40%, var(--paper, oklch(0.235 0.008 80)))
+        );
+        pointer-events: none;
+      }
+      :host #projection-container svg .lyric-lamp[data-playback-voice="2"] { --playback-voice: var(--playback-2); }
+      :host #projection-container svg .lyric-lamp[data-playback-voice="3"] { --playback-voice: var(--playback-3); }
+      :host #projection-container svg .lyric-lamp[data-playback-voice="4"] { --playback-voice: var(--playback-4); }
+
       /* THE TAB STAFF'S REST PILL. Tab draws no rest, so a reader following
          a performance on the fingerboard has nothing to follow through one —
          and a blank staff is also what held notes look like. The layout puts

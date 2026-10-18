@@ -136,6 +136,10 @@ export interface TextPrim extends PrimitiveBase {
   baseline?: 'alphabetic' | 'middle' | 'central' | 'hanging';
   weight?: 'normal' | 'bold' | number;
   fill?: string;
+  /** A PLAYBACK-ONLY name, as on `RectPrim`: a lyric syllable carries its
+   *  event's note key so the playhead can light the word being sung. Present
+   *  only under `durationSpans`, so the goldens never see it. */
+  playbackId?: string;
 }
 
 export interface RectPrim extends PrimitiveBase {
