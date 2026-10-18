@@ -78,6 +78,7 @@ import type { MixPart } from './MixSheet.ts';
 import { hostSetup } from '../../../src/audio/hostSetup.ts';
 import type { FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import { loadFactoryDesigns } from '../../../src/audio/native/hostPort.ts';
+import { playbackNotes, playbackNotice } from './playbackNotes.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, SOUND_KEY, AUDITION_KEY, write, readSound, readAuditionNotes, soundRate, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
 
@@ -113,9 +114,12 @@ export class PiecePage extends LitElement {
   @state() private masterVolume = 0.7;
   @state() private saveOpen = false;
   @state() private keysOpen = false;
-  /** What a copy, cut or paste did, or why it did not; it names the last outcome and leaves. */
-  @state() private clipboardNotice = '';
+  /** The page's one transient line: what a copy, cut or paste did, why an edit was refused,
+   *  or that the piece plays other than as written. It names the last outcome and leaves. */
+  @state() private notice: { message: string; tone: 'info' | 'warning' } | null = null;
   private noticeTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The playback notice last flashed for this piece: it is said when it changes, not on every edit. */
+  private playbackNoticeSaid = '';
   /** The save session's state, for the chip; null until a piece with a stored score is open. */
   @state() private save: SaveState | null = null;
   /** The last checkpoint's losses in full; the state carries their shapes. */
@@ -353,7 +357,7 @@ export class PiecePage extends LitElement {
       z-index: 4;
       pointer-events: none;
     }
-    .clip-notice {
+    .toast {
       position: absolute;
       z-index: 5;
       left: 50%;
@@ -366,6 +370,12 @@ export class PiecePage extends LitElement {
       background: var(--bar, light-dark(#fff, #222));
       font-size: 13px;
       pointer-events: none;
+    }
+    .toast.warning {
+      width: max-content;
+      max-width: min(560px, calc(100% - 32px));
+      border-color: light-dark(#a12121, #ffb4ab);
+      line-height: 1.4;
     }
     .viewing {
       display: flex;
@@ -477,6 +487,7 @@ export class PiecePage extends LitElement {
     this.recordings = []; this.snapshot = null;
     this.doc = null;
     this.error = '';
+    this.playbackNoticeSaid = '';
     this.loading = true;
     this.editOpen = false; this.recordingsOpen = false; this.mixOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
     this.videoDividerPercent = null;
@@ -660,11 +671,12 @@ export class PiecePage extends LitElement {
     if (notice) this.showNotice(notice.message);
   }
 
-  /** One line, one timer — delete's sentence, a refusal and the clipboard share it. */
-  private showNotice(message: string) {
-    this.clipboardNotice = message;
+  /** One line, one timer — delete's sentence, a refusal, the clipboard and playback share it.
+   *  A warning stays longer: it names something about the piece, not a keystroke. */
+  private showNotice(message: string, tone: 'info' | 'warning' = 'info') {
+    this.notice = { message, tone };
     clearTimeout(this.noticeTimer);
-    this.noticeTimer = setTimeout(() => (this.clipboardNotice = ''), 4000);
+    this.noticeTimer = setTimeout(() => (this.notice = null), tone === 'warning' ? 8000 : 4000);
   }
 
   private applyIntent(intent: EditorIntent) { this.editor?.handleIntent(intent); this.requestUpdate(); }
@@ -768,9 +780,11 @@ export class PiecePage extends LitElement {
    *  viewer resolves the view, and the views it can offer, from the document
    *  it now has — so the frame is rendered once more to ask it. */
   private present(doc: MnxDocument) {
-    // A document without a performance needs no notice: the player's readout
-    // already says so, and the score shows either way.
-    this.binding!.setDocument(doc);
+    // A piece that cannot play, or plays other than as written, says so once — as it
+    // opens, or as an edit changes what there is to say. The Mix panel keeps the details.
+    const said = playbackNotice(playbackNotes(this.binding!.setDocument(doc)));
+    if (said && said !== this.playbackNoticeSaid) this.showNotice(said, 'warning');
+    this.playbackNoticeSaid = said;
     const { performance, writtenBarDurations } = this.player;
     const shapeBefore = this.scoreShape;
     this.scoreShape = performance && writtenBarDurations ? performedShape(performance, writtenBarDurations) : '';
@@ -1145,7 +1159,7 @@ export class PiecePage extends LitElement {
             <button type="submit" ?disabled=${this.versionBusy || !this.versionTitle.title.trim()}>Make current</button>
             <button type="button" ?disabled=${this.versionBusy} @click=${() => { this.versionTitle = null; }}>Cancel</button>
           </form>` : nothing}
-        ${this.clipboardNotice ? html`<p class="clip-notice" role="status">${this.clipboardNotice}</p>` : nothing}
+        ${this.notice ? html`<p class=${this.notice.tone === 'warning' ? 'toast warning' : 'toast'} role="status">${this.notice.message}</p>` : nothing}
         <div class="editor-overlay"></div>
         <mnx-document-viewer
           ?hidden=${!this.doc}

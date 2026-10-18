@@ -990,7 +990,7 @@ export class Player extends LitElement {
     return null;
   }
   get positionLabel() {
-    if (!this.performance) return 'No performance available';
+    if (!this.performance) return 'Nothing to play';
     const status = this.playback;
     if (!status || status.kind === 'synth') return formatPlaybackPosition(this.performance, this.position, this.document);
     if (status.scorePosition) return formatScorePlaybackPosition(this.performance, status.scorePosition, this.document);
@@ -1524,7 +1524,7 @@ export class Player extends LitElement {
                 : html`<span>${this.readout()}</span
                     ><span class="widest" aria-hidden="true">${Player.bare(this.widest)}</span>`}</output
             ></div>`
-          : html`<output aria-live="off" class="none">No performance available</output>`}
+          : html`<output aria-live="off" class="none">Nothing to play</output>`}
         ${this.syncToggle()}
         ${this.syncMode ? this.syncBar() : this.rail()}
         ${this.sourceControl && (this.recordings.length || this.canAddRecording) ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}

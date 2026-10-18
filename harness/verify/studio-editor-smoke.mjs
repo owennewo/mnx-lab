@@ -222,7 +222,7 @@ try {
   await c.evaluate(`${viewer}.focus()`);
   await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
   await key('KeyC', { ctrl: true });
-  await wait(`${piece}.querySelector('.clip-notice')?.textContent.length > 0`);
+  await wait(`${piece}.querySelector('.toast')?.textContent.length > 0`);
   await key('ArrowRight'); await key('ArrowRight');
   await key('KeyV', { ctrl: true });
   await wait(`JSON.parse(${frets}).length === 3`);

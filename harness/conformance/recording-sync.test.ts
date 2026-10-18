@@ -293,3 +293,16 @@ describe('synth handoff is separate from the recorded time axis', () => {
       expect(unwrap(map.fromPerformance(unwrap(map.toPerformance(position))))).toEqual(position);
   });
 });
+
+describe('a jump clipped to its bar', () => {
+  it('still follows the score: the clipped bound is the bar, not a disagreement', () => {
+    // A D.S. placed a whole note into a 3/8 bar: the compiler clips it to 3/8 (`slice-clipped`).
+    const document = score([[note('a'), note('b', 'eighth')], [note('c'), note('d', 'eighth')]], [
+      { time: { count: 3, unit: 8 }, segno: { location: { fraction: [0, 1] } } },
+      { jump: { type: 'segno', location: { fraction: [1, 1] } } } as MnxGlobalMeasure,
+    ]);
+    const sync = bind([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4]], document);
+    expect(unwrap(sync.secondsAt(pos(3)))).toBe(3);
+    expect(unwrap(sync.positionAt(3.5)).position.ordinal).toBe(3);
+  });
+});

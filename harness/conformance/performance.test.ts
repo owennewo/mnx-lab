@@ -177,6 +177,21 @@ it('clips a note to a mid-bar return slice and restores written tempo before its
   expect(returned.metricDuration).toEqual(q(1n, 2n));
   expect(p.tempo.at(-1)?.quarterBpm).toEqual(q(60n));
 });
+it('clips a jump placed past its bar to the bar, and says so, rather than failing the piece', () => {
+  // A converter once wrote "end of bar" as a whole note: a D.S. in 3/8 then lay past its bar.
+  const d = doc([n('a'), n('b', 'eighth')]);
+  d.global.measures[0].time = { count: 3, unit: 8 };
+  d.global.measures[0].segno = { location: { fraction: [0, 1] } };
+  d.global.measures.push({ jump: { type: 'segno', location: { fraction: [1, 1] } } } as never);
+  d.parts[0].measures.push({ sequences: [{ content: [n('c'), n('d', 'eighth')] }] });
+  const result = compilePerformance(d);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+  const p = result.performance;
+  expect(p.measures.map((m) => m.measureIndex)).toEqual([0, 1, 0, 1]);
+  expect(p.measures[1]!.until).toEqual(q(3n, 8n));
+  expect(p.diagnostics).toContainEqual(expect.objectContaining({ code: 'slice-clipped', ordinal: 1 }));
+});
 it('holds the shortened principal before a stealPrevious grace, rather than holding the grace', () => {
   const principal = n('a');
   principal.fermata = { duration: 'long' };

@@ -105,3 +105,24 @@ describe('Guitar Pro master-bar navigation', () => {
     for (const token of jumpTokens) expect(written).toContain(`<Jump>${token}</Jump>`);
   });
 });
+
+describe('Guitar Pro end-of-bar directions', () => {
+  // "At the end of the bar" is the bar's own length, not a whole note: at [1, 1] a D.S. in
+  // 3/8 lies past its bar, and the performance compiler could not reach it.
+  it('places Fine and every jump at the end of a 3/8 bar, not a whole note in', async () => {
+    const base: MnxStructure = JSON.parse(await fs.readFile(path.join(SCORES, 'Vestapol.mnx.json'), 'utf-8'));
+    let xml = mnxToGpifXml(base).replace(/<Time>[^<]*<\/Time>/g, '<Time>3/8</Time>');
+    expect(xml).toContain('<Time>3/8</Time>');
+    const directions = ['<Target>Fine</Target>', '<Jump>DaSegno</Jump>', '<Jump>DaCoda</Jump>'];
+    let ordinal = 0;
+    xml = xml.replace(/<MasterBar>/g, whole => {
+      const token = directions[ordinal++];
+      return token ? `<MasterBar><Directions>${token}</Directions>` : whole;
+    });
+    const mnx = gpifToMnx(parseGpif(xml));
+
+    expect(mnx.global.measures[0].fine?.location).toEqual({ fraction: [3, 8] });
+    expect(mnx.global.measures[1].jump?.location).toEqual({ fraction: [3, 8] });
+    expect(mnx.global.measures[2]._x?.mnxLab?.navigation?.jumps?.[0]?.location).toEqual({ fraction: [3, 8] });
+  });
+});

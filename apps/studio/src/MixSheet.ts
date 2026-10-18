@@ -24,6 +24,7 @@ import type { RoutedPart } from '../../../src/audio/hostSetup.ts';
 import { linearizePasses } from '../../../src/model/passes.ts';
 import { compilePerformance } from '../../../src/audio/performance.ts';
 import { syncSummary, type SyncSummary } from './syncSummary.ts';
+import { playbackNotes } from './playbackNotes.ts';
 import { isImportedSync, storedScoreShape } from '../../../src/model/recordingAttachment.ts';
 
 export interface MixPart {
@@ -117,6 +118,7 @@ export class MixSheet extends LitElement {
     .side { width: 34px; flex: none; padding: 0; border: 0; display: grid; place-items: center; color: var(--ink-3); }
     .side:hover, .side[aria-expanded='true'] { color: var(--ink); background: var(--frame-press, var(--hover)); }
     .on .side { border-left: 1px solid var(--frame-line, var(--line)); }
+    .diagnostic ul { margin: 4px 0 0; padding-left: 18px; }
     .diagnostic { margin: 2px 0 4px; font-size: 13px; padding: 10px; background: light-dark(#efeeeb, #343330); line-height: 1.5; }
     .add { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border: 0; font-size: 13px; color: var(--ink-2); text-align: left; }
     .add:hover { color: var(--ink); }
@@ -234,6 +236,16 @@ export class MixSheet extends LitElement {
       <button class="side" type="button" data-settings aria-label="Synth settings" title="Synth settings" aria-expanded=${this.settingsAt !== null}
         @click=${(e: Event) => this.toggleSettings(e.currentTarget as HTMLElement)}>${sliders}</button>
     </div>`;
+  }
+
+  /** Why the score plays other than as written, or not at all: the synth plays this
+   *  performance and every recording follows it, so it sits under the Synth row. */
+  private playbackNotes() {
+    const { failure, notes } = playbackNotes(this.compiled);
+    if (failure) return html`<div class="diagnostic" role="status" data-playback-notes><strong>Can't play:</strong> ${failure} The score still shows; the synth and score following wait until it plays.</div>`;
+    if (!notes.length) return nothing;
+    return html`<div class="diagnostic" role="status" data-playback-notes><strong>Plays not quite as written:</strong>
+      ${notes.length === 1 ? notes[0] : html`<ul>${notes.map(n => html`<li>${n}</li>`)}</ul>`}</div>`;
   }
 
   private recordingRow(row: LibraryRecording) {
@@ -382,6 +394,7 @@ export class MixSheet extends LitElement {
         <div class="label">Play from</div>
         <div class="sources" role="radiogroup" aria-label="Play from">
           ${this.synthRow()}
+          ${this.playbackNotes()}
           ${this.recordings.map((row) => this.recordingRow(row))}
           ${this.canAdd ? html`<button class="add" type="button" aria-label="Add recording" @click=${() => this.emit('recording-add')}>${plus}<span>Add recording</span></button>` : nothing}
         </div>

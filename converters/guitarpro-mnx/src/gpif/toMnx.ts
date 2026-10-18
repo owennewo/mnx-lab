@@ -273,7 +273,9 @@ function applyDirections(
   report: ImportState['report']
 ): void {
   const atStart = { fraction: [0, 1] as [number, number] };
-  const atEnd = { fraction: [1, 1] as [number, number] };
+  // The END of the bar is its own length in whole notes, never a whole note: a jump
+  // at [1, 1] lies past the end of a 3/8 bar, and the performance cannot reach it.
+  const atEnd = { fraction: reduceFraction(masterBar.timeNumerator, masterBar.timeDenominator) };
   const navigation: { marks: MnxLabNavigationMark[]; jumps: MnxLabNavigationJump[] } = {
     marks: [],
     jumps: []

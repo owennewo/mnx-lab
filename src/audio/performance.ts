@@ -278,14 +278,24 @@ function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
   const measures: Performance['measures'] = [];
   let position = ZERO;
   for (const entry of passes.entries) {
-    const from = entry.from ? fraction(entry.from) : ZERO,
-      until = entry.until ? fraction(entry.until) : lengths[entry.measureIndex];
-    if (
-      !until ||
-      compare(from, ZERO) < 0 ||
-      compare(until, from) < 0 ||
-      compare(until, lengths[entry.measureIndex]) > 0
-    )
+    const length = lengths[entry.measureIndex];
+    if (!length) throw new RangeError('Traversal slice is outside its written measure.');
+    // A jump or mark placed past the bar's end (or before its start) is clipped to the
+    // bar, with a diagnostic, rather than failing the whole performance: one misplaced
+    // D.S. should not leave a piece with nothing to play.
+    const clip = (value: Rational, side: 'start' | 'end') => {
+      const clipped = compare(value, ZERO) < 0 ? ZERO : compare(value, length) > 0 ? length : value;
+      if (clipped !== value)
+        diagnostic(
+          'slice-clipped',
+          `Bar ${entry.measureIndex + 1}: a jump lies ${side === 'start' ? 'before the start' : 'past the end'} of the bar, so playback ${side === 'start' ? 'starts' : 'leaves'} at its ${side}.`,
+          entry.ordinal,
+        );
+      return clipped;
+    };
+    const from = entry.from ? clip(fraction(entry.from), 'start') : ZERO,
+      until = entry.until ? clip(fraction(entry.until), 'end') : length;
+    if (compare(until, from) < 0)
       throw new RangeError('Traversal slice is outside its written measure.');
     // `from`/`until` stay WRITTEN — they are the slice a reader sees. The
     // unrolled span is what that slice plays for, which swing can change when

@@ -94,7 +94,11 @@ export function createRecordingSync(
         fail('invalid-traversal', 'The compiler must supply the full written duration for every performed bar.');
       if (compare(m.from, ZERO) !== 0 || compare(m.until, full) !== 0)
         fail('partial-bar', `Performed bar ${i} has partial navigation bounds; Soundslice correspondence is not established.`);
-      const bound = (value: [number, number]) => rational(BigInt(value[0]), BigInt(value[1]));
+      // The compiler clips a bound placed outside its bar to the bar (`slice-clipped`); compare clipped.
+      const bound = (value: [number, number]) => {
+        const at = rational(BigInt(value[0]), BigInt(value[1]));
+        return compare(at, ZERO) < 0 ? ZERO : compare(at, full) > 0 ? full : at;
+      };
       if ((entry.from && compare(bound(entry.from), m.from) !== 0)
           || (entry.until && compare(bound(entry.until), m.until) !== 0))
         fail('invalid-traversal', 'Performance and traversal bounds disagree.');
