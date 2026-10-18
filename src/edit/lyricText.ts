@@ -223,6 +223,10 @@ export interface LyricTokenSpan {
   to: number;
   /** The first walk entry the token's syllables land on. */
   entryIndex: number;
+  /** Where that syllable is sung, in anchored text: the performed visit and its note's onset in the bar
+   *  (whole notes) — what the editor's cursor is moved to when the caret is on the token. */
+  ordinal?: number;
+  onset?: [number, number];
 }
 
 export interface ParsedLyricText {
@@ -590,7 +594,7 @@ function lyricPerformance(doc: MnxStructure, partIndex: number) {
     });
   }
   starts.push(walk.length);
-  return { written, visits, walk, sources, starts };
+  return { written, visits, walk, sources, starts, onsets };
 }
 
 /** Canonical performance-order text. Explicit row headers preserve hymn verses
@@ -647,7 +651,7 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
 export function parseLyricText(doc: MnxStructure, partIndex: number, text: string): ParsedLyricText {
   const raw = tokenize(text, 0);
   if (!raw.some(token => OCCURRENCE_ANCHOR.test(token.text))) return parseWrittenLyricText(doc, partIndex, text);
-  const { written, visits, walk, sources } = lyricPerformance(doc, partIndex);
+  const { written, visits, walk, sources, onsets } = lyricPerformance(doc, partIndex);
   const { groups } = lineGroups(doc, written);
   const taken = new Set([...groups.values()].flat());
   const minted = new Set<string>();
@@ -724,7 +728,9 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     result.lines.push(...lines.values());
     for (const token of parsed.tokens) {
       const original = offsets.find(offset => offset.from === token.from)?.source;
-      if (original) result.tokens.push({ from: original.from, to: original.to, entryIndex: sources[token.entryIndex]! });
+      const sung = walk[token.entryIndex], at = sung && onsets.get(sung.event);
+      if (original) result.tokens.push({ from: original.from, to: original.to, entryIndex: sources[token.entryIndex]!,
+        ...(sung && at ? { ordinal: sung.measureIndex, onset: [Number(at.num), Number(at.den)] as [number, number] } : {}) });
     }
     begin = end;
   }

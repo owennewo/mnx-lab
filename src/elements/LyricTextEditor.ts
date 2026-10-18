@@ -11,8 +11,9 @@
 // typing previews the words on the score. Keyboard ownership needs no
 // precedence wiring — a focused textarea is isTextEntry and the page keymap
 // yields; clicking the score hands the keys back without closing the drawer.
-// The caret→score cross-highlight rides the selection context's preview
-// channel via the lyric-editor-preview event.
+// The caret IS the editor's cursor: a caret on a word sends its visit and
+// onset (lyric-editor-caret) and the host moves the one cursor there — the
+// playback cursor with it. The panel draws no cursor of its own.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome, scrollbars } from './tokens.ts';
@@ -39,6 +40,8 @@ export class LyricTextEditor extends LitElement {
   @property({ type: String }) partLabel = '';
   /** Opens with the caret on this note's token, when it has one. */
   @property({ type: String }) focusNoteKey = '';
+  /** …on this performed visit of it, when the text names that visit. */
+  @property({ type: Number }) focusOrdinal: number | null = null;
   /** The music is playing: the panel stays open, read-only, until it pauses — nothing is written while it plays. */
   @property({ type: Boolean }) playing = false;
 
@@ -198,10 +201,11 @@ export class LyricTextEditor extends LitElement {
     if (this.focusNoteKey && this.doc) {
       const walk = lyricEventWalk(this.doc, this.partIndex);
       const entryIndex = walk.findIndex(entry => entry.noteKey === this.focusNoteKey);
-      const span = this.parsed.tokens.find(token => token.entryIndex === entryIndex);
+      const tokens = this.parsed.tokens.filter(token => token.entryIndex === entryIndex);
+      const span = tokens.find(token => token.ordinal === this.focusOrdinal) ?? tokens[0];
       if (span) {
+        // The cursor is already there, so nothing is sent until the caret moves.
         area.setSelectionRange(span.from, span.to);
-        this.previewAt(span.from);
       }
     }
   }
@@ -230,14 +234,14 @@ export class LyricTextEditor extends LitElement {
     }
   }
 
-  /** Caret → walk entry → the note to light, over the preview channel. */
-  private previewAt(caret: number) {
-    if (!this.doc) return;
+  /** Caret → the word's performed place → the host moves the editor's cursor there. */
+  private caretAt(caret: number) {
     const span = this.parsed.tokens.find(token => caret >= token.from && caret <= token.to);
-    const walk = span ? lyricEventWalk(this.doc, this.partIndex) : [];
-    const noteKey = span ? walk[span.entryIndex]?.noteKey : undefined;
-    this.dispatchEvent(new CustomEvent('lyric-editor-preview', {
-      detail: { noteKeys: noteKey ? [noteKey] : [] },
+    // Sent on every caret move, the same word too: the cursor may have moved off it meanwhile, and a
+    // place the cursor already holds settles without seeking.
+    if (span?.ordinal === undefined || !span.onset) return;
+    this.dispatchEvent(new CustomEvent('lyric-editor-caret', {
+      detail: { ordinal: span.ordinal, onset: span.onset },
       bubbles: true,
       composed: true
     }));
@@ -248,12 +252,12 @@ export class LyricTextEditor extends LitElement {
     if (!area) return;
     this.text = area.value;
     this.reparse();
-    this.previewAt(area.selectionStart);
+    this.caretAt(area.selectionStart);
   };
 
   private onCaretMove = () => {
     const area = this.textarea();
-    if (area) this.previewAt(area.selectionStart);
+    if (area) this.caretAt(area.selectionStart);
   };
 
   private close() {

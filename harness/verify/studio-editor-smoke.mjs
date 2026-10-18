@@ -230,6 +230,13 @@ try {
   // Side panels are exclusive; switching away cancels the lyric draft and its preview.
   await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
   await wait(`!!${lyrics}`);
+  // The caret is the cursor: a click on the second word moves the ONE cursor (and the tray) to its note,
+  // and the panel draws no box of its own.
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'), at = t.value.indexOf('song') + 1;
+    t.setSelectionRange(at, at); t.dispatchEvent(new MouseEvent('click')); }`);
+  await wait(`${page}.editor.session.cursor.onset.num > 0 && ${piece}.querySelector('mnx-player').cursorPlace?.metricOffset.num > 0n`);
+  assert.equal(await c.evaluate(`!!${viewer}.shadowRoot.querySelector('svg .enclosure-preview')`), false, 'the lyric caret drew its own cursor');
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'draft words'; t.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${action('Keys')}.click()`);
   await wait(`!${lyrics} && !!${keys} && ${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);

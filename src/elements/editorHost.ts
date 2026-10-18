@@ -56,7 +56,7 @@ import { neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
 import { focusUnclaimed, focusWithin, isTextEntry, realTarget } from './keyScope.ts';
-import { enclosureFor, selectionContextFor } from './editorSelection.ts';
+import { selectionContextFor } from './editorSelection.ts';
 import { buildInspectorView, type InspectorView } from './inspectorRows.ts';
 import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from './inspectorMount.ts';
 import type { OverlayAnchor } from './overlayPlacement.ts';
@@ -242,7 +242,6 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   let pendingFret: number | null = null;
   let disposed = false;
   /** A footprint lit without moving the session: the lyric editor's caret. */
-  let preview: { enclosure: ReturnType<typeof enclosureFor>; noteIds: string[] } | null = null;
   let anchor: OverlayAnchor | null = null;
   let paneWidth = 0;
   let inspector: RungInspector | null = null;
@@ -296,7 +295,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const hasKeyboard = () => focusWithin(scope) || (lyrics !== null && focusWithin(lyrics)) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
   const draw = () => {
     if (disposed) return;
-    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret, preview });
+    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret });
     // The tray names the cursor's exact place while it is drawn and the music is not playing.
     const start = session.playStart;
     playback?.place?.(start && !playing && !cursorHidden && !suspended() ? toPosition(start) : null);
@@ -525,7 +524,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   };
   function closeLyrics(refocus = true) {
     if (!lyrics) return;
-    lyrics.remove(); lyrics = null; preview = null;
+    lyrics.remove(); lyrics = null;
     options.onPreview?.(null);
     if (refocus) scope.focus();
     draw();
@@ -540,16 +539,18 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
-    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '' });
+    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '', focusOrdinal: session.performedOrdinal ?? null });
     // Clean parses draw live on a SCRATCH copy, through the very ops the session would use; nothing is edited until Apply.
     el.addEventListener('lyric-editor-edits', e => {
       const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
       options.onPreview?.(edits.length === 0 ? null : lyricPlanOps(edits).reduce(applyOp, session.doc));
     });
-    el.addEventListener('lyric-editor-preview', e => {
-      const noteIds = (e as CustomEvent<{ noteKeys: string[] }>).detail.noteKeys;
-      preview = noteIds.length ? { enclosure: enclosureFor('note'), noteIds } : null;
-      draw();
+    // The caret is the cursor: a word's visit and onset move the one cursor — and so the playhead — there.
+    el.addEventListener('lyric-editor-caret', e => {
+      const { ordinal, onset } = (e as CustomEvent<{ ordinal: number; onset: [number, number] }>).detail;
+      if (!session.handleIntent({ type: 'goToPerformed', ordinal, onset, level: 'note' })) return;
+      cursorHidden = false;
+      if (playing && playback) { seekNow(); draw(); } else settle(true);
     });
     // The buffer's diff lands as ONE intent: the history records the syllables, never the keystrokes.
     el.addEventListener('lyric-editor-apply', e => {

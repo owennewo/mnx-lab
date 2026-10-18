@@ -6,6 +6,11 @@ of the event lyrics, with live preview; Ctrl+Enter applies one undoable edit.
 Closing without applying discards the draft. Play leaves the panel open, read-only
 (Apply too) until the music pauses.
 
+The caret is the editor's cursor. Clicking or arrowing onto a word moves the one
+cursor to that word's note on that visit (`9.5|` is not `9.1|`), and the
+playback cursor with it; while playing, it seeks. The panel draws no cursor
+of its own. Anchor-free legacy text has no visit, so its caret moves nothing.
+
 ## Performance anchors
 
 Every generated line starts with `bar.occurrence|`. `9.2|` means the second

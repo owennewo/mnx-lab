@@ -419,3 +419,13 @@ it('accepts an anchor on a real final bar containing only rests', () => {
   doc.parts[0]!.measures[1]!.sequences[0]!.content = [{ duration: { base: 'whole' }, rest: {} }];
   expect(parseLyricText(doc, 0, '2.1|').diagnostics).toEqual([]);
 });
+
+it('places each anchored word on its performed visit and onset, where the caret moves the cursor', () => {
+  const doc = bars(2);
+  doc.global.measures[0]!.repeatStart = {};
+  doc.global.measures[0]!.repeatEnd = {};
+  // Bar 1 twice: 1.1 is ordinal 0, 1.2 ordinal 1; bar 2 is ordinal 2.
+  const parsed = parseLyricText(doc, 0, '1.1| one two\n1.2| _ three | four');
+  expect(parsed.diagnostics).toEqual([]);
+  expect(parsed.tokens.map(t => [t.ordinal, t.onset])).toEqual([[0, [0, 1]], [0, [1, 4]], [1, [1, 4]], [2, [0, 1]]]);
+});
