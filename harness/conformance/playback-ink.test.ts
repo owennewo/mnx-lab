@@ -302,13 +302,17 @@ describe('the sung word', () => {
     expect([one.lit, two.lit]).toEqual([false, false]);
   });
 
-  it('a note with no word on the pass\'s verse lights every word it has, not none', () => {
-    const one = new FakeSyllable('n1', '1'), two = new FakeSyllable('n1', '2'), solo = new FakeSyllable('n2', '1');
-    const root = new FakeRoot([one, two, solo]) as unknown as ParentNode;
-    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '3');
-    expect([one.lit, two.lit, solo.lit]).toEqual([true, true, true]);
+  it('a note with no word on the pass\'s verse lights its only word, and none of several', () => {
+    // Bars 10–12 of One Of These Things First: rows 1 and 3 under a 4× repeat,
+    // so passes 2 and 4 have no word written there.
+    const one = new FakeSyllable('n1', '1'), three = new FakeSyllable('n1', '3'), solo = new FakeSyllable('n2', '1');
+    const root = new FakeRoot([one, three, solo]) as unknown as ParentNode;
     paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '2');
-    expect([one.lit, two.lit, solo.lit]).toEqual([false, true, true]);
+    expect([one.lit, three.lit, solo.lit]).toEqual([false, false, true]);
+    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), undefined); // a pass past the last verse
+    expect([one.lit, three.lit, solo.lit]).toEqual([false, false, true]);
+    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '3');
+    expect([one.lit, three.lit, solo.lit]).toEqual([false, true, true]);
   });
 });
 
