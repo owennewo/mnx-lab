@@ -24,6 +24,32 @@ export async function checkPlayer(cdp, base, format) {
     check(binding.state.ordinal===iterations[1],'Click ignored the inspected second pass');
     viewer.dispatchEvent(new CustomEvent('note-selected',{detail:{noteId:key},bubbles:true,composed:true}));
     check(binding.state.ordinal===iterations[1],'Repeated click changed the second pass');
+    // Hit tolerance is in screen pixels, not staff spaces. Dispatch on the
+    // SVG background to prove the result does not depend on hitting the digit.
+    for (const view of ['tab', 'notation']) {
+      viewer.view=view;await viewer.updateComplete;
+      const root=viewer.shadowRoot.querySelector('svg');
+      const selector=view==='tab'?'.fret-number[data-source-id]':'.notehead[data-source-id]';
+      const notes=[...root.querySelectorAll(selector)].map(el=>{
+        const box=el.getBBox(),m=el.getScreenCTM();
+        const p=new DOMPoint(box.x+box.width/2,Number(el.getAttribute('y'))).matrixTransform(m);
+        return {el,x:p.x,y:p.y,key:el.getAttribute('data-source-id')};
+      }).sort((a,b)=>a.x-b.x||a.y-b.y);
+      const first=notes[0],hits=[];
+      const selected=e=>hits.push(e.detail);
+      viewer.addEventListener('note-selected',selected);
+      const press=(x,y,pointerType='touch')=>root.dispatchEvent(new PointerEvent('pointerdown',
+        {bubbles:true,composed:true,isPrimary:true,button:0,pointerType,clientX:x,clientY:y}));
+      press(first.x-16,first.y);
+      check(hits.length===1 && hits[0].noteId===first.key && hits[0].projection===view,
+        'Near-miss touch did not select the nearest '+view+' note');
+      check(binding.state.playbackIteration===2,'Near-miss touch changed the repeat pass');
+      press(first.x-16,first.y,'mouse');
+      check(hits.length===1,'Mouse target unexpectedly used the touch radius');
+      press(first.x-100,first.y-100);
+      check(hits.length===1,'Distant whitespace selected a note');
+      viewer.removeEventListener('note-selected',selected);
+    }
     player.seek(0);binding.inspect(2);await player.play();await delay(150);
     check(player.snapshot.state==='playing','Player did not start');
     check(viewer.playbackState.playbackIteration===1 && viewer.playbackState.inspectionIteration===2 && !viewer.playbackState.followPlayback,'Live playback overwrote inspection');

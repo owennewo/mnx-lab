@@ -10,8 +10,9 @@
  * readout responsive — `src/elements/layout.worker.ts`. A plan crosses
  * `postMessage` by structured clone: plain data and a Map, nothing else.
  */
+import { noteTargetAt } from './noteTarget.ts';
 import type { Primitive, SourceLocation } from '../primitives.ts';
-import { renderSvg } from './svg.ts';
+import { renderSvg, sourceTargetOf } from './svg.ts';
 import { projectionForSourceClass, type RenderedProjection } from './projection.ts';
 import type { RenderOutcome } from './scale.ts';
 
@@ -54,6 +55,7 @@ export function emitPlan(
     pxPerSpY: plan.pxPerSpY,
     viewBoxSp: plan.viewBoxSp,
     className: plan.className,
+    sourceTarget: (event, svg) => noteTargetAt(event, svg, plan.index),
     onSourceActivate: onNoteClick
       ? (sourceId, event) => {
           const loc = plan.index.get(sourceId);
@@ -62,9 +64,7 @@ export function emitPlan(
             onNoteClick(sourceId, loc.measureIndex, loc.eventIndex, plan.projection);
             return;
           }
-          const target = event.target instanceof Element
-            ? event.target.closest('[data-source-id]')
-            : null;
+          const target = sourceTargetOf(event);
           if (target) {
             onNoteClick(
               sourceId,

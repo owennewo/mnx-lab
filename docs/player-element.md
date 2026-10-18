@@ -164,6 +164,12 @@ It preserves inspection preference, not old ordinals or highlights. The workbenc
 performs the same lifecycle when an edit creates a new score revision. Stale asynchronous
 player callbacks cannot stamp a replacement document.
 
+Noteheads and fret numbers have forgiving invisible pointer targets: 22 screen
+pixels from the note centre for touch, 6 for a mouse or pen, with the nearest note
+winning where targets overlap. The drawn ink remains clickable at larger zoom.
+Distant whitespace does not select a note; the editor's empty-cell placement
+continues to handle it. The engraving and exported SVG are unchanged.
+
 A viewer `note-selected` event maps its key to performed candidates using item 2's
 `chooseScoreOrdinal`. Clicks keep the displayed iteration and choose its nearest
 visit; repeated clicks keep that visit. An ending absent on the displayed iteration

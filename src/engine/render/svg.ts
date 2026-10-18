@@ -99,6 +99,8 @@ export interface RenderSvgOptions {
    * from an ordinary pointer sequence.
   */
   onSourceActivate?: (sourceId: string, event: MouseEvent) => void;
+  /** Optional interaction hit resolver; it never changes emitted markup. */
+  sourceTarget?: (event: MouseEvent, svg: SVGSVGElement) => Element | null;
   /** Legacy click-only bridge. New interactive viewers should prefer
    * `onSourceActivate`, which survives focus-triggered SVG replacement. */
   onSourceClick?: (sourceId: string, event: MouseEvent) => void;
@@ -179,6 +181,13 @@ function n(v: number): string {
   return String(Math.round(v * 1e4) / 1e4);
 }
 
+const activationTargets = new WeakMap<Event, Element>();
+/** The resolved hit, shared with host pointer placement as the event bubbles. */
+export function sourceTargetOf(event: Event): Element | null {
+  return activationTargets.get(event)
+    ?? (event.target instanceof Element ? event.target.closest('[data-source-id]') : null);
+}
+
 export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
   const { container, onSourceActivate, onSourceClick } = opts;
 
@@ -187,12 +196,13 @@ export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
 
   if (onSourceActivate) {
     let pointerSource: string | null = null;
-    const sourceFrom = (event: Event): string | null => {
-      const target = event.target;
-      if (!(target instanceof Element)) return null;
-      return target.closest('[data-source-id]')?.getAttribute('data-source-id') ?? null;
+    const sourceFrom = (event: MouseEvent): string | null => {
+      const target = opts.sourceTarget ? opts.sourceTarget(event, svg) : sourceTargetOf(event);
+      if (target) activationTargets.set(event, target);
+      return target?.getAttribute('data-source-id') ?? null;
     };
     svg.addEventListener('pointerdown', event => {
+      if (event.button !== 0 || (event.pointerType === 'touch' && !event.isPrimary)) return;
       const sourceId = sourceFrom(event);
       if (!sourceId) return;
       pointerSource = sourceId;

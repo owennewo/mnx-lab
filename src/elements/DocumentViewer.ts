@@ -1,3 +1,4 @@
+import { sourceTargetOf } from '../engine/render/svg.ts';
 import { engravingEntries } from '../engine/layout/unrolled.ts';
 import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
 import { forEachNoteAddress } from '../model/noteWalk.ts';
@@ -1392,8 +1393,8 @@ export class DocumentViewer extends LitElement {
   /** The note under a pointer, when there is one — the same ink the click
    *  path already resolves, unwrapped from its occurrence in an unrolled view. */
   private noteKeyUnder(event: Event): string | undefined {
-    const target = event.target;
-    if (!(target instanceof Element)) return undefined;
+    const target = sourceTargetOf(event);
+    if (!target) return undefined;
     // A NOTE, not merely something with a name. Rests, stems and beams all
     // carry their event's id, and this field means "the pointer was on a
     // notehead" to everything that reads it: the session takes the slot's own
@@ -1438,8 +1439,8 @@ export class DocumentViewer extends LitElement {
     const hit = point && hitTest(page.map, point, this.noteKeyUnder(event));
     if (!hit) return;
     // Unrolled, the ink names its visit (`w2:…`): the press means THAT visit.
-    const visit = this.unrolled && event.target instanceof Element
-      ? parseOccurrenceKey(event.target.closest('[data-source-id]')?.getAttribute('data-source-id') ?? '')?.ordinal
+    const visit = this.unrolled
+      ? parseOccurrenceKey(sourceTargetOf(event)?.getAttribute('data-source-id') ?? '')?.ordinal
       : undefined;
     const placement: PointerPlacement = visit === undefined ? hit : { ...hit, ordinal: visit };
     drawPointerGhost(page.svg, page.map, null);
