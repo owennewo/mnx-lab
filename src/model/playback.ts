@@ -21,6 +21,18 @@ export function chooseOrdinal(ordinals: readonly number[], current: number | nul
   if (!options.cycle && candidates.includes(current)) return current;
   return candidates.find(ordinal => ordinal > current) ?? (options.explicitSeek ? candidates[0] ?? null : null);
 }
+/** Score presses retain the displayed pass, preferring its nearest visit.
+ * An ending absent on that pass falls back to its first performed visit. */
+export function chooseScoreOrdinal(
+  model: PassModel, ordinals: readonly number[], state: PlaybackPositionState
+): number | null {
+  const candidates = [...new Set(ordinals)].sort((a, b) => a - b);
+  const same = candidates.filter(ordinal => model.entries[ordinal]?.iteration === activeIteration(state));
+  if (same.length === 0) return candidates[0] ?? null;
+  const current = state.ordinal;
+  return current === null ? same[0] : same.reduce((best, ordinal) =>
+    Math.abs(ordinal - current) < Math.abs(best - current) ? ordinal : best);
+}
 export interface PlaybackPositionState {
   ordinal: number | null;
   playbackIteration: number | null;

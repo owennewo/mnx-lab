@@ -165,8 +165,9 @@ performs the same lifecycle when an edit creates a new score revision. Stale asy
 player callbacks cannot stamp a replacement document.
 
 A viewer `note-selected` event maps its key to performed candidates using item 2's
-`chooseOrdinal`. The first click keeps the current candidate or chooses the next;
-repeated clicks cycle, including multiple visits on the same iteration. This seeks
+`chooseScoreOrdinal`. Clicks keep the displayed iteration and choose its nearest
+visit; repeated clicks keep that visit. An ending absent on the displayed iteration
+falls back to its first visit. An explicit unrolled occurrence selects that visit. This seeks
 playback to the pressed note's own BEAT within that visit, not to the bar's first —
 landing on the barline reads as the scrubber ignoring a press that was already inside
 the bar it is playing. A press that is not on a note seeks the same way through

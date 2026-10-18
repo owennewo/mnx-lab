@@ -3,7 +3,9 @@
 `model/playback.ts` resolves written measures and repeat iterations to **all**
 performed ordinals. A D.S. may produce several candidates for the same iteration.
 `chooseOrdinal` retains the current candidate, then chooses the next; wrapping
-requires `explicitSeek`, and repeated clicks use `cycle`. Occurrence identifies
+requires `explicitSeek`. Score presses use `chooseScoreOrdinal` to keep the displayed
+iteration and its nearest visit, including repeated presses; an unavailable iteration
+falls back to the first visit. Occurrence identifies
 one visit to a written measure; iteration identifies its repeat context.
 
 `elements/mnxContext.ts` exports `playbackStateContext`, `initialPlaybackState`,

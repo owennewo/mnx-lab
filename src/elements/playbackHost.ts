@@ -4,7 +4,7 @@ import { playbackStateContext, initialPlaybackState, type PlaybackUpdate } from 
 import { linearizePasses } from '../model/passes.ts';
 import {
   activeIteration,
-  chooseOrdinal,
+  chooseScoreOrdinal,
   resolveIteration,
   withPlaybackOrdinal,
   inspectIteration,
@@ -23,7 +23,6 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   let state = initialPlaybackState();
   let model: ReturnType<typeof linearizePasses> | undefined;
   let document: MnxDocument | undefined;
-  let lastKey = '';
   /** An editor cursor owns press-to-seek while this is above zero (core-single-cursor.md). */
   let coupled = 0;
   const provider = new ContextProvider(host, {
@@ -57,11 +56,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     const candidates = player.performance.written
       .filter((w) => w.noteKey === key)
       .map((w) => w.ordinal);
-    const ordinal = detail.ordinal ?? chooseOrdinal(candidates, state.ordinal, {
-      explicitSeek: true,
-      cycle: lastKey === key,
-    });
-    lastKey = key;
+    const ordinal = detail.ordinal ?? (model ? chooseScoreOrdinal(model, candidates, state) : null);
     // THE NOTE'S OWN BEAT, not its bar's first. A press names a moment, and
     // seeking to the barline instead reads as the scrubber ignoring a press
     // that was already inside the bar it is playing.
@@ -89,7 +84,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     const candidates = ordinals.length > 0
       ? ordinals
       : model.entries.filter(entry => entry.measureIndex === detail.measureIndex).map(entry => entry.ordinal);
-    const ordinal = chooseOrdinal(candidates, state.ordinal, { explicitSeek: true });
+    const ordinal = chooseScoreOrdinal(model, candidates, state);
     if (ordinal === null) return;
     // The drawn moment the press was nearest to — a rest, or a neighbour's
     // notehead on the same beat. It is the same column the edit cursor lands
@@ -149,7 +144,6 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       }
       document = next;
       model = linearizePasses(next.mnxJson);
-      lastKey = '';
       viewer.mnxDoc = next;
       player.documentId = next.id;
       player.document = next.mnxJson;

@@ -3,7 +3,7 @@ import type { Player } from '../elements/Player.ts';
 import { beatOfKey } from '../elements/scoreSeek.ts';
 import { compilePerformance } from '../audio/performance.ts';
 import type { Performance } from '../audio/performanceTypes.ts';
-import { chooseOrdinal } from '../model/playback.ts';
+import { chooseScoreOrdinal } from '../model/playback.ts';
 import { ContextProvider } from '@lit/context';
 import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
 import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
@@ -266,7 +266,6 @@ export class ScenarioPage extends LitElement {
   @property({ type: String }) panel = '';
   @property({attribute:false}) at: number | null=null;
   @state() private performance: Performance | null=null;
-  private clickedPlaybackKey='';
   private performanceError='';
   private routeSeekConsumed=false;
   /** A one-shot local file supplied by the shell. It is never persisted and
@@ -348,7 +347,6 @@ export class ScenarioPage extends LitElement {
    */
   private refreshPassModel(document: MnxStructure) {
     if (this.passDocument === document) return;
-    this.clickedPlaybackKey='';
     this.passDocument = document;
     this.passModel = linearizePasses(document);
     const compiled=compilePerformance(document,this.passModel);
@@ -1982,7 +1980,7 @@ export class ScenarioPage extends LitElement {
     const candidates = ordinals.length > 0
       ? ordinals
       : this.passModel.entries.filter(entry => entry.measureIndex === measureIndex).map(entry => entry.ordinal);
-    const ordinal = chooseOrdinal(candidates, this.playback.ordinal, { explicitSeek: true });
+    const ordinal = chooseScoreOrdinal(this.passModel, candidates, this.playback);
     if (ordinal === null) return;
     // The drawn moment the press was nearest to — a rest, or a neighbour's
     // notehead on the same beat. The edit cursor lands on that same column, so
@@ -1998,10 +1996,9 @@ export class ScenarioPage extends LitElement {
   ) => {
     const key=event.detail.noteId;
     if(this.cursorCoupled>0)return; // the cursor seeks for itself
-    if(key && this.performance){
+    if(key && this.performance && this.passModel){
       const candidates=this.performance.written.filter(w=>w.noteKey===key).map(w=>w.ordinal);
-      const ordinal=event.detail.ordinal ?? chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
-      this.clickedPlaybackKey=key;
+      const ordinal=event.detail.ordinal ?? chooseScoreOrdinal(this.passModel,candidates,this.playback);
       // The note's OWN beat, not its bar's first.
       if(ordinal!==null){
         const beat = beatOfKey(this.performance, this.doc?.mnxJson, key, ordinal);

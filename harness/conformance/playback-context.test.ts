@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { linearizePasses, hasRepeatStructure } from '../../src/model/passes.ts';
-import { resolveIteration, resolveOrdinal, resolveOccurrence, chooseOrdinal,
+import { resolveIteration, resolveOrdinal, resolveOccurrence, chooseOrdinal, chooseScoreOrdinal,
   initialPlaybackPosition, inspectIteration, followPlayback, withPlaybackOrdinal,
   nextInspectionIteration, activeIteration, verseForIteration } from '../../src/model/playback.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
@@ -100,4 +100,16 @@ it('has no repeat affordance for plain music and no invented entry for invalid a
   expect(resolveOccurrence(model,0,99)).toBeNull();
   expect(resolveIteration(model,99,1)).toEqual({performed:false,ordinals:[]});
   expect(() => inspectIteration(initialPlaybackPosition(),0)).toThrow(RangeError);
+});
+
+it('score presses retain the displayed verse when seeking backwards or pressing again', () => {
+  const model = simple();
+  const first = withPlaybackOrdinal(initialPlaybackPosition(), model, 1);
+  expect(chooseScoreOrdinal(model, [0, 2], first)).toBe(0);
+  expect(chooseScoreOrdinal(model, [0, 2], withPlaybackOrdinal(first, model, 0))).toBe(0);
+  const second = withPlaybackOrdinal(first, model, 3);
+  expect(chooseScoreOrdinal(model, [0, 2], second)).toBe(2);
+  expect(chooseScoreOrdinal(model, [0, 2], inspectIteration(first, 2))).toBe(2);
+  expect(chooseScoreOrdinal(model, [1], second)).toBe(1); // first ending only
+  expect(chooseScoreOrdinal(model, [], second)).toBeNull();
 });

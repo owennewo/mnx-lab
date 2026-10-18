@@ -18,7 +18,12 @@ export async function checkPlayer(cdp, base, format) {
     const iterations=[...new Set(player.performance.written.filter(w=>w.noteKey===key).map(w=>w.ordinal))];
     viewer.dispatchEvent(new CustomEvent('note-selected',{detail:{noteId:key},bubbles:true,composed:true}));
     viewer.dispatchEvent(new CustomEvent('note-selected',{detail:{noteId:key},bubbles:true,composed:true}));
-    check(binding.state.ordinal===iterations[1],'Repeated click did not cycle visits');
+    check(binding.state.ordinal===iterations[0],'Repeated click changed the first pass');
+    binding.inspect(2);
+    viewer.dispatchEvent(new CustomEvent('note-selected',{detail:{noteId:key},bubbles:true,composed:true}));
+    check(binding.state.ordinal===iterations[1],'Click ignored the inspected second pass');
+    viewer.dispatchEvent(new CustomEvent('note-selected',{detail:{noteId:key},bubbles:true,composed:true}));
+    check(binding.state.ordinal===iterations[1],'Repeated click changed the second pass');
     player.seek(0);binding.inspect(2);await player.play();await delay(150);
     check(player.snapshot.state==='playing','Player did not start');
     check(viewer.playbackState.playbackIteration===1 && viewer.playbackState.inspectionIteration===2 && !viewer.playbackState.followPlayback,'Live playback overwrote inspection');

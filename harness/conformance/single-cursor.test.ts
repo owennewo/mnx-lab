@@ -91,19 +91,23 @@ describe('the loop back, on a real repeat', () => {
     expect(session.passNotice).toEqual({ kind: 'pass', pass: 1 });
   });
 
-  it('a second press where the cursor stands moves to the next visit of that moment', () => {
+  it('repeated presses retain the current pass', () => {
     const session = new EditorSession(read(id));
     const at = session.cursor;
     const press = () => session.handleIntent({
       type: 'goToPointer', measureIndex: at.measureIndex, partIndex: 0, staffIndex: 1,
       line: at.line, projection: session.projection, fraction: 0
     });
-    // The cursor opens on bar 0's first visit, so the first press is already a second one.
+    // A press on the initial cursor must not advance the verse.
     expect(session.performedOrdinal).toBe(0);
-    expect(press()).toBe(true);
+    press();
+    expect(session.performedOrdinal).toBe(0);
+    press();
+    expect(session.performedOrdinal).toBe(0);
+    session.handleIntent({ type: 'goToPointer', measureIndex: 0, partIndex: 0, staffIndex: 1,
+      line: at.line, projection: session.projection, fraction: 0, ordinal: 2 });
+    press();
     expect(session.performedOrdinal).toBe(2);
-    expect(press()).toBe(true);
-    expect(session.performedOrdinal).toBe(0);
   });
 
   it('a press in the unrolled view lands on the visit it was drawn as', () => {

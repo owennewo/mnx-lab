@@ -509,17 +509,6 @@ export class EditorSession {
     ) {
       // The view draws visits (unrolled): the press named one, and it is that one.
       this.ordinalState = intent.ordinal;
-    } else if (
-      intent.type === 'goToPointer' && ordinalBefore !== null
-      && cursor.measureIndex === cursorBefore.measureIndex && onsetsEqual(cursor.onset, cursorBefore.onset)
-      && cursor.line === cursorBefore.line
-    ) {
-      // A press where the cursor already stands names the same moment again:
-      // the next visit of it, so a bar's second pass is a second press away.
-      const visits = performancesAt(model, cursor.measureIndex, cursor.onset);
-      const at = visits.findIndex(entry => entry.ordinal === ordinalBefore);
-      const next = visits.length > 1 ? visits[(at + 1) % visits.length] : undefined;
-      if (next) { this.ordinalState = next.ordinal; handled = true; }
     } else {
       const entry = ordinalBefore === null ? undefined : model.entries[ordinalBefore];
       this.ordinalState = entry && entryContains(entry, cursor.measureIndex, cursor.onset)
