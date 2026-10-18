@@ -6,6 +6,7 @@
  * notation.ts primitive-for-primitive, so the notation goldens did not move.
  */
 import type { Primitive } from '../primitives.ts';
+import { settleRepeatTimes } from './barlineText.ts';
 
 /** Dots at 1.2× read as repeat dots, not as augmentation dots. */
 export const REPEAT_DOT_SCALE = 1.2;
@@ -111,7 +112,7 @@ export function emitRepeatTimes(
   primitives: Primitive[]
 ): void {
   if (times === undefined || times === 2) return;
-  primitives.push({
+  const text: Primitive = {
     kind: 'text',
     text: `${times}x`,
     x,
@@ -121,5 +122,7 @@ export function emitRepeatTimes(
     weight: 'bold',
     anchor: 'end',
     className: 'repeat-times'
-  });
+  };
+  primitives.push(text);
+  settleRepeatTimes(text, primitives);
 }

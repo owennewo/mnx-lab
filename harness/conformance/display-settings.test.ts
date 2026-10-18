@@ -10,6 +10,7 @@ import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { planHorizontal } from '../../src/engine/layout/spacing.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
+import { computeBoundsSp } from '../../src/engine/render/bounds.ts';
 
 const fixture = (path: string): MnxStructure => JSON.parse(readFileSync(`scenarios/${path}/document.mnx.json`, 'utf8'));
 function verses(): MnxStructure {
@@ -160,6 +161,23 @@ describe('displayed measure and instrument labels', () => {
       const entries = linearizePasses(mnx).entries;
       const labels = layout({ mnx, widthSp: 400, entries, display: { barNumbers: 'every-bar' } });
       expect(text(labels, 'measure-number').map(p => p.kind === 'text' ? p.text : '').slice(0, 4)).toEqual(['1', '0', '1', '2']);
+    });
+    it(`${name}: a bar number, a repeat count and a jump on one barline do not overlap`, () => {
+      initSmufl();
+      const mnx = score();
+      mnx.global.measures[1] = { ...mnx.global.measures[1], repeatStart: {} };
+      mnx.global.measures[2] = { ...mnx.global.measures[2], repeatEnd: { times: 4 }, _x: { mnxLab: { navigation: {
+        marks: [{ id: 'coda', kind: 'coda', location: { fraction: [0, 1] } }],
+        jumps: [{ type: 'toCoda', target: 'coda', location: { fraction: [1, 1] } }]
+      } } } };
+      const labels = layout({ mnx, widthSp: 400, display: { barNumbers: 'every-bar' } });
+      const marks = labels.primitives.filter(p => p.kind === 'text' && ['measure-number', 'repeat-times', 'jump'].includes(p.className ?? ''));
+      expect(marks.map(p => p.className)).toEqual(expect.arrayContaining(['repeat-times', 'jump']));
+      const boxes = marks.map(p => ({ text: p.kind === 'text' ? p.text : '', box: computeBoundsSp([p])! }));
+      for (const [i, a] of boxes.entries()) for (const b of boxes.slice(i + 1)) {
+        const meet = a.box.x < b.box.x + b.box.w && b.box.x < a.box.x + a.box.w && a.box.y < b.box.y + b.box.h && b.box.y < a.box.y + a.box.h;
+        expect(meet, `${a.text} meets ${b.text}`).toBe(false);
+      }
     });
     it(`${name}: unnamed parts remain unlabeled`, () => {
       initSmufl();

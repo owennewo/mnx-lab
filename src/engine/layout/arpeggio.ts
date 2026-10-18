@@ -7,6 +7,7 @@ import type { DisplayOptions } from '../displayOptions.ts';
 // three lines.
 import type { MnxArpeggio, MnxGlobalMeasure, MnxNonArpeggio } from '../../model/mnx.ts';
 import type { Primitive } from '../primitives.ts';
+import { meetsBarlineText } from './barlineText.ts';
 
 export interface SpanMarks {
   arpeggio?: MnxArpeggio;
@@ -166,7 +167,7 @@ export function emitMeasureNumber(
   const number = mode ? displayedNumber ?? gm.number : gm.number;
   if (number === undefined) return;
   const overPrefix = m.firstInSystem && (m.showClef || m.showTimeSig);
-  primitives.push({
+  const text: Primitive = {
     kind: 'text',
     text: `${number}`,
     x: overPrefix ? m.x + MEASURE_NUMBER_INSET_SP : m.x,
@@ -175,5 +176,12 @@ export function emitMeasureNumber(
     size: MEASURE_NUMBER_SIZE_SP,
     anchor: overPrefix ? 'start' : 'middle',
     className: 'measure-number'
-  });
+  };
+  // A "4x" or a jump ending on this barline owns its left side: the number
+  // steps to its own bar's side of it (barlineText.ts).
+  if (!overPrefix && meetsBarlineText(text, primitives)) {
+    text.x = m.x + MEASURE_NUMBER_INSET_SP;
+    text.anchor = 'start';
+  }
+  primitives.push(text);
 }

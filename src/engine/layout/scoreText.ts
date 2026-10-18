@@ -12,6 +12,7 @@ import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
 import { durationValue, tremoloDuration, tupletDuration, measureHeadingX, ONSET_TEXT_LEAD_SP, type MeasureHeading } from './spacing.ts';
 import { chordSymbolDisplay } from '../../model/harmony.ts';
 import { measureNavigation } from '../../model/navigation.ts';
+import { settleJumpText } from './barlineText.ts';
 import type { ResolvedSwing, SwingTimelineEntry } from '../../model/swing.ts';
 
 // ---------- Ink-measured placement (core-ink-measured-gaps.md, stage A) ----------
@@ -258,10 +259,12 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
   for (const mark of navigation.marks) {
     const p = place(mark.location);
     if (mark.kind === 'fine') {
-      primitives.push({
+      const fine: Primitive = {
         kind: 'text', text: 'fine', x: p.x, y: textY, font: 'bodyItalic', size: NAV_TEXT_SIZE_SP,
         anchor: p.anchor, ...(mark.color ? { fill: mark.color } : {}), className: 'fine'
-      });
+      };
+      primitives.push(fine);
+      settleJumpText(fine, primitives);
       continue;
     }
     const glyph = mark.glyph ?? mark.kind;
@@ -277,7 +280,7 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
   }
   for (const jump of navigation.jumps) {
     const p = place(jump.location);
-    primitives.push({
+    const text: Primitive = {
       kind: 'text',
       text: jump.text ?? JUMP_TEXT[jump.type] ?? jump.type,
       x: p.x,
@@ -286,7 +289,9 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
       size: NAV_TEXT_SIZE_SP,
       anchor: p.anchor,
       className: 'jump'
-    });
+    };
+    primitives.push(text);
+    settleJumpText(text, primitives);
   }
 }
 
