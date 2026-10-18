@@ -36,6 +36,8 @@ export function chooseScoreOrdinal(
 export interface PlaybackPositionState {
   ordinal: number | null;
   playbackIteration: number | null;
+  /** The playing visit's lyric row (`PerformedEntry.verse`). */
+  playbackVerse?: number | null;
   inspectionIteration: number;
   followPlayback: boolean;
 }
@@ -51,17 +53,18 @@ export function followPlayback<T extends PlaybackPositionState>(state: T): T {
 }
 export function withPlaybackOrdinal<T extends PlaybackPositionState>(state: T, model: PassModel, ordinal: number | null): T {
   const entry = resolveOrdinal(model, ordinal);
-  return { ...state, ordinal: entry?.ordinal ?? null, playbackIteration: entry?.iteration ?? null };
+  return { ...state, ordinal: entry?.ordinal ?? null, playbackIteration: entry?.iteration ?? null, playbackVerse: entry?.verse ?? null };
 }
 export function activeIteration(state: PlaybackPositionState): number {
   return state.followPlayback && state.ordinal !== null && state.playbackIteration !== null
     ? state.playbackIteration : state.inspectionIteration;
 }
-/** Pass N sings verse N; a pass past the last written verse sings the first
- *  (a verse written once under a repeat). One answer for the shown verse and
- *  the lit word, so the two cannot disagree. */
-export function verseForIteration(orderedVerseIds: readonly string[], state: PlaybackPositionState): string | undefined {
-  return orderedVerseIds[activeIteration(state) - 1] ?? orderedVerseIds[0];
+/** The verse row the shown pass sings: the playing visit's `verse`, else the inspected pass's. A pass
+ *  with no row of that number sings nothing — `''`, which lights no word and, under `lyrics: 'current'`,
+ *  shows none. One answer for the shown verse and the lit word, so the two cannot disagree. */
+export function verseForPass(orderedVerseIds: readonly string[], state: PlaybackPositionState): string {
+  const following = state.followPlayback && state.ordinal !== null && state.playbackVerse != null;
+  return orderedVerseIds[(following ? state.playbackVerse! : state.inspectionIteration) - 1] ?? '';
 }
 /**
  * Where ←/→ WHILE PLAYING are taking the playhead (core-single-cursor.md):

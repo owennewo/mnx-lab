@@ -36,7 +36,8 @@ export function normalizeDisplayOptions(input: unknown = {}, hide: readonly stri
     if ((choices as readonly unknown[]).includes(source[key])) result[key] = source[key];
   }
   if (source.clearance != null) result.clearance = normalizeClearance(source.clearance);
-  if (typeof source.selectedVerse === 'string' && source.selectedVerse.length) result.selectedVerse = source.selectedVerse;
+  // '' is a choice too: the pass sings no verse, so none is shown or lit.
+  if (typeof source.selectedVerse === 'string') result.selectedVerse = source.selectedVerse;
   if (hide.includes('lyrics')) result.lyrics = 'hide';
   return result as DisplayOptions;
 }

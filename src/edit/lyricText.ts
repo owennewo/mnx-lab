@@ -406,7 +406,7 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
 
 /**
  * The blue diagnostic: a verse whose pass number the repeat structure never
- * sounds for its bar. Fewer verses than passes is a chorus (normal, silent);
+ * sings for its bar. Fewer verses than passes leaves the later passes unsung;
  * a verse on a bar that only sounds on other passes — volta text on the
  * wrong ending, a third verse on a twice-played strain — is worth naming.
  * Silent when the document declares no repeat structure at all: stacked
@@ -428,7 +428,8 @@ export function lyricPassWarnings(
     for (const entryIndex of line.syllables.keys()) {
       const measureIndex = walk[entryIndex]?.measureIndex;
       if (measureIndex === undefined || flagged.has(measureIndex)) continue;
-      const sounding = model.soundingPasses[measureIndex] ?? [];
+      // The verses this bar sings — counting on through a D.S. return, as playback does.
+      const sounding = [...new Set(model.entries.filter(e => e.measureIndex === measureIndex).map(e => e.verse))];
       if (sounding.includes(line.ordinal)) continue;
       flagged.add(measureIndex);
       const verse = `verse ${line.ordinal}${line.lang ? ` (${line.lang})` : ''}`;
@@ -438,7 +439,7 @@ export function lyricPassWarnings(
         severity: 'warning',
         message: sounding.length === 0
           ? `${verse} has text on a bar the repeat structure never sounds`
-          : `${verse} has text, but this bar only sounds on pass${sounding.length === 1 ? '' : 'es'} ${sounding.join(', ')}`
+          : `${verse} has text, but this bar only sings verse${sounding.length === 1 ? '' : 's'} ${sounding.join(', ')}`
       });
     }
   }
@@ -607,7 +608,7 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
       visits.forEach((visit, ordinal) => {
         if (ordinal > 0 && (visit.via || doc.global.measures[visit.measureIndex]?.repeatStart
           || visit.measureIndex !== visits[ordinal - 1]!.measureIndex + 1)) flush();
-        const row = override ?? (ids[visit.iteration - 1] ? visit.iteration : 1);
+        const row = override ?? visit.verse;
         const id = ids[row - 1];
         if (!id) return;
         const syllables = new Map<number, { text: string; type?: string }>();
@@ -650,8 +651,6 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
   const { groups } = lineGroups(doc, written);
   const taken = new Set([...groups.values()].flat());
   const minted = new Set<string>();
-  const emptyGroups = new Set([...groups].filter(([, ids]) => !ids.length).map(([group]) => group));
-  if (!groups.has('')) emptyGroups.add('');
   const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
   const atLine = (offset: number) => text.slice(0, offset).split('\n').length - 1;
   const assigned = new Map<string, { text: string; type?: SyllableType }>();
@@ -678,11 +677,10 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       begin = end; continue;
     }
     const group = header?.lang ?? '';
-    if (!groups.has(group)) emptyGroups.add(group);
     const ids = groups.get(group) ?? [];
     groups.set(group, ids);
-    const rowId = (iteration: number): { id: string; row: number } => {
-      const row = header?.ordinal ?? (emptyGroups.has(group) || ids[iteration - 1] ? iteration : 1);
+    const rowId = (verse: number): { id: string; row: number } => {
+      const row = header?.ordinal ?? verse;
       while (ids.length < row) {
         const id = mintLineId(taken); taken.add(id); minted.add(id); ids.push(id);
       }
@@ -708,7 +706,7 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     for (const [index, syllable] of parsed.lines[0]?.syllables ?? []) {
       const source = sources[index]!;
       const visit = visits[walk[index]!.measureIndex]!;
-      const { id, row } = rowId(visit.iteration);
+      const { id, row } = rowId(visit.verse);
       const key = `${id}:${source}`;
       const previous = assigned.get(key);
       if (previous && (previous.text !== syllable.text || normalizeType(previous.type) !== normalizeType(syllable.type))) {

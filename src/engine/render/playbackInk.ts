@@ -59,7 +59,7 @@ export function playbackVoiceSlot(voice: number): number {
 export function paintPlaybackInk(
   root: ParentNode,
   sounding: ReadonlyMap<string, number>,
-  /** The verse the current pass sings (`verseForIteration`), if any. */
+  /** The verse the current pass sings (`verseForPass`), if any. */
   verse?: string
 ): void {
   for (const ink of root.querySelectorAll<SVGElement>('[data-source-id], [data-playback-id]')) {

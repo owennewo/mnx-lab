@@ -173,6 +173,7 @@ it('retains whole partial bars, marks excluded notes and clips crossing notes by
       measureIndex: 0,
       occurrence: 1,
       iteration: 1,
+      verse: 1,
       from: [1, 4] as [number, number],
       until: [1, 2] as [number, number],
     },
@@ -225,7 +226,7 @@ it('excludes ID-less partial-bar tie sources and technique targets from span geo
   delete a.id;
   delete a.notes![0].id;
   a.notes![0]._x = {mnxLab:{tab:{technique:{hammerPull:{target:'b1'}}}}};
-  const entries = [{ordinal:0, measureIndex:0, occurrence:1, iteration:1, from:[1,2] as [number,number]}];
+  const entries = [{ordinal:0, measureIndex:0, occurrence:1, iteration:1, verse:1, from:[1,2] as [number,number]}];
   const rendered = layoutNotation({mnx:doc,widthSp:80,entries});
   expect(rendered.primitives.some(p => p.className === 'tie' || p.className === 'slur' || p.className?.includes('technique-hammerPull'))).toBe(false);
   expect(rendered.primitives.find(p => p.sourceId === 'w0:@m0.v0.e0.n0')?.className).toContain('unperformed');
@@ -247,7 +248,7 @@ it('does not warn for Dal Segno boundaries at the start or end of a whole bar', 
 
 it('compares slice bounds with actual content length, including pickups and empty bars', () => {
   const doc = seed();
-  const entry = { ordinal: 0, measureIndex: 0, occurrence: 1, iteration: 1 };
+  const entry = { ordinal: 0, measureIndex: 0, occurrence: 1, iteration: 1, verse: 1 };
   const partial = (from: [number, number], until: [number, number]) =>
     isPartialEntry(doc, { ...entry, from, until });
   expect(partial([0, 1], [2, 2])).toBe(false);

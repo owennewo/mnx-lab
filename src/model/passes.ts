@@ -23,6 +23,13 @@
 //
 // On a D.S. return, numbered endings use the final declared strain iteration.
 // No repeats are retaken. This is a lab performance convention, not an MNX rule.
+//
+// Which lyric row a visit sings is its `verse`, not its `iteration`: a pass
+// sings the bar's NEXT row — one past the row its last visit sang — or its
+// strain iteration when that is further on (a second ending, first reached on
+// pass 2, sings row 2). So verses keep counting through a D.S. return, where
+// the iteration starts over, and a verse with no written row sings nothing
+// (decided 2026-10-18: the returns of One Of These Things First are unsung).
 
 import type { MnxStructure } from './mnx.ts';
 import { measureNavigation, navigationMarkById, type NavigationJump } from './navigation.ts';
@@ -32,6 +39,9 @@ export interface PerformedEntry {
   measureIndex: number;
   occurrence: number;
   iteration: number;
+  /** The lyric row this visit sings, from 1: one past the bar's previous visit's, or the iteration if that is
+   *  further on. Unlike `iteration` it does not start over on a D.S. return; no row by this number → unsung. */
+  verse: number;
   /** Half-open metric slice; omitted bounds mean the written bar's start/end. */
   from?: [number, number];
   until?: [number, number];
@@ -90,6 +100,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
   const entries: PerformedEntry[] = [];
   const diagnostics: PassDiagnostic[] = [];
   const passCounts = Array.from({ length: count }, () => 0);
+  const lastVerse = Array.from({ length: count }, () => 0);
   const cap = count * 64 + 64;
   const availableIterations: number[][] = Array.from({ length: count }, () => [1]);
   const inStrain = Array.from({ length: count }, () => false);
@@ -219,6 +230,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
 
     const entry: PerformedEntry = {
       ordinal: order.length, measureIndex: i, occurrence: ++passCounts[i]!, iteration,
+      verse: lastVerse[i] = Math.max(iteration, lastVerse[i]! + 1),
       ...(from ? { from: [...from] as [number, number] } : {}),
       ...(arrival ? { via: arrival } : {})
     };

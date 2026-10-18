@@ -222,9 +222,11 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   syllable is collected, since syllables are emitted after `qualifyMeasure` has run).
   While that note sounds the paint puts a lamp behind the word — a rounded rect
   measured from the drawn text, in the fret mask's tint — and removes it after; the
-  word keeps its ink. Of stacked verses, the one the pass sings lights — pass N sings
-  verse N (`verseForIteration`, the viewer's `selectedVerse`; syllables carry
-  `data-lyric-line` beside their key; a pass past the last verse sings the first).
+  word keeps its ink. Of stacked verses, the one the pass sings lights — a visit sings
+  its `verse` (`verseForPass`, the viewer's `selectedVerse`; syllables carry
+  `data-lyric-line` beside their key). The verse is one past the bar's previous visit's,
+  so it keeps counting through a D.S. return; a visit with no row of that number sings
+  nothing (`selectedVerse = ''`) — since 2026-10-18 it no longer borrows the first.
   That is the whole rule: lyric ink lights only on the pass's row, and nothing guesses
   what another row "really" means. A sounding note with no word on that row lights its
   EMPTY place there instead (`rect.lyric-gap`, laid out on each verse row a note has no

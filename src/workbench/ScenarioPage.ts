@@ -7,7 +7,7 @@ import { chooseScoreOrdinal } from '../model/playback.ts';
 import { ContextProvider } from '@lit/context';
 import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
 import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
-import { resolveIteration, activeIteration, withPlaybackOrdinal, verseForIteration } from '../model/playback.ts';
+import { resolveIteration, activeIteration, withPlaybackOrdinal, verseForPass } from '../model/playback.ts';
 import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { readDisplayPreferences, writeDisplayPreferences } from './displayPreferences.ts';
 import type { DisplayOptions } from '../engine/displayOptions.ts';
@@ -2434,7 +2434,7 @@ export class ScenarioPage extends LitElement {
         .barNumbers=${this.displayPreferences.barNumbers}
         .instrumentNames=${this.displayPreferences.instrumentNames}
         .beams=${this.displayPreferences.beams}
-        .selectedVerse=${shownDoc ? verseForIteration(documentLyricLineIds(shownDoc.mnxJson), this.playback) : undefined}
+        .selectedVerse=${shownDoc ? verseForPass(documentLyricLineIds(shownDoc.mnxJson), this.playback) : undefined}
         .mnxDoc=${shownDoc}
         .view=${viewMode}
         .unrolled=${this.unrolled}

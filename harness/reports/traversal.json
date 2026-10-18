@@ -27,19 +27,22 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -73,7 +76,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -101,7 +105,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -134,13 +139,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -176,13 +183,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -213,7 +222,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -241,7 +251,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -269,7 +280,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -297,7 +309,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -325,7 +338,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -358,13 +372,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -395,7 +411,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -438,25 +455,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -493,7 +514,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -521,7 +543,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -554,13 +577,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -591,7 +616,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -643,31 +669,36 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "until": [
           1,
           1
@@ -678,6 +709,7 @@
         "measureIndex": 1,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "from": [
           0,
           1
@@ -688,19 +720,22 @@
         "ordinal": 6,
         "measureIndex": 2,
         "occurrence": 2,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 2
       },
       {
         "ordinal": 7,
         "measureIndex": 3,
         "occurrence": 2,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 2
       },
       {
         "ordinal": 8,
         "measureIndex": 4,
         "occurrence": 2,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 2
       }
     ],
     "diagnostics": [],
@@ -762,31 +797,36 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "until": [
           1,
           1
@@ -797,6 +837,7 @@
         "measureIndex": 1,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "from": [
           0,
           1
@@ -808,6 +849,7 @@
         "measureIndex": 2,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "until": [
           1,
           1
@@ -867,25 +909,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -927,13 +973,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -964,7 +1012,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -992,7 +1041,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1055,49 +1105,57 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 7,
         "measureIndex": 7,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1161,25 +1219,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1246,43 +1308,50 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1333,13 +1402,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1375,13 +1446,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1421,7 +1494,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1454,13 +1528,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1496,13 +1572,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1535,13 +1613,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       }
     ],
@@ -1596,44 +1676,51 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
         "ordinal": 4,
         "measureIndex": 1,
         "occurrence": 2,
-        "iteration": 2
+        "iteration": 2,
+        "verse": 2
       },
       {
         "ordinal": 5,
         "measureIndex": 2,
         "occurrence": 2,
-        "iteration": 2
+        "iteration": 2,
+        "verse": 2
       },
       {
         "ordinal": 6,
         "measureIndex": 5,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "via": "ending"
       }
     ],
@@ -1702,19 +1789,22 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
@@ -1722,6 +1812,7 @@
         "measureIndex": 2,
         "occurrence": 1,
         "iteration": 2,
+        "verse": 2,
         "via": "ending"
       }
     ],
@@ -1771,13 +1862,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       }
     ],
@@ -1813,13 +1906,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
@@ -1827,6 +1922,7 @@
         "measureIndex": 0,
         "occurrence": 3,
         "iteration": 3,
+        "verse": 3,
         "via": "loop"
       },
       {
@@ -1834,6 +1930,7 @@
         "measureIndex": 0,
         "occurrence": 4,
         "iteration": 4,
+        "verse": 4,
         "via": "loop"
       }
     ],
@@ -1865,7 +1962,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1893,7 +1991,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1926,13 +2025,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1963,7 +2064,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -1991,7 +2093,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2049,43 +2152,50 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2136,13 +2246,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2173,7 +2285,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2225,45 +2338,52 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
         "ordinal": 4,
         "measureIndex": 1,
         "occurrence": 2,
-        "iteration": 2
+        "iteration": 2,
+        "verse": 2
       },
       {
         "ordinal": 5,
         "measureIndex": 3,
         "occurrence": 1,
         "iteration": 2,
+        "verse": 2,
         "via": "ending"
       },
       {
         "ordinal": 6,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2312,13 +2432,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2354,13 +2476,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2401,19 +2525,22 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2452,13 +2579,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2494,13 +2623,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2536,13 +2667,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2573,7 +2706,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2601,7 +2735,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2664,49 +2799,57 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 7,
         "measureIndex": 7,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2810,73 +2953,85 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 7,
         "measureIndex": 7,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 8,
         "measureIndex": 8,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 9,
         "measureIndex": 9,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 10,
         "measureIndex": 10,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 11,
         "measureIndex": 11,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2937,7 +3092,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2965,7 +3121,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -2998,13 +3155,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3115,103 +3274,120 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 7,
         "measureIndex": 7,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 8,
         "measureIndex": 8,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 9,
         "measureIndex": 9,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 10,
         "measureIndex": 10,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 11,
         "measureIndex": 11,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 12,
         "measureIndex": 12,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 13,
         "measureIndex": 13,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 14,
         "measureIndex": 14,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 15,
         "measureIndex": 15,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 16,
         "measureIndex": 16,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3287,7 +3463,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3315,7 +3492,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3343,7 +3521,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3401,43 +3580,50 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3498,25 +3684,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3553,7 +3743,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3581,7 +3772,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3609,7 +3801,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3637,7 +3830,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3665,7 +3859,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3693,7 +3888,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3721,7 +3917,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3749,7 +3946,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3777,7 +3975,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3805,7 +4004,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3833,7 +4033,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3861,7 +4062,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3889,7 +4091,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3917,7 +4120,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3945,7 +4149,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -3973,7 +4178,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4001,7 +4207,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4029,7 +4236,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4057,7 +4265,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4085,7 +4294,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4113,7 +4323,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4141,7 +4352,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4169,7 +4381,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4197,7 +4410,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4230,13 +4444,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4272,13 +4488,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4309,7 +4527,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4342,13 +4561,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4379,7 +4600,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4407,7 +4629,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4460,37 +4683,43 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4563,43 +4792,50 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 5,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 6,
         "measureIndex": 6,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4650,13 +4886,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4687,7 +4925,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4720,13 +4959,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4772,25 +5013,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4842,25 +5087,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4912,25 +5161,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -4972,13 +5225,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5014,13 +5269,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5056,13 +5313,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5098,13 +5357,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5135,7 +5396,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5178,25 +5440,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5248,25 +5514,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5318,25 +5588,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5378,13 +5652,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5415,7 +5691,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5443,7 +5720,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5471,7 +5749,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5499,7 +5778,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5532,13 +5812,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5598,31 +5880,36 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "until": [
           1,
           1
@@ -5633,6 +5920,7 @@
         "measureIndex": 1,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "from": [
           0,
           1
@@ -5643,25 +5931,29 @@
         "ordinal": 6,
         "measureIndex": 2,
         "occurrence": 2,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 2
       },
       {
         "ordinal": 7,
         "measureIndex": 3,
         "occurrence": 2,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 2
       },
       {
         "ordinal": 8,
         "measureIndex": 4,
         "occurrence": 2,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 2
       },
       {
         "ordinal": 9,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5721,19 +6013,22 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
@@ -5741,13 +6036,15 @@
         "measureIndex": 2,
         "occurrence": 1,
         "iteration": 2,
+        "verse": 2,
         "via": "ending"
       },
       {
         "ordinal": 4,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5805,25 +6102,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5889,50 +6190,58 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 2,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
         "ordinal": 5,
         "measureIndex": 3,
         "occurrence": 2,
-        "iteration": 2
+        "iteration": 2,
+        "verse": 2
       },
       {
         "ordinal": 6,
         "measureIndex": 4,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 7,
         "measureIndex": 5,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -5982,13 +6291,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -6038,19 +6349,22 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 2,
         "via": "loop"
       },
       {
@@ -6058,6 +6372,7 @@
         "measureIndex": 2,
         "occurrence": 1,
         "iteration": 2,
+        "verse": 2,
         "via": "ending"
       },
       {
@@ -6065,6 +6380,7 @@
         "measureIndex": 3,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "until": [
           1,
           2
@@ -6075,6 +6391,7 @@
         "measureIndex": 0,
         "occurrence": 3,
         "iteration": 2,
+        "verse": 3,
         "from": [
           1,
           4
@@ -6086,6 +6403,7 @@
         "measureIndex": 2,
         "occurrence": 2,
         "iteration": 2,
+        "verse": 3,
         "via": "fine",
         "until": [
           3,
@@ -6169,31 +6487,36 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 4,
         "measureIndex": 4,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "until": [
           1,
           1
@@ -6204,6 +6527,7 @@
         "measureIndex": 2,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "from": [
           0,
           1
@@ -6215,6 +6539,7 @@
         "measureIndex": 3,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "until": [
           1,
           1
@@ -6225,6 +6550,7 @@
         "measureIndex": 5,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "from": [
           0,
           1
@@ -6236,6 +6562,7 @@
         "measureIndex": 6,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "until": [
           1,
           1
@@ -6246,6 +6573,7 @@
         "measureIndex": 0,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "from": [
           0,
           1
@@ -6257,6 +6585,7 @@
         "measureIndex": 1,
         "occurrence": 2,
         "iteration": 1,
+        "verse": 2,
         "until": [
           1,
           1
@@ -6267,6 +6596,7 @@
         "measureIndex": 7,
         "occurrence": 1,
         "iteration": 1,
+        "verse": 1,
         "from": [
           0,
           1
@@ -6320,7 +6650,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -6363,25 +6694,29 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 2,
         "measureIndex": 2,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 3,
         "measureIndex": 3,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -6418,7 +6753,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -6451,13 +6787,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [
@@ -6494,7 +6832,8 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],
@@ -6527,13 +6866,15 @@
         "ordinal": 0,
         "measureIndex": 0,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       },
       {
         "ordinal": 1,
         "measureIndex": 1,
         "occurrence": 1,
-        "iteration": 1
+        "iteration": 1,
+        "verse": 1
       }
     ],
     "diagnostics": [],

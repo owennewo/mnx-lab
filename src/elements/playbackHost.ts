@@ -9,7 +9,7 @@ import {
   withPlaybackOrdinal,
   inspectIteration,
   followPlayback,
-  verseForIteration,
+  verseForPass,
 } from '../model/playback.ts';
 import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { compilePerformance } from '../audio/performance.ts';
@@ -40,7 +40,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   const publish = () => {
     provider.setValue(state);
     if (document)
-      viewer.selectedVerse = verseForIteration(documentLyricLineIds(document.mnxJson), state);
+      viewer.selectedVerse = verseForPass(documentLyricLineIds(document.mnxJson), state);
   };
   const update = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;

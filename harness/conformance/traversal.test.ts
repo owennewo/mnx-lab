@@ -37,7 +37,7 @@ const stated: Record<string, Stated[]> = {
   'lab/navigation/ds-final-ending': [[0,1], [1,1], [0,2,'loop'], [2,2,'ending'], [3,1,undefined,undefined,[1,2]], [0,2,'jump',[1,4]], [2,2,'fine',undefined,[3,4]]],
   'lab/navigation/coda-navigation': [[0,1], [1,1], [2,1], [3,1], [4,1,undefined,undefined,[1,1]], [2,1,'jump',[0,1]], [3,1,undefined,undefined,[1,1]], [5,1,'jump',[0,1]], [6,1,undefined,undefined,[1,1]], [0,1,'jump',[0,1]], [1,1,undefined,undefined,[1,1]], [7,1,'jump',[0,1]]]
 };
-function entries(rows: Stated[]): PerformedEntry[] {
+function entries(rows: Stated[]): Omit<PerformedEntry, 'verse'>[] {
   const counts = new Map<number, number>();
   return rows.map(([measureIndex, iteration, via, from, until], ordinal) => {
     const occurrence = (counts.get(measureIndex) ?? 0) + 1;
@@ -47,11 +47,29 @@ function entries(rows: Stated[]): PerformedEntry[] {
   });
 }
 
+/** Entries as navigation states them — without the derived `verse`, which is stated on its own. */
+const nav = (list: readonly { verse: number }[]) => list.map(({ verse: _, ...entry }) => entry);
 describe('hand-stated navigation entries', () => {
   for (const [id, rows] of Object.entries(stated)) it(id, () => {
     const scenario = corpus.find(s => s.id === id);
     expect(scenario, 'hand-stated scenario must exist').toBeDefined();
-    expect(linearizePasses(read(scenario!.dir)).entries).toEqual(entries(rows));
+    // Navigation alone: `verse` is derived from it and stated on its own below.
+    expect(nav(linearizePasses(read(scenario!.dir)).entries)).toEqual(entries(rows));
+  });
+});
+
+// Hand-stated verse rows: one past the bar's previous visit's, or the iteration
+// if that is further on — so a second ending sings row 2, and a D.S. return sings
+// the next row where its iteration starts over.
+const statedVerses: Record<string, number[]> = {
+  'spec/repeats-alternate-endings-simple': [1, 1, 2, 2],
+  'spec/jumps-dal-segno': [1, 1, 1, 1, 1, 2, 2, 2, 2],
+  'lab/navigation/ds-final-ending': [1, 1, 2, 2, 1, 3, 3],
+};
+describe('hand-stated verses', () => {
+  for (const [id, verses] of Object.entries(statedVerses)) it(id, () => {
+    const scenario = corpus.find(s => s.id === id)!;
+    expect(linearizePasses(read(scenario.dir)).entries.map(e => e.verse)).toEqual(verses);
   });
 });
 
@@ -84,8 +102,8 @@ it('keeps duplicate D.S. candidates on the same iteration', () => {
     { jump: { type: 'segno', location: { fraction: [1,1] } } }, {}
   ]));
   expect(model.entries.filter(e => e.measureIndex === 2)).toEqual([
-    { ordinal: 4, measureIndex: 2, occurrence: 1, iteration: 1, until: [1,1] },
-    { ordinal: 7, measureIndex: 2, occurrence: 2, iteration: 1 }
+    { ordinal: 4, measureIndex: 2, occurrence: 1, iteration: 1, verse: 1, until: [1,1] },
+    { ordinal: 7, measureIndex: 2, occurrence: 2, iteration: 1, verse: 2 }
   ]);
 });
 
@@ -96,7 +114,7 @@ it('ignores Fine before the mid-bar segno on return; bounds are owned copies', (
     { fine: { location: { fraction: [1,2] } } }
   ]);
   const model = linearizePasses(doc);
-  expect(model.entries).toEqual(entries([[0,1],[1,1,undefined,undefined,[3,4]],[0,1,'jump',[1,2]],[1,1],[2,1,'fine',undefined,[1,2]]]));
+  expect(nav(model.entries)).toEqual(entries([[0,1],[1,1,undefined,undefined,[3,4]],[0,1,'jump',[1,2]],[1,1],[2,1,'fine',undefined,[1,2]]]));
   model.entries[2]!.from![0] = 99;
   expect(doc.global.measures[0]!.segno!.location.fraction).toEqual([1,2]);
 });
@@ -124,7 +142,7 @@ it('a jump into the interior of a first ending skips the rest of that span', () 
     { ending: { numbers: [2] } },
     { jump: { type: 'segno', location: { fraction: [1,1] } } }
   ]));
-  expect(model.entries).toEqual(entries([
+  expect(nav(model.entries)).toEqual(entries([
     [0,1],[1,1],[2,1],[0,2,'loop'],[3,2,'ending'],
     [4,1,undefined,undefined,[1,1]],[3,2,'ending'],[4,1]
   ]));
@@ -137,10 +155,12 @@ it('retains iteration through a multi-bar final ending on a D.S. return', () => 
     { ending: { numbers: [2], duration: 2 } }, {},
     { jump: { type: 'segno', location: { fraction: [1,1] } } }
   ]));
-  expect(model.entries).toEqual(entries([
+  expect(nav(model.entries)).toEqual(entries([
     [0,1],[1,1],[0,2,'loop'],[2,2,'ending'],[3,2],[4,1,undefined,undefined,[1,1]],
     [0,2,'jump',[1,4]],[2,2,'ending'],[3,2],[4,1]
   ]));
+  // The return keeps iteration 2 for the ending, but sings the NEXT verse: 3.
+  expect(model.entries.map(e => e.verse)).toEqual([1,1,2,2,2,1,3,3,3,2]);
   expect(model.availableIterations).toEqual([[1,2],[1,2],[1,2],[1,2],[1]]);
 });
 
@@ -154,5 +174,5 @@ it('has empty evidence for an empty document and uses part length when globals a
   expect(linearizePasses(docOf([]))).toEqual({ order: [], entries: [], passCounts: [], soundingPasses: [], availableIterations: [], diagnostics: [], truncated: false });
   const doc = docOf([{}]);
   doc.parts = [{ measures: [{}, {}, {}] }] as MnxStructure['parts'];
-  expect(linearizePasses(doc).entries).toEqual(entries([[0,1],[1,1],[2,1]]));
+  expect(nav(linearizePasses(doc).entries)).toEqual(entries([[0,1],[1,1],[2,1]]));
 });

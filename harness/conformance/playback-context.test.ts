@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { linearizePasses, hasRepeatStructure } from '../../src/model/passes.ts';
 import { resolveIteration, resolveOrdinal, resolveOccurrence, chooseOrdinal, chooseScoreOrdinal,
   initialPlaybackPosition, inspectIteration, followPlayback, withPlaybackOrdinal,
-  nextInspectionIteration, activeIteration, verseForIteration } from '../../src/model/playback.ts';
+  nextInspectionIteration, activeIteration, verseForPass } from '../../src/model/playback.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 // @ts-expect-error — corpus loader is plain JavaScript
 import { loadCorpus } from '../verify/check-scenarios.mjs';
@@ -44,7 +44,7 @@ it('keeps iteration 2 on a skipped first ending, including when playback is acti
   const model = simple();
   const initial = withPlaybackOrdinal(initialPlaybackPosition(),model,1);
   const inspected = inspectIteration(initial,2);
-  expect(inspected).toEqual({ordinal:1,playbackIteration:1,inspectionIteration:2,followPlayback:false});
+  expect(inspected).toEqual({ordinal:1,playbackIteration:1,playbackVerse:1,inspectionIteration:2,followPlayback:false});
   expect(resolveIteration(model,1,inspected.inspectionIteration)).toEqual({performed:false,ordinals:[]});
   expect(resolveIteration(model,2,inspected.inspectionIteration)).toEqual({performed:true,ordinals:[3]});
   expect(initial.inspectionIteration).toBe(1);
@@ -58,7 +58,7 @@ it('playback progression and stopping never overwrite inspection', () => {
   const live = withPlaybackOrdinal(followPlayback(inspected),model,0);
   expect(live.inspectionIteration).toBe(2);
   const stopped = withPlaybackOrdinal(live,model,null);
-  expect(stopped).toEqual({ordinal:null,playbackIteration:null,inspectionIteration:2,followPlayback:true});
+  expect(stopped).toEqual({ordinal:null,playbackIteration:null,playbackVerse:null,inspectionIteration:2,followPlayback:true});
   expect(activeIteration(stopped)).toBe(2);
   expect(withPlaybackOrdinal(live,model,999)).toEqual(stopped);
 });
@@ -85,13 +85,22 @@ it('cycles the structural domain, including iterations on which a bar never soun
   expect(state.inspectionIteration).toBe(3);
   expect(nextInspectionIteration(model,3,state.inspectionIteration)).toBe(1); // explicit click only
 });
-it('clears an unavailable verse, falls back to inspection when stopped, and does not persist IDs', () => {
+it('sings no verse where none is written, falls back to inspection when stopped, and does not persist IDs', () => {
   const inspected = inspectIteration(initialPlaybackPosition(),2);
-  expect(verseForIteration(['verse-a','verse-b'],inspected)).toBe('verse-b');
-  expect(verseForIteration(['verse-a'],inspected)).toBe('verse-a');
+  expect(verseForPass(['verse-a','verse-b'],inspected)).toBe('verse-b');
+  // A pass past the last written verse sings nothing — it does not borrow verse 1.
+  expect(verseForPass(['verse-a'],inspected)).toBe('');
   const live = withPlaybackOrdinal(followPlayback(inspected),simple(),0);
-  expect(verseForIteration(['verse-a','verse-b'],live)).toBe('verse-a');
-  expect(verseForIteration([],live)).toBeUndefined();
+  expect(verseForPass(['verse-a','verse-b'],live)).toBe('verse-a');
+  expect(verseForPass([],live)).toBe('');
+});
+it('counts verses on through a D.S. return, where the iteration starts over', () => {
+  const model = linearizePasses(read('spec/jumps-dal-segno'));
+  const visits = model.entries.filter(entry => entry.measureIndex === 1);
+  expect(visits.map(entry => [entry.iteration, entry.verse])).toEqual([[1,1],[1,2]]);
+  const live = withPlaybackOrdinal(initialPlaybackPosition(),model,visits[1]!.ordinal);
+  expect(verseForPass(['verse-a'],live)).toBe('');
+  expect(verseForPass(['verse-a','verse-b'],live)).toBe('verse-b');
 });
 it('has no repeat affordance for plain music and no invented entry for invalid addresses', () => {
   expect(hasRepeatStructure(read('spec/hello-world'))).toBe(false);

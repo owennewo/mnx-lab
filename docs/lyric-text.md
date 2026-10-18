@@ -43,19 +43,23 @@ use `6.1|`, not `6|`. Reopening generates the new canonical form.
 
 ## Stored rows, languages, and shared words
 
-Navigation supplies the repeat iteration; that selects a stored row within
-the language group. As with playback, an iteration beyond the existing rows
-reuses the first row. On a score with no lyrics, entry creates rows for the
-iterations encountered. An optional header **after** the anchor can explicitly
+Navigation supplies each visit's **verse**, and that selects a stored row within
+the language group: a visit sings one past the row its bar's previous visit
+sang, or its repeat iteration if that is further on (a second ending reached on
+pass 2 sings row 2). So verses keep counting through a D.S./D.C. return, where
+the repeat iteration starts over. A verse with no stored row is **unsung** —
+it generates no text and lights nothing in playback, exactly as the player
+shows it; typing words at that anchor creates the row. (Until 2026-10-18 a
+return re-sang row 1, so deleting a return's line silently did nothing: the
+user's call, on *One Of These Things First*, was that unwritten returns are
+unsung. The cost: a repeat written once under `×2` now sings once.) An optional header **after** the anchor can explicitly
 select a language and/or stored-row ordinal: `9.2| nl: …` or `1.1| 2: …`.
 The latter preserves hymn verses and rows that navigation does not select;
 use it also when adding a new row to a score that already has lyrics.
 
-Later returns can share the same stored syllable. Their generated text is
-repeated in performance order; conflicting assignments are diagnosed, rather
-than silently choosing the last one. Change all appearances consistently;
-to remove a shared syllable, remove all its appearances. The document still
-stores it only once. Lyrics on events never reached by navigation are retained
+Two anchors can still name one stored syllable — by an explicit row header —
+and conflicting assignments are diagnosed, rather than silently choosing the
+last one. Lyrics on events never reached by navigation are retained
 when applying this surface, as are lyrics outside its staff-1 first-voice walk.
 
 ## Design record

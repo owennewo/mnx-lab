@@ -175,7 +175,7 @@ describe('the pass bound (phase 3)', () => {
     expect(lyricPassWarnings(doc, 0, okay)).toEqual([]);
     const spilled = parseLyricText(doc, 0, 'one two\nthree four\nfive six');
     expect(lyricPassWarnings(doc, 0, spilled)).toMatchObject([
-      { textLine: 2, bar: 1, severity: 'warning', message: expect.stringContaining('passes 1, 2') }
+      { textLine: 2, bar: 1, severity: 'warning', message: expect.stringContaining('verses 1, 2') }
     ]);
   });
 
@@ -193,10 +193,10 @@ describe('the pass bound (phase 3)', () => {
     doc.global!.measures![1]!.ending = { numbers: [1], duration: 1 };
     doc.global!.measures![1]!.repeatEnd = {};
     doc.global!.measures![2]!.ending = { numbers: [2], duration: 1 };
-    // Verse 1 text on the second ending's bar: it only sounds on pass 2.
+    // Verse 1 text on the second ending's bar: it only sings verse 2.
     const parsed = parseLyricText(doc, 0, '3| last');
     expect(lyricPassWarnings(doc, 0, parsed)).toMatchObject([
-      { textLine: 0, bar: 3, severity: 'warning', message: expect.stringContaining('pass 2') }
+      { textLine: 0, bar: 3, severity: 'warning', message: expect.stringContaining('verse 2') }
     ]);
   });
 });
@@ -305,7 +305,7 @@ describe('performance anchors and canonical wrapping', () => {
     unchanged(doc);
   });
 
-  it('counts D.S. visits continuously but writes them back to the existing verse', () => {
+  it('a D.S. return sings the next verse: unwritten, it is unsung, and typing there writes a new row', () => {
     const doc = bars(3);
     doc.global.measures[0]!.repeatStart = {};
     doc.global.measures[0]!.segno = { location: { fraction: [0, 1] } };
@@ -313,10 +313,16 @@ describe('performance anchors and canonical wrapping', () => {
     doc.global.measures[1]!.fine = { location: { fraction: [1, 1] } };
     doc.global.measures[2]!.jump = { type: 'dsalfine', location: { fraction: [1, 1] } };
     put(doc, 1, '1', 'first'); put(doc, 1, '2', 'second');
-    expect(unchanged(doc)).toBe('1.1| first\n1.2| second\n1.3| first');
-    const parsed = parseLyricText(doc, 0, '1.1| changed\n1.2| second\n1.3| changed');
+    // The return is verse 3, and nothing is written there — so it prints nothing, rather than verse 1 again.
+    expect(unchanged(doc)).toBe('1.1| first\n1.2| second');
+    const parsed = parseLyricText(doc, 0, '1.1| changed\n1.2| second');
     expect(planLyricEdits(doc, 0, parsed)).toMatchObject([{ line: '1', text: 'changed' }]);
-    const conflict = parseLyricText(doc, 0, '1.1| changed\n1.3| different');
+    // Words typed at the return are its own: a third row, and verse 1 is untouched.
+    const third = parseLyricText(doc, 0, '1.1| first\n1.2| second\n1.3| third');
+    expect(third.newRows).toHaveLength(1);
+    expect(planLyricEdits(doc, 0, third).filter(edit => edit.op === 'setSyllable')).toMatchObject([{ text: 'third' }]);
+    // Two anchors naming the same stored row explicitly still have to agree.
+    const conflict = parseLyricText(doc, 0, '1.1| 2: changed\n1.2| different');
     expect(conflict.diagnostics[0]!.message).toContain('share a stored syllable');
     expect(planLyricEdits(doc, 0, conflict)).toEqual([]);
   });
@@ -369,7 +375,8 @@ it('keeps only events inside a partial-bar navigation visit', () => {
   doc.global.measures[0]!.segno = { location: { fraction: [1, 2] } };
   doc.global.measures[1]!.jump = { type: 'segno', location: { fraction: [1, 1] } };
   put(doc, 1, '1', 'before'); put(doc, 1, '1', 'after', 2);
-  expect(unchanged(doc)).toBe('1.1| before_ after\n1.2| after');
+  // The partial D.S. visit is verse 2, unwritten — it does not sing verse 1's 'after' again.
+  expect(unchanged(doc)).toBe('1.1| before_ after');
 });
 
 it('wraps a hyphenated word across canonical lines without treating the wrap as a word end', () => {

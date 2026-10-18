@@ -25,8 +25,8 @@ scrolls to the playhead only while `playing`, or a parked playhead would outrank
 the reader's own keyboard navigation and the score would never follow the cursor.
 While following live playback, the viewer
 reveals highlighted ink; the later player element owns the public position reveal
-API, including rests. The host sets `selectedVerse` from `verseForIteration` and
-must assign undefined when the verse index is absent, clearing stale selection.
+API, including rests. The host sets `selectedVerse` from `verseForPass`, which is
+`''` when the pass sings no verse — no row is shown or lit, and no stale selection survives.
 
 The workbench owns the provider and listens for `playback-state-change` with a
 `PlaybackUpdate` detail. The later player must emit bubbling, composed events at
