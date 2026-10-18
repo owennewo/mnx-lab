@@ -1,6 +1,7 @@
 # Lyric text entry
 
-Shift+L opens the lyric drawer in studio and workbench. The text is a projection
+Shift+L opens the right-hand lyric panel in studio and workbench. The score narrows
+to keep the panel beside it, between the toolbar and playback tray. The text is a projection
 of the event lyrics, with live preview; Ctrl+Enter applies one undoable edit.
 Closing without applying discards the draft.
 

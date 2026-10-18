@@ -5,10 +5,10 @@
 // hands the host a computed plan (planLyricEdits) to fire as ONE intent —
 // nothing here writes the document.
 //
-// A bottom DRAWER, not a centered modal: the score stays visible above and
+// A right-hand panel: the score frame makes room beside the score and
 // the host renders the buffer's parse onto it live (lyric-editor-edits →
 // a scratch document through the same lyricPlanOps the session applies), so
-// typing reads as writing under the staff. Keyboard ownership needs no
+// typing previews the words on the score. Keyboard ownership needs no
 // precedence wiring — a focused textarea is isTextEntry and the page keymap
 // yields; clicking the score hands the keys back without closing the drawer.
 // The caret→score cross-highlight rides the selection context's preview
@@ -53,21 +53,30 @@ export class LyricTextEditor extends LitElement {
     css`
       :host {
         position: fixed;
-        left: 0;
+        top: 0;
         right: 0;
         bottom: 0;
+        width: min(480px, 100vw);
         z-index: 40;
+        display: flex;
+        min-height: 0;
+      }
+      :host([slot='side']) {
+        position: relative;
+        inset: auto;
+        width: min(480px, 45vw);
+        max-width: 100%;
+        height: 100%;
+        z-index: auto;
       }
       .card {
         position: relative;
-        margin: 0 auto;
-        width: min(960px, 100vw);
-        max-height: 44vh;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
         background: var(--surface);
-        border: 1px solid var(--line-strong);
-        border-bottom: none;
-        border-radius: var(--radius-card) var(--radius-card) 0 0;
-        box-shadow: var(--shadow);
+        border-left: 1px solid var(--frame-line, var(--line));
         overflow: hidden;
         outline: none;
         display: flex;
@@ -75,22 +84,30 @@ export class LyricTextEditor extends LitElement {
       }
       header {
         display: flex;
-        align-items: baseline;
+        align-items: center;
+        flex: none;
+        min-height: 40px;
         gap: 8px;
-        padding: 10px 14px 8px;
+        padding: 0 8px 0 16px;
         border-bottom: 1px solid var(--line);
       }
       header .title {
         font-weight: 600;
       }
       header .part {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         color: var(--ink-3);
         font-size: 12px;
       }
       textarea {
         margin: 10px 14px 6px;
+        flex: 1;
         min-height: 5em;
-        resize: vertical;
+        min-width: 0;
+        resize: none;
         font: 13px/1.7 var(--mono);
         color: var(--ink);
         background: var(--bg);
@@ -104,6 +121,9 @@ export class LyricTextEditor extends LitElement {
       }
       .diagnostics {
         margin: 0 14px;
+        max-height: 25%;
+        overflow: auto;
+        flex: none;
         display: flex;
         flex-direction: column;
         gap: 2px;
@@ -120,12 +140,16 @@ export class LyricTextEditor extends LitElement {
       }
       footer {
         display: flex;
+        flex: none;
+        flex-wrap: wrap;
+        justify-content: flex-end;
         align-items: center;
         gap: 10px;
         padding: 10px 14px;
+        border-top: 1px solid var(--line);
       }
       .legend {
-        flex: 1;
+        flex: 1 0 100%;
         font-size: 11px;
         color: var(--ink-3);
       }
@@ -138,6 +162,18 @@ export class LyricTextEditor extends LitElement {
         color: var(--ink);
         cursor: pointer;
       }
+      button.close {
+        margin-left: auto;
+        flex: none;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--ink-3);
+        font-size: 20px;
+      }
+      button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
       button.apply {
         font-weight: 600;
       }
@@ -180,7 +216,7 @@ export class LyricTextEditor extends LitElement {
       ? planLyricEdits(this.doc, this.partIndex, this.parsed)
       : [];
     // The live preview: a clean parse hands the host the current diff so the
-    // score above redraws as if applied. While errors stand, the last clean
+    // score beside it redraws as if applied. While errors stand, the last clean
     // preview holds — flickering back to the committed text mid-word would
     // punish typing the very hyphen the parser is complaining about.
     if (this.parsed.diagnostics.length === 0) {
@@ -249,12 +285,14 @@ export class LyricTextEditor extends LitElement {
     const blocked = this.parsed.diagnostics.length > 0;
     const shown = [...this.parsed.diagnostics, ...this.warnings];
     return html`
-      <div class="card" tabindex="-1" @keydown=${this.onKey}>
+      <div class="card" role="complementary" aria-label="Lyrics" tabindex="-1" @keydown=${this.onKey}>
         <header>
           <span class="title">lyrics</span>
           ${this.partLabel ? html`<span class="part">${this.partLabel}</span>` : nothing}
+          <button class="close" aria-label="Close lyrics" title="Close lyrics (Escape)" @click=${() => this.close()}>×</button>
         </header>
         <textarea
+          aria-label="Lyric text"
           spellcheck="false"
           .value=${this.text}
           @input=${this.onInput}

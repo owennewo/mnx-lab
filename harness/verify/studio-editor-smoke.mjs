@@ -200,7 +200,7 @@ try {
   console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation');
 
   // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy; nothing is edited until it is applied.
-  const lyrics = `${piece}.querySelector('.editor-overlay mnx-editor-surfaces mnx-lyric-text-editor')`;
+  const lyrics = `${piece}.querySelector('mnx-score-frame > mnx-lyric-text-editor[slot="side"]')`;
   const sung = doc => `JSON.stringify(${doc}.parts[0].measures[0].sequences[0].content.map(e => Object.values(e.lyrics?.lines ?? {}).map(l => l.text)).flat())`;
   // Let the meter section's save land first: the claim below is that the
   // preview leaves a settled chip alone, and a save still in flight is not settled.
@@ -208,15 +208,35 @@ try {
   await c.evaluate(`${page}.editor.handleIntent({ type: 'goToLevel', level: 'note' })`);
   await key('KeyL', { shift: true });
   await wait(`!!${lyrics}?.shadowRoot?.querySelector('textarea')`);
+  const lyricPanelBounds = await c.evaluate(`(() => {
+    const panel = ${lyrics}.getBoundingClientRect(), score = ${viewer}.getBoundingClientRect();
+    const area = ${lyrics}.shadowRoot.querySelector('textarea').getBoundingClientRect();
+    return { beside: panel.left >= score.right - 1, tall: area.height > panel.height / 2,
+      inFrame: panel.right <= ${piece}.querySelector('mnx-score-frame').getBoundingClientRect().right + 1 };
+  })()`);
+  assert.deepEqual(lyricPanelBounds, { beside: true, tall: true, inFrame: true }, 'lyrics must sit beside the score with a full-height editor');
+  assert.equal(await c.evaluate(`${viewer}.selectionInactive`), false, 'the lyric panel lost editor keyboard ownership');
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
   await wait(`${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'the preview edited the document');
+  const lyricShot = await c.send('Page.captureScreenshot');
+  await fs.writeFile('/tmp/mnx-studio-lyrics.png', Buffer.from(lyricShot.result.data, 'base64'));
   const previewSave = await c.evaluate(`${chip}.dataset.save + ' / ' + ${chip}.textContent.trim()`);
   assert.ok(previewSave.startsWith('clean /'), `the preview was told to the save session: ${previewSave}`);
   await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.apply').click()`);
   await wait(`!${lyrics} && ${sung(`${page}.editor.document`)} === '["sing","song"]'`);
   // One edit, however many syllables: the chip counts history steps (and by now it knows when it last saved).
   await wait(`${chip}.textContent.trim().startsWith('1 edit unsaved')`);
+  // Side panels are exclusive; switching away cancels the lyric draft and its preview.
+  await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
+  await wait(`!!${lyrics}`);
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'draft words'; t.dispatchEvent(new Event('input')); }`);
+  await c.evaluate(`${action('Keys')}.click()`);
+  await wait(`!${lyrics} && !!${keys} && ${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);
+  await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
+  await wait(`!!${lyrics} && !${keys}`);
+  await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.close').click()`);
+  await wait(`!${lyrics}`);
 
   // Copy a note, paste it two beats on; the page says what happened.
   await c.evaluate(`${viewer}.focus()`);

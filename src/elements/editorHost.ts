@@ -115,6 +115,10 @@ export interface EditorBindingOptions {
    * viewer's rects can be measured against — the host's score pane.
    */
   overlay?: HTMLElement;
+  /** A score frame whose side slot hosts the lyric panel in flow. */
+  lyricPanel?: HTMLElement;
+  /** Let the shell put away other side panels before lyrics opens. */
+  onOpenLyrics?: () => void;
   /** What the inspector's top crumb calls the document. Asked when it opens. */
   title?(): string;
   /** A document to DRAW without it becoming the document — the lyric editor's live preview; null puts the real one back. */
@@ -289,7 +293,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
 
   const suspended = () => options.suspended?.() ?? false;
   /** The inspector is ours too; unclaimed focus only for a host that asked for it. */
-  const hasKeyboard = () => focusWithin(scope) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
+  const hasKeyboard = () => focusWithin(scope) || (lyrics !== null && focusWithin(lyrics)) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
   const draw = () => {
     if (disposed) return;
     viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret, preview });
@@ -525,7 +529,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (!surfaces || lyrics || suspended() || readOnly()) return;
     tabDigits.flush();
     closeInspector(false);
+    options.onOpenLyrics?.();
     const el = document_.createElement('mnx-lyric-text-editor');
+    if (options.lyricPanel) el.slot = 'side';
+    el.addEventListener('focusin', onFocusChange);
+    el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
     Object.assign(el, { doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '' });
     // Clean parses draw live on a SCRATCH copy, through the very ops the session would use; nothing is edited until Apply.
@@ -546,7 +554,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     });
     el.addEventListener('lyric-editor-close', () => closeLyrics());
     lyrics = el;
-    surfaces.append(el);
+    (options.lyricPanel ?? surfaces).append(el);
   };
   /** The viewer's enclosure rect, in the overlay's own coordinates: where the inspector hangs. */
   const onAnchored = (event: Event) => {
@@ -799,6 +807,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       win?.removeEventListener('keydown', onUnclaimedKey);
       win?.removeEventListener('focusin', onFocusChange);
       win?.removeEventListener('focusout', onFocusChange);
+      lyrics?.remove();
       inspector = null; lyrics = null;
       surfaces?.remove();
       options.onPreview?.(null);

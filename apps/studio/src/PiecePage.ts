@@ -609,6 +609,8 @@ export class PiecePage extends LitElement {
     const editor = bindEditor(this.viewer, this.viewer, live, {
       documentId: '', onChange: doc => this.showDocument(doc),
       overlay: this.renderRoot.querySelector<HTMLElement>('.editor-overlay') ?? undefined,
+      lyricPanel: this.renderRoot.querySelector<HTMLElement>('mnx-score-frame') ?? undefined,
+      onOpenLyrics: () => this.openPanel(null),
       title: () => (this.doc ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? 'Untitled',
       // The lyric editor's live preview: drawn, never told to the save session.
       onPreview: preview => { if (this.doc && this.editor) this.doc = { ...this.doc, lastUpdated: Date.now(), mnxJson: preview ?? this.editor.document }; },
@@ -938,6 +940,7 @@ export class PiecePage extends LitElement {
   // ── the side panels: one at a time ──────────────────────────────────────
 
   private openPanel(which: 'edit' | 'mix' | 'recording' | 'save' | 'keys' | null) {
+    this.editor?.closeSurfaces();
     this.keysOpen = which === 'keys';
     this.saveOpen = which === 'save';
     this.editOpen = which === 'edit';

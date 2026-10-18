@@ -1904,6 +1904,7 @@ export class ScenarioPage extends LitElement {
     this.editor = bindEditor(this, viewer, session.doc, {
       session,
       overlay,
+      lyricPanel: this.renderRoot.querySelector<HTMLElement>('mnx-score-frame') ?? undefined,
       // A workbench reader who has clicked nothing yet is unambiguously addressing the score.
       claimUnfocused: true,
       ...(this.selectionClipboard ? { clipboard: this.selectionClipboard } : {}),
