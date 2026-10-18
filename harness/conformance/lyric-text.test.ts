@@ -290,7 +290,7 @@ describe('performance anchors and canonical wrapping', () => {
     const parsed = parseLyricText(doc, 0, '1.1| one | | three | four');
     expect(parsed.diagnostics).toEqual([]);
     expect(parsed.lines[0]!.syllables.size).toBe(3);
-    expect(planLyricEdits(doc, 0, parsed).map(e => 'noteKey' in e ? e.noteKey : '')).toEqual(['b0n0', 'b2n0', 'b3n0']);
+    expect(planLyricEdits(doc, 0, parsed).flatMap(e => 'noteKey' in e ? [e.noteKey] : [])).toEqual(['b0n0', 'b2n0', 'b3n0']);
   });
 
   it('wraps at four bars and at 80 characters, preserving cross-line syllables', () => {
@@ -405,4 +405,10 @@ it('escapes header-shaped lyric text in canonical output', () => {
   const doc = bars(1);
   put(doc, 1, '1', 'nl:');
   expect(unchanged(doc)).toBe('1.1| \\nl:');
+});
+
+it('accepts an anchor on a real final bar containing only rests', () => {
+  const doc = bars(2);
+  doc.parts[0]!.measures[1]!.sequences[0]!.content = [{ duration: { base: 'whole' }, rest: {} }];
+  expect(parseLyricText(doc, 0, '2.1|').diagnostics).toEqual([]);
 });

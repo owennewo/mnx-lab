@@ -99,7 +99,6 @@ export function lyricEventWalk(doc: MnxStructure, partIndex: number): LyricEvent
 interface LineGroups {
   /** group key ('' = primary, else the lang code) → ids in stacking order */
   groups: Map<string, string[]>;
-  ordinalOf: (id: string) => { group: string; ordinal: number };
 }
 
 function lineGroups(doc: MnxStructure, walk: LyricEventEntry[]): LineGroups {
@@ -119,13 +118,7 @@ function lineGroups(doc: MnxStructure, walk: LyricEventEntry[]): LineGroups {
     ids.push(id);
     groups.set(key, ids);
   }
-  return {
-    groups,
-    ordinalOf: id => {
-      const key = metadata[id]?.lang ?? '';
-      return { group: key, ordinal: (groups.get(key) ?? []).indexOf(id) + 1 };
-    }
-  };
+  return { groups };
 }
 
 /** The smallest positive-integer id not yet taken — the lab's own convention;
@@ -281,7 +274,7 @@ function takeHeader(tokens: RawToken[]): { ordinal?: number; lang?: string; cons
   return null;
 }
 
-function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: string, walk = lyricEventWalk(doc, partIndex), allowOpenWord = false): ParsedLyricText {
+function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: string, walk = lyricEventWalk(doc, partIndex), allowOpenWord = false, measureCount?: number): ParsedLyricText {
   const { groups } = lineGroups(doc, walk);
   const diagnostics: LyricTextDiagnostic[] = [];
   const tokens: LyricTokenSpan[] = [];
@@ -289,7 +282,7 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
   const counters = new Map<string, number>();
   const minted = new Set<string>();
   const takenIds = new Set<string>([...groups.values()].flat());
-  const barCount = walk.reduce((max, entry) => Math.max(max, entry.measureIndex + 1), 0);
+  const barCount = measureCount ?? walk.reduce((max, entry) => Math.max(max, entry.measureIndex + 1), 0);
 
   let offset = 0;
   const textLines = text.split('\n');
@@ -497,7 +490,8 @@ const normalizeType = (type?: string) => (type === 'whole' ? undefined : type);
 
 /**
  * The buffer is the complete lyric state of the part's walk: a line absent
- * from it clears its syllables on those events; events outside the walk (and
+ * from it clears its syllables on reachable events; events outside navigation,
+ * outside the walk (and
  * other parts, other voices) are untouched. Empty result = nothing to apply.
  */
 export function planLyricEdits(doc: MnxStructure, partIndex: number, parsed: ParsedLyricText): LyricPlanEdit[] {
@@ -707,7 +701,7 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       buffer += ` ${token.text}`;
       offsets.push({ from, to: buffer.length, source: token });
     }
-    const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true);
+    const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true, visits.length);
     result.diagnostics.push(...parsed.diagnostics.map(d => ({ ...d, textLine,
       ...(d.bar === undefined ? {} : { bar: visits[d.bar - 1]?.measureIndex === undefined ? bar : visits[d.bar - 1]!.measureIndex + 1 }) })));
     const lines = new Map<string, ParsedLyricLine>();
