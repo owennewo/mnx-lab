@@ -413,7 +413,7 @@ export class Player extends LitElement {
     }
     /* The readout is sized by the widest label the performance can print
        (stacked under it, invisible) so the scrubber beside it never moves
-       as the beat ticks from 4 to 4.5. */
+       as the beat ticks from 4 to 4½. */
     output {
       display: inline-grid;
       font: 500 13px/1 var(--mono);
@@ -430,6 +430,9 @@ export class Player extends LitElement {
     }
     .place {
       display: inline-grid;
+    }
+    .place .beat {
+      color: var(--ink-3);
     }
     output.none {
       font: inherit;
@@ -1134,16 +1137,17 @@ export class Player extends LitElement {
   private static stroke(d: string, px = 18) {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
   }
-  /** The live readout prints the place alone — `# 8.1` — plus a hold or
-   *  grace when the playhead is inside one. Which pass this is lives in
-   *  the rail (the lit lane), the lane's hover card and the output's
-   *  accessible name; the readout does not repeat it. */
+  /** The live readout prints the bar and its visit as the lyric text names
+   *  them — `9.2` — then the beat, dimmed, then a hold or grace when the
+   *  playhead is inside one. `of 6` stays in the lane's hover card and the
+   *  output's accessible name. */
   private readout() {
     if (!this.performance) return nothing;
     const parts = this.positionParts;
     if (!parts) return this.positionLabel;
     const tail = parts.insertion ? ` · ${parts.insertion}` : '';
-    return html`<span class="place"><span>${Player.bare(placeLabel(parts))}</span><span class="widest" aria-hidden="true">${Player.bare(this.widestPlace)}</span></span>${tail}`;
+    const [bar, beat] = Player.bare(placeLabel(parts)).split(' · ');
+    return html`<span class="place"><span>${bar} · <span class="beat">${beat}</span></span><span class="widest" aria-hidden="true">${Player.bare(this.widestPlace)}</span></span>${tail}`;
   }
   /** The readout sits under its BAR label, so it drops the `#` the rail's cards and the accessible name keep. */
   private static bare(label: string) { return label.replace(/^# /, ''); }

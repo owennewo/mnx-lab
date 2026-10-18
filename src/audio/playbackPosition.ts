@@ -10,12 +10,13 @@ export function measureAt(
     (m) => compare(position, m.position) >= 0 && compare(position, add(m.position, m.duration)) < 0,
   );
 }
-/** How many times the performance visits this written measure — the last
- *  iteration it reaches, so a readout can say `pass 2 of 3`. */
-export function iterationsOf(performance: Performance, measureIndex: number): number {
+/** How many times the performance visits this written measure — its last
+ *  occurrence, so a readout can say `pass 2 of 3`. Occurrences never reset,
+ *  where the strain `iteration` does when a jump fires. */
+export function occurrencesOf(performance: Performance, measureIndex: number): number {
   let last = 1;
   for (const m of performance.measures)
-    if (m.measureIndex === measureIndex && m.iteration > last) last = m.iteration;
+    if (m.measureIndex === measureIndex && m.occurrence > last) last = m.occurrence;
   return last;
 }
 /** Every visit to a written measure, in performed order — the passes a
@@ -31,9 +32,10 @@ export interface PlaybackPositionParts {
   measureIndex: number;
   /** The written bar number as printed. */
   bar: string;
-  iteration: number;
-  iterations: number;
-  /** The beat with its tenth when it has one: `3`, `4.5` — printed after the bar as `# 21.4.5`. */
+  /** Which visit to the bar this is, from 1 — the `.2` of `9.2`, as the lyric text names it. */
+  occurrence: number;
+  occurrences: number;
+  /** The beat, with its written fraction when it has one: `3`, `1½`, `2⅓`. */
   beat: string;
   insertion: 'hold' | 'grace' | null;
 }
@@ -67,28 +69,44 @@ export function scorePlaybackPositionParts(performance: Performance, position: S
   let unit = 4;
   for (let i = 0; i <= measure.measureIndex; i++)
     unit = document?.global.measures[i]?.time?.unit ?? unit;
-  const beat = add(rational(1n), multiply(position.metricOffset, rational(BigInt(unit))));
-  const tenths = (beat.num * 10n) / beat.den;
-  const label = `${tenths / 10n}${tenths % 10n ? '.' + (tenths % 10n) : ''}`;
+  const beat = beatLabel(add(rational(1n), multiply(position.metricOffset, rational(BigInt(unit)))));
   return {
     ordinal: measure.ordinal,
     measureIndex: measure.measureIndex,
     bar: String(document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1),
-    iteration: measure.iteration,
-    iterations: iterationsOf(performance, measure.measureIndex),
-    beat: label,
+    occurrence: measure.occurrence,
+    occurrences: occurrencesOf(performance, measure.measureIndex),
+    beat,
     insertion: null,
   };
 }
-/** The place in the written score as one dotted number — `# 21.4` is bar 21
- *  beat 4, `# 21.4.5` half a beat in — so bar, beat and sub-beat read together. */
-export function placeLabel(parts: Pick<PlaybackPositionParts, 'bar' | 'beat'>): string {
-  return `# ${parts.bar}.${parts.beat}`;
+/** The finest fraction of a beat the readout names. A note or rest sits on a
+ *  written fraction; a running playhead is read off the clock's 2⁻²⁰ grid, so
+ *  it never reduces this far and reads as its whole beat instead of ticking. */
+const FINEST_BEAT_FRACTION = 32n;
+const VULGAR: Record<string, string> = {
+  '1/2': '½', '1/3': '⅓', '2/3': '⅔', '1/4': '¼', '3/4': '¾', '1/5': '⅕', '2/5': '⅖', '3/5': '⅗', '4/5': '⅘',
+  '1/6': '⅙', '5/6': '⅚', '1/8': '⅛', '3/8': '⅜', '5/8': '⅝', '7/8': '⅞',
+};
+const SUPER = '⁰¹²³⁴⁵⁶⁷⁸⁹', SUB = '₀₁₂₃₄₅₆₇₈₉';
+const script = (n: bigint, digits: string) => [...String(n)].map(d => digits[Number(d)]).join('');
+/** `1`, `1½`, `2⅓`, `3⁵⁄₁₆`: the beat with its written fraction, or the whole beat when the fraction is finer than any written one. */
+export function beatLabel(beat: Rational): string {
+  const whole = beat.num / beat.den;
+  const num = beat.num - whole * beat.den, den = beat.den;
+  if (num === 0n || den > FINEST_BEAT_FRACTION) return String(whole);
+  return `${whole}${VULGAR[`${num}/${den}`] ?? `${script(num, SUPER)}⁄${script(den, SUB)}`}`;
+}
+/** The place in the written score: the bar and its visit as the lyric text
+ *  names them — `# 9.2` is the second visit to bar 9 — then the beat, so
+ *  `# 9.2 · beat 1½`. The dot only ever separates bar from visit. */
+export function placeLabel(parts: Pick<PlaybackPositionParts, 'bar' | 'occurrence' | 'beat'>): string {
+  return `# ${parts.bar}.${parts.occurrence} · beat ${parts.beat}`;
 }
 /** Which pass through the bar this is — `pass 2 of 3` — or nothing at all on
  *  a bar the performance plays once: `pass 1 of 1` tells the reader nothing. */
-export function passLabel(parts: Pick<PlaybackPositionParts, 'iteration' | 'iterations'>): string {
-  return parts.iterations > 1 ? `pass ${parts.iteration} of ${parts.iterations}` : '';
+export function passLabel(parts: Pick<PlaybackPositionParts, 'occurrence' | 'occurrences'>): string {
+  return parts.occurrences > 1 ? `pass ${parts.occurrence} of ${parts.occurrences}` : '';
 }
 /** The readout's segments in order, empties dropped: place · pass · hold/grace. */
 export function readoutSegments(parts: PlaybackPositionParts): string[] {
@@ -110,44 +128,45 @@ export function formatScorePlaybackPosition(performance: Performance, position: 
 /**
  * The widest label `formatPlaybackPosition` can print for this performance,
  * so a readout can reserve its width once instead of nudging its neighbours
- * every time the beat ticks from `4` to `4.5`. Every field is taken at its
- * longest: the longest written bar number, the last iteration, the fullest
- * beat of any measure with a tenth on it, and the longer insertion word when
- * the performance holds or graces anywhere.
+ * every time the beat ticks from `4` to `4½`. Every field is taken at its
+ * longest: the longest written bar number, the most visits to any bar, the
+ * fullest beat of any measure with a one-glyph fraction on it (a rarer
+ * `⁵⁄₁₆` may widen it), and the longer insertion word when the performance
+ * holds or graces anywhere.
  */
 export function widestPlaybackPosition(performance: Performance, document?: MnxStructure): string {
   if (performance.measures.length === 0) return 'Ready';
   return widestReadoutSegments(performance, document).join(' · ');
 }
-/** The widest place alone — `# 128.4.5` — so a readout can reserve that
- *  segment's width by itself and keep what follows it from drifting as the
- *  tenth comes and goes. */
+/** The widest place alone — `# 128.3 · beat 4½` — so a readout can reserve
+ *  that segment's width by itself and keep what follows it from drifting as
+ *  the fraction comes and goes. */
 export function widestPlaceLabel(performance: Performance, document?: MnxStructure): string {
   return widestReadoutSegments(performance, document)[0] ?? '';
 }
 function widestReadoutSegments(performance: Performance, document?: MnxStructure): string[] {
   if (performance.measures.length === 0) return [];
   let bar = '';
-  let iteration = 1;
+  let occurrence = 1;
   let beat = 1n;
   let unit = 4;
   let nextUnitIndex = 0;
   for (const measure of performance.measures) {
     const number = String(document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1);
     if (number.length > bar.length) bar = number;
-    iteration = Math.max(iteration, measure.iteration);
+    occurrence = Math.max(occurrence, measure.occurrence);
     for (let i = nextUnitIndex; i <= measure.measureIndex; i++)
       unit = document?.global.measures[i]?.time?.unit ?? unit;
     nextUnitIndex = Math.max(nextUnitIndex, measure.measureIndex + 1);
     // The last beat label a measure prints has integer part ⌈until × unit⌉:
     // offsets stop just short of `until`, so a whole-beat end prints that
-    // beat's tenths and a partial end rounds up into its final beat.
+    // beat with a fraction and a partial end rounds up into its final beat.
     const scaled = multiply(measure.until, rational(BigInt(unit)));
     const last = (scaled.num + scaled.den - 1n) / scaled.den;
     if (last > beat) beat = last;
   }
   const kinds = new Set(performance.sourceMap.map((s) => s.kind));
   const suffix = kinds.has('makeTime') ? 'grace' : kinds.has('fermata') ? 'hold' : '';
-  const pass = passLabel({ iteration, iterations: iteration });
-  return [placeLabel({ bar, beat: `${beat}.5` }), pass, suffix].filter((s) => s !== '');
+  const pass = passLabel({ occurrence, occurrences: occurrence });
+  return [placeLabel({ bar, occurrence, beat: `${beat}½` }), pass, suffix].filter((s) => s !== '');
 }

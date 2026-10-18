@@ -7,12 +7,16 @@ no backend service. It does not own the viewer's context or the editor selection
 
 The element supplies Play/Pause, Stop, a rail over the written bars, rate
 (0.25×–2× in 0.05 steps), and master volume. API ordinals and `at=` links are
-zero-based. The position readout prints the place as one dotted number — `# 21.4` is
-bar 21 beat 4, `# 21.4.5` half a beat in, so bar, beat and sub-beat read together — plus
-an explicit hold/grace label when the playhead is inside one. The readout uses a pure
-helper, including inherited meter and authored bar numbers. Tenths of a beat are display
-formatting only; the readout is not an incessant live-region announcement; its accessible
-name carries the full label, pass included.
+zero-based. The position readout prints the bar and its visit as the lyric text names
+them — `9.2` is the second visit to bar 9, counted by `occurrence` — then the beat with
+its written fraction: `9.2 · beat 1½`. The dot only ever separates bar from visit, so a
+lyric line `9.2|` and the tray agree at a glance (until 2026-10-18 the tray printed
+`9.1.4` for bar 9 beat 1.4, which read as a visit). A fraction finer than a 32nd of a
+beat prints as its whole beat, so a running playhead reads `beat 3` rather than ticking.
+An explicit hold/grace label follows when the playhead is inside one. The readout uses a
+pure helper, including inherited meter and authored bar numbers; it is not an incessant
+live-region announcement; its accessible name carries the full label, `pass 2 of 6`
+included.
 
 **The rail** (locked on the *Playback Tray* canvas, 2026-09-13) replaces the range slider:
 one column per written bar, one lane per visit to it, so the rail reads left to right like
