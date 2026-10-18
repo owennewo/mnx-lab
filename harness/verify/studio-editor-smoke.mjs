@@ -247,9 +247,14 @@ try {
   await key('KeyV', { ctrl: true });
   await wait(`JSON.parse(${frets}).length === 3`);
 
+  // Not playing, the tray names the cursor's own place — exact, where a recording's clock is only near it.
+  const placed = await c.evaluate(`(() => { const at = ${piece}.querySelector('mnx-player').cursorPlace, start = ${page}.editor.session.playStart;
+    return at && start ? [at.ordinal === start.ordinal, at.metricOffset.num * BigInt(start.onset.den) === at.metricOffset.den * BigInt(start.onset.num)] : null; })()`);
+  assert.deepEqual(placed, [true, true], 'the tray is not told where the cursor stands');
   // Escape puts the cursor away; an arrow brings it back.
   await c.evaluate(`${viewer}.focus()`);
   await key('Escape'); await wait(`${viewer}.selection.cursor == null`);
+  await wait(`${piece}.querySelector('mnx-player').cursorPlace === null`);
   await key('ArrowLeft'); await wait(`${viewer}.selection.cursor != null`);
 
   // A bar added is saved at once, not after the pause: the chip goes clean without anyone asking.

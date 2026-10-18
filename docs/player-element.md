@@ -13,6 +13,10 @@ its written fraction: `9.2 · beat 1½`. The dot only ever separates bar from vi
 lyric line `9.2|` and the tray agree at a glance (until 2026-10-18 the tray printed
 `9.1.4` for bar 9 beat 1.4, which read as a visit). A fraction finer than a 32nd of a
 beat prints as its whole beat, so a running playhead reads `beat 3` rather than ticking.
+**Not playing, the readout names the editor cursor, not the playhead** (`cursorPlace`, fed
+by `CursorPlayback.place`): the cursor is an exact place in the score, while a playhead
+read back from a recording's clock only lands near the note it was parked on — so the
+note at beat 3½ read `beat 3` under a YouTube recording until 2026-10-18.
 An explicit hold/grace label follows when the playhead is inside one. The readout uses a
 pure helper, including inherited meter and authored bar numbers; it is not an incessant
 live-region announcement; its accessible name carries the full label, `pass 2 of 6`

@@ -37,4 +37,8 @@ export interface CursorPlayback {
    *  (roadmap: core-note-audition). `edited`: an edit just made or changed it, so the sound
    *  waits for the performance that edit produces. Optional: a player without one stays silent. */
   audition?(note: { noteKey: string; ordinal: number; edited?: boolean }): void;
+  /** Where the cursor stands, for the player's readout to name while it is not playing — an
+   *  exact place in the score, where the playhead read back from a recording's clock is only
+   *  near it. Null when there is no cursor to name (playing, hidden, unbound). Optional. */
+  place?(position: PerformedPosition | null): void;
 }

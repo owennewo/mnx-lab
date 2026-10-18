@@ -84,6 +84,9 @@ export class Player extends LitElement {
   /** Per-part level, mute and instrument beneath the master volume, keyed by part index
    *  (src/audio/partMix.ts). Synth only: a recording has no parts. */
   @property({ attribute: false }) partMix: PartMix = {};
+  /** An editor cursor's place (`CursorPlayback.place`). Not playing, the readout names it rather
+   *  than the playhead: a recording's clock only lands near the note the cursor is on. */
+  @property({ attribute: false }) cursorPlace: ScorePosition | null = null;
   /** The synth's sample rate (undefined: the device's). A change rebuilds the synth: an
    *  AudioContext's rate is fixed when it is made. */
   @property({ type: Number }) sampleRate: number | undefined;
@@ -982,8 +985,15 @@ export class Player extends LitElement {
   get sourceId() { return this.session?.backend.id ?? 'synth'; }
   /** The readout's fields when the position is a place in the score — the
    *  synth's position, or recorded audio inside its sync — else null. */
+  /** The cursor's place while the music is not playing, when there is one in this performance. */
+  private get parkedCursor(): ScorePosition | null {
+    const at = this.cursorPlace;
+    return at && !this.playback?.wantsPlayback && this.performance && at.ordinal < this.performance.measures.length ? at : null;
+  }
   get positionParts(): PlaybackPositionParts | null {
     if (!this.performance) return null;
+    const parked = this.parkedCursor;
+    if (parked) { const parts = scorePlaybackPositionParts(this.performance, parked, this.document); return parts ? { ...parts, insertion: null } : null; }
     const status = this.playback;
     if (!status || status.kind === 'synth') return playbackPositionParts(this.performance, this.position, this.document);
     if (status.scorePosition) {
@@ -994,6 +1004,8 @@ export class Player extends LitElement {
   }
   get positionLabel() {
     if (!this.performance) return 'Nothing to play';
+    const parked = this.parkedCursor;
+    if (parked) return formatScorePlaybackPosition(this.performance, parked, this.document);
     const status = this.playback;
     if (!status || status.kind === 'synth') return formatPlaybackPosition(this.performance, this.position, this.document);
     if (status.scorePosition) return formatScorePlaybackPosition(this.performance, status.scorePosition, this.document);

@@ -297,6 +297,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const draw = () => {
     if (disposed) return;
     viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret, preview });
+    // The tray names the cursor's exact place while it is drawn and the music is not playing.
+    const start = session.playStart;
+    playback?.place?.(start && !playing && !cursorHidden && !suspended() ? toPosition(start) : null);
     // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard.
     viewer.selectionInactive = !hasKeyboard();
     if (inspector) {
@@ -792,6 +795,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     },
     dispose: () => {
       disposed = true;
+      playback?.place?.(null);
       tabDigits.cancel();
       clearTimeout(seekTimer); clearTimeout(barTimer); clearTimeout(labelTimer);
       unsubscribe?.(); uncouple?.();

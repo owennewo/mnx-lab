@@ -112,6 +112,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       return () => player.removeEventListener('playback-state-changed', listener);
     },
     audition: ({ noteKey, ordinal, edited }) => { player.audition(noteKey, ordinal, { edited }); },
+    place: position => { player.cursorPlace = position && { ordinal: position.ordinal, metricOffset: position.offset }; },
     couple() {
       coupled++;
       let released = false;

@@ -380,6 +380,7 @@ export class ScenarioPage extends LitElement {
       },
       seek: ({ ordinal, offset }) => { page.player?.seek(ordinal, offset); },
       audition: ({ noteKey, ordinal, edited }) => { page.player?.audition(noteKey, ordinal, { edited }); },
+      place: position => { if (page.player) page.player.cursorPlace = position && { ordinal: position.ordinal, metricOffset: position.offset }; },
       subscribe(listener) {
         page.addEventListener('playback-state-changed', listener);
         return () => page.removeEventListener('playback-state-changed', listener);
