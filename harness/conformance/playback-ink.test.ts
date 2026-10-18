@@ -250,7 +250,7 @@ describe('lyric syllables', () => {
     for (const layout of Object.values(layouts)) {
       const found = syllables(layout({ mnx: doc, widthSp: WIDTH_SP }).primitives);
       expect(found.length).toBeGreaterThan(0);
-      expect(found.every(p => p.playbackId === undefined)).toBe(true);
+      expect(found.every(p => p.playbackId === undefined && p.lyricLine === undefined)).toBe(true);
     }
   });
 
@@ -261,6 +261,7 @@ describe('lyric syllables', () => {
         const found = syllables(primitives), keys = noteKeys(primitives);
         expect(found).toHaveLength(entries ? 8 : 4);
         for (const syllable of found) expect(keys, `${syllable.text} → ${syllable.playbackId}`).toContain(syllable.playbackId);
+        expect(found.every(p => p.lyricLine === '1')).toBe(true);
         expect(new Set(found.map(p => p.playbackId)).size).toBe(found.length);
       }
     });
@@ -270,6 +271,44 @@ describe('lyric syllables', () => {
     const layout = layoutTab({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true });
     const svg = renderSvgToString({ primitives: layout.primitives, widthSp: layout.widthSp, heightSp: layout.heightSp, pxPerSp: 16 });
     expect(svg).toMatch(/<text[^>]*data-playback-id="n1"[^>]*class="lyric"/);
+  });
+});
+
+/** A lyric syllable as the paint sees it: a text node a lamp can stand before. */
+class FakeSyllable extends FakeNode {
+  previousElementSibling: FakeNode & { remove(): void } | null = null;
+  ownerDocument = {
+    createElementNS: () => {
+      const lamp = Object.assign(new FakeNode({}), { remove: () => { this.previousElementSibling = null; } });
+      lamp.setAttribute = (k: string, v: string) => { if (k === 'class') v.split(' ').forEach(c => lamp.classes.add(c)); lamp.attrs.set(k, String(v)); };
+      return lamp;
+    }
+  };
+  constructor(key: string, line: string) { super({ 'data-playback-id': key, 'data-lyric-line': line }, ['lyric']); }
+  getBBox() { return { x: 0, y: 0, width: 20, height: 10 }; }
+  before(lamp: FakeNode & { remove(): void }) { this.previousElementSibling = lamp; }
+  get lit() { return this.previousElementSibling !== null; }
+}
+
+describe('the sung word', () => {
+  it('lights the verse the pass sings, and only that one', () => {
+    const one = new FakeSyllable('n1', '1'), two = new FakeSyllable('n1', '2');
+    const root = new FakeRoot([one, two]) as unknown as ParentNode;
+    paintPlaybackInk(root, new Map([['n1', 1]]), '2');
+    expect([one.lit, two.lit]).toEqual([false, true]);
+    paintPlaybackInk(root, new Map([['n1', 1]]), '1');
+    expect([one.lit, two.lit]).toEqual([true, false]);
+    paintPlaybackInk(root, new Map(), '1');
+    expect([one.lit, two.lit]).toEqual([false, false]);
+  });
+
+  it('a note with no word on the pass\'s verse lights every word it has, not none', () => {
+    const one = new FakeSyllable('n1', '1'), two = new FakeSyllable('n1', '2'), solo = new FakeSyllable('n2', '1');
+    const root = new FakeRoot([one, two, solo]) as unknown as ParentNode;
+    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '3');
+    expect([one.lit, two.lit, solo.lit]).toEqual([true, true, true]);
+    paintPlaybackInk(root, new Map([['n1', 1], ['n2', 1]]), '2');
+    expect([one.lit, two.lit, solo.lit]).toEqual([false, true, true]);
   });
 });
 

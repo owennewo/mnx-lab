@@ -56,7 +56,13 @@ export function playbackVoiceSlot(voice: number): number {
  * beside it is the rest's playback mark (core-tab-rest-targets). Lit, it drew
  * a solid block in the voice's colour over the staff.
  */
-export function paintPlaybackInk(root: ParentNode, sounding: ReadonlyMap<string, number>): void {
+export function paintPlaybackInk(
+  root: ParentNode,
+  sounding: ReadonlyMap<string, number>,
+  /** The verse the current pass sings (`verseForIteration`), if any. */
+  verse?: string
+): void {
+  const sung = new Map<string, { ink: SVGElement; voice: number }[]>();
   for (const ink of root.querySelectorAll<SVGElement>('[data-source-id], [data-playback-id]')) {
     if (ink.classList.contains('tab-rest')) continue;
     const key = ink.getAttribute('data-source-id') ?? ink.getAttribute('data-playback-id') ?? '';
@@ -67,7 +73,18 @@ export function paintPlaybackInk(root: ParentNode, sounding: ReadonlyMap<string,
     if (voice === undefined) ink.removeAttribute('data-playback-voice');
     else ink.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice)));
     if (ink.classList.contains('fret-bg')) stretchMask(ink, voice !== undefined);
-    else if (ink.classList.contains('lyric')) lightSyllable(ink, voice);
+    else if (ink.classList.contains('lyric')) {
+      if (voice === undefined) lightSyllable(ink, undefined);
+      else sung.set(key, [...(sung.get(key) ?? []), { ink, voice }]);
+    }
+  }
+  // Stacked verses share their note: light the one this pass sings. A note with
+  // no word on that verse (a fourth pass over two written verses, a verse that
+  // skips a bar) lights every word it has, rather than none.
+  for (const words of sung.values()) {
+    const current = words.filter(({ ink }) => ink.getAttribute('data-lyric-line') === verse);
+    const lit = current.length ? current : words;
+    for (const { ink, voice } of words) lightSyllable(ink, lit.some(w => w.ink === ink) ? voice : undefined);
   }
 }
 

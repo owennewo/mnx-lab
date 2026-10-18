@@ -416,7 +416,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
             bandTop: lyricBandTop(m.row),
             text: line.text,
             continues: line.type === 'start' || line.type === 'middle',
-            ...(playbackId === undefined ? {} : { playbackId })
+            ...(playbackId === undefined ? {} : { playbackId, lyricLine: lineId })
           });
           lyricRuns.set(lineId, run);
         }

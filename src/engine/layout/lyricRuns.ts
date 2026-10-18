@@ -83,6 +83,8 @@ export interface LyricSyllable {
   continues: boolean;
   /** The playhead's name for the syllable (`syllablePlaybackKey`), viewer layouts only. */
   playbackId?: string;
+  /** Its lyric line id, carried with `playbackId` (viewer layouts only). */
+  lyricLine?: string;
 }
 
 /**
@@ -203,7 +205,8 @@ export function emitLyricRuns(
         size: LYRIC_SIZE_SP,
         anchor: 'middle',
         className: 'lyric',
-        ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId })
+        ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
+        ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
       };
       primitives.push(syllable);
       owners.set(syllable, syl.row);

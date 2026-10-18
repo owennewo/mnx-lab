@@ -1912,7 +1912,7 @@ export class DocumentViewer extends LitElement {
     const sounding=new Map<string,number>();
     for(const w of this.playbackState?.highlight??[])
       sounding.set(occurrenceKey(w.noteKey,this.unrolled?w.ordinal:undefined),this.playbackVoiceOf(w.noteKey));
-    if(this.container)paintPlaybackInk(this.container,sounding);
+    if(this.container)paintPlaybackInk(this.container,sounding,this.selectedVerse);
   }
   private systemBookends() {
     const durations = this.playbackState?.recordingBookends;

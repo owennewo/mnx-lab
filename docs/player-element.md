@@ -214,8 +214,10 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   syllable is collected, since syllables are emitted after `qualifyMeasure` has run).
   While that note sounds the paint puts a lamp behind the word — a rounded rect
   measured from the drawn text, in the fret mask's tint — and removes it after; the
-  word keeps its ink. Every verse under the note lights: which verse a pass sings is
-  not modelled. `revealOccurrence({noteKey, ordinal})` is public; it shares the
+  word keeps its ink. Of stacked verses, the one the pass sings lights — pass N sings
+  verse N (`verseForIteration`, the viewer's `selectedVerse`; syllables carry
+  `data-lyric-line` beside their key) — and a note with no word on that verse lights
+  all it has rather than none. `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.
 

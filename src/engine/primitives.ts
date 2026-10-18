@@ -140,6 +140,9 @@ export interface TextPrim extends PrimitiveBase {
    *  event's note key so the playhead can light the word being sung. Present
    *  only under `durationSpans`, so the goldens never see it. */
   playbackId?: string;
+  /** The verse a syllable belongs to (its lyric line id), beside `playbackId`
+   *  and under the same flag: the paint lights the verse the pass sings. */
+  lyricLine?: string;
 }
 
 export interface RectPrim extends PrimitiveBase {
