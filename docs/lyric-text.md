@@ -3,7 +3,8 @@
 Shift+L opens the right-hand lyric panel in studio and workbench. The score narrows
 to keep the panel beside it, between the toolbar and playback tray. The text is a projection
 of the event lyrics, with live preview; Ctrl+Enter applies one undoable edit.
-Closing without applying discards the draft.
+Closing without applying discards the draft. Play leaves the panel open, read-only
+(Apply too) until the music pauses.
 
 ## Performance anchors
 

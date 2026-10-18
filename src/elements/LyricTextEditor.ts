@@ -39,6 +39,8 @@ export class LyricTextEditor extends LitElement {
   @property({ type: String }) partLabel = '';
   /** Opens with the caret on this note's token, when it has one. */
   @property({ type: String }) focusNoteKey = '';
+  /** The music is playing: the panel stays open, read-only, until it pauses — nothing is written while it plays. */
+  @property({ type: Boolean }) playing = false;
 
   @state() private text = '';
   @state() private parsed: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
@@ -259,7 +261,7 @@ export class LyricTextEditor extends LitElement {
   }
 
   private apply() {
-    if (this.parsed.diagnostics.length > 0 || this.edits.length === 0) return;
+    if (this.parsed.diagnostics.length > 0 || this.edits.length === 0 || this.playing) return;
     this.dispatchEvent(new CustomEvent('lyric-editor-apply', {
       detail: { edits: this.edits },
       bubbles: true,
@@ -293,6 +295,8 @@ export class LyricTextEditor extends LitElement {
         </header>
         <textarea
           aria-label="Lyric text"
+          ?readonly=${this.playing}
+          title=${this.playing ? 'pause to edit' : ''}
           spellcheck="false"
           .value=${this.text}
           @input=${this.onInput}
@@ -311,8 +315,8 @@ export class LyricTextEditor extends LitElement {
           <button @click=${() => this.close()}>close</button>
           <button
             class="apply"
-            ?disabled=${blocked || this.edits.length === 0}
-            title=${blocked ? 'fix the diagnostics first' : this.edits.length === 0 ? 'no changes' : 'apply as one edit'}
+            ?disabled=${blocked || this.edits.length === 0 || this.playing}
+            title=${blocked ? 'fix the diagnostics first' : this.edits.length === 0 ? 'no changes' : this.playing ? 'pause to apply' : 'apply as one edit'}
             @click=${() => this.apply()}
           >apply</button>
         </footer>

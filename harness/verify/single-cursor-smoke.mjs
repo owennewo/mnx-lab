@@ -7,7 +7,7 @@
 //
 // Paused, the arrows move the video; → at the first ending loops back and says
 // Pass 2; a bar selection plays from its first event and Play collapses it.
-// Playing, a fret is refused with Pause to edit, and ←/→ presses are counted
+// Playing, the lyric panel stays open read-only, a fret is refused with Pause to edit, and ←/→ presses are counted
 // into ONE seek of whole bars. A pause parks the cursor on the playhead without
 // seeking, and the next move seeks again.
 import os from 'node:os';
@@ -103,8 +103,13 @@ try {
     await delay(650);near(video(),9+2,'The video did not follow into the bar');
     editor.handleIntent({type:'goToLevel',level:'measure'});
     await delay(650);near(video(),9,'A bar selection did not put the video at the bar');
+    // The lyric panel stays open through Play, read-only until the pause.
+    editor.openLyrics();
+    const lyricArea=()=>page.shadowRoot.querySelector('mnx-lyric-text-editor')?.shadowRoot?.querySelector('textarea');
+    await until(()=>lyricArea(),'the lyric panel');
     await player.play();
     await until(()=>player.playback?.wantsPlayback&&session.selectionLevel==='note','Play to collapse the selection');
+    await until(()=>lyricArea()?.readOnly,'the lyric panel to stay open, read-only, while playing');
     check(session.cursor.onset.num===0&&session.performedOrdinal===2,'Play did not collapse to the first event');
 
     // Playing: a fret is refused, and says why.
@@ -130,6 +135,8 @@ try {
     await until(()=>!player.playback?.wantsPlayback,'the pause');
     await delay(250);
     check(seeks===base,'Pausing seeked');
+    await until(()=>lyricArea()&&!lyricArea().readOnly,'the lyric panel to be editable after the pause');
+    page.shadowRoot.querySelector('mnx-lyric-text-editor').shadowRoot.querySelector('button.close').click();
     check(session.performedOrdinal===player.scorePosition.ordinal,'The cursor did not park on the playhead');
     near(video(),at,'Pausing moved the video');
     // …and the next move is a seek again.

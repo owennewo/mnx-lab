@@ -405,7 +405,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (now !== playing) {
       playing = now;
       if (now) {
-        tabDigits.flush(); closeInspector(false); closeLyrics(false);
+        // The lyric panel stays open while the music plays, read-only: following the words is the point.
+        tabDigits.flush(); closeInspector(false);
         // A move made just before Play is where Play meant to start.
         if (seekTimer !== undefined) seekNow();
         // Play collapses a range, or a rung wider than the event, to its first event.
@@ -426,6 +427,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
         if (visit) seekNow({ ordinal: visit.ordinal, onset: entryStart(visit) });
         else if (head) park(head);
       }
+      if (lyrics) lyrics.playing = playing;
       draw();
       return;
     }
@@ -538,7 +540,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
-    Object.assign(el, { doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '' });
+    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '' });
     // Clean parses draw live on a SCRATCH copy, through the very ops the session would use; nothing is edited until Apply.
     el.addEventListener('lyric-editor-edits', e => {
       const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
