@@ -51,8 +51,10 @@ export class YouTubePort implements MediaPort {
   private priming = false;
   private primed?: Promise<boolean>;
   private primeFinish?: (started: boolean) => void;
+  /** `pageHidden` reports a page no one can see — a background tab, where the browser holds back
+   *  the frames a load waits on. Time spent hidden is not counted against readiness. */
   constructor(private readonly videoId: string, private readonly factory: YouTubeFactory,
-    private readonly visible: () => boolean) {}
+    private readonly visible: () => boolean, private readonly pageHidden: () => boolean = () => false) {}
   get capabilities(): PlaybackCapabilities {
     const reported = this.apiReady ? this.api!.getAvailablePlaybackRates() : [1];
     const values = [...new Set((Array.isArray(reported) ? reported : [1]).filter(r => Number.isFinite(r) && r > 0))].sort((a,b)=>a-b);
@@ -80,9 +82,13 @@ export class YouTubePort implements MediaPort {
     if (this.closed) return Promise.reject(new Error('YouTube source is disposed.'));
     return this.ready ??= new Promise<void>((resolve,reject) => {
       let announced = false, finished = false, failed = false;
-      const timeout = setTimeout(() => finish(new Error('YouTube did not become ready. Check the connection and host CSP.')), 15000);
+      // A load that ran out of time while the page was hidden was waiting for the page, not
+      // failing: it gets a fresh 15 seconds, and goes on as soon as the page is looked at.
+      let timeout: ReturnType<typeof setTimeout>;
+      const arm = () => { timeout = setTimeout(() => this.pageHidden() ? arm() : finish(new Error('YouTube did not become ready. Check the connection and host CSP.')), 15000); };
       const finish = (error?: Error) => { if (finished) return; finished=true; clearTimeout(timeout); this.readyCancel=undefined;
         if(error){failed=true;this.fault=error.message;this.api?.destroy();this.api=undefined;this.apiReady=false;reject(error);}else resolve(); };
+      arm();
       this.readyCancel=()=>finish(new Error('YouTube loading cancelled.'));
       const ready = () => {
         if (!this.api || !announced || this.closed || failed) return;

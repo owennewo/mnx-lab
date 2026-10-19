@@ -71,7 +71,7 @@ export class NativeYouTubePort extends YouTubePort {
       document.addEventListener('visibilitychange',owner.visibility);document.addEventListener('fullscreenchange',owner.visibility);
       window.addEventListener('pagehide',owner.visibility);
       return new api.Player(frame,{events});
-    },()=>!!owner.frame&&youtubeVisible(owner.frame));
+    },()=>!!owner.frame&&youtubeVisible(owner.frame),()=>document.hidden);
     owner=this;
   }
   override dispose(){

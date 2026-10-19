@@ -109,6 +109,17 @@ describe('official IFrame API adapter',()=>{
     const play=port.play();await flush();port.pause();ready();await play;expect(f.api.plays).toBe(0);port.dispose();
     const pending=new YouTubePort(id,()=>new Promise(()=>{}),()=>true);const wait=pending.prepare();const rejected=expect(wait).rejects.toThrow('ready');await vi.advanceTimersByTimeAsync(15001);await rejected;pending.dispose();
   });
+  it('does not time out readiness while the page is hidden, and loads when it is shown',async()=>{
+    // A background tab holds back the frames a load waits on: a reload there is waiting, not failing.
+    vi.useFakeTimers();let hidden=true,ready!:()=>void,resolve!:(api:YouTubePlayerApi)=>void;const f=fixture();
+    const port=new YouTubePort(id,events=>{ready=events.onReady;return new Promise(r=>resolve=r);},()=>true,()=>hidden);
+    let failed=false;const prepared=port.prepare().catch(()=>{failed=true;});
+    await vi.advanceTimersByTimeAsync(60000);expect(failed).toBe(false);expect(port.error).toBeUndefined();
+    hidden=false;resolve(f.api);ready();await prepared;expect(failed).toBe(false);port.dispose();
+    // Shown and still not ready, it fails within a fresh 15 seconds.
+    hidden=true;const stuck=new YouTubePort(id,()=>new Promise(()=>{}),()=>true,()=>hidden);const wait=stuck.prepare();const rejected=expect(wait).rejects.toThrow('ready');
+    await vi.advanceTimersByTimeAsync(40000);hidden=false;await vi.advanceTimersByTimeAsync(15001);await rejected;stuck.dispose();
+  });
   it('suppresses following when duration changes instead of scaling score time to it',async()=>{
     const f=fixture();await f.port.prepare();f.state(1);f.api.duration=30;f.port.sample();expect(f.port.clockReliable).toBe(false);expect(f.port.clockIssue).toContain('changing');f.port.dispose();
   });
