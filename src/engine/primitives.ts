@@ -72,6 +72,27 @@ export interface PrimitiveBase {
   /** Only for a host that paints the selection itself (layout/selectionHooks.ts):
    *  the ids that select ink whose selection is a class and no colour. */
   selects?: string;
+  /**
+   * The element this ink draws and where the document keeps it — emitted as
+   * `data-element` / `data-measure`, the click target's address
+   * (roadmap/inprogress/core-editor-click-targets.md). Present only when the
+   * layout was asked for `elementTargets`, which the viewer does and the
+   * goldens never do, so no committed primitive carries it.
+   */
+  element?: ElementTag;
+}
+
+/** Which element a piece of ink belongs to: its kind (`edit/elementWalk.ts`'s
+ *  vocabulary) and the global measure that declares it. */
+export interface ElementTag {
+  kind: 'repeat-end' | 'repeat-start' | 'ending';
+  measureIndex: number;
+}
+
+/** Tag everything pushed since `from` as one element's ink — a no-op without a tag. */
+export function tagElement(primitives: Primitive[], from: number, tag: ElementTag | undefined): void {
+  if (!tag) return;
+  for (let k = from; k < primitives.length; k++) primitives[k]!.element = tag;
 }
 
 export interface GlyphPrim extends PrimitiveBase {

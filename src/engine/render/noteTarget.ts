@@ -35,6 +35,10 @@ export function noteTargetAt(
       best = distance;
     }
   }
-  // Preserve activation of other source-bearing ink (for library callers).
-  return nearest ?? direct;
+  // Preserve activation of other source-bearing ink (for library callers) —
+  // but never a NOTE the geometry above just declined: the DOM's hit area for
+  // a glyph is its whole font em, far past the ink, so falling back to it
+  // made empty paper beside a note a press on that note
+  // (roadmap/inprogress/core-editor-click-targets.md).
+  return nearest ?? (direct && !direct.matches(NOTES) ? direct : null);
 }

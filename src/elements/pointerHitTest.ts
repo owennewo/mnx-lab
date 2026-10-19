@@ -36,6 +36,8 @@ import {
   type SystemBand
 } from './scoreGeometry.ts';
 import { measurePositionAt, measurePositionX } from '../engine/render/selectionGeometry.ts';
+import { slotAt, type ClickTarget, type SlotStaff } from '../engine/render/clickTargets.ts';
+import { collectClickTargets } from './clickTargetPaint.ts';
 
 /**
  * One rendered staff, in model terms. The viewer builds this list in the order
@@ -102,6 +104,10 @@ export interface ScorePointerMap {
   boundaries: (number | undefined)[][];
   /** Every drawn moment on the page — the ruler the fraction is not. */
   columns: InkColumn[];
+  /** The elements a press can select (`engine/render/clickTargets.ts`). */
+  targets: ClickTarget[];
+  /** The staves as the slot rule reads them — where a press may place the cursor. */
+  slots: SlotStaff[];
 }
 
 /**
@@ -126,7 +132,12 @@ export function buildPointerMap(
   });
   return {
     sp: unitsPerSp, staves, systems, markers, rows, table, gaps, boundaries,
-    columns: collectInkColumns(svg, unitsPerSp)
+    columns: collectInkColumns(svg, unitsPerSp),
+    targets: collectClickTargets(svg, unitsPerSp),
+    slots: staves.map((band, index) => ({
+      top: band.top, bottom: band.bottom, x1: band.x1, x2: band.x2,
+      gap: gaps[index] || unitsPerSp, tab: isTabBand(markers, band, unitsPerSp)
+    }))
   };
 }
 
@@ -134,6 +145,12 @@ export function buildPointerMap(
  * The join. A point yields a full address or nothing at all — there is no
  * half-answer, because a placement that guessed at a part would move the cursor
  * somewhere the reader did not point.
+ *
+ * NOTHING is an answer for empty paper, too: a point inside no staff's reach
+ * is dead space, and a press there changes nothing
+ * (core-editor-click-targets.md). Ink outranks reach — a note under the
+ * pointer is a note however many ledger lines up it sits, so with `noteKey`
+ * the system and staff are still the NEAREST ones.
  *
  * Nothing here clamps the line into the staff: a notehead on a ledger line is
  * outside the band and still a legitimate place to stand, so the raw staff
@@ -146,39 +163,49 @@ export function hitTest(
 ): PointerPlacement | null {
   if (map.systems.length === 0 || map.staves.length === 0) return null;
 
-  // The system first: rows are laid out down the page and never overlap, so
-  // the nearest one owns the point even when it fell in the gutter between two.
-  let rowIndex = 0;
-  let bestSystem = Number.POSITIVE_INFINITY;
-  map.systems.forEach((system, index) => {
-    const distance = bandDistance(system, point.y);
-    if (distance < bestSystem) {
-      bestSystem = distance;
-      rowIndex = index;
+  let rowIndex: number;
+  let bandIndex: number;
+  if (noteKey === undefined) {
+    const slot = slotAt(map.slots, point);
+    if (slot === null) return null;
+    bandIndex = slot;
+    rowIndex = map.systems.findIndex(system => system.staffIndices.includes(slot));
+    if (rowIndex < 0) return null;
+  } else {
+    // On ink: the system first — rows are laid out down the page and never
+    // overlap, so the nearest one owns the point even when it fell in the
+    // gutter between two — then the staff within it, again by nearest.
+    rowIndex = 0;
+    let bestSystem = Number.POSITIVE_INFINITY;
+    map.systems.forEach((system, index) => {
+      const distance = bandDistance(system, point.y);
+      if (distance < bestSystem) {
+        bestSystem = distance;
+        rowIndex = index;
+      }
+    });
+    bandIndex = map.systems[rowIndex].staffIndices[0];
+    let bestBand = Number.POSITIVE_INFINITY;
+    for (const index of map.systems[rowIndex].staffIndices) {
+      const distance = bandDistance(map.staves[index], point.y);
+      if (distance < bestBand) {
+        bestBand = distance;
+        bandIndex = index;
+      }
     }
-  });
+  }
   const system = map.systems[rowIndex];
   const rowMeasures = map.rows[rowIndex];
   if (!system || !rowMeasures || rowMeasures.length === 0) return null;
 
-  // Then the staff within it, again by nearest — the point may be above the
-  // top line or below the bottom one and still plainly mean that staff.
-  let bandIndex = system.staffIndices[0];
-  let bestBand = Number.POSITIVE_INFINITY;
-  for (const index of system.staffIndices) {
-    const distance = bandDistance(map.staves[index], point.y);
-    if (distance < bestBand) {
-      bestBand = distance;
-      bandIndex = index;
-    }
-  }
   const band = map.staves[bandIndex];
   const ordinal = system.staffIndices.indexOf(bandIndex);
   const staff = map.table[ordinal];
   if (!band || !staff) return null;
 
   // The bar: which interval between this row's boundaries holds the x. Past
-  // either end the nearest bar owns it, so a click in the margin still lands.
+  // either end the nearest bar owns it — only ink gets there now, since the
+  // empty margin is dead space.
   const boundaries = map.boundaries[rowIndex] ?? [];
   let cell = -1;
   for (let i = 0; i + 1 < boundaries.length; i++) {

@@ -75,7 +75,7 @@ import {
   BeamHookSpec
 } from './beams.ts';
 import {
-  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, translatePrimitiveY
+  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, tagElement, translatePrimitiveY
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import {
@@ -564,6 +564,9 @@ export interface LayoutNotationOptions {
   /** Record fret-mask duration spans on injected tab staves for the playback
    *  paint (`RectPrim.spanEndX`). Never set by the goldens. */
   durationSpans?: boolean;
+  /** Tag element ink with its address for the pointer (`PrimitiveBase.element`,
+   *  core-editor-click-targets.md). Never set by the goldens. */
+  elementTargets?: boolean;
   /**
    * Append each tab-bearing part's tab staff to its system (the `both` view):
    * one system walk, native shared barlines. Limitation: documents declaring
@@ -927,6 +930,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         selectedNoteIds,
         selectedEventIds,
         durationSpans: opts.durationSpans,
+        elementTargets: opts.elementTargets,
         index,
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (opts.display !== undefined || (mnx.scores ?? []).length === 0),
@@ -1031,6 +1035,7 @@ interface RenderSegmentArgs {
   selectedNoteIds: readonly string[];
   selectedEventIds: readonly string[];
   durationSpans?: boolean;
+  elementTargets?: boolean;
   index: SpatialIndex;
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
@@ -1218,7 +1223,7 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, durationSpans, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
+  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, durationSpans, elementTargets, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
   const labelParts = originalSegment.staves.map((staff, s) => staff.sources.map(source => source.part).filter((part, index, parts) =>
     parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part))));
   // Beams slant with the outer heads by default; the flat house style is a
@@ -1716,6 +1721,7 @@ function assembleSegment(
       // two currencies of `PrimitiveBase`. `thinDx` is where the thin stroke
       // sits relative to the cluster's left edge, and the dots sit past it.
       const dotDx = repeatStartDotDx(REPEAT_METRICS);
+      const repeatStartInk = primitives.length;
       for (const g of segment.groups) {
         for (const [gTop, gBottom] of groupSpans(g)) {
           emitRepeatStartStrokes(m.repeatStartX, gTop, gBottom, REPEAT_METRICS, primitives);
@@ -1728,6 +1734,7 @@ function assembleSegment(
       for (const td of tabDisplays) {
         emitRepeatDots(m.repeatStartX, dotDx, displayTopOf(m.row, td.displayIndex), TAB_REPEAT_DOT_YS, primitives);
       }
+      tagElement(primitives, repeatStartInk, elementTargets ? { kind: 'repeat-start', measureIndex: writtenIndex(plan, i) } : undefined);
     }
 
     // Mid-measure clef changes, at the column the plan reserved for them.
@@ -2129,7 +2136,9 @@ function assembleSegment(
       for (const [gTop, gBottom] of groupSpans(g)) {
         if (m.repeatEnd) {
           // Backward repeat :| — dots + thin + thick (doubles as a final barline).
+          const strokes = primitives.length;
           emitRepeatEndStrokes(barX, gTop, gBottom, REPEAT_METRICS, primitives);
+          tagElement(primitives, strokes, elementTargets ? { kind: 'repeat-end', measureIndex: writtenIndex(plan, i) } : undefined);
         } else if (!repeatStartSuppliesBarline(plan.measures, i)) {
           // The GLOBAL measure owns the barline style; `isLast` only supplies
           // the spec's default when the document is silent about it. A
@@ -2148,12 +2157,14 @@ function assembleSegment(
     }
     if (m.repeatEnd) {
       const dotDx = repeatEndDotDx(REPEAT_METRICS);
+      const repeatEndInk = primitives.length;
       for (const top of staffTops) emitRepeatDots(barX, dotDx, top, NOTATION_REPEAT_DOT_YS, primitives);
       for (const td of tabDisplays) {
         emitRepeatDots(barX, dotDx, displayTopOf(m.row, td.displayIndex), TAB_REPEAT_DOT_YS, primitives);
       }
       // Unconventional play counts print above the barline ("4x").
       emitRepeatTimes(m.repeatEnd.times, barX, staffTop, primitives);
+      tagElement(primitives, repeatEndInk, elementTargets ? { kind: 'repeat-end', measureIndex: writtenIndex(plan, i) } : undefined);
     }
 
     // Full-measure rests (sequence.fullMeasure with empty content): one rest
@@ -2312,7 +2323,7 @@ function assembleSegment(
 
   // Volta brackets belong to the row that drew them (endings.ts).
   const endingOwners = new Map<Primitive, number>();
-  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives, undefined, endingOwners);
+  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives, undefined, endingOwners, elementTargets);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
   if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
 

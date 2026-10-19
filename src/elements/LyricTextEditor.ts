@@ -283,17 +283,36 @@ export class LyricTextEditor extends LitElement {
     const area = this.textarea();
     if (!area) return;
     area.focus();
-    // Open at the caller's note: place the caret on its token.
-    if (this.focusNoteKey && this.doc) {
-      const walk = lyricEventWalk(this.doc, this.partIndex);
-      const entryIndex = walk.findIndex(entry => entry.noteKey === this.focusNoteKey);
-      const tokens = this.parsed.tokens.filter(token => token.entryIndex === entryIndex);
-      const span = tokens.find(token => token.ordinal === this.focusOrdinal) ?? tokens[0];
-      if (span) {
-        // The cursor is already there, so nothing is sent until the caret moves.
-        area.setSelectionRange(span.from, span.to);
-      }
+    // Open at the caller's note: place the caret on its token — once the text
+    // set above has been rendered into the box, or the range lands on an empty
+    // box and the render that fills it leaves the caret at the end.
+    void this.updateComplete.then(() => this.showWord(this.focusNoteKey, this.focusOrdinal));
+  }
+
+  /**
+   * Put the caret on a note's word — on this visit of it, when the text names
+   * that visit — and bring it into view. Used when the panel opens and when a
+   * syllable is pressed on the score while it is open
+   * (core-editor-click-targets.md): the cursor is already there, so nothing
+   * is sent back until the caret moves. False when the note has no word here.
+   */
+  showWord(noteKey: string, ordinal: number | null): boolean {
+    const area = this.textarea();
+    if (!area || !noteKey || !this.doc) return false;
+    const walk = lyricEventWalk(this.doc, this.partIndex);
+    const entryIndex = walk.findIndex(entry => entry.noteKey === noteKey);
+    const tokens = this.parsed.tokens.filter(token => token.entryIndex === entryIndex);
+    const span = tokens.find(token => token.ordinal === ordinal) ?? tokens[0];
+    if (!span) return false;
+    area.setSelectionRange(span.from, span.to);
+    // A caret set from outside does not scroll the box: bring its line into view
+    // by the same measuring twin the gutter labels are placed with.
+    const line = this.text.slice(0, span.from).split('\n').length - 1;
+    const row = this.renderRoot.querySelector<HTMLElement>('.mirror')?.children[line] as HTMLElement | undefined;
+    if (row && (row.offsetTop < area.scrollTop || row.offsetTop + row.offsetHeight > area.scrollTop + area.clientHeight)) {
+      area.scrollTop = Math.max(0, row.offsetTop - area.clientHeight / 3);
     }
+    return true;
   }
 
   /** Where each line of the text starts in the performance, drawn in the margin beside it. */

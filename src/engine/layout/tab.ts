@@ -5,7 +5,7 @@ import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
 import type { HorizontalPlan, PlanOptions } from './spacing.ts';
 import { buildScoreJobs, layoutNotation } from './notation.ts';
-import { translatePrimitiveY } from '../primitives.ts';
+import { tagElement, translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, tieOrigins } from './spacing.ts';
@@ -120,6 +120,8 @@ export interface LayoutTabOptions {
   selectedNoteIds?: readonly string[];
   /** Record fret-mask duration spans for the playback paint (never for goldens). */
   durationSpans?: boolean;
+  /** Tag element ink with its address for the pointer (never for goldens). */
+  elementTargets?: boolean;
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
@@ -318,7 +320,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       rowStart[m.row] = primitives.length;
       // This row's voltas first, so the labels placed below scan them as ink
       // and stack above (core-measure-attributes-gaps.md, item 5).
-      if (!m.entry && (!context || context.globalLabels)) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + rowPadTopSp, primitives, m.row, endingOwners);
+      if (!m.entry && (!context || context.globalLabels)) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + rowPadTopSp, primitives, m.row, endingOwners, opts.elementTargets);
     }
     const edges = rowEdges.get(m.row);
     rowEdges.set(m.row, {
@@ -355,8 +357,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     // Forward repeat |: — the same strokes and dots the both-view tab staff
     // gets (core-measure-attributes-gaps.md, item 5: this view drew nothing).
     if (m.repeatStart) {
+      const ink = primitives.length;
       emitRepeatStartStrokes(m.repeatStartX, staffTop, staffBottom, REPEAT_METRICS, primitives);
       emitRepeatDots(m.repeatStartX, repeatStartDotDx(REPEAT_METRICS), staffTop, TAB_REPEAT_DOT_YS, primitives);
+      tagElement(primitives, ink, opts.elementTargets ? { kind: 'repeat-start', measureIndex: writtenIndex(plan, i) } : undefined);
     }
 
     // Tab clef (the notation clef's slot in the shared plan keeps both views aligned)
@@ -555,9 +559,11 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     if (m.repeatEnd) {
       // Backward repeat :| — dots + thin + thick, and the "4x" over it.
       const barX = m.x + m.width;
+      const ink = primitives.length;
       emitRepeatEndStrokes(barX, staffTop, staffBottom, REPEAT_METRICS, primitives);
       emitRepeatDots(barX, repeatEndDotDx(REPEAT_METRICS), staffTop, TAB_REPEAT_DOT_YS, primitives);
       emitRepeatTimes(m.repeatEnd.times, barX, staffTop, primitives);
+      tagElement(primitives, ink, opts.elementTargets ? { kind: 'repeat-end', measureIndex: writtenIndex(plan, i) } : undefined);
     } else if (!repeatStartSuppliesBarline(plan.measures, i)) {
       // A following `|:` stands exactly here and opens with a thick stroke, so
       // it IS this barline — drawing both doubles the ink.

@@ -151,6 +151,11 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-editor-click-targets.md](inprogress/core-editor-click-targets.md)** — **built 2026-10-19**,
+  awaiting the owner's hands-on check. What a press on the score means: every point is an **element** (selected), a **slot** (places the cursor) or **dead space**
+  (nothing); hover promises what the press does. Narrows pointer placement's "anywhere in the bar"
+  to staff reach, makes lyrics clickable (verse N → pass N) and opens the element mechanism on
+  repeats and voltas: press selects, double-press or Enter opens the inspector on its pill.
 - **[lab-listening-promotion.md](inprogress/lab-listening-promotion.md)** — promote the Basic Pitch listener (`basic-pitch-chain@5`) on experiments 050 and 051, with the sentinel instrument and outside review decoupled on the record; then make routine listening runs take minutes (sentinels, cited comparators, reused observations, quiet host only for formal claims); then the user picks chords or real playing.
 - **[core-single-cursor.md](inprogress/core-single-cursor.md)** — studio authoring item 10,
   **built 2026-09-22**, awaiting the owner's hands-on check: one cursor. The edit cursor is a

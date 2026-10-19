@@ -5,7 +5,7 @@
  * stood, so the notation goldens did not move.
  */
 import type { MnxStructure } from '../../model/mnx.ts';
-import type { Primitive } from '../primitives.ts';
+import { tagElement, type Primitive } from '../primitives.ts';
 import type { HorizontalPlan } from './spacing.ts';
 
 const VOLTA_RISE_SP = 3.4;  // bracket line above the top staff line
@@ -32,7 +32,10 @@ function emitEndings(
    *  files ink by its midpoint, and a volta's line rides high enough to land
    *  in the lyric band of the system above while its short hooks stay below
    *  the boundary — the two then move apart. Which row drew it is a fact. */
-  owners?: Map<Primitive, number>
+  owners?: Map<Primitive, number>,
+  /** Tag the bracket as the `ending` element its measure declares
+   *  (core-editor-click-targets.md) — the viewer asks, the goldens never do. */
+  tagTargets?: boolean
 ): void {
   (mnx.global.measures ?? []).forEach((gm, i) => {
     const ending = gm?.ending;
@@ -90,6 +93,7 @@ function emitEndings(
         });
       }
       if (owners) for (const p of primitives.slice(start)) owners.set(p, row);
+      tagElement(primitives, start, tagTargets ? { kind: 'ending', measureIndex: i } : undefined);
       a = b + 1;
     }
   });

@@ -73,6 +73,8 @@ import type { PassNotice, PerformedPlace } from '../edit/session.ts';
 import { entryStart } from '../edit/performedCursor.ts';
 import { slotAt } from '../edit/cursor.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
+import { parseOccurrenceKey } from '../model/noteKeys.ts';
+import { PILL_OF, lyricVisit, type ElementPress } from '../engine/render/clickTargets.ts';
 import { barSeekTarget } from '../model/playback.ts';
 import { hasRepeatStructure } from '../model/passes.ts';
 import { rational, type Rational } from '../model/time.ts';
@@ -253,6 +255,12 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   let inspector: RungInspector | null = null;
   let inspectorError: string | null = null;
   let lyrics: LyricTextEditor | null = null;
+  /**
+   * The element a press selected (core-editor-click-targets.md), and where the
+   * cursor stood when it did: the selection is the element's only while the
+   * cursor stays there, so any move away lets it go without anyone clearing it.
+   */
+  let focused: { press: ElementPress; place: string } | null = null;
   /** The document this lyric visit's last commit produced: while it is still the document, the next commit replaces that step. */
   let lyricStep: MnxStructure | null = null;
   const surfaces = options.overlay ? options.overlay.appendChild(document_.createElement('mnx-editor-surfaces')) : null;
@@ -279,6 +287,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     lastSounded = key;
     playback?.audition?.({ noteKey: slot!.noteKey, ordinal: ordinal! });
   };
+  /** Where the cursor stands, as one comparable value: an element stays selected while this holds. */
+  const cursorPlace = () => JSON.stringify([session.cursor, session.selectionLevel, session.performedOrdinal]);
   /** The note under the cursor and what decides its sound — pitch, string, fret — or null. */
   const cursorNote = () => {
     const slot = slotAt(session.positions, session.cursor, session.projection);
@@ -303,7 +313,10 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const hasKeyboard = () => focusWithin(scope) || (lyrics !== null && focusWithin(lyrics)) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
   const draw = () => {
     if (disposed) return;
-    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret });
+    if (focused && (cursorHidden || focused.place !== cursorPlace())) focused = null;
+    viewer.selection = suspended()
+      ? NO_SELECTION
+      : { ...selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret }), focusedElement: focused?.press.key ?? null };
     // The tray names the cursor's exact place while it is drawn and the music is not playing.
     const start = session.playStart;
     playback?.place?.(start && !playing && !cursorHidden && !suspended() ? toPosition(start) : null);
@@ -508,7 +521,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     settle();
     if (fired && !NAVIGATION.has(intent.type)) auditionEdit(before);
   };
-  const openInspector = () => {
+  /** Open the inspector — on `pill`, opened for amending with its value selected, when one is named. */
+  const openInspector = (pill?: string) => {
     if (!surfaces || inspector || cursorHidden || suspended()) return;
     tabDigits.flush();
     closeLyrics(false);
@@ -531,6 +545,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     inspector = el;
     draw();
     surfaces.append(el);
+    if (pill) void el.updateComplete.then(() => { if (inspector === el) el.openPill(pill); });
   };
   function closeLyrics(refocus = true) {
     if (!lyrics) return;
@@ -682,7 +697,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       if (tabDigits.pending !== null) { event.preventDefault(); if (shell === 'commitPending') tabDigits.flush(); else { tabDigits.cancel(); pendingFret = null; draw(); } return; }
       if (shell === 'abandonPending' && !cursorHidden) { event.preventDefault(); cursorHidden = true; draw(); }
       // Enter with nothing pending is the inspector's door — last in the walk, so a half-typed fret never opens one.
-      else if (shell === 'commitPending' && surfaces && !cursorHidden) { event.preventDefault(); openInspector(); }
+      // A pressed element is opened for editing instead (core-editor-click-targets.md).
+      else if (shell === 'commitPending' && surfaces && !cursorHidden) { event.preventDefault(); if (focused) activateElement(focused.press); else openInspector(); }
       return;
     }
     if (shell === 'lyricTextEditor' && surfaces) { event.preventDefault(); tabDigits.flush(); openLyrics(); return; }
@@ -742,6 +758,78 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (session.handleIntent({ type: 'setProjection', projection })) settle();
   };
   /**
+   * A press SELECTED an element (core-editor-click-targets.md): the cursor
+   * goes to where the document keeps it, at its rung, and the element is
+   * outlined until the cursor moves on.
+   *
+   * - A lyric is its note's: the cursor lands on that note at the note rung,
+   *   in the visit that SINGS the pressed verse (verse N is pass N, the
+   *   lamp's rule) — unrolled, the ink names its visit outright. With the
+   *   lyric panel open, its caret follows.
+   * - A bar-level kind (a repeat, a volta) is its bar's: the cursor goes to
+   *   that bar at the bar rung, where the inspector carries its pill.
+   *
+   * Navigation, like any placement, so a read-only score takes it too.
+   */
+  const selectElement = (press: ElementPress): boolean => {
+    if (disposed) return false;
+    tabDigits.flush();
+    cursorHidden = false;
+    let moved: boolean;
+    if (press.kind === 'lyric') {
+      if (press.noteKey === undefined || press.lyricLine === undefined) return false;
+      const occurrence = parseOccurrenceKey(press.noteKey);
+      const noteKey = occurrence?.noteKey ?? press.noteKey;
+      const address = findNoteAddress(session.doc, noteKey);
+      if (!address) return false;
+      const ordinal = occurrence?.ordinal ?? lyricVisit(session.doc, session.passModel, address.measureIndex, press.lyricLine);
+      moved = dispatch({
+        type: 'goToPointer', measureIndex: address.measureIndex, partIndex: address.partIndex,
+        staffIndex: address.staffIndex, line: 0, projection: session.projection, fraction: 0, noteKey,
+        ...(ordinal === undefined ? {} : { ordinal })
+      });
+      toLevel('note');
+    } else {
+      if (press.measureIndex === undefined) return false;
+      moved = press.measureIndex === session.cursor.measureIndex || dispatch({ type: 'goToMeasure', measureIndex: press.measureIndex });
+      toLevel('measure');
+    }
+    if (!moved) { draw(); return false; }
+    focused = { press, place: cursorPlace() };
+    if (press.kind === 'lyric' && lyrics) {
+      // The panel shows one part: a word of another reopens it there.
+      if (lyrics.partIndex === (session.cursor.partIndex ?? 0)) lyrics.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal);
+      else { closeLyrics(false); openLyrics(); }
+    }
+    draw();
+    return true;
+  };
+  /** Step to a rung without the refusal flash a keyboard request earns — the press asked for a thing, not a rung. */
+  const toLevel = (level: 'note' | 'measure') => {
+    if (session.selectionLevel !== level && session.handleIntent({ type: 'goToLevel', level })) settle();
+  };
+  /** A double press — or Enter on a selected element — opens it: a lyric in the lyric panel, a bar-level kind on its inspector pill. */
+  const activateElement = (press: ElementPress) => {
+    if (focused?.press.key !== press.key && !selectElement(press)) return;
+    if (press.kind === 'lyric') {
+      if (lyrics) { lyrics.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal); lyrics.focus(); }
+      else openLyrics();
+    } else {
+      closeInspector(false);
+      openInspector(PILL_OF[press.kind]);
+    }
+  };
+  const onElementSelected = (event: Event) => {
+    const press = (event as CustomEvent<ElementPress>).detail;
+    if (press) selectElement(press);
+  };
+  /** Opened a task later: the press that asked is still being delivered, and its mouse-down
+   *  focuses the score when it finishes — which would take the keys from the pill or the panel. */
+  const onElementActivated = (event: Event) => {
+    const press = (event as CustomEvent<ElementPress>).detail;
+    if (press) setTimeout(() => { if (!disposed && !suspended()) activateElement(press); }, 0);
+  };
+  /**
    * A POINTER placed the cursor (core-editor-pointer-placement.md). The viewer
    * measured where it landed; the session decides what that means, because only
    * the grid knows where a cursor may stand.
@@ -764,6 +852,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // Even a refused placement un-hides the cursor: the reader pointed at the
     // score, so showing them where they already are beats showing nothing.
     cursorHidden = false;
+    // A slot is not the element: whatever was selected lets go.
+    focused = null;
     if (!dispatch({
       type: 'goToPointer',
       measureIndex: detail.measureIndex,
@@ -787,6 +877,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   viewer.addEventListener('selection-anchored', onAnchored);
   viewer.addEventListener('note-selected', onNoteSelected);
   viewer.addEventListener('position-selected', onPositionSelected);
+  viewer.addEventListener('element-selected', onElementSelected);
+  viewer.addEventListener('element-activated', onElementActivated);
   // Placement is the host's to grant: a viewer with no editor bound emits nothing and draws no hover ghost.
   viewer.pointerPlacement = true;
   win?.addEventListener('pointerdown', onPointerDown, true);
@@ -850,6 +942,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       viewer.removeEventListener('selection-anchored', onAnchored);
       viewer.removeEventListener('note-selected', onNoteSelected);
       viewer.removeEventListener('position-selected', onPositionSelected);
+      viewer.removeEventListener('element-selected', onElementSelected);
+      viewer.removeEventListener('element-activated', onElementActivated);
       viewer.pointerPlacement = false;
       win?.removeEventListener('pointerdown', onPointerDown, true);
       win?.removeEventListener('keydown', onUnclaimedKey);

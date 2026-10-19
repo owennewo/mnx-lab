@@ -30,6 +30,8 @@ export interface LayoutBothOptions {
   selectedEventIds?: readonly string[];
   /** Record fret-mask duration spans for the playback paint. */
   durationSpans?: boolean;
+  /** Tag element ink with its address for the pointer (never for goldens). */
+  elementTargets?: boolean;
   /** Viewer-supplied instrument (strings/capo) — overrides each part's own
    *  declaration; never written back. */
   tabSetup?: PartTabSetups;

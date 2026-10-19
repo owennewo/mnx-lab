@@ -124,6 +124,9 @@ export interface SelectionContext {
    *  nothing to enclose and fell back to interpolating a metric fraction
    *  across the bar, which drew the box on the wrong beat. */
   selectedEventIds?: string[];
+  /** The element a press selected, by its click-target key (`clickTargets.ts`):
+   *  outlined until the cursor moves elsewhere (core-editor-click-targets.md). */
+  focusedElement?: string | null;
   /** In the combined view, which rendering owns the input dialect. The same
    * model selection remains visible on the other projection as a dim echo. */
   primaryProjection?: RenderedProjection | null;

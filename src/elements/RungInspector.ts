@@ -664,6 +664,20 @@ export class RungInspector extends LitElement {
     return false;
   }
 
+  /**
+   * Open one pill for amending, by its key — the walk's cursor on it and its
+   * value selected, as Enter on it would. How a pressed element on the score
+   * opens straight onto the thing that was pressed
+   * (core-editor-click-targets.md). False when the rung carries no such pill.
+   */
+  openPill(key: string): boolean {
+    const index = this.pills.findIndex(pill => pill.key === key);
+    if (index < 0) return false;
+    this.cursor = index + 2;
+    this.openUnderCursor();
+    return this.open?.kind === 'pill';
+  }
+
   private openUnderCursor(): void {
     const item = this.itemAt(this.cursor);
     this.menuIndex = 0;

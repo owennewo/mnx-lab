@@ -1,6 +1,11 @@
 # Pointer placement — a click or a tap puts the edit cursor where it landed
 
 > **Status: complete 2026-09-20.** Serves the **implementation loop**.
+>
+> **Narrowed 2026-10-19** by [core-editor-click-targets](../inprogress/core-editor-click-targets.md):
+> decision 4's "anywhere in the bar" is now *a staff and its reach* (three ledger lines in
+> notation, half a gap in tab). Paper outside every reach is dead space, and a press there
+> changes nothing. Lyrics, repeats and voltas are now elements a press selects.
 > [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 9, and the
 > named prerequisite of item 8 (touch entry): the pickup note's
 > *there is no click-to-place*. Inherits the campaign contract; clauses 12–14 are the ones

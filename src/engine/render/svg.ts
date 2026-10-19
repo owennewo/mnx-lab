@@ -252,6 +252,7 @@ function identity(p: Primitive): string {
   if (p.className) out += ` class="${escapeXml(p.className)}"`;
   if (p.sourceId) out += ` data-source-id="${escapeXml(p.sourceId)}"`;
   if (p.writtenSourceId !== undefined) out += ` data-written-source-id="${escapeXml(p.writtenSourceId)}"`;
+  if (p.element) out += ` data-element="${p.element.kind}" data-measure="${p.element.measureIndex}"`;
   const hook = hooks.get(p);
   if (hook) out += ` data-selects="${escapeXml(JSON.stringify(hook.ids))}" data-select-paint="${hook.paint.join(' ')}"`;
   return out;

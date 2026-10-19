@@ -22,6 +22,8 @@ export interface RenderOptions {
   activeNoteIds?: string[];
   /** Record fret-mask duration spans for the playback paint (`RectPrim.spanEndX`). */
   durationSpans?: boolean;
+  /** Tag element ink with its address for the pointer (`PrimitiveBase.element`). */
+  elementTargets?: boolean;
   selectedNoteIds?: string[];
   onNoteClick?: NoteClickHandler;
   pxPerSp?: number;
@@ -67,6 +69,7 @@ export function commonLayoutArgs(opts: PlanOptions) {
     widthSp: opts.width / (opts.pxPerSp ?? DEFAULT_PX_PER_SP),
     activeNoteIds: opts.activeNoteIds,
     durationSpans: opts.durationSpans,
+    elementTargets: opts.elementTargets,
     selectedNoteIds: opts.selectedNoteIds,
     display: opts.display,
     hide: opts.hide,

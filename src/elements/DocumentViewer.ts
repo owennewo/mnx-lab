@@ -1,4 +1,4 @@
-import { sourceTargetOf } from '../engine/render/svg.ts';
+import { noteTargetAt } from '../engine/render/noteTarget.ts';
 import { engravingEntries } from '../engine/layout/unrolled.ts';
 import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
 import { forEachNoteAddress } from '../model/noteWalk.ts';
@@ -76,6 +76,8 @@ import {
   type RenderedStaff,
   type ScorePointerMap
 } from './pointerHitTest.ts';
+import { pressOf, PressCounter, targetAt, type ElementPress } from '../engine/render/clickTargets.ts';
+import { collectClickTargets, drawTargetOutline } from './clickTargetPaint.ts';
 import { systemReaches, unitsPerSp } from './scoreGeometry.ts';
 import type { RenderedProjection } from '../engine/render/projection.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
@@ -108,6 +110,9 @@ import type { HideableFeature } from '../engine/layout/notation.ts';
  *  - failed projection → the render failure panel
  * Paper never inverts with the theme (DIRECTION.md §4).
  */
+/** The hover asks `noteTargetAt` about every note on the page; a press asks the plan's index. */
+const EVERY_KEY: ReadonlyMap<string, unknown> = { has: () => true } as unknown as ReadonlyMap<string, unknown>;
+
 @customElement('mnx-document-viewer')
 export class DocumentViewer extends LitElement {
   @property({ type: Boolean }) unrolled = false;
@@ -697,6 +702,19 @@ export class DocumentViewer extends LitElement {
         stroke: var(--accent);
         stroke-opacity: 0.4;
       }
+      :host #projection-container svg .element-hover,
+      :host #projection-container svg .element-focus { pointer-events: none; }
+      :host #projection-container svg .element-hover rect {
+        fill: none;
+        stroke: var(--accent);
+        stroke-opacity: 0.4;
+        stroke-dasharray: 2 1.5;
+      }
+      :host #projection-container svg .element-focus rect {
+        fill: color-mix(in srgb, var(--accent) 10%, transparent);
+        stroke: var(--accent);
+      }
+      :host([selection-inactive]) #projection-container svg .element-focus,
       :host([selection-inactive]) #projection-container svg .pointer-ghost,
       :host([selection-inactive]) #projection-container svg .enclosure,
       :host([selection-inactive]) #projection-container svg .cursor-ghost {
@@ -1197,6 +1215,15 @@ export class DocumentViewer extends LitElement {
 
   private drawSelection(svg: SVGSVGElement, page: SelectionPage, previousEnclosure: EnclosureSnapshot | null, quick: boolean) {
     paintSelection(svg, this.selection?.selectedNoteIds, this.selection?.selectedEventIds);
+    // The element a press selected keeps its outline (core-editor-click-targets.md).
+    // Measured off this drawing, not the pointer map, which a paint has just invalidated.
+    const focused = this.selection?.focusedElement;
+    if (focused) {
+      const sp = unitsPerSp(svg);
+      drawTargetOutline(svg, collectClickTargets(svg, sp), focused, 'element-focus', sp);
+    } else {
+      svg.querySelector(':scope > g.element-focus')?.remove();
+    }
     // A page that already carried a selection keeps nothing of it that this one does not draw.
     for (const layer of svg.querySelectorAll(':scope > g.enclosure, :scope > g.enclosure-label, :scope > g.cursor-ghost'))
       layer.remove();
@@ -1475,10 +1502,9 @@ export class DocumentViewer extends LitElement {
     return { x: local.x, y: local.y };
   }
 
-  /** The note under a pointer, when there is one — the same ink the click
-   *  path already resolves, unwrapped from its occurrence in an unrolled view. */
-  private noteKeyUnder(event: Event): string | undefined {
-    const target = sourceTargetOf(event);
+  /** The note a pointer target names, when it is one — unwrapped from its
+   *  occurrence in an unrolled view. */
+  private noteKeyOf(target: Element | null): string | undefined {
     if (!target) return undefined;
     // A NOTE, not merely something with a name. Rests, stems and beams all
     // carry their event's id, and this field means "the pointer was on a
@@ -1521,15 +1547,35 @@ export class DocumentViewer extends LitElement {
     const page = this.measuredPage();
     if (!page) return;
     const point = this.scorePointOf(event, page.svg);
-    const hit = point && hitTest(page.map, point, this.noteKeyUnder(event));
+    if (!point) return;
+    // The note the press means — by the forgiving geometry the click bridge
+    // uses (`noteTargetAt`), never by the DOM's em-square hit area alone.
+    const ink = noteTargetAt(event, page.svg, EVERY_KEY);
+    const noteKey = this.noteKeyOf(ink);
+    // An ELEMENT under the pointer is selected rather than stood on
+    // (core-editor-click-targets.md) — note ink first, so a notehead beside a
+    // repeat's dots is still the note.
+    const target = noteKey === undefined ? targetAt(page.map.targets, point, page.map.sp) : null;
+    if (target) {
+      this.clearHover(page.svg);
+      // The first press selects, the second opens; a third is the tail of the
+      // same gesture and asks for nothing.
+      const count = this.presses.press(target.key, event.timeStamp);
+      if (count > 2) return;
+      const type = count === 2 ? 'element-activated' : 'element-selected';
+      this.dispatchEvent(new CustomEvent<ElementPress>(type, { detail: pressOf(target), bubbles: true, composed: true }));
+      return;
+    }
+    this.presses.reset();
+    // Otherwise a SLOT places the cursor — and dead space is null: nothing.
+    const hit = hitTest(page.map, point, noteKey);
     if (!hit) return;
     // Unrolled, the ink names its visit (`w2:…`): the press means THAT visit.
     const visit = this.unrolled
-      ? parseOccurrenceKey(sourceTargetOf(event)?.getAttribute('data-source-id') ?? '')?.ordinal
+      ? parseOccurrenceKey(ink?.getAttribute('data-source-id') ?? '')?.ordinal
       : undefined;
     const placement: PointerPlacement = visit === undefined ? hit : { ...hit, ordinal: visit };
-    drawPointerGhost(page.svg, page.map, null);
-    this.hoverSignature = '';
+    this.clearHover(page.svg);
     this.dispatchEvent(
       new CustomEvent<PointerPlacement>('position-selected', {
         detail: placement,
@@ -1539,9 +1585,15 @@ export class DocumentViewer extends LitElement {
     );
   };
 
+  /** Presses on one element close together — a double press opens it. */
+  private readonly presses = new PressCounter();
+
   /**
-   * The hover ghost: where a click would land. Mouse only — touch has no
-   * hover, and the snap is what makes a tap self-evident there instead.
+   * The hover: what a press WOULD do (core-editor-click-targets.md). Over an
+   * element its ink is outlined; over a slot the ghost shows the landing;
+   * over dead space nothing is drawn, because a press there does nothing.
+   * Mouse only — touch has no hover, and the snap is what makes a tap
+   * self-evident there instead.
    *
    * Coalesced to one frame and skipped when the landing has not changed, so
    * moving the mouse across a bar costs one redraw per cell, not per pixel.
@@ -1550,7 +1602,7 @@ export class DocumentViewer extends LitElement {
     if (!this.pointerPlacement || event.pointerType !== 'mouse' || this.gesturing) return;
     if (this.hoverQueued) return;
     this.hoverQueued = true;
-    const { clientX, clientY, target } = event;
+    const { clientX, clientY } = event;
     requestAnimationFrame(() => {
       this.hoverQueued = false;
       if (!this.pointerPlacement || this.gesturing) return;
@@ -1560,30 +1612,40 @@ export class DocumentViewer extends LitElement {
         { clientX, clientY } as MouseEvent,
         page.svg
       );
-      const placement =
-        point &&
-        hitTest(
-          page.map,
-          point,
-          target instanceof Element ? this.noteKeyUnder({ target } as unknown as Event) : undefined
-        );
-      // Keyed by where the ghost will be DRAWN, so a mouse sliding across one
-      // beat's neighbourhood redraws nothing: the column is the landing when
-      // there is one, and the fraction only where there is no ink to measure.
-      const signature = placement
-        ? `${placement.measureIndex}:${placement.partIndex}:${placement.staffIndex}:${placement.projection}:${placement.line}:` +
-          (placement.columnKey ?? placement.fraction.toFixed(3))
-        : '';
+      // The same forgiving resolution a press gets (`noteTargetAt`), so the
+      // hover never promises a note the press would not land on.
+      const noteKey = this.noteKeyOf(noteTargetAt(event, page.svg, EVERY_KEY));
+      const element = point && noteKey === undefined ? targetAt(page.map.targets, point, page.map.sp) : null;
+      const placement = point && !element ? hitTest(page.map, point, noteKey) : null;
+      // Keyed by what will be DRAWN, so a mouse sliding across one beat's
+      // neighbourhood redraws nothing: the column is the landing when there
+      // is one, and the fraction only where there is no ink to measure.
+      const signature = element
+        ? `element:${element.key}`
+        : placement
+          ? `${placement.measureIndex}:${placement.partIndex}:${placement.staffIndex}:${placement.projection}:${placement.line}:` +
+            (placement.columnKey ?? placement.fraction.toFixed(3))
+          : '';
       if (signature === this.hoverSignature) return;
       this.hoverSignature = signature;
       drawPointerGhost(page.svg, page.map, placement ?? null);
+      drawTargetOutline(page.svg, page.map.targets, element?.key, 'element-hover', page.map.sp);
+      if (this.container) this.container.style.cursor = element ? 'pointer' : '';
     });
   };
 
-  private readonly onPointerLeave = () => {
-    const svg = this.container?.querySelector<SVGSVGElement>('svg');
-    if (svg) svg.querySelector(':scope > g.pointer-ghost')?.remove();
+  /** Take the hover's marks away — the ghost and the element outline. */
+  private clearHover(svg: SVGSVGElement | null | undefined) {
+    if (svg) {
+      svg.querySelector(':scope > g.pointer-ghost')?.remove();
+      svg.querySelector(':scope > g.element-hover')?.remove();
+    }
+    if (this.container) this.container.style.cursor = '';
     this.hoverSignature = '';
+  }
+
+  private readonly onPointerLeave = () => {
+    this.clearHover(this.container?.querySelector<SVGSVGElement>('svg'));
   };
 
   /** The click that becomes a selection — shared by every emit path. */
@@ -1623,6 +1685,8 @@ export class DocumentViewer extends LitElement {
       width,
       activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
       durationSpans: true, // …but it stretches fret masks to the release the layout records.
+      // …and names the elements a press can select (core-editor-click-targets.md).
+      elementTargets: true,
       // The selection is a paint too: the layout marks what it would colour, and
       // `drawSelection` lights it — so a cursor move needs no layout (selectionHooks.ts).
       selectedNoteIds: [SELECT_NOTES_HOOK],

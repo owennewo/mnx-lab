@@ -348,6 +348,136 @@ try {
     'the hover ghost outlived the pointer'
   );
 
+  // ── click targets (core-editor-click-targets.md) ─────────────────────────
+  //
+  // Every point is an element (selected), a slot (places the cursor) or dead
+  // space (nothing). The gutter between two systems is dead: a press there
+  // emits no placement, moves no cursor, and the hover shows nothing.
+  const pressTwice = async (x, y) => {
+    // A person's double press does not run on from the single press before it.
+    await delay(600);
+    for (const clickCount of [1, 2]) {
+      for (const type of ['mousePressed', 'mouseReleased']) await c.send('Input.dispatchMouseEvent', { type, x, y, button: 'left', clickCount });
+    }
+    await settle(c);
+  };
+  await run(`window.__placed = []; window.__pressed = [];
+    viewer().addEventListener('element-selected', e => window.__pressed.push(['selected', JSON.parse(JSON.stringify(e.detail))]));
+    viewer().addEventListener('element-activated', e => window.__pressed.push(['activated', JSON.parse(JSON.stringify(e.detail))]));
+    return 'armed';`);
+  // Dead paper by the slot rule itself: the staves' reaches (three ledger
+  // lines in notation, half a gap in tab), and a point outside every one —
+  // between two systems when they stand far enough apart, else above the first.
+  const gutter = await run(`
+    const v = viewer(); const { svg, map } = v.measuredPage();
+    const ctm = svg.getScreenCTM();
+    const toClient = (x, y) => { const p = svg.createSVGPoint(); p.x = x; p.y = y; return p.matrixTransform(ctm); };
+    const reachOf = (band, i) => (map.markers.some(y => y >= band.top - map.sp && y <= band.bottom + map.sp) ? 0.5 : 3.25) * (map.gaps[i] || map.sp);
+    const staves = map.staves.map((band, i) => ({ top: band.top - reachOf(band, i), bottom: band.bottom + reachOf(band, i), x: (band.x1 + band.x2) / 2 }))
+      .sort((a, b) => a.top - b.top);
+    const holes = [[svg.viewBox.baseVal.y, staves[0].top]];
+    for (let i = 0; i + 1 < staves.length; i++) holes.push([staves[i].bottom, staves[i + 1].top]);
+    for (const [from, to] of holes) {
+      if (to - from < 2 * map.sp) continue;
+      const at = toClient(staves[0].x, (from + to) / 2);
+      if (at.y > 80 && at.y < window.innerHeight - 80) return JSON.stringify({ x: at.x, y: at.y });
+    }
+    return null;`);
+  assert.ok(gutter, 'found no dead paper on screen to press');
+  const gap2 = JSON.parse(gutter);
+  const beforeGutter = await run(`return JSON.stringify(page().editor.session.cursor);`);
+  await c.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: gap2.x, y: gap2.y, button: 'none' });
+  await settle(c);
+  assert.equal(
+    await run(`const svg = viewer().renderRoot.querySelector('#projection-container svg'); return !!svg.querySelector(':scope > g.pointer-ghost');`),
+    false,
+    'the hover over dead paper promised a landing: ' + await run(`
+      const v = viewer(); const pg = v.measuredPage(); const svg = pg.svg;
+      const pt = v.scorePointOf({ clientX: ${gap2.x}, clientY: ${gap2.y} }, svg);
+      return JSON.stringify({ pt, staves: pg.map.staves, gaps: pg.map.gaps, sig: v.hoverSignature,
+        ghost: svg.querySelector(':scope > g.pointer-ghost rect')?.getAttribute('y') });`)
+  );
+  await clickAt(gap2.x, gap2.y);
+  assert.equal(await run(`return window.__placed.length;`), 0, 'a press on dead paper emitted a placement');
+  assert.equal(await run(`return JSON.stringify(page().editor.session.cursor);`), beforeGutter, 'a press on dead space moved the cursor');
+
+  // A REPEAT COUNT is an element: hover outlines it, a press selects its bar
+  // at the bar rung, and a double press opens the inspector on its pill with
+  // the value selected — ×3 becomes ×4 by typing 4 and Enter.
+  await c.send('Page.navigate', { url: 'about:blank' });
+  await open('lab/navigation/repeats-and-marks-on-tab');
+  await run(`window.__pressed = [];
+    viewer().addEventListener('element-selected', e => window.__pressed.push(['selected', JSON.parse(JSON.stringify(e.detail))]));
+    viewer().addEventListener('element-activated', e => window.__pressed.push(['activated', JSON.parse(JSON.stringify(e.detail))]));
+    return 'armed';`);
+  const times = JSON.parse(await run(`
+    const el = viewer().renderRoot.querySelector('#projection-container svg .repeat-times[data-element="repeat-end"]');
+    if (!el) return 'null';
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2, measure: Number(el.getAttribute('data-measure')) });`));
+  assert.ok(times, 'the repeat count carries no element target');
+  await c.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: times.x, y: times.y, button: 'none' });
+  await settle(c);
+  assert.equal(
+    await run(`const svg = viewer().renderRoot.querySelector('#projection-container svg'); return [!!svg.querySelector(':scope > g.element-hover'), !!svg.querySelector(':scope > g.pointer-ghost')].join();`),
+    'true,false',
+    'hovering the repeat count did not outline it (or still drew a landing ghost)'
+  );
+  await clickAt(times.x, times.y);
+  assert.deepEqual(
+    JSON.parse(await run(`const s = page().editor.session; return JSON.stringify([window.__pressed.map(p => p[0]).join(), s.cursor.measureIndex, s.selectionLevel, viewer().selection.focusedElement]);`)),
+    ['selected', times.measure, 'measure', `repeat-end:${times.measure}`],
+    'a press on the repeat count did not select its bar at the bar rung'
+  );
+  assert.equal(
+    await run(`return !!viewer().renderRoot.querySelector('#projection-container svg > g.element-focus');`),
+    true,
+    'the selected repeat is not outlined'
+  );
+  await pressTwice(times.x, times.y);
+  await until(`find(document, 'mnx-rung-inspector')?.renderRoot.querySelector('input')`, 'a double press on the repeat count did not open its pill');
+  const amend = JSON.parse(await run(`
+    const input = find(document, 'mnx-rung-inspector').renderRoot.querySelector('input');
+    return JSON.stringify({ value: input.value, selected: input.value.slice(input.selectionStart, input.selectionEnd) });`));
+  assert.deepEqual(amend, { value: '3', selected: '3' }, 'the repeat pill did not open with its count selected');
+  await press('4', 'Digit4', 52, 0, '4');
+  await press('Enter', 'Enter', 13);
+  assert.equal(
+    await run(`return page().editor.session.doc.global.measures[${times.measure}].repeatEnd.times;`),
+    4,
+    'typing 4 into the opened pill did not make the repeat ×4'
+  );
+  await press('Escape', 'Escape', 27);
+
+  // A LYRIC is an element: a press puts the cursor on its note at the note
+  // rung, and a double press opens the lyric panel with the caret on the word.
+  await c.send('Page.navigate', { url: 'about:blank' });
+  await open('lab/lyrics/tab-verses');
+  const word = JSON.parse(await run(`
+    const el = [...viewer().renderRoot.querySelectorAll('#projection-container svg text.lyric[data-lyric-line="1"]')]
+      .find(t => t.textContent === 'did');
+    if (!el) return 'null';
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2, key: el.getAttribute('data-playback-id') });`));
+  assert.ok(word, 'no syllable "did" drawn to press');
+  await run(`page().editor.handleIntent({ type: 'goToLevel', level: 'measure' }); return true;`);
+  await clickAt(word.x, word.y);
+  assert.deepEqual(
+    JSON.parse(await run(`const s = page().editor.session; return JSON.stringify([s.selectionLevel, s.selectedNoteKeys.includes(${JSON.stringify(word.key)}), (viewer().selection.focusedElement ?? '').startsWith('lyric:1:')]);`)),
+    ['note', true, true],
+    'a press on a syllable did not put the cursor on its note at the note rung'
+  );
+  await pressTwice(word.x, word.y);
+  await until(`find(document, 'mnx-lyric-text-editor')?.renderRoot.querySelector('textarea')`, 'a double press on a syllable did not open the lyric panel');
+  await settle(c);
+  assert.equal(
+    await run(`const area = find(document, 'mnx-lyric-text-editor').renderRoot.querySelector('textarea'); return area.value.slice(area.selectionStart, area.selectionEnd);`),
+    'did',
+    'the lyric panel did not open with the caret on the pressed word'
+  );
+  await run(`find(document, 'mnx-lyric-text-editor').dispatchEvent(new CustomEvent('lyric-editor-close')); return true;`);
+  await settle(c);
+
   // ── the container may arrive LATE, and must still be bound ────────────────
   //
   // The studio bug, as a test. With no document the viewer renders a "no
@@ -370,10 +500,12 @@ try {
     const onPlace = e => { fired = JSON.parse(JSON.stringify(e.detail)); };
     v.addEventListener('position-selected', onPlace);
     const svg = v.container && v.container.querySelector('svg');
-    if (svg) {
-      const r = svg.getBoundingClientRect();
+    // On a staff line: a press on the paper between systems is dead space and places nothing.
+    const line = svg && svg.querySelector('line.staff-line');
+    if (line) {
+      const r = svg.getBoundingClientRect(), l = line.getBoundingClientRect();
       v.container.dispatchEvent(new PointerEvent('pointerdown', {
-        clientX: r.x + r.width * 0.35, clientY: r.y + r.height * 0.35,
+        clientX: r.x + r.width * 0.35, clientY: l.y + l.height / 2,
         button: 0, isPrimary: true, pointerType: 'mouse', bubbles: true, composed: true
       }));
     }
@@ -406,7 +538,7 @@ try {
   assert.equal(await run(`return window.scrollY === 0 && document.documentElement.scrollTop === 0;`), true,
     'Space scrolled the page: the surface did not take the keystroke');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
 } finally {
   ws?.close();
   chrome.kill();
