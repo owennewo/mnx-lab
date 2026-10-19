@@ -27,7 +27,7 @@ const cases: [string,number,number,number[]][] = [
   ['lab/score-text/labels-with-navigation',2,1,[2]],
   ['lab/score-text/labels-on-a-tab-staff',2,1,[2]],
   ['lab/layout/coloured-marks-and-clef-forms',0,1,[0]],
-  ['lab/navigation/ds-final-ending',2,2,[3,6]]
+  ['lab/navigation/ds-final-ending',2,2,[3,8]]
 ];
 describe('iteration queries over navigation scenarios', () => {
   for (const [id, measure, iteration, ordinals] of cases) it(id, () => {

@@ -1738,3 +1738,21 @@ stretch along with everything else instead of staying bunched. A bar that opens 
 triplet has the same air after its barline as one opening with a plain note. In the
 `both` views the tab digits stay exactly under their noteheads; brackets and numbers
 still span their groups.
+
+## Repeats are played after a jump — 2026-10-19
+
+Owner: no roadmap doc — the owner asked why the D.S. returns of *One Of These Things
+First* skipped the "Verse 1, 2, 3" strain's repeats, and decided that the lab plays
+repeats after every jump (reversing the player campaign's item-1 convention, recorded
+in [core-campaign-player.md](core-campaign-player.md)). Two fixes rode along: a bar that
+closes a repeat and carries a jump (or Fine) finishes the repeat before the jump fires,
+unless it sits in a numbered ending; and a jump to the coda plays the coda's repeats.
+
+One scenario's performed goldens moved: `lab/navigation/ds-final-ending`
+(`expected.performance.json`, `expected.midi.json`, `expected.unrolled.svg`). Its
+engraving goldens did not move.
+
+**What a reviewer should look for.** The unrolled view reads bars 1, 2, 1, 3, 4, then
+the return 1 (from beat 2), 2, 1, 3, stopping at the Fine three beats into that last
+bar 3 — the return takes ending 1 and the repeat before ending 2. `notes.md` states the
+order by hand.

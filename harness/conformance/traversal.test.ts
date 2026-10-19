@@ -34,7 +34,7 @@ const stated: Record<string, Stated[]> = {
   'lab/score-text/labels-with-navigation': [[0,1], [1,1], [2,1], [3,1]],
   'lab/score-text/labels-on-a-tab-staff': [[0,1], [1,1], [2,1], [3,1]],
   'lab/layout/coloured-marks-and-clef-forms': [[0,1], [1,1]],
-  'lab/navigation/ds-final-ending': [[0,1], [1,1], [0,2,'loop'], [2,2,'ending'], [3,1,undefined,undefined,[1,2]], [0,2,'jump',[1,4]], [2,2,'fine',undefined,[3,4]]],
+  'lab/navigation/ds-final-ending': [[0,1], [1,1], [0,2,'loop'], [2,2,'ending'], [3,1,undefined,undefined,[1,2]], [0,1,'jump',[1,4]], [1,1], [0,2,'loop'], [2,2,'fine',undefined,[3,4]]],
   'lab/navigation/coda-navigation': [[0,1], [1,1], [2,1], [3,1], [4,1,undefined,undefined,[1,1]], [2,1,'jump',[0,1]], [3,1,undefined,undefined,[1,1]], [5,1,'jump',[0,1]], [6,1,undefined,undefined,[1,1]], [0,1,'jump',[0,1]], [1,1,undefined,undefined,[1,1]], [7,1,'jump',[0,1]]]
 };
 function entries(rows: Stated[]): Omit<PerformedEntry, 'verse'>[] {
@@ -64,7 +64,7 @@ describe('hand-stated navigation entries', () => {
 const statedVerses: Record<string, number[]> = {
   'spec/repeats-alternate-endings-simple': [1, 1, 2, 2],
   'spec/jumps-dal-segno': [1, 1, 1, 1, 1, 2, 2, 2, 2],
-  'lab/navigation/ds-final-ending': [1, 1, 2, 2, 1, 3, 3],
+  'lab/navigation/ds-final-ending': [1, 1, 2, 2, 1, 3, 2, 4, 3],
 };
 describe('hand-stated verses', () => {
   for (const [id, verses] of Object.entries(statedVerses)) it(id, () => {
@@ -103,7 +103,7 @@ it('keeps duplicate D.S. candidates on the same iteration', () => {
   ]));
   expect(model.entries.filter(e => e.measureIndex === 2)).toEqual([
     { ordinal: 4, measureIndex: 2, occurrence: 1, iteration: 1, verse: 1, until: [1,1] },
-    { ordinal: 7, measureIndex: 2, occurrence: 2, iteration: 1, verse: 2 }
+    { ordinal: 9, measureIndex: 2, occurrence: 2, iteration: 1, verse: 2 }
   ]);
 });
 
@@ -135,7 +135,7 @@ it('reports malformed navigation without losing the surviving order', () => {
 });
 
 
-it('a jump into the interior of a first ending skips the rest of that span', () => {
+it('a jump into the interior of a first ending plays it, then takes the repeat', () => {
   const model = linearizePasses(docOf([
     { repeatStart: {} }, { ending: { numbers: [1], duration: 2 } },
     { repeatEnd: {}, segno: { location: { fraction: [1,2] } } },
@@ -144,11 +144,11 @@ it('a jump into the interior of a first ending skips the rest of that span', () 
   ]));
   expect(nav(model.entries)).toEqual(entries([
     [0,1],[1,1],[2,1],[0,2,'loop'],[3,2,'ending'],
-    [4,1,undefined,undefined,[1,1]],[3,2,'ending'],[4,1]
+    [4,1,undefined,undefined,[1,1]],[2,1,'jump',[1,2]],[0,2,'loop'],[3,2,'ending'],[4,1]
   ]));
 });
 
-it('retains iteration through a multi-bar final ending on a D.S. return', () => {
+it('a D.S. return into a strain with endings takes them in order again', () => {
   const model = linearizePasses(docOf([
     { repeatStart: {}, segno: { location: { fraction: [1,4] } } },
     { ending: { numbers: [1] }, repeatEnd: {} },
@@ -157,10 +157,10 @@ it('retains iteration through a multi-bar final ending on a D.S. return', () => 
   ]));
   expect(nav(model.entries)).toEqual(entries([
     [0,1],[1,1],[0,2,'loop'],[2,2,'ending'],[3,2],[4,1,undefined,undefined,[1,1]],
-    [0,2,'jump',[1,4]],[2,2,'ending'],[3,2],[4,1]
+    [0,1,'jump',[1,4]],[1,1],[0,2,'loop'],[2,2,'ending'],[3,2],[4,1]
   ]));
-  // The return keeps iteration 2 for the ending, but sings the NEXT verse: 3.
-  expect(model.entries.map(e => e.verse)).toEqual([1,1,2,2,2,1,3,3,3,2]);
+  // The return starts the strain over at iteration 1, but sings the NEXT verses: 3, then 4.
+  expect(model.entries.map(e => e.verse)).toEqual([1,1,2,2,2,1,3,2,4,3,3,2]);
   expect(model.availableIterations).toEqual([[1,2],[1,2],[1,2],[1,2],[1]]);
 });
 

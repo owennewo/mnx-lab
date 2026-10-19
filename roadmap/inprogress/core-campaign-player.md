@@ -214,7 +214,11 @@ run any time before 6.
 - **Grace and fermata numbers.** Item 3 records executable conventions below; item 5
   applies them to the performance golden.
 - **Repeats after a D.S.** Resolved by item 1: no repeats on return; take the final
-  declared iteration in strains with endings.
+  declared iteration in strains with endings. **Reversed 2026-10-19** by the owner, on
+  *One Of These Things First*: every jump plays the repeats it meets, a strain it lands
+  in starts over at iteration 1, and a repeat closing on a jump's bar is finished before
+  the jump fires (verification debt:
+  [lab-verify.md](lab-verify.md#repeats-are-played-after-a-jump--2026-10-19)).
 - **Backend.** Item 4 measured both and selected native Web Audio; see the log below.
 
 ## Progress + learnings

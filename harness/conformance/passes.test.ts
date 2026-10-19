@@ -67,7 +67,7 @@ describe('linearizePasses', () => {
     expect(model.soundingPasses).toEqual([[1, 4], [1, 3, 4], [1, 2, 3, 4], [1]]);
   });
 
-  it('D.S. al fine: to the segno, no repeats on the return, stop at fine', () => {
+  it('D.S. al fine: to the segno, stop at fine', () => {
     // m0 · m1 segno · m2 fine · m3 D.S. al fine · m4 (never reached)
     const model = linearizePasses(docOf([
       {},
@@ -81,15 +81,67 @@ describe('linearizePasses', () => {
     expect(model.soundingPasses[4]).toEqual([]);
   });
 
-  it('plain D.S.: to the segno, repeats not retaken, plays to the end', () => {
+  it('plain D.S.: to the segno, repeats taken again, plays to the end', () => {
     const model = linearizePasses(docOf([
       { segno: { location: { fraction: [0, 1] } } },
       { repeatEnd: {} },
       { jump: { type: 'segno', location: { fraction: [1, 1] } } },
       {}
     ]));
-    expect(model.order).toEqual([0, 1, 0, 1, 2, 0, 1, 2, 3]);
-    expect(model.passCounts).toEqual([3, 3, 2, 1]);
+    expect(model.order).toEqual([0, 1, 0, 1, 2, 0, 1, 0, 1, 2, 3]);
+    expect(model.passCounts).toEqual([4, 4, 2, 1]);
+  });
+
+  it('a D.S. landing mid-strain repeats from that strain\'s start', () => {
+    // |: m0 · m1 segno · m2 :| · m3 D.S.
+    const model = linearizePasses(docOf([
+      { repeatStart: {} },
+      { segno: { location: { fraction: [0, 1] } } },
+      { repeatEnd: {} },
+      { jump: { type: 'segno', location: { fraction: [1, 1] } } }
+    ]));
+    expect(model.order).toEqual([0, 1, 2, 0, 1, 2, 3, 1, 2, 0, 1, 2, 3]);
+  });
+
+  it('a repeat closing on a jump\'s bar is finished before the jump', () => {
+    // m0 segno · |: m1 · m2 :| D.S. · m3 — One Of These Things First, bars 41–44
+    const model = linearizePasses(docOf([
+      { segno: { location: { fraction: [0, 1] } } },
+      { repeatStart: {} },
+      { repeatEnd: {}, jump: { type: 'segno', location: { fraction: [1, 1] } } },
+      {}
+    ]));
+    expect(model.order).toEqual([0, 1, 2, 1, 2, 0, 1, 2, 1, 2, 3]);
+    expect(model.entries[4]!.until).toEqual([1, 1]);
+    expect(model.entries[2]!.until).toBeUndefined();
+  });
+
+  it('a jump in a numbered ending fires on that ending\'s pass', () => {
+    // |: m0 · m1 (1.) :| D.S. · m2 (2.) — the first ending's D.S. fires on pass 1
+    const model = linearizePasses(docOf([
+      { repeatStart: {}, segno: { location: { fraction: [0, 1] } } },
+      { ending: { numbers: [1], duration: 1 }, repeatEnd: {}, jump: { type: 'segno', location: { fraction: [1, 1] } } },
+      { ending: { numbers: [2], duration: 1 } }
+    ]));
+    expect(model.order).toEqual([0, 1, 0, 1, 0, 2]);
+    expect(model.entries[1]!.until).toEqual([1, 1]);
+  });
+
+  it('D.S. al Coda: the return and the coda both take their repeats', () => {
+    // m0 segno · |: m1 :|x3 To Coda · m2 D.S. al Coda · |: m3 coda · m4 :|
+    const measures: MnxGlobalMeasure[] = [
+      { segno: { id: 'segno', location: { fraction: [0, 1] } } },
+      { repeatStart: {}, repeatEnd: { times: 3 }, _x: { mnxLab: { navigation: { jumps: [
+        { type: 'toCoda', target: 'coda', location: { fraction: [1, 1] } }] } } } },
+      { _x: { mnxLab: { navigation: { jumps: [
+        { type: 'dalSegnoAlCoda', target: 'segno', resumeAt: 'coda', location: { fraction: [1, 1] } }] } } } },
+      { repeatStart: {}, _x: { mnxLab: { navigation: { marks: [{ id: 'coda', kind: 'coda', location: { fraction: [0, 1] } }] } } } },
+      { repeatEnd: {} }
+    ];
+    const model = linearizePasses(docOf(measures));
+    expect(model.order).toEqual([0, 1, 1, 1, 2, 0, 1, 1, 1, 3, 4, 3, 4]);
+    expect(model.entries.filter(e => e.via === 'jump').map(e => e.measureIndex)).toEqual([0, 3]);
+    expect(model.diagnostics).toEqual([]);
   });
 
   it('performs the two-stage coda route distilled from Blackbird', () => {

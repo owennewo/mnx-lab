@@ -16,13 +16,19 @@
 //     included — that is what makes second endings continue). An ending
 //     without numbers is never skipped.
 //   · A `jump` fires once, at its metric location: both kinds go to the segno
-//     (the first bar carrying one, else the beginning). The return takes no
-//     repeats, and only `dsalfine` stops at `fine`.
+//     (the first bar carrying one, else the beginning). Only `dsalfine` stops
+//     at `fine`.
+//   · A bar that both closes a repeat and carries a jump (or a Fine) finishes
+//     its repeat first: the jump fires on the strain's last time through. A
+//     jump inside a numbered ending fires on that ending's pass instead.
 //   · The walk is capped; a malformed graph truncates rather than spins,
 //     and says so.
 //
-// On a D.S. return, numbered endings use the final declared strain iteration.
-// No repeats are retaken. This is a lab performance convention, not an MNX rule.
+// A return (D.C., D.S.) and a jump to the coda play the repeats they meet, and a
+// strain they land in starts over at iteration 1, endings and all. Classical
+// practice skips repeats on a return; pop practice usually plays them, and so
+// does this lab (decided 2026-10-19 on One Of These Things First, whose
+// "Verse 1, 2, 3" strain returns by D.S.). A lab convention, not an MNX rule.
 //
 // Which lyric row a visit sings is its `verse`, not its `iteration`: a pass
 // sings the bar's NEXT row — one past the row its last visit sang — or its
@@ -112,7 +118,10 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     const end = Math.min(count, at + Math.max(1, globals[at]!.ending!.duration ?? 1));
     for (let k = at; k < end; k++) endingAt[k] = at;
   }
-  const finalEndingIteration = Array.from({ length: count }, () => 1);
+  /** Per measure index: the repeat start in force reading the score in written order. */
+  const startAt = Array.from({ length: count }, () => 0);
+  for (let at = 0, start = 0; at < count; at++)
+    startAt[at] = start = globals[at]?.repeatStart !== undefined ? at : start;
   const diagnose = (code: PassDiagnostic['code'], measureIndex: number, message: string) => {
     if (!diagnostics.some(d => d.code === code && d.measureIndex === measureIndex))
       diagnostics.push({ code, measureIndex, message });
@@ -143,17 +152,14 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     if (!m?.repeatEnd) continue;
     let end = at;
     let times = m.repeatEnd.times ?? 2;
-    let hasEndings = false;
     for (let k = start; k <= end; k++) {
       const ending = globals[k]?.ending;
       if (ending) {
-        hasEndings = true;
         end = Math.min(count - 1, Math.max(end, k + Math.max(1, ending.duration ?? 1) - 1));
       }
     }
     while (globals[end + 1]?.ending && globals[end + 1]?.repeatStart === undefined) {
       const next = end + 1;
-      hasEndings = true;
       end = Math.min(count - 1, next + Math.max(1, globals[next]!.ending!.duration ?? 1) - 1);
     }
     for (let k = at + 1; k <= end; k++)
@@ -164,7 +170,6 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       availableIterations[k] = offered;
       inStrain[k] = true;
       strainEnd[k] = end;
-      if (hasEndings) finalEndingIteration[k] = times;
       if (globals[k]?.ending?.numbers?.some(n => n > times))
         diagnose('unmatched-ending', k, `Ending numbers exceed the strain's ${times} iterations.`);
     }
@@ -180,7 +185,6 @@ export function linearizePasses(doc: MnxStructure): PassModel {
   let repeatStartIndex = 0;
   let iteration = 1;      // 1-based iteration of the current strain
   let viaLoop = false;    // arrived by looping back (do not re-read repeatStart)
-  let returnJumpTaken = false; // after a return, written repeats are not retaken
   let publishedJumpTaken = false; // published MNX defines one unqualified jump route
   const takenJumps = new Set<string>();
   let fineArmed = false;
@@ -209,7 +213,6 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       iteration = 1;
     }
     viaLoop = false;
-    if (returnJumpTaken) iteration = finalEndingIteration[i]!;
     // A numbered volta not for this iteration: step over its whole span,
     // repeat barlines and all.
     const endingStart = endingAt[i];
@@ -239,6 +242,19 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     arrival = undefined;
     if (!soundingPasses[i]!.includes(iteration)) soundingPasses[i]!.push(iteration);
 
+    // A repeat closing here is finished before the bar's Fine or jump is
+    // honoured — unless the bar sits in a numbered ending, whose own pass is
+    // the one the jump belongs to.
+    const loopsBack = measure.repeatEnd !== undefined && iteration < (measure.repeatEnd.times ?? 2);
+    if (loopsBack && !(numbers && numbers.length > 0)) {
+      i = repeatStartIndex;
+      iteration += 1;
+      viaLoop = true;
+      arrival = 'loop';
+      from = undefined;
+      continue;
+    }
+
     const navigation = measureNavigation(measure);
     const fine = navigation.marks.find(mark => mark.kind === 'fine'
       && (!from || atOrAfter(mark.location.fraction, from)));
@@ -263,6 +279,8 @@ export function linearizePasses(doc: MnxStructure): PassModel {
         armedCoda = undefined;
         arrival = 'jump';
         iteration = 1;
+        repeatStartIndex = startAt[i]!;
+        endingExit = null;
         continue;
       }
     }
@@ -274,7 +292,6 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     if (returnJump) {
       takenJumps.add(returnJump.key);
       if (returnJump.jump.source === 'published') publishedJumpTaken = true;
-      returnJumpTaken = true;
       const jump = returnJump.jump;
       entry.until = [...jump.location.fraction];
       fineArmed = jump.type === 'dsalfine' || jump.type === 'daCapoAlFine'
@@ -295,11 +312,12 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       from = destination ? [...destination.location] : undefined;
       arrival = 'jump';
       iteration = 1;
+      repeatStartIndex = startAt[i]!;
+      endingExit = null;
       continue;
     }
-    if (measure.repeatEnd !== undefined && !returnJumpTaken) {
-      const times = measure.repeatEnd.times ?? 2;
-      if (iteration < times) {
+    if (measure.repeatEnd !== undefined) {
+      if (loopsBack) {
         i = repeatStartIndex;
         iteration += 1;
         viaLoop = true;

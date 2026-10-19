@@ -6320,11 +6320,13 @@
       2,
       3,
       0,
+      1,
+      0,
       2
     ],
     "passCounts": [
-      3,
-      1,
+      4,
+      2,
       2,
       1
     ],
@@ -6390,7 +6392,7 @@
         "ordinal": 5,
         "measureIndex": 0,
         "occurrence": 3,
-        "iteration": 2,
+        "iteration": 1,
         "verse": 3,
         "from": [
           1,
@@ -6400,6 +6402,21 @@
       },
       {
         "ordinal": 6,
+        "measureIndex": 1,
+        "occurrence": 2,
+        "iteration": 1,
+        "verse": 2
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 0,
+        "occurrence": 4,
+        "iteration": 2,
+        "verse": 4,
+        "via": "loop"
+      },
+      {
+        "ordinal": 8,
         "measureIndex": 2,
         "occurrence": 2,
         "iteration": 2,
