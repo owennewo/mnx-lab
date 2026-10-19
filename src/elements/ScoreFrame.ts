@@ -241,10 +241,11 @@ export class ScoreFrame extends LitElement {
       .video-surface { width: 100%; height: var(--video-height); flex: 0 1 var(--video-height); min-height: 200px; }
       .video-controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; flex: none; }
       .video-controls .btn { white-space: normal; }
-      .youtube-notice { padding: 12px; overflow-wrap: anywhere; }
+      .youtube-notice, .youtube-error { padding: 12px; overflow-wrap: anywhere; }
+      .youtube-error p { margin: 0 0 8px; }
       .youtube-notice h3 { margin-top: 0; }
       .youtube-notice a { color: inherit; text-decoration: underline; }
-      .youtube-notice button { margin: 4px 4px 0 0; padding: 8px; color: inherit; background: var(--frame-bar); border: 1px solid var(--ink-muted); border-radius: 3px; cursor: pointer; }
+      .youtube-notice button, .youtube-error button { margin: 4px 4px 0 0; padding: 8px; color: inherit; background: var(--frame-bar); border: 1px solid var(--ink-muted); border-radius: 3px; cursor: pointer; }
       .video-divider { flex: 0 0 8px; cursor: col-resize; touch-action: none; background: var(--frame-ground); }
       .video-divider:hover, .video-divider:focus-visible { background: var(--ink-muted); outline: 2px solid var(--ink); outline-offset: -2px; }
       .video-pane[hidden], .video-divider[hidden], .video-surface[hidden], .video-controls[hidden] { display: none; }
@@ -1031,6 +1032,7 @@ export class ScoreFrame extends LitElement {
         <aside class="video-pane" aria-label="YouTube video" ?hidden=${!this.videoOpen}
           style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
           <div class="video-surface" ?hidden=${this.player?.playback?.kind !== 'youtube'}></div>
+          ${this.player?.renderYouTubeError() ?? nothing}
           <div class="video-controls" ?hidden=${this.player?.playback?.kind !== 'youtube'}>
             <button class="btn ghost" @click=${() => this.player?.showYouTubeNotice()}>Terms and privacy</button>
             <button class="btn ghost" @click=${() => { this.player?.pause(); void this.player?.selectSource('synth'); }}>Close video</button>

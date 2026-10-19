@@ -124,6 +124,9 @@ export class Player extends LitElement {
   @state() private status: PlaybackSnapshot | undefined;
   @state() private localError = '';
   private get error() { return this.localError || this.status?.error || (this.status?.alignmentIssue ? '' : this.status?.issue) || ''; }
+  /** A video's failure is shown in the video's own region, not under the tray. */
+  private get youtubeError() { return this.status?.kind === 'youtube' ? this.error : ''; }
+  private shownYouTubeError = '';
   @state() private rate = 1;
   /** Default synth/audio controls; other backends advertise their own rates. */
   static readonly RATE_MIN = 0.25;
@@ -758,7 +761,9 @@ export class Player extends LitElement {
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
-    if (changed.has('youtubeNotice')) {
+    // A host video pane draws the notice and the video's failure from here: either changing redraws it.
+    if (changed.has('youtubeNotice') || this.youtubeError !== this.shownYouTubeError) {
+      this.shownYouTubeError = this.youtubeError;
       this.dispatchEvent(new CustomEvent('video-notice-changed', { bubbles: true, composed: true }));
     }
     // An edit — the same document, a new performance — keeps the session and hands the
@@ -1511,6 +1516,15 @@ export class Player extends LitElement {
       </section>` : nothing;
   }
 
+  /** The video's failure and its retry, for the inline panel or a host video pane. */
+  renderYouTubeError() {
+    const error = this.youtubeError;
+    return error ? html`<section class="youtube-error" role="alert">
+        <p>Playback unavailable: ${error}</p>
+        ${this.status?.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : nothing}
+      </section>` : nothing;
+  }
+
   render() {
     const playing = this.status?.wantsPlayback ?? false;
     const busy = this.syncEditable && this.sourceId !== 'synth'
@@ -1563,6 +1577,7 @@ export class Player extends LitElement {
       </div>
       ${this.status?.kind === 'youtube' && !this.videoPaneHosted ? html`<section class="youtube-panel" aria-label="YouTube recording">
         <div class="youtube-surface"></div>
+        ${this.renderYouTubeError()}
         <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}
       ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
@@ -1571,8 +1586,8 @@ export class Player extends LitElement {
             Preparing audio…
           </p>`
         : nothing}
-      ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
-      ${this.status?.kind === 'youtube' && this.status.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : this.status?.needsStart && !this.status.alignmentIssue ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
+      ${this.error && !this.youtubeError ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
+      ${!(this.status?.kind === 'youtube' && this.status.error) && this.status?.needsStart && !this.status.alignmentIssue ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
       ${this.replacesImportedSync ? html`<p role="status">This recording's imported sync has no segments to reopen. Placing the start handle replaces it.</p>` : nothing}
       ${!this.loading && this.status?.state === 'buffering' ? html`<p role="status">Buffering audio…</p>` : nothing}
       ${!this.syncWarningsInPanel && (this.status?.alignmentIssue || this.status?.syncIssue) && !this.error ? html`<p role="status">Score follow: ${this.status?.alignmentIssue || this.status?.syncIssue}</p>` : nothing}`;

@@ -66,7 +66,10 @@ try{
  if(!await c.evaluate(`localStorage.getItem('mnx-player-youtube-terms-hidden')==='true'`))throw new Error('Terms dismissal was not saved');
  if(!live){
    await wait(`test.player.playback?.kind==='youtube' && !test.player.playback.loading`,25);
-   await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Retry video').click()`);
+   // The failure and its retry are the video's: in the pane, never under the tray.
+   if(!await c.evaluate(`(()=>{const root=test.frame.shadowRoot,error=root.querySelector('.youtube-error');return !!error && root.querySelector('.video-pane').contains(error) && error.textContent.includes('Playback unavailable') && !test.player.shadowRoot.querySelector('[role=alert]');})()`))throw new Error('YouTube failure did not appear in the video pane');
+   await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Retry video').click()`);
+   await wait(`!test.frame.shadowRoot.querySelector('.youtube-error')`);
  }
  await wait(`test.player.playback?.kind==='youtube' && !test.player.playback.loading`,25);
  const ready=await c.evaluate(`({source:test.player.sourceId,issue:test.player.playback.issue,state:test.player.playback.state,time:test.player.playback.mediaTime,iframe:test.frame.shadowRoot.querySelector('iframe')?.src})`);
