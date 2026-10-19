@@ -70,7 +70,16 @@ use it also when adding a new row to a score that already has lyrics.
 
 Two anchors can still name one stored syllable — by an explicit row header —
 and conflicting assignments are diagnosed, rather than silently choosing the
-last one. Lyrics on events never reached by navigation are retained
+last one. Two mistakes look alike here and are told apart, each named once:
+
+- **A passage that runs on into the next anchor** (one more `|` pushed its
+  last words into bars the next line writes) is named on its own line, with
+  the words that ran on: *18.3 runs 6 syllables on into 20.3 (“been the end I
+  could be”)…* — move them into that line, or delete its anchor to let the text
+  flow on.
+- **Two passes of a bar that sing the same verse row** store one set of words,
+  so they must agree: *1.1 sings “changed” and 1.2 sings “different”, but both
+  are verse 2 of the same written notes…* Lyrics on events never reached by navigation are retained
 when committing this surface, as are lyrics outside its staff-1 first-voice walk.
 
 ## Design record

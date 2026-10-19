@@ -351,8 +351,27 @@ describe('performance anchors and canonical wrapping', () => {
     expect(planLyricEdits(doc, 0, third).filter(edit => edit.op === 'setSyllable')).toMatchObject([{ text: 'third' }]);
     // Two anchors naming the same stored row explicitly still have to agree.
     const conflict = parseLyricText(doc, 0, '1.1| 2: changed\n1.2| different');
-    expect(conflict.diagnostics[0]!.message).toContain('share a stored syllable');
+    expect(conflict.diagnostics.map(d => d.message)).toEqual([
+      '1.1 sings “changed” and 1.2 sings “different”, but both are verse 2 of the same written notes, which hold one set of words — make them match'
+    ]);
     expect(planLyricEdits(doc, 0, conflict)).toEqual([]);
+  });
+
+  it('a passage that runs on into the next anchor is named once, on its own line, with the words that ran on', () => {
+    const doc = bars(3);
+    // Three syllables from 1.1 fill bar 1 (two notes) and run one into bar 2, which 2.1 also writes.
+    const parsed = parseLyricText(doc, 0, '1.1| a b c\n2.1| d e');
+    expect(parsed.diagnostics).toEqual([{ textLine: 0, bar: 2,
+      message: '1.1 runs 1 syllable on into 2.1 (“c”), which has words of its own — move them into the 2.1 line, or delete the 2.1| anchor to let the text flow on' }]);
+    expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
+    // The same word at the same place is no disagreement.
+    expect(parseLyricText(doc, 0, '1.1| a b d\n2.1| d e').diagnostics).toEqual([]);
+    // Deleting the anchor lets the words flow on.
+    expect(parseLyricText(doc, 0, '1.1| a b c d e').diagnostics).toEqual([]);
+    // Anchoring one place twice says so.
+    expect(parseLyricText(doc, 0, '2.1| x\n2.1| y').diagnostics.map(d => d.message)).toEqual([
+      '2.1 is anchored twice — keep one 2.1| and put its words together'
+    ]);
   });
 
   it('first visit to a second ending maps to verse two, not verse one', () => {

@@ -657,7 +657,18 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
   const minted = new Set<string>();
   const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
   const atLine = (offset: number) => text.slice(0, offset).split('\n').length - 1;
-  const assigned = new Map<string, { text: string; type?: SyllableType }>();
+  const assigned = new Map<string, { text: string; type?: SyllableType; index: number }>();
+  // Who has written each performed place (a verse row at one sung position), so two
+  // passages that reach the same place are told apart from two passes of a bar that
+  // share the same stored words: they are different mistakes with different fixes.
+  const passages: { label: string; ordinal: number; textLine: number; bar: number }[] = [];
+  const claims = new Map<string, { passage: number; text: string }>();
+  const overruns = new Map<string, { a: number; b: number; words: Map<number, string[]>; differs: boolean }>();
+  const shares = new Map<string, { textLine: number; bar: number; row: number; first: string; second: string; words: [string[], string[]] }>();
+  const visitLabel = (index: number) => {
+    const visit = visits[walk[index]!.measureIndex]!;
+    return `${visit.measureIndex + 1}.${visit.occurrence}`;
+  };
   for (let begin = 0; begin < raw.length;) {
     const anchor = raw[begin]!;
     const match = OCCURRENCE_ANCHOR.exec(anchor.text);
@@ -675,6 +686,7 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       begin = end; continue;
     }
     const chunk = raw.slice(begin + 1, end);
+    const passage = passages.push({ label: `${bar}.${occurrence}`, ordinal, textLine, bar }) - 1;
     const header = takeHeader(chunk);
     if (header?.ordinal !== undefined && (!Number.isSafeInteger(header.ordinal) || header.ordinal < 1)) {
       result.diagnostics.push({ textLine, bar, message: 'verse number must be a positive integer' });
@@ -711,13 +723,30 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       const source = sources[index]!;
       const visit = visits[walk[index]!.measureIndex]!;
       const { id, row } = rowId(visit.verse);
+      const place = `${id}:${index}`, claim = claims.get(place);
+      if (claim && claim.passage !== passage) {
+        // Two passages reach the same performed place: one has run on into the other.
+        const [a, b] = passages[claim.passage]!.ordinal <= ordinal ? [claim.passage, passage] : [passage, claim.passage];
+        const pair = `${a}>${b}`;
+        const overrun = overruns.get(pair) ?? { a, b, words: new Map<number, string[]>(), differs: false };
+        overruns.set(pair, overrun);
+        const theirs = a === claim.passage ? claim.text : syllable.text;
+        overrun.words.set(index, [theirs]);
+        // Agreeing about a place is no mistake (as before); one disagreement and the whole run is named.
+        overrun.differs ||= claim.text !== syllable.text;
+        continue;
+      }
+      claims.set(place, { passage, text: syllable.text });
       const key = `${id}:${source}`;
       const previous = assigned.get(key);
-      if (previous && (previous.text !== syllable.text || normalizeType(previous.type) !== normalizeType(syllable.type))) {
-        result.diagnostics.push({ textLine, bar: visit.measureIndex + 1,
-          message: 'these performance occurrences share a stored syllable; give them the same text' });
+      if (previous && previous.index !== index && (previous.text !== syllable.text || normalizeType(previous.type) !== normalizeType(syllable.type))) {
+        // Two passes of a bar that sing the same verse row store one set of words.
+        const first = visitLabel(previous.index), second = visitLabel(index), pair = `${id}:${first}>${second}`;
+        const share = shares.get(pair) ?? { textLine, bar: visit.measureIndex + 1, row, first, second, words: [[], []] as [string[], string[]] };
+        shares.set(pair, share);
+        share.words[0].push(previous.text); share.words[1].push(syllable.text);
       }
-      assigned.set(key, syllable);
+      assigned.set(key, { ...syllable, index });
       let line = lines.get(id);
       if (!line) {
         line = { lineId: id, minted: minted.has(id), ...(group ? { lang: group } : {}), ordinal: row, textLine, syllables: new Map() };
@@ -733,6 +762,21 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
         ...(sung && at ? { ordinal: sung.measureIndex, onset: [Number(at.num), Number(at.den)] as [number, number] } : {}) });
     }
     begin = end;
+  }
+  const quoted = (words: string[]) => `“${words.join(' ')}”`;
+  for (const { a, b, words, differs } of overruns.values()) {
+    if (!differs) continue;
+    const from = passages[a]!, into = passages[b]!, ran = [...words].sort(([x], [y]) => x - y).map(([, [word]]) => word!);
+    result.diagnostics.push({ textLine: from.textLine, bar: into.bar,
+      message: from.ordinal === into.ordinal
+        ? `${into.label} is anchored twice — keep one ${into.label}| and put its words together`
+        : `${from.label} runs ${ran.length} ${ran.length === 1 ? 'syllable' : 'syllables'} on into ${into.label} (${quoted(ran)}), ` +
+          `which has words of its own — move them into the ${into.label} line, or delete the ${into.label}| anchor to let the text flow on` });
+  }
+  for (const share of shares.values()) {
+    result.diagnostics.push({ textLine: share.textLine, bar: share.bar,
+      message: `${share.first} sings ${quoted(share.words[0])} and ${share.second} sings ${quoted(share.words[1])}, ` +
+        `but both are verse ${share.row} of the same written notes, which hold one set of words — make them match` });
   }
   if (minted.size) {
     result.newRows = [...groups].flatMap(([lang, ids]) => ids.filter(id => minted.has(id)).map(id => ({ id, ...(lang ? { lang } : {}) })));
