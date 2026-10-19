@@ -254,6 +254,13 @@ try {
     t.setSelectionRange(at, at); t.dispatchEvent(new MouseEvent('click')); }`);
   await wait(`${page}.editor.session.cursor.onset.num > 0 && ${piece}.querySelector('mnx-player').cursorPlace?.metricOffset.num > 0n`);
   assert.equal(await c.evaluate(`!!${viewer}.shadowRoot.querySelector('svg .enclosure-preview')`), false, 'the lyric caret drew its own cursor');
+  // A line the margin labels is a way to its first word: a click on the label moves the cursor there.
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| sing\\n song'; t.dispatchEvent(new Event('input')); }`);
+  await wait(`${lyrics}.shadowRoot.querySelectorAll('.gutter span').length === 1 && ${page}.editor.session.cursor.onset.num === 0`);
+  await c.evaluate(`${lyrics}.shadowRoot.querySelector('.gutter span').click()`);
+  await wait(`${page}.editor.session.cursor.onset.num > 0`);
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| sing song'; t.dispatchEvent(new Event('input')); }`);
   // Side panels are exclusive, and switching away commits what the lyric panel holds.
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'new words'; t.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${action('Keys')}.click()`);

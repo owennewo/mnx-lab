@@ -26,7 +26,8 @@ count actual visits too: the first visit to a second ending is `.1`.
 
 **Only a run's first line is anchored.** Every later line opens on the `|`
 that carries the words on into the next bar, and the margin beside it names
-where it lands, live, as you type:
+where it lands, live, as you type. A click on a margin label takes the caret,
+and the score's cursor with it, to that line's first word:
 
 ```
        9.1| _____ I | could-a been a_ sail- | -or | ___ could have

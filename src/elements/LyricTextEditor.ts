@@ -154,6 +154,11 @@ export class LyricTextEditor extends LitElement {
         position: absolute;
         right: 6px;
         font-variant-numeric: tabular-nums;
+        cursor: pointer;
+      }
+      .gutter span:hover {
+        color: var(--ink);
+        text-decoration: underline;
       }
       .mirror {
         position: absolute;
@@ -317,19 +322,27 @@ export class LyricTextEditor extends LitElement {
     const starts: number[] = [];
     for (let at = 0, i = 0; i < lines.length; at += lines[i]!.length + 1, i++) starts.push(at);
     const lineOf = (offset: number) => { let lo = 0, hi = starts.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid]! <= offset) lo = mid; else hi = mid - 1; } return lo; };
-    const first = new Map<number, number>();
+    const first = new Map<number, { from: number; to: number; ordinal: number }>();
     for (const token of this.parsed.tokens) {
       if (token.ordinal === undefined) continue;
       const line = lineOf(token.from);
-      if (!first.has(line)) first.set(line, token.ordinal);
+      if (!first.has(line)) first.set(line, { from: token.from, to: token.to, ordinal: token.ordinal });
     }
     mirror.style.width = `${area.clientWidth + 2}px`;
     mirror.style.left = `${area.offsetLeft}px`;
     mirror.replaceChildren(...lines.map(line => { const row = document.createElement('div'); row.textContent = line || '\u200b'; return row; }));
     const rows = [...mirror.children] as HTMLElement[];
-    inner.replaceChildren(...[...first].filter(([line]) => !/^\s*\d+\.\d+\|/.test(lines[line]!)).map(([line, ordinal]) => {
+    inner.replaceChildren(...[...first].filter(([line]) => !/^\s*\d+\.\d+\|/.test(lines[line]!)).map(([line, token]) => {
       const label = document.createElement('span');
-      label.textContent = this.labels[ordinal] ?? '';
+      label.textContent = this.labels[token.ordinal] ?? '';
+      label.title = `Go to ${label.textContent}`;
+      // A label is a way to the line's first word: the caret goes there, and the cursor with it.
+      label.addEventListener('mousedown', event => event.preventDefault());
+      label.addEventListener('click', () => {
+        area.focus();
+        area.setSelectionRange(token.from, token.to);
+        this.caretAt(token.from);
+      });
       // The row's top (past the box's 1px border) plus half the gap between a 13px line box (1.7) and this 11px label.
       label.style.top = `${1 + (rows[line]?.offsetTop ?? 0) + (13 * 1.7 - 11) / 2}px`;
       return label;
