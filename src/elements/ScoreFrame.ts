@@ -74,6 +74,18 @@ const NO_STRINGS = 'Needs known strings — declare strings[] in the document, o
 
 type Pad = 'zoom' | 'settings' | null;
 
+/** The slotted content is ONE element in the flow, and it scrolls itself: absolutely
+ *  placed overlays aside, nothing else is there for the pane to scroll. */
+function selfScrolling(elements: Element[]): boolean {
+  const inFlow = elements.filter(element => {
+    const position = getComputedStyle(element).position;
+    return position !== 'absolute' && position !== 'fixed' && getComputedStyle(element).display !== 'none';
+  });
+  if (inFlow.length !== 1) return false;
+  const overflow = getComputedStyle(inFlow[0]!).overflowY;
+  return overflow === 'auto' || overflow === 'scroll';
+}
+
 @customElement('mnx-score-frame')
 export class ScoreFrame extends LitElement {
   /** What the tools row prints. */
@@ -127,6 +139,7 @@ export class ScoreFrame extends LitElement {
     this.scrollerObserver?.disconnect();
     for (const element of slot.assignedElements()) this.scrollerObserver?.observe(element);
     this.measureScrollbar(slot.assignedElements());
+    this.toggleAttribute('data-self-scrolling', selfScrolling(slot.assignedElements()));
   };
   private measureScrollbar(elements: Element[]) {
     let width = 0;
@@ -246,6 +259,16 @@ export class ScoreFrame extends LitElement {
         position: absolute;
         inset: 0;
         overflow: auto;
+      }
+      /* The pane holds one score that scrolls itself and fills it (overlays
+         aside): the pane has nothing of its own to scroll. Left on auto, it
+         re-asked whether it needed a scrollbar on every layout that reached it
+         — the content is exactly its height — and its answer resized the
+         score, which laid the whole SVG out again: ~45 ms of every cursor move
+         on a 160-bar piece (2026-10-19). Anything else in the flow (a banner
+         above the score) puts the pane's scrolling back. */
+      :host([data-self-scrolling]) .score {
+        overflow: hidden;
       }
 
       /* ── focus controls ──
@@ -751,7 +774,12 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('video-notice-changed', this.onVideoNotice);
     this.videoObserver = new ResizeObserver(() => { this.fitVideo(); this.requestUpdate(); });
     this.videoObserver.observe(this);
-    this.scrollerObserver = new ResizeObserver(entries => this.measureScrollbar(entries.map(entry => entry.target)));
+    this.scrollerObserver = new ResizeObserver(entries => {
+      this.measureScrollbar(entries.map(entry => entry.target));
+      // A score shown or hidden changes what is in the flow without changing the slot.
+      const slot = this.renderRoot.querySelector<HTMLSlotElement>('.score > slot');
+      if (slot) this.toggleAttribute('data-self-scrolling', selfScrolling(slot.assignedElements()));
+    });
     document.addEventListener('fullscreenchange', this.onFullscreenChange);
   }
 

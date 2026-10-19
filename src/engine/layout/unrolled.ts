@@ -1,3 +1,4 @@
+import { SELECTED_CLASS_MARK, extendSelectionMark, hookedNamespaces, selectionHooked } from './selectionHooks.ts';
 import type { TechniqueCollector } from './technique.ts';
 import {
   isTimedEvent,
@@ -215,6 +216,7 @@ export function qualifyMeasure(
   const entry = measure.entry;
   if (!entry) return;
   const performed = performedKeys(doc, entry, true);
+  const hooks = selectionHooked(selectedIds) ? hookedNamespaces(selectedIds) : [];
   const locations = new Map<
     string,
     { measureIndex: number; voiceIndex: number; eventIndex: number }
@@ -233,7 +235,15 @@ export function qualifyMeasure(
     const key = primitive.sourceId;
     primitive.sourceId = occurrenceKey(key, entry.ordinal);
     primitive.writtenSourceId = key;
-    if (
+    if (hooks.length > 0 && /notehead|fret-number|rest/.test(primitive.className ?? '')) {
+      // Painted by the host: the written key lights every visit's copy, as below —
+      // in the colour slot where the rule below colours, as a class alone where it does not.
+      const keys = hooks.map(ns => `${ns}:${key}`);
+      if (!primitive.className?.includes(SELECTED_CLASS_MARK)) primitive.className = `${primitive.className ?? ''}${SELECTED_CLASS_MARK}`;
+      if ('fill' in primitive || primitive.kind === 'glyph' || primitive.kind === 'text')
+        (primitive as { fill?: string }).fill = extendSelectionMark((primitive as { fill?: string }).fill, keys);
+      else primitive.selects = extendSelectionMark(primitive.selects, keys);
+    } else if (
       selectedIds.includes(key) &&
       /notehead|fret-number|rest/.test(primitive.className ?? '') &&
       !primitive.className?.split(' ').includes('selected')

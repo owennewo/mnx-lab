@@ -1,5 +1,6 @@
 import { Point, Primitive, GlyphPrim, LinePrim, CurvePrim, TextPrim, RectPrim } from '../primitives.ts';
 import { glyphCodepoint } from '../smufl/smufl.ts';
+import { readClassMark, readSelectionMark } from '../layout/selectionHooks.ts';
 
 /**
  * Walks a primitive list and emits SVG. Knows nothing about music — primitives
@@ -251,10 +252,42 @@ function identity(p: Primitive): string {
   if (p.className) out += ` class="${escapeXml(p.className)}"`;
   if (p.sourceId) out += ` data-source-id="${escapeXml(p.sourceId)}"`;
   if (p.writtenSourceId !== undefined) out += ` data-written-source-id="${escapeXml(p.writtenSourceId)}"`;
+  const hook = hooks.get(p);
+  if (hook) out += ` data-selects="${escapeXml(JSON.stringify(hook.ids))}" data-select-paint="${hook.paint.join(' ')}"`;
   return out;
 }
 
-function emitPrimitive(p: Primitive, kx: number, ky: number): string {
+/** What a hooked primitive's selection lights, for `identity` (layout/selectionHooks.ts). */
+const hooks = new WeakMap<Primitive, { ids: string[]; paint: string[] }>();
+
+/**
+ * A primitive the layout marked for a host that paints the selection itself:
+ * the marks leave the colour slots (which go back to what an unselected
+ * primitive has) and become `data-selects`, with the style properties a lit
+ * one takes in `data-select-paint`. A tapered curve fills in its stroke's
+ * colour, so it takes both.
+ */
+function unhook(p: Primitive): Primitive {
+  const fill = 'fill' in p ? readSelectionMark(p.fill) : null;
+  const stroke = 'stroke' in p ? readSelectionMark(p.stroke) : null;
+  const only = readSelectionMark(p.selects);
+  const classed = readClassMark(p.className);
+  if (!fill && !stroke && !only && !classed.marked) return p;
+  const copy = { ...p } as Primitive & { fill?: string; stroke?: string };
+  if (classed.className === undefined) delete copy.className;
+  else copy.className = classed.className;
+  // A class token with no ids to light it (ink no note owns) is only taken away.
+  if (!fill && !stroke && !only) return copy;
+  const paint: string[] = classed.marked ? ['class'] : [];
+  if (fill) { delete copy.fill; paint.push('fill'); }
+  if (stroke) { delete copy.stroke; paint.push('stroke'); if (p.kind === 'curve' && p.taper) paint.push('fill'); }
+  delete copy.selects;
+  hooks.set(copy, { ids: [...new Set([...(fill ?? []), ...(stroke ?? []), ...(only ?? [])])], paint: [...new Set(paint)] });
+  return copy;
+}
+
+function emitPrimitive(primitive: Primitive, kx: number, ky: number): string {
+  const p = unhook(primitive);
   switch (p.kind) {
     case 'glyph': return emitGlyph(p, kx, ky);
     case 'line':  return emitLine(p, kx, ky);

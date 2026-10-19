@@ -69,6 +69,9 @@ export interface PrimitiveBase {
   opacity?: number;
   /** Plain-text tooltip, emitted as an SVG `<title>` child (native hover). */
   title?: string;
+  /** Only for a host that paints the selection itself (layout/selectionHooks.ts):
+   *  the ids that select ink whose selection is a class and no colour. */
+  selects?: string;
 }
 
 export interface GlyphPrim extends PrimitiveBase {

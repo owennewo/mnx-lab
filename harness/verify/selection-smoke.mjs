@@ -323,6 +323,25 @@ try {
   } else {
     pass('stepping back into the score clears it');
   }
+  // A CURSOR MOVE IS A PAINT. The selection used to be a layout input, so every
+  // arrow laid the whole score out again and replaced the SVG; now the layout
+  // marks what the selection could light and the viewer lights it on the
+  // drawing in hand (src/engine/layout/selectionHooks.ts). The same SVG must
+  // still be there after the move, with the new place lit and the old one not.
+  console.log('\nan arrow repaints the selection on the drawing in hand');
+  const SCORE_SVG = `(() => { const svgs = []; const walk = (root, depth) => { if (!root || depth > 12) return;
+    for (const el of root.querySelectorAll('svg')) svgs.push(el); for (const el of root.querySelectorAll('*')) if (el.shadowRoot) walk(el.shadowRoot, depth + 1); };
+    walk(document, 0); return svgs.map(s => ({ s, n: s.querySelectorAll('*').length })).sort((a, b) => b.n - a.n)[0]?.s; })()`;
+  await cdp.evaluate(`window.__scoreSvg = ${SCORE_SVG}; true`);
+  const litBefore = JSON.parse(await cdp.evaluate(DUMP)).selected.map(el => el.id).filter(Boolean);
+  await press('ArrowLeft', 'ArrowLeft', 37);
+  const moved = JSON.parse(await cdp.evaluate(DUMP));
+  const litAfter = moved.selected.map(el => el.id).filter(Boolean);
+  if (await cdp.evaluate(`window.__scoreSvg === ${SCORE_SVG} && window.__scoreSvg.isConnected`)) pass('the score was not drawn again');
+  else fail('the arrow replaced the score SVG — the move laid the score out again');
+  if (litAfter.length === 0) fail('nothing is lit after the move');
+  else if (litAfter.some(id => litBefore.includes(id)) && litBefore.every(id => litAfter.includes(id))) fail(`the lit ink did not move (${litAfter.join(' ')})`);
+  else pass(`the new place is lit (${[...new Set(litAfter)].join(' ')}) and the old one is not`);
   // The viewer scrolls itself, so navigating off the visible systems used to
   // leave the reader looking at music they were no longer editing. Both
   // directions: the arithmetic reveals a selection below the fold and one

@@ -54,8 +54,19 @@ import {
   drawEnclosure,
   markProjectionEchoes,
   snapshotEnclosure,
-  tweenEnclosure
+  tweenEnclosure,
+  type EnclosureSnapshot
 } from './enclosure.ts';
+import { paintSelection } from './selectionPaint.ts';
+import { SELECT_EVENTS_HOOK, SELECT_NOTES_HOOK } from '../engine/layout/selectionHooks.ts';
+
+/** What the last full paint drew the selection against — enough to draw it again on the same page. */
+interface SelectionPage {
+  entries: ReturnType<DocumentViewer['entriesFor']>;
+  packings: RenderOutcome['packings'];
+  densityH: number;
+  staffOrdinals: (unit: NonNullable<SelectionContext['span']>['units'][number]) => number[];
+}
 import {
   buildPointerMap,
   drawPointerGhost,
@@ -1136,9 +1147,8 @@ export class DocumentViewer extends LitElement {
     if (changed.has('noGestures')) this.syncGestures();
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
     const verseMoved = changed.has('selectedVerse') && changed.get('selectedVerse') !== this.selectedVerse;
-    if (
+    const relayout =
       changed.has('mnxDoc') ||
-      changed.has('selection') ||
       changed.has('view') || changed.has('unrolled') ||
       changed.has('density') ||
       changed.has('densityH') ||
@@ -1162,16 +1172,105 @@ export class DocumentViewer extends LitElement {
       changed.has('zoom') ||
       changed.has('stringsOverride') ||
       changed.has('capoOverride') ||
-      changed.has('partTabSetups')
-    ) {
+      changed.has('partTabSetups');
+    if (relayout || changed.has('selection')) {
       // A property moved: either the selection itself, or the layout under
       // it. Both are the reader acting on the score, so both earn a scroll.
       // The OTHER two callers of renderProjection — the resize observer and the
       // font-ready redraw — deliberately do not queue one: nobody asked for
       // them, and a repaint nobody asked for must not move the page.
       this.followQueued = true;
-      this.renderProjection();
-    } else if (verseMoved) this.paintPlayback();
+      // The selection alone is a paint on the drawing in hand, not a layout.
+      if (relayout || !this.repaintSelection()) this.renderProjection();
+    }
+    if (!relayout && verseMoved) this.paintPlayback();
+  }
+
+  /**
+   * The selection on a drawn page: the selected ink lit (selectionPaint.ts), its
+   * echo in the other projection, the enclosure and the cursor's ghost cell. A
+   * full paint calls this on its fresh drawing; a cursor move calls it on the
+   * drawing it already has (`repaintSelection`), so moving costs no layout.
+   */
+  /** The page the selection was last drawn against; null when the drawing in hand cannot take a repaint. */
+  private selectionPage: SelectionPage | null = null;
+
+  private drawSelection(svg: SVGSVGElement, page: SelectionPage, previousEnclosure: EnclosureSnapshot | null, quick: boolean) {
+    paintSelection(svg, this.selection?.selectedNoteIds, this.selection?.selectedEventIds);
+    // A page that already carried a selection keeps nothing of it that this one does not draw.
+    for (const layer of svg.querySelectorAll(':scope > g.enclosure, :scope > g.enclosure-label, :scope > g.cursor-ghost'))
+      layer.remove();
+    const kind = this.selection?.enclosure;
+    const primaryProjection = this.resolvedView() === 'both'
+      ? this.selection?.primaryProjection
+      : null;
+    if (svg) markProjectionEchoes(svg, primaryProjection);
+    // The candidate scope, when the host is previewing one: its own dashed
+    // layer, drawn from note ids because nothing in the render is tagged
+    // for it (the selection has not moved).
+    const preview = this.selection?.preview;
+    if (preview && svg && !quick) {
+      drawEnclosure(svg, preview.enclosure, {
+        preview: true,
+        entries: page.entries,
+        noteIds: preview.noteIds,
+        primaryProjection
+      });
+    } else if (svg) {
+      svg.querySelector(':scope > g.enclosure-preview')?.remove();
+    }
+    if (kind && svg && !quick) {
+      drawEnclosure(svg, kind, {
+        entries: page.entries,
+        noteIds: this.selection?.selectedNoteIds,
+        eventIds: this.selection?.selectedEventIds,
+        span: this.selection?.span,
+        systemRows: packedRowMeasures(page.packings, page.densityH),
+        staffOrdinals: page.staffOrdinals,
+        primaryProjection,
+        litLabels: this.selection?.litLabels === true
+      });
+      let cancellation: (() => void) | null = null;
+      cancellation = tweenEnclosure(svg, previousEnclosure, () => {
+        if (this.cancelEnclosureTween === cancellation) this.cancelEnclosureTween = null;
+        this.emitSelectionAnchor();
+      });
+      this.cancelEnclosureTween = cancellation;
+      // The ghost cell: the cursor's own cell when empty. A measureless part
+      // is the one structural exception — it receives a panel-shaped vacancy
+      // because a note cannot exist until the first bar does.
+      const ghost = this.selection?.cursor;
+      if ((kind === 'cell' || ghost?.structuralEmpty || ghost?.pendingFret != null) && ghost) {
+        drawCursorGhost(svg, ghost, {
+          systemRows: packedRowMeasures(page.packings, page.densityH),
+          staffOrdinals: page.staffOrdinals
+        });
+      }
+      if (!this.fontRedrawQueued && !document.fonts.check('4px Bravura')) {
+        this.fontRedrawQueued = true;
+        void document.fonts.ready.then(() => this.renderProjection());
+      }
+    }
+  }
+
+  /** A cursor move on an unchanged score: repaint the selection on the drawing in hand.
+   *  False when there is none to repaint, and the caller paints in full. */
+  private repaintSelection(): boolean {
+    const svg = this.container?.querySelector<SVGSVGElement>('svg');
+    const page = this.selectionPage;
+    if (!svg || !page || this.gesturing || !isSmuflLoaded()) return false;
+    const previousEnclosure = snapshotEnclosure(svg);
+    this.cancelEnclosureTween?.();
+    this.cancelEnclosureTween = null;
+    this.drawSelection(svg, page, previousEnclosure, false);
+    const chasing = this.playbackState?.playing === true
+      && this.playbackState.followPlayback && this.playbackState.ordinal !== null;
+    this.emitSelectionAnchor();
+    if (this.followQueued) {
+      this.followQueued = false;
+      if (!chasing) this.revealSelection();
+    }
+    return true;
   }
 
   renderProjection() {
@@ -1277,58 +1376,15 @@ export class DocumentViewer extends LitElement {
       ordinalsOf(table, unit.partIndex, unit.staffIndex, tabOnly);
 
     const enclosed = (pane: HTMLElement, paint: RenderOutcome) => {
-      const kind = this.selection?.enclosure;
       const svg = pane.querySelector('svg');
-      const primaryProjection = this.resolvedView() === 'both'
-        ? this.selection?.primaryProjection
-        : null;
-      if (svg) markProjectionEchoes(svg, primaryProjection);
-      // The candidate scope, when the host is previewing one: its own dashed
-      // layer, drawn from note ids because nothing in the render is tagged
-      // for it (the selection has not moved).
-      const preview = this.selection?.preview;
-      if (preview && svg && !quick) {
-        drawEnclosure(svg, preview.enclosure, {
-          preview: true,
-          entries: commonOpts.entries,
-          noteIds: preview.noteIds,
-          primaryProjection
-        });
-      } else if (svg) {
-        svg.querySelector(':scope > g.enclosure-preview')?.remove();
-      }
-      if (kind && svg && !quick) {
-        drawEnclosure(svg, kind, {
-          entries: commonOpts.entries,
-          noteIds: this.selection?.selectedNoteIds,
-          eventIds: this.selection?.selectedEventIds,
-          span: this.selection?.span,
-          systemRows: packedRowMeasures(paint.packings, densityH),
-          staffOrdinals: renderedStaffOrdinals,
-          primaryProjection,
-          litLabels: this.selection?.litLabels === true
-        });
-        let cancellation: (() => void) | null = null;
-        cancellation = tweenEnclosure(svg, previousEnclosure, () => {
-          if (this.cancelEnclosureTween === cancellation) this.cancelEnclosureTween = null;
-          this.emitSelectionAnchor();
-        });
-        this.cancelEnclosureTween = cancellation;
-        // The ghost cell: the cursor's own cell when empty. A measureless part
-        // is the one structural exception — it receives a panel-shaped vacancy
-        // because a note cannot exist until the first bar does.
-        const ghost = this.selection?.cursor;
-        if ((kind === 'cell' || ghost?.structuralEmpty || ghost?.pendingFret != null) && ghost) {
-          drawCursorGhost(svg, ghost, {
-            systemRows: packedRowMeasures(paint.packings, densityH),
-            staffOrdinals: renderedStaffOrdinals
-          });
-        }
-        if (!this.fontRedrawQueued && !document.fonts.check('4px Bravura')) {
-          this.fontRedrawQueued = true;
-          void document.fonts.ready.then(() => this.renderProjection());
-        }
-      }
+      const page: SelectionPage = {
+        entries: commonOpts.entries,
+        packings: paint.packings,
+        densityH,
+        staffOrdinals: renderedStaffOrdinals
+      };
+      this.selectionPage = svg && !quick ? page : null;
+      if (svg) this.drawSelection(svg, page, previousEnclosure, quick);
     };
 
     // No pane captions: the view is named by whichever surface hosts this
@@ -1567,8 +1623,10 @@ export class DocumentViewer extends LitElement {
       width,
       activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
       durationSpans: true, // …but it stretches fret masks to the release the layout records.
-      selectedNoteIds: this.selection?.selectedNoteIds ?? [],
-      selectedEventIds: this.selection?.selectedEventIds ?? [],
+      // The selection is a paint too: the layout marks what it would colour, and
+      // `drawSelection` lights it — so a cursor move needs no layout (selectionHooks.ts).
+      selectedNoteIds: [SELECT_NOTES_HOOK],
+      selectedEventIds: [SELECT_EVENTS_HOOK],
       // Layout-side hides reach the engine so their space is reclaimed —
       // every view honors them (the tab layout draws lyrics too).
       display: this.effectiveDisplay(),
@@ -1759,7 +1817,9 @@ export class DocumentViewer extends LitElement {
     try {
       outcome = emitPlan(plan, pane, this.onNoteClick);
       const svg = pane.querySelector('svg');
+      this.selectionPage = null;
       if (svg) {
+        paintSelection(svg, this.selection?.selectedNoteIds, this.selection?.selectedEventIds);
         markProjectionEchoes(svg, this.resolvedView() === 'both' ? this.selection?.primaryProjection : null);
       }
       if (this.renderErrors.length) this.renderErrors = [];

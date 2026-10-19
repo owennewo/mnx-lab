@@ -1,3 +1,4 @@
+import { SELECTED_CLASS_MARK, selectionHooked, selectionMark } from './selectionHooks.ts';
 import { occurrenceKey, syntheticEventKey } from '../../model/noteKeys.ts';
 import type { ContainerIndex } from '../../model/noteKeys.ts';
 import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
@@ -743,7 +744,8 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // chord, and highlighting the whole event would erase it.
       const isActive = noteId !== undefined && activeNoteIds.includes(noteId);
       const isSelected = noteId !== undefined && selectedNoteIds.includes(noteId);
-      const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
+      const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR
+        : selectionHooked(selectedNoteIds) ? selectionMark('n', [noteId]) : undefined;
 
       // A tie continuation keeps ringing: no digit, unless its origin was
       // drawn on an earlier system (`TabTies`). It never claims the slot, so
@@ -830,7 +832,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         fill: fretFill,
         className: 'fret-number' +
           (isActive ? ' active' : '') +
-          (isSelected ? ' selected' : ''),
+          (isSelected ? ' selected' : fretFill !== undefined && !isActive ? SELECTED_CLASS_MARK : ''),
         sourceId: noteId
       });
     }

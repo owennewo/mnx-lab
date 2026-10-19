@@ -1,3 +1,4 @@
+import { SELECTED_CLASS_MARK, selectionHooked, selectionMark } from './selectionHooks.ts';
 import { qualifyMeasure, qualifyTechniques, occurrenceTarget, performedSpans, performedKeys, occurrenceKey, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
 import { resolveSwingTimeline } from '../../model/swing.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
@@ -4382,6 +4383,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
         })
       : undefined);
     const restSelected = restKey !== undefined && selectedEventIds.includes(restKey);
+    const restMark = selectionHooked(selectedEventIds) && restKey !== undefined ? selectionMark('e', [restKey]) : undefined;
     // `rest.staffPosition` (half-spaces from the middle line, +up) overrides the
     // value's default resting place — same convention as full-measure rests.
     const positioned = event.rest.staffPosition !== undefined;
@@ -4394,9 +4396,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       x: eventX,
       y: staffTop + yOffset,
       anchor: 'middle',
-      className: `rest${restSelected ? ' selected' : ''}`,
+      className: `rest${restSelected ? ' selected' : restMark ? SELECTED_CLASS_MARK : ''}`,
       ...(restKey === undefined ? {} : { sourceId: restKey }),
-      ...(restSelected ? { fill: SELECTED_COLOR } : {})
+      ...(restSelected ? { fill: SELECTED_COLOR } : restMark ? { fill: restMark } : {})
     });
     // Augmentation dots for rests (just above the rest's centre)
     for (let d = 0; d < dots; d++) {
@@ -4452,19 +4454,22 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // editor's one-note cursor stays visible inside a chord.
   const isActive = noteIds.some(id => id !== undefined && activeNoteIds.includes(id));
   const isSelected = noteIds.some(id => id !== undefined && selectedNoteIds.includes(id));
-  const fill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
-  const colorClass = isActive ? ' active' : isSelected ? ' selected' : '';
+  // A host painting the selection itself is handed marks where the colour would go (selectionHooks.ts).
+  const hooked = selectionHooked(selectedNoteIds);
+  const fill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : hooked ? selectionMark('n', noteIds) : undefined;
+  const colorClass = isActive ? ' active' : isSelected ? ' selected' : hooked ? SELECTED_CLASS_MARK : '';
   const noteFill = (idx: number): string | undefined => {
     const id = noteIds[idx];
     if (id === undefined) return undefined;
     return activeNoteIds.includes(id) ? ACTIVE_COLOR
       : selectedNoteIds.includes(id) ? SELECTED_COLOR
+      : hooked ? selectionMark('n', [id])
       : undefined;
   };
   const noteColorClass = (idx: number): string => {
     const id = noteIds[idx];
     if (id === undefined) return '';
-    return activeNoteIds.includes(id) ? ' active' : selectedNoteIds.includes(id) ? ' selected' : '';
+    return activeNoteIds.includes(id) ? ' active' : selectedNoteIds.includes(id) ? ' selected' : hooked ? SELECTED_CLASS_MARK : '';
   };
 
   // Stem direction — a beam run's shared direction trumps everything.
