@@ -27,8 +27,14 @@ function gcd(a: bigint, b: bigint): bigint {
   while (b) [a, b] = [b, a % b];
   return a;
 }
+/** 2^limit, per limit: a magnitude needs more than `limit` bits exactly when it reaches it.
+ *  (Measured, not assumed: printing every value in binary to count its digits was the
+ *  largest single cost of building a transport.) */
+const bitCeilings = new Map<number, bigint>();
 function checkBits(n: bigint, limit: number) {
-  if (abs(n).toString(2).length > limit) fail('resource-limit', `Exact time exceeds ${limit} bits.`);
+  let ceiling = bitCeilings.get(limit);
+  if (ceiling === undefined) bitCeilings.set(limit, ceiling = 1n << BigInt(limit));
+  if (abs(n) >= ceiling) fail('resource-limit', `Exact time exceeds ${limit} bits.`);
 }
 /** Up to twice the canonical bit budget for arithmetic intermediates. */
 export function rational(num: bigint, den = 1n): Rational {

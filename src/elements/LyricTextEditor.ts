@@ -16,7 +16,8 @@
 // yields; clicking the score hands the keys back without closing the drawer.
 // The caret IS the editor's cursor: a caret on a word sends its visit and
 // onset (lyric-editor-caret) and the host moves the one cursor there — the
-// playback cursor with it. The panel draws no cursor of its own.
+// playback cursor with it. The panel draws no cursor of its own. A click or
+// an arrow moves it at once; typing moves it at the pause, with the preview.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome, scrollbars } from './tokens.ts';
@@ -71,6 +72,8 @@ export class LyricTextEditor extends LitElement {
   private touched = false;
   private commitTimer: ReturnType<typeof setTimeout> | undefined;
   private previewTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The key down now typed (an input followed it), rather than only moving the caret. */
+  private typed = false;
 
   static styles = [
     designTokens,
@@ -301,9 +304,11 @@ export class LyricTextEditor extends LitElement {
     this.text = area.value;
     this.touched = this.pending = true;
     this.reparse();
-    this.caretAt(area.selectionStart);
+    // The cursor follows the typing at the pause, with the preview — in the same
+    // frame, so the score is laid out once, not on every word the caret enters.
+    this.typed = true;
     clearTimeout(this.previewTimer);
-    this.previewTimer = setTimeout(() => this.preview(), LYRIC_PREVIEW_PAUSE_MS);
+    this.previewTimer = setTimeout(() => this.settleTyping(), LYRIC_PREVIEW_PAUSE_MS);
     clearTimeout(this.commitTimer);
     this.commitTimer = setTimeout(() => this.commit(), LYRIC_COMMIT_PAUSE_MS);
   };
@@ -315,8 +320,13 @@ export class LyricTextEditor extends LitElement {
    */
   commit() {
     clearTimeout(this.commitTimer); this.commitTimer = undefined;
-    // A commit redraws the score itself; the preview it would have drawn is moot.
-    clearTimeout(this.previewTimer); this.previewTimer = undefined;
+    // A commit redraws the score itself; the preview it would have drawn is moot — but not
+    // the cursor move that was waiting with it.
+    if (this.previewTimer !== undefined) {
+      clearTimeout(this.previewTimer); this.previewTimer = undefined;
+      const area = this.textarea();
+      if (area) this.caretAt(area.selectionStart);
+    }
     if (!this.pending || this.playing || !this.doc) return;
     this.reparse();
     if (this.parsed.diagnostics.length === 0) {
@@ -357,7 +367,16 @@ export class LyricTextEditor extends LitElement {
 
   private onBlur = () => this.commit();
 
-  private onCaretMove = () => {
+  /** The pause after typing: the cursor goes to the caret's word, and the score previews the text. */
+  private settleTyping() {
+    const area = this.textarea();
+    if (area) this.caretAt(area.selectionStart);
+    this.preview();
+  }
+
+  /** A key that typed waits for the pause; one that only moved the caret moves the cursor now. */
+  private onCaretMove = (event: Event) => {
+    if (event.type === 'keyup' && this.typed) return;
     const area = this.textarea();
     if (area) this.caretAt(area.selectionStart);
   };
@@ -372,6 +391,7 @@ export class LyricTextEditor extends LitElement {
     // keymap. (The reverse door stays open — clicking the score moves focus
     // out and the score keys work with the drawer still up.)
     event.stopPropagation();
+    this.typed = false;
     if (event.key === 'Escape') {
       event.preventDefault();
       this.close();

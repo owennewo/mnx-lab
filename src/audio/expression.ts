@@ -76,12 +76,11 @@ function numericDynamic(mark: MnxDynamic): MnxDynamic {
 function velocity(
   doc: MnxStructure,
   source: ExpressionSource,
-  lengths: Rational[],
+  /** Where each written bar starts: the running sum of the bar lengths, made once per compile. */
+  starts: readonly Rational[],
   report: (code: string, message: string) => void,
 ): number {
   const voice = doc.parts[source.part].measures[source.measure].sequences?.[source.sequence].voice;
-  const starts: Rational[] = [ZERO];
-  for (const length of lengths) starts.push(add(starts[starts.length - 1], length));
   const now = add(starts[source.measure], source.offset);
   let value = 80,
     attack: number | undefined;
@@ -174,6 +173,8 @@ export function applyExpression(
   diagnostics: Performance['diagnostics'],
 ): void {
   const byWritten = new Map(written.map((w) => [w.id, w]));
+  const starts: Rational[] = [ZERO];
+  for (const length of lengths) starts.push(add(starts[starts.length - 1], length));
   const reportFor = (s: SoundingEvent) => (code: string, message: string) => {
     const w = byWritten.get(s.writtenIds[0])!;
     if (
@@ -193,7 +194,7 @@ export function applyExpression(
       report = reportFor(s);
     const marks = source.event.markings,
       technique = source.note?._x?.mnxLab?.tab?.technique;
-    s.velocity = velocity(doc, source, lengths, report);
+    s.velocity = velocity(doc, source, starts, report);
     if (marks?.accent) s.velocity += 20;
     if (source.tremoloIndex !== undefined) s.velocity += source.tremoloIndex % 2 ? -4 : 4;
     // Ties retain their continuous gate. Staccato wins over tenuto on an untied note.

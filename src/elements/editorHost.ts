@@ -567,7 +567,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       // Read after any rebase: the plan against the document the visit now stands on.
       const edits = el.plan;
       if (edits === null) return;
-      options.onPreview?.(edits.length === 0 || !el.doc ? null : lyricPlanOps(edits).reduce(applyOp, el.doc));
+      options.onPreview?.(edits.length === 0 || !el.doc ? null : applyOp(el.doc, { type: 'batch', ops: lyricPlanOps(edits) }));
     });
     // The caret is the cursor: a word's visit and onset move the one cursor — and so the playhead — there.
     el.addEventListener('lyric-editor-caret', e => {

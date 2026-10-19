@@ -417,7 +417,7 @@ export class HostBackend implements PlaybackBackend {
     if (carried) {
       next.seek(carried.position);
       if (carried.state === 'playing') void next.play().catch(() => {});
-      else next.pause();
+      else if (carried.state === 'paused') next.pause();
     }
     this.follow();
     for (const listener of this.listeners) listener();

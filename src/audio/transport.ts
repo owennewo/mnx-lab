@@ -50,6 +50,16 @@ export interface TransportOptions {
 const endOf = (event: { position: Rational; duration: Rational }) =>
   add(event.position, event.duration);
 const within = (p: Rational, a: Rational, b: Rational) => compare(p, a) >= 0 && compare(p, b) < 0;
+/** The index of the first of `sorted` strictly after `p` (binary search). */
+function firstAfter(sorted: readonly Rational[], p: Rational): number {
+  let lo = 0, hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (compare(sorted[mid]!, p) <= 0) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
 /** Exact half-open onset query; this never uses the inverse clock's display grid. */
 export function eventsBetween(performance: Performance, a: Rational, b: Rational): SoundingEvent[] {
   return performance.sounding.filter((e) => within(e.position, a, b));
@@ -146,6 +156,8 @@ export class Transport {
     const key = (voice: string, p: Rational) =>
       JSON.stringify([voice, String(p.num), String(p.den)]);
     const ends = new Set(performance.sounding.map((e) => key(e.voice, endOf(e))));
+    // Tempo changes, in order: a note's curve is cut only where one falls INSIDE it.
+    const tempoPositions = performance.tempo.map((t) => t.position).sort(compare);
     const continuations = new Set(
       performance.sounding.filter((e) => e.noReattack).map((e) => key(e.voice, e.position)),
     );
@@ -199,7 +211,10 @@ export class Transport {
           points.push(add(c.offset, c.duration));
         }
       }
-      points.push(...performance.tempo.map((t) => subtract(t.position, e.position)));
+      // Those at its start or end would only repeat 0 and the duration, already here.
+      const end = endOf(e);
+      for (let i = firstAfter(tempoPositions, e.position); i < tempoPositions.length && compare(tempoPositions[i]!, end) < 0; i++)
+        points.push(subtract(tempoPositions[i]!, e.position));
       const sorted = points
         .filter((p) => compare(p, ZERO) >= 0 && compare(p, e.duration) <= 0)
         .sort(compare)

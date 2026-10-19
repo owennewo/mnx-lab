@@ -1135,6 +1135,7 @@ export class DocumentViewer extends LitElement {
     this.toggleAttribute('data-cursor-is-playhead', !this.playbackState?.playing && !!this.pointerPlacement);
     if (changed.has('noGestures')) this.syncGestures();
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
+    const verseMoved = changed.has('selectedVerse') && changed.get('selectedVerse') !== this.selectedVerse;
     if (
       changed.has('mnxDoc') ||
       changed.has('selection') ||
@@ -1151,7 +1152,11 @@ export class DocumentViewer extends LitElement {
       changed.has('barNumbers') ||
       changed.has('instrumentNames') ||
       changed.has('beams') ||
-      changed.has('selectedVerse') ||
+      // The verse a pass sings is LAYOUT only where the score shows that verse
+      // alone; showing them all, it is a lamp, which the playback paint moves.
+      // And only when it really moved: an edit's playback update can pass
+      // through another verse and back inside one frame.
+      (verseMoved && this.effectiveDisplay().lyrics === 'current') ||
       changed.has('hide') ||
       changed.has('hiddenParts') ||
       changed.has('zoom') ||
@@ -1166,7 +1171,7 @@ export class DocumentViewer extends LitElement {
       // them, and a repaint nobody asked for must not move the page.
       this.followQueued = true;
       this.renderProjection();
-    }
+    } else if (verseMoved) this.paintPlayback();
   }
 
   renderProjection() {

@@ -25,9 +25,13 @@ describe('carrying the place across an edit', () => {
     const carried = carryPlace({ state: 'paused', position: q(5n, 2n) }, from, to);
     expect(carried && place(to, carried.position)).toEqual({ ordinal: 2, metricOffset: q(1n, 2n) });
   });
-  it('carries nothing when stopped, or when the bar is gone', () => {
+  it('carries a stopped place, still stopped: a parked cursor is not sent to the top', () => {
+    const from = perf(score(3)), to = perf(score(4));
+    expect(carryPlace({ state: 'stopped', position: q(5n, 2n) }, from, to)).toEqual({ position: q(5n, 2n), state: 'stopped' });
+    expect(carryPlace({ state: 'stopped', position: ZERO }, from, to)).toEqual({ position: ZERO, state: 'stopped' });
+  });
+  it('carries nothing when the bar is gone', () => {
     const from = perf(score(3)), to = perf(score(2));
-    expect(carryPlace({ state: 'stopped', position: ZERO }, from, to)).toBeNull();
     expect(carryPlace({ state: 'paused', position: q(2n, 1n) }, from, to)).toBeNull();
     expect(carryPlace({ state: 'paused', position: q(1n, 1n) }, from, to)).toEqual({ position: q(1n, 1n), state: 'paused' });
   });

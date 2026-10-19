@@ -1295,8 +1295,76 @@ function ensureMeasureRef(doc: MnxStructure, ref: string): void {
   if (measure && measure.id === undefined) measure.id = ref;
 }
 
+/** The lyric ops change only strings and maps they make themselves, so a run of
+ *  them can share one copy of the document: a lyric plan of hundreds of syllables
+ *  used to copy the whole document once per syllable. */
+const LYRIC_OPS = new Set<EditOp['type']>(['setSyllable', 'removeSyllable', 'setLyricLine', 'removeLyricLine']);
+type LyricOp = Extract<EditOp, { type: 'setSyllable' | 'removeSyllable' | 'setLyricLine' | 'removeLyricLine' }>;
+
+function applyLyricOpInPlace(
+  doc: MnxStructure,
+  op: LyricOp,
+  /** Find the event that owns a note: by default a walk of the document per call. */
+  eventOf: (key: string) => MnxEvent | undefined = key => findKeyedNote(doc, key)?.event
+): void {
+  switch (op.type) {
+    case 'setSyllable': {
+      const event = eventOf(op.noteKey);
+      if (!event) return;
+      const lines = ((event.lyrics ??= {}).lines ??= {});
+      lines[op.line] = {
+        text: op.text,
+        ...(op.syllableType ? { type: op.syllableType } : {})
+      };
+      return;
+    }
+    case 'removeSyllable': {
+      const event = eventOf(op.noteKey);
+      if (!event) return;
+      const lines = event.lyrics?.lines;
+      if (!lines?.[op.line]) return;
+      delete lines[op.line];
+      // No tombstones: the emptied line map and its wrapper go too.
+      if (Object.keys(lines).length === 0) delete event.lyrics;
+      return;
+    }
+    case 'setLyricLine': {
+      const lyrics = ((doc.global as { lyrics?: MnxStructure['global']['lyrics'] }).lyrics ??= {});
+      if (op.lineOrder) lyrics.lineOrder = [...op.lineOrder];
+      const metadata = (lyrics.lineMetadata ??= {});
+      metadata[op.line] = {
+        ...(op.label !== undefined ? { label: op.label } : {}),
+        ...(op.lang !== undefined ? { lang: op.lang } : {})
+      };
+      return;
+    }
+    case 'removeLyricLine': {
+      const lyrics = doc.global?.lyrics;
+      if (!lyrics?.lineMetadata?.[op.line]) return;
+      delete lyrics.lineMetadata[op.line];
+      // `lineOrder` is NOT touched: it is a separate declaration about the same
+      // line (where it sits), not part of the label. The sweep caught the first
+      // version reordering the verses as a side effect of renaming one.
+      if (Object.keys(lyrics.lineMetadata).length === 0) delete lyrics.lineMetadata;
+      if (Object.keys(lyrics).length === 0) delete doc.global.lyrics;
+      return;
+    }
+  }
+}
+
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
-  if (op.type === 'batch') return op.ops.reduce(applyOp, doc);
+  if (op.type === 'batch') {
+    if (op.ops.length > 1 && op.ops.every(each => LYRIC_OPS.has(each.type))) {
+      const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
+      // One walk for the run: lyric ops move no note, so the index stays true. The first
+      // address for a key wins, as it does in a walk that stops at it.
+      const events = new Map<string, MnxEvent>();
+      forEachNoteAddress(next, address => { if (!events.has(address.key)) events.set(address.key, address.event); });
+      for (const each of op.ops) applyLyricOpInPlace(next, each as LyricOp, key => events.get(key));
+      return next;
+    }
+    return op.ops.reduce(applyOp, doc);
+  }
   if (op.type === 'pasteSelection' || op.type === 'cutSelection')
     return JSON.parse(JSON.stringify(op.document)) as MnxStructure;
   const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
@@ -1769,49 +1837,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (!Object.keys(next._x!).length) delete next._x;
       return next;
     }
-    case 'setSyllable': {
-      const located = findKeyedNote(next, op.noteKey);
-      if (!located) return next;
-      const event = located.event;
-      const lines = ((event.lyrics ??= {}).lines ??= {});
-      lines[op.line] = {
-        text: op.text,
-        ...(op.syllableType ? { type: op.syllableType } : {})
-      };
+    case 'setSyllable':
+    case 'removeSyllable':
+    case 'setLyricLine':
+    case 'removeLyricLine':
+      applyLyricOpInPlace(next, op);
       return next;
-    }
-    case 'removeSyllable': {
-      const located = findKeyedNote(next, op.noteKey);
-      if (!located) return next;
-      const event = located.event;
-      const lines = event.lyrics?.lines;
-      if (!lines?.[op.line]) return next;
-      delete lines[op.line];
-      // No tombstones: the emptied line map and its wrapper go too.
-      if (Object.keys(lines).length === 0) delete event.lyrics;
-      return next;
-    }
-    case 'setLyricLine': {
-      const lyrics = ((next.global as { lyrics?: MnxStructure['global']['lyrics'] }).lyrics ??= {});
-      if (op.lineOrder) lyrics.lineOrder = [...op.lineOrder];
-      const metadata = (lyrics.lineMetadata ??= {});
-      metadata[op.line] = {
-        ...(op.label !== undefined ? { label: op.label } : {}),
-        ...(op.lang !== undefined ? { lang: op.lang } : {})
-      };
-      return next;
-    }
-    case 'removeLyricLine': {
-      const lyrics = next.global?.lyrics;
-      if (!lyrics?.lineMetadata?.[op.line]) return next;
-      delete lyrics.lineMetadata[op.line];
-      // `lineOrder` is NOT touched: it is a separate declaration about the same
-      // line (where it sits), not part of the label. The sweep caught the first
-      // version reordering the verses as a side effect of renaming one.
-      if (Object.keys(lyrics.lineMetadata).length === 0) delete lyrics.lineMetadata;
-      if (Object.keys(lyrics).length === 0) delete next.global.lyrics;
-      return next;
-    }
     case 'setTechnique': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
