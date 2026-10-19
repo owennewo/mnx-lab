@@ -217,8 +217,10 @@ try {
   assert.deepEqual(lyricPanelBounds, { beside: true, tall: true, inFrame: true }, 'lyrics must sit beside the score with a full-height editor');
   assert.equal(await c.evaluate(`${viewer}.selectionInactive`), false, 'the lyric panel lost editor keyboard ownership');
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
-  await wait(`${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);
+  await wait(`${sung(`${viewer}.mnxDoc.mnxJson`)} === '["sing","song"]'`);
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'the preview edited the document');
+  // Drawn, not played: a preview costs a redraw, never a new performance.
+  assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '[]', 'the preview reached the player');
   const lyricShot = await c.send('Page.captureScreenshot');
   await fs.writeFile('/tmp/mnx-studio-lyrics.png', Buffer.from(lyricShot.result.data, 'base64'));
   const previewSave = await c.evaluate(`${chip}.dataset.save + ' / ' + ${chip}.textContent.trim()`);

@@ -156,6 +156,14 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       publish();
       return result;
     },
+    /**
+     * Draw `next` without playing it — the lyric panel's live preview. Only the
+     * viewer takes it: the player keeps the document it has, so a preview costs a
+     * redraw and never a new performance. Null draws that document again.
+     */
+    preview(next: MnxDocument | null) {
+      viewer.mnxDoc = next ?? document ?? null;
+    },
     inspect(iteration: number) {
       state = inspectIteration(state, iteration);
       publish();

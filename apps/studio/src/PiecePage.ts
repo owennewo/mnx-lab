@@ -207,6 +207,8 @@ export class PiecePage extends LitElement {
   }
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
+  /** Counts the lyric previews, so a late "put it away" cannot undo a newer one. */
+  private previewGeneration = 0;
   private generation = 0;
   /** The sync bar's latest unsaved edit; saves are debounced and serial. */
   private pendingSync: (SyncEdit & { piece: string }) | null = null;
@@ -623,8 +625,14 @@ export class PiecePage extends LitElement {
       lyricPanel: this.renderRoot.querySelector<HTMLElement>('mnx-score-frame') ?? undefined,
       onOpenLyrics: () => this.openPanel(null),
       title: () => (this.doc ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? 'Untitled',
-      // The lyric editor's live preview: drawn, never told to the save session.
-      onPreview: preview => { if (this.doc && this.editor) this.doc = { ...this.doc, lastUpdated: Date.now(), mnxJson: preview ?? this.editor.document }; },
+      // The lyric editor's live preview: drawn by the viewer alone — never played, never told to the save
+      // session. Putting it away waits for the frame in hand: a commit's document reaches the viewer through
+      // `present` in this element's update, and redrawing the one before it in between would flash it.
+      onPreview: preview => {
+        const shown = ++this.previewGeneration;
+        if (preview && this.doc) this.binding?.preview({ ...this.doc, lastUpdated: Date.now(), mnxJson: preview });
+        else void this.updateComplete.then(() => { if (shown === this.previewGeneration) this.binding?.preview(null); });
+      },
       lyricDrafts: lyricDrafts(this.pieceId),
       clipboard: selectionClipboard,
       onNotice: notice => this.showNotice(notice.message),

@@ -47,7 +47,7 @@ import {
 } from '../edit/keymap.ts';
 import { KEY_DOCS, KEY_GROUP_LABELS, type CheatGroup } from '../edit/keymapDocs.ts';
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
-import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
+import { lyricPlanOps } from '../edit/lyricText.ts';
 import { applyOp } from '../edit/ops.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import { copySelectionToStore, cutSelectionToStore, pasteSelectionFromStore } from '../edit/selectionClipboardActions.ts';
@@ -562,15 +562,21 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       return true;
     };
     // Clean parses draw live on a SCRATCH copy, through the very ops the session would use, until they are committed.
-    el.addEventListener('lyric-editor-edits', e => {
-      if (rebaseLyrics()) return;
-      const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
+    el.addEventListener('lyric-editor-edits', () => {
+      rebaseLyrics();
+      // Read after any rebase: the plan against the document the visit now stands on.
+      const edits = el.plan;
+      if (edits === null) return;
       options.onPreview?.(edits.length === 0 || !el.doc ? null : lyricPlanOps(edits).reduce(applyOp, el.doc));
     });
     // The caret is the cursor: a word's visit and onset move the one cursor — and so the playhead — there.
     el.addEventListener('lyric-editor-caret', e => {
       const { ordinal, onset } = (e as CustomEvent<{ ordinal: number; onset: [number, number] }>).detail;
+      // Typing inside a word sends its place on every keystroke; the cursor already there is not redrawn.
+      const place = () => JSON.stringify([placeKey(session.playStart), session.selection]);
+      const before = place();
       if (!session.handleIntent({ type: 'goToPerformed', ordinal, onset, level: 'note' })) return;
+      if (!playing && !cursorHidden && place() === before) return;
       cursorHidden = false;
       if (playing && playback) { seekNow(); draw(); } else settle(true);
     });

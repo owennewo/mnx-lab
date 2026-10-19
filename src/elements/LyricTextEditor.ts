@@ -11,8 +11,8 @@
 // A right-hand panel: the score frame makes room beside the score and
 // the host renders the buffer's parse onto it live (lyric-editor-edits →
 // a scratch document through the same lyricPlanOps the session applies), so
-// typing previews the words on the score. Keyboard ownership needs no
-// precedence wiring — a focused textarea is isTextEntry and the page keymap
+// typing previews the words on the score once it pauses (LYRIC_PREVIEW_PAUSE_MS).
+// Keyboard ownership needs no precedence wiring — a focused textarea is isTextEntry and the page keymap
 // yields; clicking the score hands the keys back without closing the drawer.
 // The caret IS the editor's cursor: a caret on a word sends its visit and
 // onset (lyric-editor-caret) and the host moves the one cursor there — the
@@ -37,6 +37,10 @@ const LEGEND =
 
 /** How long typing must pause before a clean parse is committed. */
 export const LYRIC_COMMIT_PAUSE_MS = 3_000;
+/** …and before the score beside it is redrawn as the text reads: a redraw of a long
+ *  piece costs more than a keystroke is worth, so the box answers at once and the
+ *  score catches up when the typing stops. */
+export const LYRIC_PREVIEW_PAUSE_MS = 250;
 
 /** What the host is told: `edits` to commit; `accepted` is set by the host when they landed. */
 export interface LyricCommitDetail { edits: LyricPlanEdit[]; accepted: boolean }
@@ -66,6 +70,7 @@ export class LyricTextEditor extends LitElement {
   /** The text was typed in during this visit (or brought back from a draft). */
   private touched = false;
   private commitTimer: ReturnType<typeof setTimeout> | undefined;
+  private previewTimer: ReturnType<typeof setTimeout> | undefined;
 
   static styles = [
     designTokens,
@@ -216,6 +221,7 @@ export class LyricTextEditor extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     clearTimeout(this.commitTimer);
+    clearTimeout(this.previewTimer);
     globalThis.document?.removeEventListener('visibilitychange', this.onHidden);
     globalThis.removeEventListener?.('pagehide', this.onHidden);
   }
@@ -228,6 +234,7 @@ export class LyricTextEditor extends LitElement {
         this.touched = this.pending = true;
       }
       this.reparse();
+      if (this.pending) this.preview();
     }
     const area = this.textarea();
     if (!area) return;
@@ -256,10 +263,16 @@ export class LyricTextEditor extends LitElement {
     this.edits = this.parsed.diagnostics.length === 0
       ? planLyricEdits(this.doc, this.partIndex, this.parsed)
       : [];
-    // The live preview: a clean parse hands the host the current diff so the
-    // score beside it redraws as if applied. While errors stand, the last clean
-    // preview holds — flickering back to the committed text mid-word would
-    // punish typing the very hyphen the parser is complaining about.
+  }
+
+  /**
+   * The live preview: a clean parse hands the host the current diff so the
+   * score beside it redraws as if applied. While errors stand, the last clean
+   * preview holds — flickering back to the committed text mid-word would
+   * punish typing the very hyphen the parser is complaining about.
+   */
+  private preview() {
+    clearTimeout(this.previewTimer); this.previewTimer = undefined;
     if (this.parsed.diagnostics.length === 0) {
       this.dispatchEvent(new CustomEvent('lyric-editor-edits', {
         detail: { edits: this.edits },
@@ -289,6 +302,8 @@ export class LyricTextEditor extends LitElement {
     this.touched = this.pending = true;
     this.reparse();
     this.caretAt(area.selectionStart);
+    clearTimeout(this.previewTimer);
+    this.previewTimer = setTimeout(() => this.preview(), LYRIC_PREVIEW_PAUSE_MS);
     clearTimeout(this.commitTimer);
     this.commitTimer = setTimeout(() => this.commit(), LYRIC_COMMIT_PAUSE_MS);
   };
@@ -300,6 +315,8 @@ export class LyricTextEditor extends LitElement {
    */
   commit() {
     clearTimeout(this.commitTimer); this.commitTimer = undefined;
+    // A commit redraws the score itself; the preview it would have drawn is moot.
+    clearTimeout(this.previewTimer); this.previewTimer = undefined;
     if (!this.pending || this.playing || !this.doc) return;
     this.reparse();
     if (this.parsed.diagnostics.length === 0) {
