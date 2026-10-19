@@ -19,23 +19,34 @@ of its own. Anchor-free legacy text has no visit, so its caret moves nothing.
 
 ## Performance anchors
 
-Every generated line starts with `bar.occurrence|`. `9.2|` means the second
+A run of text starts at a `bar.occurrence|` anchor. `9.2|` means the second
 actual visit to written bar 9, regardless of whether a repeat or a D.S./D.C.
 return caused it. It is not verse 2, nor performance bar 9. Alternate endings
 count actual visits too: the first visit to a second ending is `.1`.
 
+**Only a run's first line is anchored.** Every later line opens on the `|`
+that carries the words on into the next bar, and the margin beside it names
+where it lands, live, as you type:
+
 ```
-9.1| _____ I | could-a been a_ sail- | -or | ___ could have
-9.2| been a cook
-10.3| _ a real live | __ lover | ___ could have
-9.4| been a book
+       9.1| _____ I | could-a been a_ sail- | -or | ___ could have
+  9.2  | been a cook
+ 10.3  | | | | | _ a real live | __ lover | ___ could have
+  9.4  | been a book
 ```
+
+So a `|` added inside a run nudges every word after it along, through the
+following lines, and taking one out (there or further on) brings them back.
+Nothing is pinned but the run's start: an anchor you type yourself holds until
+the panel next opens, when the text is written out again from the notes.
 
 A bare `|` advances one bar in performance order, including bars without sung
 notes. `| |` crosses an empty bar. Anchors may also appear within a line.
 The generator starts at the first texted bar, omits trailing empty bars, and
-keeps empty bars between texted bars. It starts a new line at repeats/jumps
-and wraps at four bars or before the next bar would exceed 80 characters.
+keeps empty bars between texted bars as pipes — up to four; a longer silence
+ends the run, and the next words start a new, anchored one. It starts a new
+line at repeats/jumps and wraps at four bars or before the next bar would
+exceed 80 characters, without an anchor.
 A single long bar remains intact. Newlines within an anchored passage are
 whitespace, so pasted phrase breaks do not create verses.
 
@@ -93,6 +104,16 @@ The user's requested contract (2026-10-18):
 The agreed `.pass` is a continuously counted occurrence of that written bar;
 repeat and D.S./D.C. origins are derived from navigation. Four bars / 80
 characters are the canonical wrapping defaults. Sparse storage is unchanged.
+
+Anchors went from every line to a run's first on 2026-10-19. Every wrapped
+line used to be anchored, so one more `|` pushed a line's last words into the
+next line's bars and collided. Offered anchors at section boundaries instead,
+the user chose to anchor only where the flow breaks:
+
+> I'd like to try "Only where the flow breaks". I think the section boundaries
+> sound appealing but often lyrics start the bar before the chorus/verse so it
+> would be brittle. I'm hoping that if everything is "nudged along" incorrectly
+> it will be easy to "nudge it back" by removing a gap later.
 
 The apply button went on 2026-10-19, after unapplied text was lost to a page
 reload. The user's direction:

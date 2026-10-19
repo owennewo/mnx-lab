@@ -24,6 +24,7 @@ import { designTokens, sharedChrome, scrollbars } from './tokens.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import {
   lyricEventWalk,
+  lyricVisitLabels,
   lyricPassWarnings,
   parseLyricText,
   planLyricEdits,
@@ -131,10 +132,43 @@ export class LyricTextEditor extends LitElement {
         color: var(--ink-3);
         font-size: 12px;
       }
-      textarea {
-        margin: 10px 14px 6px;
+      /* The margin beside the text names where each line starts, live: only a run's
+         first line carries an anchor, so the rest are told by the parse, not pinned. */
+      .editor {
+        position: relative;
+        display: flex;
         flex: 1;
         min-height: 5em;
+        margin: 10px 14px 6px 0;
+      }
+      .gutter {
+        position: relative;
+        flex: none;
+        width: 6ch;
+        overflow: hidden;
+        font: 11px/1 var(--mono);
+        color: var(--ink-3);
+        text-align: right;
+      }
+      .gutter span {
+        position: absolute;
+        right: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+      .mirror {
+        position: absolute;
+        visibility: hidden;
+        pointer-events: none;
+        top: 0;
+        box-sizing: border-box;
+        font: 13px/1.7 var(--mono);
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        padding: 8px 10px;
+        border: 1px solid transparent;
+      }
+      textarea {
+        flex: 1;
         min-width: 0;
         resize: none;
         font: 13px/1.7 var(--mono);
@@ -223,6 +257,8 @@ export class LyricTextEditor extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     clearTimeout(this.commitTimer);
     clearTimeout(this.previewTimer);
     globalThis.document?.removeEventListener('visibilitychange', this.onHidden);
@@ -254,6 +290,58 @@ export class LyricTextEditor extends LitElement {
       }
     }
   }
+
+  /** Where each line of the text starts in the performance, drawn in the margin beside it. */
+  private labels: string[] = [];
+  private labelsFor: MnxStructure | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+
+  protected updated() {
+    this.layoutGutter();
+    const area = this.textarea();
+    if (area && !this.resizeObserver && typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.layoutGutter());
+      this.resizeObserver.observe(area);
+    }
+  }
+
+  /** Label every line that does not open on its own anchor with the visit its first word sings in,
+   *  set at the height the text box gives that line (a twin of the box measures the wrapping). */
+  private layoutGutter() {
+    const area = this.textarea();
+    const inner = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
+    const mirror = this.renderRoot.querySelector<HTMLElement>('.mirror');
+    if (!area || !inner || !mirror || !this.doc) return;
+    if (this.labelsFor !== this.doc) { this.labels = lyricVisitLabels(this.doc); this.labelsFor = this.doc; }
+    const lines = this.text.split('\n');
+    const starts: number[] = [];
+    for (let at = 0, i = 0; i < lines.length; at += lines[i]!.length + 1, i++) starts.push(at);
+    const lineOf = (offset: number) => { let lo = 0, hi = starts.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid]! <= offset) lo = mid; else hi = mid - 1; } return lo; };
+    const first = new Map<number, number>();
+    for (const token of this.parsed.tokens) {
+      if (token.ordinal === undefined) continue;
+      const line = lineOf(token.from);
+      if (!first.has(line)) first.set(line, token.ordinal);
+    }
+    mirror.style.width = `${area.clientWidth + 2}px`;
+    mirror.style.left = `${area.offsetLeft}px`;
+    mirror.replaceChildren(...lines.map(line => { const row = document.createElement('div'); row.textContent = line || '\u200b'; return row; }));
+    const rows = [...mirror.children] as HTMLElement[];
+    inner.replaceChildren(...[...first].filter(([line]) => !/^\s*\d+\.\d+\|/.test(lines[line]!)).map(([line, ordinal]) => {
+      const label = document.createElement('span');
+      label.textContent = this.labels[ordinal] ?? '';
+      // The row's top (past the box's 1px border) plus half the gap between a 13px line box (1.7) and this 11px label.
+      label.style.top = `${1 + (rows[line]?.offsetTop ?? 0) + (13 * 1.7 - 11) / 2}px`;
+      return label;
+    }));
+    this.onScroll();
+  }
+
+  private onScroll = () => {
+    const area = this.textarea();
+    const inner = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
+    if (area && inner) inner.style.transform = `translateY(${-area.scrollTop}px)`;
+  };
 
   private textarea(): HTMLTextAreaElement | null {
     return this.renderRoot.querySelector('textarea');
@@ -408,6 +496,8 @@ export class LyricTextEditor extends LitElement {
           ${this.partLabel ? html`<span class="part">${this.partLabel}</span>` : nothing}
           <button class="close" aria-label="Close lyrics" title="Close lyrics (Escape)" @click=${() => this.close()}>×</button>
         </header>
+        <div class="editor">
+        <div class="gutter" aria-hidden="true"><div class="gutter-inner"></div></div>
         <textarea
           aria-label="Lyric text"
           ?readonly=${this.playing}
@@ -418,7 +508,10 @@ export class LyricTextEditor extends LitElement {
           @keyup=${this.onCaretMove}
           @click=${this.onCaretMove}
           @blur=${this.onBlur}
+          @scroll=${this.onScroll}
         ></textarea>
+        <div class="mirror" aria-hidden="true"></div>
+        </div>
         <div class="diagnostics">
           ${shown.map(d => html`
             <span class="diagnostic${d.severity === 'warning' ? ' warning' : ''}">

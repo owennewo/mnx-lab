@@ -553,6 +553,11 @@ const OCCURRENCE_ANCHOR = /^(\d+)\.(\d+)\|$/;
 
 /** Performance identities are independent of the stored lyric-row identity.
  * Returns through navigation may reuse a row; an occurrence is never a verse. */
+/** Each performed visit's name in the text, `bar.occurrence`, by performance ordinal. */
+export function lyricVisitLabels(doc: MnxStructure): string[] {
+  return linearizePasses(doc).entries.map(visit => `${visit.measureIndex + 1}.${visit.occurrence}`);
+}
+
 function lyricPerformance(doc: MnxStructure, partIndex: number) {
   const written = lyricEventWalk(doc, partIndex);
   const visits = linearizePasses(doc).entries;
@@ -607,11 +612,17 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
   for (const [group, ids] of groups) {
     const represented = new Set<string>();
     const emit = (override?: number) => {
-      let pending = '', first = -1, last = -1;
-      const flush = () => { if (pending) result.push(pending); pending = ''; first = last = -1; };
+      // One run of text is ONE passage: anchored once, where it starts, and carried on
+      // line after line with a leading `|` — so a bar added or taken away in it nudges
+      // every word after it along, rather than into the next line's anchor (2026-10-19:
+      // the user's choice, over anchoring at sections, which lyrics often start a bar
+      // before). Lines still break where a reader expects them (a repeat, a jump, four
+      // bars, 80 characters); only a long silence starts a new, anchored passage.
+      let pending = '', lineStart = -1, last = -1, boundary = false;
+      const close = () => { if (pending) result.push(pending); pending = ''; lineStart = last = -1; boundary = false; };
       visits.forEach((visit, ordinal) => {
         if (ordinal > 0 && (visit.via || doc.global.measures[visit.measureIndex]?.repeatStart
-          || visit.measureIndex !== visits[ordinal - 1]!.measureIndex + 1)) flush();
+          || visit.measureIndex !== visits[ordinal - 1]!.measureIndex + 1)) boundary = true;
         const row = override ?? visit.verse;
         const id = ids[row - 1];
         if (!id) return;
@@ -626,16 +637,24 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
         if (!syllables.size) return;
         let body = serializeLine(walk.slice(starts[ordinal], starts[ordinal + 1]).map(e => ({ ...e, measureIndex: 0 })), syllables);
         if (takeHeader(tokenize(body, 0))) body = `\\${body}`;
-        const addition = ' |'.repeat(ordinal - last) + ` ${body}`;
-        if (pending && (ordinal - first >= TEXT_BARS || pending.length + addition.length > TEXT_COLUMNS)) flush();
-        if (!pending) {
+        if (last >= 0 && ordinal - last - 1 > TEXT_BARS) close();
+        if (last < 0) {
           const header = [group, override === undefined ? '' : String(override)].filter(Boolean).join(' ');
           pending = `${visit.measureIndex + 1}.${visit.occurrence}| ${header ? `${header}: ` : ''}${body}`;
-          first = ordinal;
-        } else pending += addition;
+          lineStart = ordinal;
+        } else {
+          const addition = ' |'.repeat(ordinal - last) + ` ${body}`;
+          if (boundary || ordinal - lineStart >= TEXT_BARS || pending.length + addition.length > TEXT_COLUMNS) {
+            // A new line of the same passage: it opens on the bar line that carries the text on.
+            result.push(pending);
+            pending = addition.slice(1);
+            lineStart = ordinal;
+          } else pending += addition;
+        }
+        boundary = false;
         last = ordinal;
       });
-      flush();
+      close();
     };
     emit();
     // Rows outside the performance mapping are still editable and must never

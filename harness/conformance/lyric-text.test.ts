@@ -309,7 +309,32 @@ describe('performance anchors and canonical wrapping', () => {
     put(doc, 9, '1', 'first'); put(doc, 12, '1', 'end');
     put(doc, 9, '2', 'second'); put(doc, 10, '3', 'third'); put(doc, 9, '4', 'fourth');
     put(doc, 13, '1', 'after');
-    expect(unchanged(doc)).toBe('9.1| first | | | end\n9.2| second\n10.3| third\n9.4| fourth\n13.1| after');
+    // One run, anchored once: each later line opens on the `|` that carries it on (9.2, 10.3, 9.4, 13.1).
+    expect(unchanged(doc)).toBe('9.1| first | | | end\n| second\n| | | | | third\n| | | fourth\n| | | | after');
+  });
+
+  it('a bar added inside a run nudges every word after it along; taken out again, they come back', () => {
+    const doc = bars(8);
+    for (let bar = 1; bar <= 6; bar++) put(doc, bar, '1', `w${bar}`);
+    const text = unchanged(doc);
+    expect(text).toBe('1.1| w1 | w2 | w3 | w4\n| w5 | w6');
+    const nudged = parseLyricText(doc, 0, text.replace('w2', '| w2'));
+    expect(nudged.diagnostics).toEqual([]);
+    // w2…w6 each move one bar on — across the line break, into bar 7.
+    expect(nudged.lines[0]!.syllables.size).toBe(6);
+    const session = new EditorSession(doc);
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, nudged) });
+    expect(unchanged(session.doc)).toBe('1.1| w1 | | w2 | w3\n| w4 | w5 | w6');
+    const back = parseLyricText(session.doc, 0, '1.1| w1 | w2 | w3 | w4\n| w5 | w6');
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, back) });
+    expect(unchanged(session.doc)).toBe(text);
+  });
+
+  it('only a silence longer than a line starts a new anchored run', () => {
+    const doc = bars(12);
+    put(doc, 1, '1', 'a'); put(doc, 6, '1', 'b'); put(doc, 12, '1', 'c');
+    // Four empty bars are carried by pipes; five are a new run with its own anchor.
+    expect(unchanged(doc)).toBe('1.1| a\n| | | | | b\n12.1| c');
   });
 
   it('bare pipes advance across empty bars and an all-rest bar', () => {
@@ -324,9 +349,9 @@ describe('performance anchors and canonical wrapping', () => {
   it('wraps at four bars and at 80 characters, preserving cross-line syllables', () => {
     const doc = bars(6);
     for (let bar = 1; bar <= 6; bar++) put(doc, bar, '1', `word${bar}`);
-    expect(unchanged(doc)).toBe('1.1| word1 | word2 | word3 | word4\n5.1| word5 | word6');
+    expect(unchanged(doc)).toBe('1.1| word1 | word2 | word3 | word4\n| word5 | word6');
     put(doc, 1, '1', 'x'.repeat(70));
-    expect(unchanged(doc).split('\n')[1]).toMatch(/^2\.1\|/);
+    expect(unchanged(doc).split('\n')[1]).toMatch(/^\| word2/);
     const walk = lyricEventWalk(doc, 0);
     walk[6]!.event.lyrics!.lines!['1'] = { text: 'begin', type: 'start' };
     walk[8]!.event.lyrics!.lines!['1'] = { text: 'end', type: 'end' };
@@ -342,7 +367,7 @@ describe('performance anchors and canonical wrapping', () => {
     doc.global.measures[2]!.jump = { type: 'dsalfine', location: { fraction: [1, 1] } };
     put(doc, 1, '1', 'first'); put(doc, 1, '2', 'second');
     // The return is verse 3, and nothing is written there — so it prints nothing, rather than verse 1 again.
-    expect(unchanged(doc)).toBe('1.1| first\n1.2| second');
+    expect(unchanged(doc)).toBe('1.1| first\n| | second');
     const parsed = parseLyricText(doc, 0, '1.1| changed\n1.2| second');
     expect(planLyricEdits(doc, 0, parsed)).toMatchObject([{ line: '1', text: 'changed' }]);
     // Words typed at the return are its own: a third row, and verse 1 is untouched.
@@ -381,7 +406,7 @@ describe('performance anchors and canonical wrapping', () => {
     doc.global.measures[1]!.repeatEnd = {};
     doc.global.measures[2]!.ending = { numbers: [2], duration: 1 };
     put(doc, 1, '1', 'first'); put(doc, 3, '2', 'ending');
-    expect(unchanged(doc)).toContain('3.1| ending');
+    expect(unchanged(doc)).toBe('1.1| first\n| | | ending');
   });
 
   it('accepts phrase newlines and maps caret offsets back to the original buffer', () => {
@@ -432,7 +457,7 @@ it('wraps a hyphenated word across canonical lines without treating the wrap as 
   const walk = lyricEventWalk(doc, 0);
   walk[6]!.event.lyrics!.lines!['1'] = { text: 'be', type: 'start' };
   walk[8]!.event.lyrics!.lines!['1'] = { text: 'yond', type: 'end' };
-  expect(unchanged(doc)).toBe('1.1| word | word | word | be-\n5.1| -yond');
+  expect(unchanged(doc)).toBe('1.1| word | word | word | be-\n| -yond');
 });
 
 it('rejects ambiguous or malformed numbered markers in anchored text', () => {
@@ -451,7 +476,7 @@ it('retains the ordinal of a newly entered sparse verse and arbitrary existing r
     const parsed = parseLyricText(doc, 0, `${existing ? '1.1| old\n' : ''}1.2| 2: new`);
     expect(parsed.diagnostics).toEqual([]);
     session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, parsed) });
-    expect(unchanged(session.doc)).toContain('1.2| new');
+    expect(unchanged(session.doc)).toBe(existing ? '1.1| old\n| | new' : '1.2| new');
   }
 });
 
