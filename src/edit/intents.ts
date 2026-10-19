@@ -221,7 +221,9 @@ export type MutationIntent =
   // diff in one intent, each edit note-addressed — the clipboard's
   // materialized-plan shape, batched like every other multi-member command,
   // so the trace records the syllables and undo is one gesture.
-  | { type: 'applyLyricPlan'; edits: import('./lyricText.ts').LyricPlanEdit[] }
+  // `amend`: the plan REPLACES the last step, when that step was a lyric plan too —
+  // the lyric panel commits as it goes and keeps one undo step per visit.
+  | { type: 'applyLyricPlan'; edits: import('./lyricText.ts').LyricPlanEdit[]; amend?: boolean }
   // Tab technique (campaign item 9): one toggle per technique, and `hammerPull`
   // is ONE intent — which of the pair you get is physics, not a choice. A
   // SHAPED bend goes through `setTechnique` with its stops (core-bend-stops.md);

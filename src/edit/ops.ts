@@ -3698,6 +3698,19 @@ export class EditHistory {
     return this.present;
   }
 
+  /** Take back the last step as though it was never made: no redo. A step being
+   *  rewritten (the lyric panel's visit) is replaced, not undone. */
+  retract(): MnxStructure {
+    const entry = this.past.pop();
+    if (entry) this.present = entry.before;
+    return this.present;
+  }
+
+  /** The intent that made the last step, when one was recorded. */
+  get lastIntent(): EditorIntent | undefined {
+    return this.past[this.past.length - 1]?.intent;
+  }
+
   undo(): MnxStructure {
     const entry = this.past.pop();
     if (entry) {

@@ -1,9 +1,12 @@
 // The lyric text editor — the paste-and-tweak surface of one-surface item 6
 // phase 2 (roadmap/complete/workbench-one-surface-lyrics.md). The buffer is
 // WORKBENCH STATE, not the document: it opens on the canonical projection
-// (serializeLyricText), parses live into bar-anchored diagnostics, and Apply
-// hands the host a computed plan (planLyricEdits) to fire as ONE intent —
-// nothing here writes the document.
+// (serializeLyricText) and parses live into bar-anchored diagnostics. There is
+// no apply: a pause in typing, leaving the box, closing the panel or hiding the
+// page COMMITS a clean parse — the host is handed the plan (planLyricEdits)
+// against `doc`, the document the visit opened on, and keeps one undo step per
+// visit. Text that does not parse cannot be committed, so it goes to the host's
+// draft store instead and is offered back the next time the panel opens.
 //
 // A right-hand panel: the score frame makes room beside the score and
 // the host renders the buffer's parse onto it live (lyric-editor-edits →
@@ -30,7 +33,13 @@ import {
 } from '../edit/lyricText.ts';
 
 const LEGEND =
-  'split - · hold fant--as · extend day__ · skip _ · join you~are · bars 9.1| (bar.visit), | next · optional nl 2: · Ctrl+Enter applies';
+  'split - · hold fant--as · extend day__ · skip _ · join you~are · bars 9.1| (bar.visit), | next · optional nl 2:';
+
+/** How long typing must pause before a clean parse is committed. */
+export const LYRIC_COMMIT_PAUSE_MS = 3_000;
+
+/** What the host is told: `edits` to commit; `accepted` is set by the host when they landed. */
+export interface LyricCommitDetail { edits: LyricPlanEdit[]; accepted: boolean }
 
 @customElement('mnx-lyric-text-editor')
 export class LyricTextEditor extends LitElement {
@@ -44,12 +53,19 @@ export class LyricTextEditor extends LitElement {
   @property({ type: Number }) focusOrdinal: number | null = null;
   /** The music is playing: the panel stays open, read-only, until it pauses — nothing is written while it plays. */
   @property({ type: Boolean }) playing = false;
+  /** Text a previous visit could not commit, offered in place of the document's own. */
+  @property({ attribute: false }) draft: string | null = null;
 
   @state() private text = '';
   @state() private parsed: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
-  /** The pass bound (phase 3): blue, live, never blocks apply. */
+  /** The pass bound (phase 3): blue, live, never blocks a commit. */
   @state() private warnings: LyricTextDiagnostic[] = [];
   @state() private edits: LyricPlanEdit[] = [];
+  /** The box holds text the document has not been given yet. */
+  @state() private pending = false;
+  /** The text was typed in during this visit (or brought back from a draft). */
+  private touched = false;
+  private commitTimer: ReturnType<typeof setTimeout> | undefined;
 
   static styles = [
     designTokens,
@@ -179,8 +195,10 @@ export class LyricTextEditor extends LitElement {
         font-size: 20px;
       }
       button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-      button.apply {
-        font-weight: 600;
+      .status {
+        margin-right: auto;
+        font-size: 12px;
+        color: var(--ink-3);
       }
       button:disabled {
         opacity: 0.5;
@@ -189,9 +207,26 @@ export class LyricTextEditor extends LitElement {
     `
   ];
 
+  connectedCallback() {
+    super.connectedCallback();
+    globalThis.document?.addEventListener('visibilitychange', this.onHidden);
+    globalThis.addEventListener?.('pagehide', this.onHidden);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    clearTimeout(this.commitTimer);
+    globalThis.document?.removeEventListener('visibilitychange', this.onHidden);
+    globalThis.removeEventListener?.('pagehide', this.onHidden);
+  }
+
   firstUpdated() {
     if (this.doc) {
       this.text = serializeLyricText(this.doc, this.partIndex);
+      if (this.draft !== null && this.draft !== this.text) {
+        this.text = this.draft;
+        this.touched = this.pending = true;
+      }
       this.reparse();
     }
     const area = this.textarea();
@@ -251,9 +286,59 @@ export class LyricTextEditor extends LitElement {
     const area = this.textarea();
     if (!area) return;
     this.text = area.value;
+    this.touched = this.pending = true;
     this.reparse();
     this.caretAt(area.selectionStart);
+    clearTimeout(this.commitTimer);
+    this.commitTimer = setTimeout(() => this.commit(), LYRIC_COMMIT_PAUSE_MS);
   };
+
+  /**
+   * Give the document what the box holds, now. A clean parse is handed to the
+   * host as the plan against `doc`; text that does not parse — or that the host
+   * turned away — is kept as a draft instead. Nothing is sent while playing.
+   */
+  commit() {
+    clearTimeout(this.commitTimer); this.commitTimer = undefined;
+    if (!this.pending || this.playing || !this.doc) return;
+    this.reparse();
+    if (this.parsed.diagnostics.length === 0) {
+      const detail: LyricCommitDetail = { edits: this.edits, accepted: false };
+      this.dispatchEvent(new CustomEvent('lyric-editor-commit', { detail, bubbles: true, composed: true }));
+      if (detail.accepted) {
+        this.pending = false;
+        this.saveDraft(null);
+        return;
+      }
+    }
+    this.saveDraft(this.text);
+  }
+
+  /** The document the plan is measured against moved under the visit: plan against the new one. */
+  rebase(doc: MnxStructure) {
+    this.doc = doc;
+    this.reparse();
+  }
+
+  /** The plan against `doc`, or null while the text does not parse. */
+  get plan(): LyricPlanEdit[] | null {
+    return this.parsed.diagnostics.length === 0 ? this.edits : null;
+  }
+
+  private saveDraft(text: string | null) {
+    this.dispatchEvent(new CustomEvent('lyric-editor-draft', { detail: { text }, bubbles: true, composed: true }));
+  }
+
+  /** Leaving the page: commit what can be, and keep this visit's text as a draft too — the
+   *  commit's own recovery write may not get out before the page does. A draft the document
+   *  already holds plans to nothing when it is next opened, and is dropped then. */
+  private onHidden = (event: Event) => {
+    if (event.type === 'visibilitychange' && globalThis.document?.visibilityState !== 'hidden') return;
+    this.commit();
+    if (this.touched) this.saveDraft(this.text);
+  };
+
+  private onBlur = () => this.commit();
 
   private onCaretMove = () => {
     const area = this.textarea();
@@ -261,16 +346,8 @@ export class LyricTextEditor extends LitElement {
   };
 
   private close() {
+    this.commit();
     this.dispatchEvent(new CustomEvent('lyric-editor-close', { bubbles: true, composed: true }));
-  }
-
-  private apply() {
-    if (this.parsed.diagnostics.length > 0 || this.edits.length === 0 || this.playing) return;
-    this.dispatchEvent(new CustomEvent('lyric-editor-apply', {
-      detail: { edits: this.edits },
-      bubbles: true,
-      composed: true
-    }));
   }
 
   private onKey = (event: KeyboardEvent) => {
@@ -281,9 +358,6 @@ export class LyricTextEditor extends LitElement {
     if (event.key === 'Escape') {
       event.preventDefault();
       this.close();
-    } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault();
-      this.apply();
     }
   };
 
@@ -306,6 +380,7 @@ export class LyricTextEditor extends LitElement {
           @input=${this.onInput}
           @keyup=${this.onCaretMove}
           @click=${this.onCaretMove}
+          @blur=${this.onBlur}
         ></textarea>
         <div class="diagnostics">
           ${shown.map(d => html`
@@ -316,13 +391,8 @@ export class LyricTextEditor extends LitElement {
         </div>
         <footer>
           <span class="legend">${LEGEND}</span>
+          <span class="status" role="status">${this.pending && blocked ? 'not in the score yet — fix the errors above' : ''}</span>
           <button @click=${() => this.close()}>close</button>
-          <button
-            class="apply"
-            ?disabled=${blocked || this.edits.length === 0 || this.playing}
-            title=${blocked ? 'fix the diagnostics first' : this.edits.length === 0 ? 'no changes' : this.playing ? 'pause to apply' : 'apply as one edit'}
-            @click=${() => this.apply()}
-          >apply</button>
         </footer>
       </div>
     `;

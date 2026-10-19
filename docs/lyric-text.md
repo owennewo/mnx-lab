@@ -2,9 +2,15 @@
 
 Shift+L opens the right-hand lyric panel in studio and workbench. The score narrows
 to keep the panel beside it, between the toolbar and playback tray. The text is a projection
-of the event lyrics, with live preview; Ctrl+Enter applies one undoable edit.
-Closing without applying discards the draft. Play leaves the panel open, read-only
-(Apply too) until the music pauses.
+of the event lyrics, with live preview. There is no apply: the text is committed
+when typing pauses for 3 seconds, when the box loses focus, when the panel closes
+(another panel opening closes it), when Play starts and when the page is hidden.
+All the commits of one visit to the panel are a single undoable edit.
+
+Text that does not parse cannot be committed. The panel says so beside the
+diagnostics, and studio keeps it as a draft on the device (per piece and part)
+that the panel offers back the next time it opens. Play leaves the panel open,
+read-only, until the music pauses.
 
 The caret is the editor's cursor. Clicking or arrowing onto a word moves the one
 cursor to that word's note on that visit (`9.5|` is not `9.1|`), and the
@@ -65,7 +71,7 @@ use it also when adding a new row to a score that already has lyrics.
 Two anchors can still name one stored syllable — by an explicit row header —
 and conflicting assignments are diagnosed, rather than silently choosing the
 last one. Lyrics on events never reached by navigation are retained
-when applying this surface, as are lyrics outside its staff-1 first-voice walk.
+when committing this surface, as are lyrics outside its staff-1 first-voice walk.
 
 ## Design record
 
@@ -78,3 +84,14 @@ The user's requested contract (2026-10-18):
 The agreed `.pass` is a continuously counted occurrence of that written bar;
 repeat and D.S./D.C. origins are derived from navigation. Four bars / 80
 characters are the canonical wrapping defaults. Sparse storage is unchanged.
+
+The apply button went on 2026-10-19, after unapplied text was lost to a page
+reload. The user's direction:
+
+> Do you think we could go one step further and remove the apply button
+> altogether? I.e. like most things changing is enough for state to get
+> written locally.
+
+and, on the proposed one-second pause, "1s pause seems quite small", so the
+pause is 3 seconds (`LYRIC_COMMIT_PAUSE_MS`). The save session already batches
+its local writes, so a commit costs one recovery write, not one per keystroke.

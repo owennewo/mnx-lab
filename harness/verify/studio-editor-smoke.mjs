@@ -199,7 +199,7 @@ try {
   assert.deepEqual(await meterRead(), meterInitial);
   console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation');
 
-  // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy; nothing is edited until it is applied.
+  // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy, and is committed when typing pauses.
   const lyrics = `${piece}.querySelector('mnx-score-frame > mnx-lyric-text-editor[slot="side"]')`;
   const sung = doc => `JSON.stringify(${doc}.parts[0].measures[0].sequences[0].content.map(e => Object.values(e.lyrics?.lines ?? {}).map(l => l.text)).flat())`;
   // Let the meter section's save land first: the claim below is that the
@@ -223,13 +223,28 @@ try {
   await fs.writeFile('/tmp/mnx-studio-lyrics.png', Buffer.from(lyricShot.result.data, 'base64'));
   const previewSave = await c.evaluate(`${chip}.dataset.save + ' / ' + ${chip}.textContent.trim()`);
   assert.ok(previewSave.startsWith('clean /'), `the preview was told to the save session: ${previewSave}`);
-  await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.apply').click()`);
-  await wait(`!${lyrics} && ${sung(`${page}.editor.document`)} === '["sing","song"]'`);
+  assert.equal(await c.evaluate(`!!${lyrics}.shadowRoot.querySelector('button.apply')`), false, 'the panel still offers apply');
+  // The pause commits, and the panel stays open.
+  await wait(`!!${lyrics} && ${sung(`${page}.editor.document`)} === '["sing","song"]'`);
   // One edit, however many syllables: the chip counts history steps (and by now it knows when it last saved).
   await wait(`${chip}.textContent.trim().startsWith('1 edit unsaved')`);
-  // Side panels are exclusive; switching away cancels the lyric draft and its preview.
+  // Leaving the box commits too, and a visit's commits are ONE step: the second replaces the first.
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sung song'; t.dispatchEvent(new Event('input')); t.dispatchEvent(new Event('blur')); }`);
+  await wait(`${sung(`${page}.editor.document`)} === '["sung","song"]'`);
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'undo' })`);
+  assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'a second commit in the same visit made a second undo step');
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'redo' })`);
+  assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["sung","song"]');
+  // Text that does not parse cannot be committed: it is kept as a draft and offered back.
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'half-'; t.dispatchEvent(new Event('input')); }`);
+  await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.close').click()`);
+  await wait(`!${lyrics}`);
+  assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["sung","song"]', 'text that does not parse reached the document');
   await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
-  await wait(`!!${lyrics}`);
+  await wait(`${lyrics}?.shadowRoot?.querySelector('textarea')?.value === 'half-'`);
+  // Fixed, it commits like any other text — and the draft goes. (Anchored: an anchor-free caret names no visit.)
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| sing song'; t.dispatchEvent(new Event('input')); t.dispatchEvent(new Event('blur')); }`);
+  await wait(`${sung(`${page}.editor.document`)} === '["sing","song"]' && localStorage.getItem('mnx-studio-lyric-draft:${pieceId}:0') === null`);
   // The caret is the cursor: a click on the second word moves the ONE cursor (and the tray) to its note,
   // and the panel draws no box of its own.
   await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
@@ -237,9 +252,10 @@ try {
     t.setSelectionRange(at, at); t.dispatchEvent(new MouseEvent('click')); }`);
   await wait(`${page}.editor.session.cursor.onset.num > 0 && ${piece}.querySelector('mnx-player').cursorPlace?.metricOffset.num > 0n`);
   assert.equal(await c.evaluate(`!!${viewer}.shadowRoot.querySelector('svg .enclosure-preview')`), false, 'the lyric caret drew its own cursor');
-  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'draft words'; t.dispatchEvent(new Event('input')); }`);
+  // Side panels are exclusive, and switching away commits what the lyric panel holds.
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'new words'; t.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${action('Keys')}.click()`);
-  await wait(`!${lyrics} && !!${keys} && ${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);
+  await wait(`!${lyrics} && !!${keys} && ${sung(`${piece}.querySelector('mnx-player').document`)} === '["new","words"]'`);
   await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
   await wait(`!!${lyrics} && !${keys}`);
   await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.close').click()`);
@@ -281,7 +297,7 @@ try {
   assert.deepEqual(reloaded.map(f => f.split(':')[2]).sort(), ['12', '3', '3']);
   assert.equal(await c.evaluate(`${piece}.querySelector('mnx-player').document.global.measures.length`), 17);
   assert.deepEqual(await c.evaluate(`JSON.stringify(${piece}.querySelector('mnx-player').document.global.measures[0].time)`), '{"count":3,"unit":4}');
-  assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '["sing","song"]', 'the lyrics did not survive the stored .gp');
-  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then applied from the text editor, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
+  assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '["new","words"]', 'the lyrics did not survive the stored .gp');
+  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then committed by a pause, a blur and a close (one step per visit, unparsed text kept as a draft), a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

@@ -237,6 +237,34 @@ describe('the plan and its application', () => {
     // An empty plan is a refusal, not a silent success.
     expect(session.handleIntent({ type: 'applyLyricPlan', edits: [] })).toBe(false);
   });
+
+  it('amending replaces the last lyric step, so a panel visit is one undo step', () => {
+    const session = new EditorSession(makeSongDoc());
+    const base = session.doc;
+    const first = (doc: MnxStructure) => doc.parts![0]!.measures![0]!.sequences![0]!.content![0];
+    // The panel plans every commit against the document its visit opened on.
+    const plan = (text: string) => planLyricEdits(base, 0, parseLyricText(base, 0, text));
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: plan('one two') })).toBe(true);
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: plan('won two'), amend: true })).toBe(true);
+    expect(first(session.doc)).toMatchObject({ lyrics: { lines: { '1': { text: 'won' } } } });
+    expect(session.handleIntent({ type: 'undo' })).toBe(true);
+    expect(session.doc).toBe(base);
+    // Redo brings back the amended step, not the one it replaced.
+    expect(session.handleIntent({ type: 'redo' })).toBe(true);
+    expect(first(session.doc)).toMatchObject({ lyrics: { lines: { '1': { text: 'won' } } } });
+    // Typed back to where the visit began: the step goes, and nothing is left to undo.
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: plan(''), amend: true })).toBe(true);
+    expect(session.doc).toBe(base);
+    expect(session.handleIntent({ type: 'undo' })).toBe(false);
+  });
+
+  it('amending over a step that is not a lyric plan adds a step of its own', () => {
+    const session = new EditorSession(makeSongDoc());
+    const edits = planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, 'one'));
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits, amend: true })).toBe(true);
+    expect(session.handleIntent({ type: 'undo' })).toBe(true);
+    expect(session.handleIntent({ type: 'undo' })).toBe(false);
+  });
 });
 
 

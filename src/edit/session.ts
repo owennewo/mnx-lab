@@ -1076,12 +1076,20 @@ export class EditorSession {
         }
         return true;
       }
-      // The lyric text surface's apply (one-surface item 6, phase 2): the
+      // The lyric text surface's commit (one-surface item 6, phase 2): the
       // edits arrive note-addressed — computed by planLyricEdits outside the
       // session, like the clipboard's materialized plans — and land as one
       // batch, so undo is one gesture and provenance keeps the envelope.
+      // Amending, the plan is measured from before the last lyric step and
+      // replaces it; a plan back to nothing leaves no step at all.
       case 'applyLyricPlan': {
-        return this.applyBulk(lyricPlanOps(intent.edits));
+        if (!intent.amend || this.history.lastIntent?.type !== 'applyLyricPlan')
+          return this.applyBulk(lyricPlanOps(intent.edits));
+        const before = this.doc;
+        this.history.retract();
+        if (this.applyBulk(lyricPlanOps(intent.edits))) return true;
+        this.reindex(true);
+        return this.doc !== before;
       }
       case 'setLyricLine':
       case 'removeLyricLine': {

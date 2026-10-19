@@ -92,6 +92,17 @@ const selectionClipboard = new MemorySelectionClipboardStore();
 const RUNG_NAMES: Record<string, string> = { note: 'a note', event: 'a beat', voiceMeasure: 'a voice in a bar', partMeasure: 'a part’s bar', measure: 'a bar', document: 'the whole piece' };
 /** Unsaved edits, on this device only, until the next checkpoint. One store for every piece. */
 const recoveryStore = indexedDbRecoveryStore<MnxStructure>();
+
+/** Lyric text this device could not commit yet (it does not parse), per piece and part — the panel offers it back. */
+const lyricDrafts = (pieceId: string) => {
+  const key = (part: number) => `mnx-studio-lyric-draft:${pieceId}:${part}`;
+  return {
+    read: (part: number) => { try { return localStorage.getItem(key(part)); } catch { return null; } },
+    write: (part: number, text: string | null) => {
+      try { text === null ? localStorage.removeItem(key(part)) : localStorage.setItem(key(part), text); } catch { /* the panel still holds it */ }
+    }
+  };
+};
 const pencilGlyph = html`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13 7l4 4"></path></svg>`;
 
 @customElement('mnx-studio-piece')
@@ -614,6 +625,7 @@ export class PiecePage extends LitElement {
       title: () => (this.doc ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? 'Untitled',
       // The lyric editor's live preview: drawn, never told to the save session.
       onPreview: preview => { if (this.doc && this.editor) this.doc = { ...this.doc, lastUpdated: Date.now(), mnxJson: preview ?? this.editor.document }; },
+      lyricDrafts: lyricDrafts(this.pieceId),
       clipboard: selectionClipboard,
       onNotice: notice => this.showNotice(notice.message),
       onState: () => { if (this.keysOpen || this.editOpen) this.requestUpdate(); },
@@ -634,9 +646,10 @@ export class PiecePage extends LitElement {
 
   /** Leaving the piece: save what is unsaved, then let go. The record stays until that save lands. */
   private endSession() {
+    // The editor goes first: disposing it commits what the lyric panel holds, and that has to reach the session.
+    this.editor?.dispose(); this.editor = null;
     const session = this.session;
     this.session = null; this.save = null;
-    this.editor?.dispose(); this.editor = null;
     const release = this.releaseLock; this.releaseLock = null;
     if (session) void session.flush().finally(() => { session.dispose(); release?.(); });
     else release?.();

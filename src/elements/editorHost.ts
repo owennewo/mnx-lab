@@ -61,7 +61,7 @@ import { buildInspectorView, type InspectorView } from './inspectorRows.ts';
 import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from './inspectorMount.ts';
 import type { OverlayAnchor } from './overlayPlacement.ts';
 import type { RungInspector } from './RungInspector.ts';
-import type { LyricTextEditor } from './LyricTextEditor.ts';
+import type { LyricCommitDetail, LyricTextEditor } from './LyricTextEditor.ts';
 import './RungInspector.ts';
 import './LyricTextEditor.ts';
 import './EditorSurfaces.ts';
@@ -123,6 +123,12 @@ export interface EditorBindingOptions {
   title?(): string;
   /** A document to DRAW without it becoming the document — the lyric editor's live preview; null puts the real one back. */
   onPreview?(document: MnxStructure | null): void;
+  /**
+   * Where the lyric panel keeps text it could not commit (it does not parse, or
+   * the edit was refused), per part, so a reload or a closed panel does not lose
+   * it. Without one, such text lives as long as the panel does.
+   */
+  lyricDrafts?: { read(partIndex: number): string | null; write(partIndex: number, text: string | null): void };
   /** Where cut and copied selections go. Without one the clipboard keys are unbound. */
   clipboard?: SelectionClipboardStore;
   /** What a copy, cut or paste did, or the precise sentence for why it did not. */
@@ -247,6 +253,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   let inspector: RungInspector | null = null;
   let inspectorError: string | null = null;
   let lyrics: LyricTextEditor | null = null;
+  /** The document this lyric visit's last commit produced: while it is still the document, the next commit replaces that step. */
+  let lyricStep: MnxStructure | null = null;
   const surfaces = options.overlay ? options.overlay.appendChild(document_.createElement('mnx-editor-surfaces')) : null;
   // ── the cursor as the playhead (core-single-cursor.md) ──
   const playback = options.playback ?? null;
@@ -405,6 +413,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       playing = now;
       if (now) {
         // The lyric panel stays open while the music plays, read-only: following the words is the point.
+        // What it holds is committed first — `playing` is not set yet, so the commit is not refused.
+        lyrics?.commit();
         tabDigits.flush(); closeInspector(false);
         // A move made just before Play is where Play meant to start.
         if (seekTimer !== undefined) seekNow();
@@ -524,7 +534,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   };
   function closeLyrics(refocus = true) {
     if (!lyrics) return;
-    lyrics.remove(); lyrics = null;
+    lyrics.commit();
+    lyrics.remove(); lyrics = null; lyricStep = null;
     options.onPreview?.(null);
     if (refocus) scope.focus();
     draw();
@@ -539,11 +550,22 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
-    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '', focusOrdinal: session.performedOrdinal ?? null });
-    // Clean parses draw live on a SCRATCH copy, through the very ops the session would use; nothing is edited until Apply.
+    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '', focusOrdinal: session.performedOrdinal ?? null, draft: options.lyricDrafts?.read(partIndex) ?? null });
+    lyricStep = null;
+    /** The panel plans against the document its visit opened on. If something else moved the
+     *  document since (an edit on the score, an undo), it plans against that instead — and
+     *  the visit's next commit is a step of its own. Returns whether it moved. */
+    const rebaseLyrics = (): boolean => {
+      if (session.doc === el.doc || (lyricStep !== null && session.doc === lyricStep)) return false;
+      lyricStep = null;
+      el.rebase(session.doc);
+      return true;
+    };
+    // Clean parses draw live on a SCRATCH copy, through the very ops the session would use, until they are committed.
     el.addEventListener('lyric-editor-edits', e => {
+      if (rebaseLyrics()) return;
       const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
-      options.onPreview?.(edits.length === 0 ? null : lyricPlanOps(edits).reduce(applyOp, session.doc));
+      options.onPreview?.(edits.length === 0 || !el.doc ? null : lyricPlanOps(edits).reduce(applyOp, el.doc));
     });
     // The caret is the cursor: a word's visit and onset move the one cursor — and so the playhead — there.
     el.addEventListener('lyric-editor-caret', e => {
@@ -552,12 +574,24 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       cursorHidden = false;
       if (playing && playback) { seekNow(); draw(); } else settle(true);
     });
-    // The buffer's diff lands as ONE intent: the history records the syllables, never the keystrokes.
-    el.addEventListener('lyric-editor-apply', e => {
-      const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
-      closeLyrics();
-      dispatch({ type: 'applyLyricPlan', edits });
+    // The buffer's diff lands as ONE intent: the history records the syllables, never the keystrokes —
+    // and each commit of the same visit replaces the last, so the visit is one undo step.
+    el.addEventListener('lyric-editor-commit', e => {
+      const detail = (e as CustomEvent<LyricCommitDetail>).detail;
+      if (rebaseLyrics()) {
+        // Replanned against the moved document; text that no longer fits it stays a draft.
+        if (el.plan === null) return;
+        detail.edits = el.plan;
+      }
+      const amend = lyricStep !== null;
+      if (!amend && detail.edits.length === 0) { detail.accepted = true; return; }
+      if (!dispatch({ type: 'applyLyricPlan', edits: detail.edits, ...(amend ? { amend: true } : {}) })) return;
+      // A plan back to the visit's start leaves no step to replace.
+      lyricStep = detail.edits.length === 0 ? null : session.doc;
+      detail.accepted = true;
+      options.onPreview?.(null);
     });
+    el.addEventListener('lyric-editor-draft', e => options.lyricDrafts?.write(partIndex, (e as CustomEvent<{ text: string | null }>).detail.text));
     el.addEventListener('lyric-editor-close', () => closeLyrics());
     lyrics = el;
     (options.lyricPanel ?? surfaces).append(el);
@@ -797,6 +831,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
         .filter(group => group.rows.length > 0);
     },
     dispose: () => {
+      lyrics?.commit();
       disposed = true;
       playback?.place?.(null);
       tabDigits.cancel();

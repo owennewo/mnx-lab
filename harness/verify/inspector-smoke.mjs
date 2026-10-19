@@ -385,7 +385,7 @@ try {
   pass(`the score took the next key (bar row: ${hudAfter.rows.find(r => r.key === 'bar')?.value})`);
 
   // ── Shift+L: the lyric text editor (one-surface item 6, phase 2) ────────
-  console.log('\nShift+L opens the lyric text editor; apply round-trips the document');
+  console.log('\nShift+L opens the lyric text editor; closing commits, and the document round-trips');
   const LYRIC = `(() => {
     const find = (root, tag, depth) => {
       if (!root || depth > 12) return null;
@@ -404,49 +404,34 @@ try {
       open: true,
       text: sr.querySelector('textarea')?.value ?? null,
       diagnostics: [...sr.querySelectorAll('.diagnostic')].map(d => d.textContent.trim()),
-      applyDisabled: sr.querySelector('button.apply')?.disabled ?? null
+      changes: el.plan?.length ?? null,
+      apply: !!sr.querySelector('button.apply')
     });
-  })()`;
-  const clickApply = `(() => {
-    const find = (root, tag, depth) => {
-      if (!root || depth > 12) return null;
-      const hit = root.querySelector(tag);
-      if (hit) return hit;
-      for (const el of root.querySelectorAll('*')) {
-        const deeper = el.shadowRoot && find(el.shadowRoot, tag, depth + 1);
-        if (deeper) return deeper;
-      }
-      return null;
-    };
-    find(document, 'mnx-lyric-text-editor', 0)?.shadowRoot.querySelector('button.apply')?.click();
   })()`;
   await press('L', 'KeyL', 76, 8);
   let ly = JSON.parse(await cdp.evaluate(LYRIC));
   if (!ly.open) fail('no lyric editor after Shift+L');
   else {
     pass(`open, buffer “${ly.text}” (${ly.diagnostics.length} diagnostic(s))`);
-    if (ly.applyDisabled !== true) fail('apply should be disabled while the buffer is unchanged');
+    if (ly.apply) fail('the panel still offers an apply button');
+    if (ly.changes !== 0) fail('the unchanged buffer plans a change');
     await type('Hush lit-tle ba-by');
     ly = JSON.parse(await cdp.evaluate(LYRIC));
     if (ly.diagnostics.length > 0) fail(`a clean verse raised diagnostics: ${ly.diagnostics.join(' · ')}`);
-    else if (ly.applyDisabled) fail('apply is disabled with a clean, changed buffer');
-    else pass('typed a verse, no diagnostics, apply armed');
-    await cdp.evaluate(clickApply);
+    else pass('typed a verse, no diagnostics');
+    await press('Escape', 'Escape', 27);
     await settle(cdp);
     ly = JSON.parse(await cdp.evaluate(LYRIC));
-    if (ly.open) fail('the editor did not close on apply');
-    else pass('applied and closed');
+    if (ly.open) fail('still open after Escape');
+    else pass('Esc closes the editor');
     await press('L', 'KeyL', 76, 8);
     ly = JSON.parse(await cdp.evaluate(LYRIC));
     // The canonical form may add bar checks the typed text lacked; the honest
     // assertions are that the verse landed and the buffer diffs to nothing.
-    if (!/^1\.1\| Hush/.test(ly.text ?? '')) fail(`reopening reads “${ly.text}” — the verse did not land in the document`);
-    else if (ly.applyDisabled !== true) fail('the reopened buffer diffs against its own document — the round trip is broken');
-    else pass(`reopened on the document’s own serialization (“${ly.text}”) — the round trip holds`);
+    if (!/^1\.1\| Hush/.test(ly.text ?? '')) fail(`reopening reads “${ly.text}” — closing did not commit the verse`);
+    else if (ly.changes !== 0) fail('the reopened buffer diffs against its own document — the round trip is broken');
+    else pass(`closing committed the verse; reopened on the document’s own serialization (“${ly.text}”)`);
     await press('Escape', 'Escape', 27);
-    ly = JSON.parse(await cdp.evaluate(LYRIC));
-    if (ly.open) fail('still open after Escape');
-    else pass('Esc closes the editor');
   }
 } catch (error) {
   fail(error.message);
