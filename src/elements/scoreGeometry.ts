@@ -321,3 +321,37 @@ export function bandLineGap(
 export function bandDistance(band: { top: number; bottom: number }, y: number): number {
   return Math.max(0, band.top - y, y - band.bottom);
 }
+
+/**
+ * Each system's vertical reach in SVG units, top to bottom: its staves and the
+ * verses that belong to it. A reveal that brings a note into view brings these
+ * too, so the words sung on it are not left past the edge.
+ *
+ * Which system a verse belongs to follows the layout's rule (lyricRuns.ts): over
+ * a tab staff, under a notation staff. So a verse with a tab staff next below it
+ * is that staff's; any other hangs from the staff above it.
+ */
+export function systemReaches(svg: SVGSVGElement, sp: number): { top: number; bottom: number }[] {
+  const staves = assignSystems(collectStaves(svg, sp), collectBarlines(svg));
+  const systems = collectSystemBands(staves);
+  const reach = systems.map(system => ({ top: system.top, bottom: system.bottom }));
+  if (systems.length === 0) return reach;
+  const markers = tabBandMarkers(svg);
+  const bySystem = new Map(systems.map((system, index) => [system.id, index]));
+  for (const el of svg.querySelectorAll<SVGTextElement>('text.lyric, text.lyric-hyphen')) {
+    if (el.y.baseVal.numberOfItems === 0) continue;
+    const y = el.y.baseVal.getItem(0).value;
+    const size = parseFloat(el.getAttribute('font-size') ?? '') || 2 * sp;
+    let above: StaffBand | undefined, below: StaffBand | undefined;
+    for (const staff of staves) {
+      if (staff.bottom <= y && (!above || staff.bottom > above.bottom)) above = staff;
+      if (staff.top >= y && (!below || staff.top < below.top)) below = staff;
+    }
+    const owner = below && (isTabBand(markers, below, sp) || !above) ? below : above;
+    const index = owner ? bySystem.get(owner.system) : undefined;
+    if (index === undefined) continue;
+    reach[index]!.top = Math.min(reach[index]!.top, y - 0.8 * size);
+    reach[index]!.bottom = Math.max(reach[index]!.bottom, y + 0.25 * size);
+  }
+  return reach;
+}

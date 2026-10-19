@@ -76,7 +76,7 @@ import {
   type RenderedStaff,
   type ScorePointerMap
 } from './pointerHitTest.ts';
-import { unitsPerSp } from './scoreGeometry.ts';
+import { systemReaches, unitsPerSp } from './scoreGeometry.ts';
 import type { RenderedProjection } from '../engine/render/projection.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -2037,9 +2037,35 @@ export class DocumentViewer extends LitElement {
     if(!ink)return false;
     this.revealBox(ink.getBoundingClientRect(),'auto');return true;
   }
+  /** Each drawn page's system reaches (`systemReaches`), measured once per SVG. */
+  private reaches = new WeakMap<SVGSVGElement, { top: number; bottom: number }[]>();
+  /**
+   * What a reveal brings into view: the box, grown to the whole system it is on —
+   * its staves and its verses, which may stand over the staff or under it — so a
+   * jump to a note shows the words sung there. A system taller than the view
+   * cannot be shown whole, and then the box alone is what is kept in view.
+   */
+  private revealSpan(box: DOMRect, view: DOMRect): { start: number; end: number } {
+    const own = { start: box.top, end: box.bottom };
+    const svg = this.container?.querySelector<SVGSVGElement>('svg');
+    const vb = svg?.viewBox.baseVal;
+    if (!svg || !vb || vb.height <= 0) return own;
+    let reaches = this.reaches.get(svg);
+    if (!reaches) { reaches = systemReaches(svg, unitsPerSp(svg)); this.reaches.set(svg, reaches); }
+    const page = svg.getBoundingClientRect();
+    const scale = page.height / vb.height;
+    const y = vb.y + ((box.top + box.bottom) / 2 - page.top) / scale;
+    const system = reaches.find(reach => y >= reach.top && y <= reach.bottom) ??
+      reaches.reduce<{ top: number; bottom: number } | undefined>((best, reach) =>
+        !best || Math.max(0, reach.top - y, y - reach.bottom) < Math.max(0, best.top - y, y - best.bottom) ? reach : best, undefined);
+    if (!system) return own;
+    const start = Math.min(box.top, page.top + (system.top - vb.y) * scale);
+    const end = Math.max(box.bottom, page.top + (system.bottom - vb.y) * scale);
+    return end - start + 2 * DocumentViewer.REVEAL_PAD_PX <= view.height ? { start, end } : own;
+  }
   private revealBox(box: DOMRect, behavior: ScrollBehavior) {
     const view=this.getBoundingClientRect();
-    const top=revealScrollDelta({start:box.top,end:box.bottom},{start:view.top,end:view.bottom},DocumentViewer.REVEAL_PAD_PX);
+    const top=revealScrollDelta(this.revealSpan(box,view),{start:view.top,end:view.bottom},DocumentViewer.REVEAL_PAD_PX);
     if(Math.abs(top)>=1)this.scrollBy({top,behavior});
   }
 

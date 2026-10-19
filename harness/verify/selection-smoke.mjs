@@ -147,6 +147,19 @@ const DUMP = `(() => {
  *  the geometry behind "the selection stays in view". The SETTLED group, not
  *  the transition: mid-morph the tween's stand-in is still at the geometry
  *  the selection is leaving. */
+const FIND_VIEWER = `() => {
+  const find = (root, depth) => {
+    if (!root || depth > 12) return null;
+    const hit = root.querySelector('mnx-document-viewer');
+    if (hit) return hit;
+    for (const el of root.querySelectorAll('*')) {
+      if (el.shadowRoot) { const found = find(el.shadowRoot, depth + 1); if (found) return found; }
+    }
+    return null;
+  };
+  return find(document, 0);
+}`;
+
 const IN_VIEW = `(() => {
   const find = (root, depth) => {
     if (!root || depth > 12) return null;
@@ -423,6 +436,49 @@ try {
     }
     inView(atStart, 'at the first bar');
   }
+
+  // A reveal brings the selection's whole system, words and all: over a
+  // standalone tab staff the verses stand ABOVE the strings, so a move up the
+  // score that stopped once the note showed left the words sung on it past the
+  // top edge.
+  console.log('a revealed system brings its verses');
+  // Every load so far was pinned to the both view (above); this one is the tab view.
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: "localStorage.setItem('mnx-lab.view','tab');" });
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 900, height: 640, deviceScaleFactor: 1, mobile: false });
+  await cdp.send('Page.navigate', { url: 'about:blank' });
+  await new Promise(r => setTimeout(r, 300));
+  await cdp.send('Page.navigate', { url: `http://127.0.0.1:${site.port}/workbench/#/scenario/lab/lyrics/tab-verses` });
+  await waitFor(cdp, SCORE_READY, 'the lyric score and fonts');
+  await cdp.evaluate(`(${FIND_VIEWER})().focus(); true`);
+  await press('End', 'End', 35);
+  await arrive();
+  await press('Home', 'Home', 36);
+  await arrive();
+  const verses = JSON.parse(await cdp.evaluate(`(() => {
+    const viewer = (${FIND_VIEWER})(), view = viewer.getBoundingClientRect();
+    const g = viewer.shadowRoot.querySelector('svg > g.enclosure:not(.enclosure-transition)') ?? viewer.shadowRoot.querySelector('svg > g.cursor-ghost');
+    const box = g.getBoundingClientRect();
+    // Staff lines into staves (a gap wider than two of a staff's own starts the next);
+    // the selection's staff is the one around its middle, and its verses are the
+    // words between it and the staff above.
+    const ys = [...viewer.shadowRoot.querySelectorAll('svg line.staff-line')].map(l => l.getBoundingClientRect().top).sort((a, b) => a - b);
+    const gap = Math.min(...ys.slice(1).map((y, i) => y - ys[i]).filter(d => d > 0.5));
+    const staves = [];
+    for (const y of ys) { const last = staves.at(-1); if (last && y - last.bottom <= 2.5 * gap) last.bottom = y; else staves.push({ top: y, bottom: y }); }
+    const middle = (box.top + box.bottom) / 2;
+    const at = staves.findIndex(staff => middle >= staff.top - gap && middle <= staff.bottom + gap);
+    const floor = staves[at]?.top ?? box.top, roof = staves[at - 1]?.bottom ?? -Infinity;
+    const words = [...viewer.shadowRoot.querySelectorAll('svg text.lyric')].map(t => t.getBoundingClientRect())
+      .filter(r => r.bottom <= floor && r.top >= roof);
+    return JSON.stringify({ view: { top: view.top, bottom: view.bottom }, count: words.length,
+      top: Math.min(...words.map(r => r.top)), overflows: viewer.scrollHeight > viewer.clientHeight + 1 });
+  })()`));
+  if (!verses.overflows) fail('the lyric score fits the viewport — this case asserts nothing about scrolling');
+  else if (verses.count === 0) fail('no verses stand over the first system');
+  // With air: words grazing the edge (the old reveal stopped at the note, leaving them at 0px) are cut.
+  else if (verses.top < verses.view.top + 8) fail(`the first system's verses start at ${verses.top.toFixed(0)}, at or past the viewer's top edge ${verses.view.top.toFixed(0)}`);
+  else pass(`the first system's ${verses.count} verse syllables are on screen with its notes (${(verses.top - verses.view.top).toFixed(0)}px below the top edge)`);
+
   // The command-tray act retired with the tray itself (one-surface 11b);
   // the inspector smoke (`npm run smoke:inspector`) covers the surviving
   // overlay's geometry and keyboard ownership.
