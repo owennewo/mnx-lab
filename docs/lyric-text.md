@@ -13,43 +13,44 @@ that the panel offers back the next time it opens. Play leaves the panel open,
 read-only, until the music pauses.
 
 The caret is the editor's cursor. Clicking or arrowing onto a word moves the one
-cursor to that word's note on that visit (`9.5|` is not `9.1|`), and the
-playback cursor with it; while playing, it seeks. The panel draws no cursor
-of its own. Anchor-free legacy text has no visit, so its caret moves nothing.
+cursor to that word's note on that visit, and the playback cursor with it; while
+playing, it seeks. The panel draws no cursor of its own; the word the cursor is
+on is outlined, as the score outlines a selected element.
 
-## Performance anchors
+## Where the words are
 
-A run of text starts at a `bar.occurrence|` anchor. `9.2|` means the second
-actual visit to written bar 9, regardless of whether a repeat or a D.S./D.C.
-return caused it. It is not verse 2, nor performance bar 9. Alternate endings
-count actual visits too: the first visit to a second ending is `.1`.
+The text is in the order the words are sung, and **names no bars**. It runs
+from the first bar played: `|` is the next bar played, and `×4` (or `x4`, as
+typed) is four bars nobody sings, standing where a bar starts. Newlines are
+whitespace, so a line can be re-wrapped or pasted without moving anything.
 
-**Only a run's first line is anchored.** Every later line opens on the `|`
-that carries the words on into the next bar, and the margin beside it names
-where it lands, live, as you type. A click on a margin label takes the caret,
-and the score's cursor with it, to that line's first word:
+The margin beside the text says where each line starts, worked out live from
+the bar lines as you type: the **bar played** (counting every pass and jump
+from 1), and that bar's **bar of the score and pass** — `26 (10.3)` is the
+26th bar played, bar 10 the third time through. Hovering a label says so in
+words; clicking it takes the caret, and the score's cursor, to the line's first
+word. The labels sit on a rail: a dot per line, hollow for a line that only
+crosses empty bars, and the rail dashed where a line ends on bars nobody sings.
 
 ```
-       9.1| _____ I | could-a been a_ sail- | -or | ___ could have
-  9.2  | been a cook
- 10.3  | | | | | _ a real live | __ lover | ___ could have
-  9.4  | been a book
+   1 (1.1)  ×16 |
+  17 (9.1)  _____ I | could-a been a_ sail- | -or | ___ could have |
+  21 (9.2)  been a cook | ×4 |
+  26 (10.3) _ a real live | __ lover | ___ could have |
+  29 (9.4)  been a book | ×4 |
 ```
 
-So a `|` added inside a run nudges every word after it along, through the
-following lines, and taking one out (there or further on) brings them back.
-Nothing is pinned but the run's start: an anchor you type yourself holds until
-the panel next opens, when the text is written out again from the notes.
+The generator ends each line on the bar line after its last bar, so every line
+opens on a word, and the label is that word's bar. Bars nobody sings close the
+line before them as one run (`| ×4 |`); a lead-in stands on a line of its own
+(`×16 |`); trailing silence is left off. It starts a new line at repeats and
+jumps, and wraps at four bars or before the next bar would pass 80 characters.
+A single long bar stays intact. A `|` added anywhere nudges every word after it
+along by a bar, and taking one out brings them back.
 
-A bare `|` advances one bar in performance order, including bars without sung
-notes. `| |` crosses an empty bar. Anchors may also appear within a line.
-The generator starts at the first texted bar, omits trailing empty bars, and
-keeps empty bars between texted bars as pipes — up to four; a longer silence
-ends the run, and the next words start a new, anchored one. It starts a new
-line at repeats/jumps and wraps at four bars or before the next bar would
-exceed 80 characters, without an anchor.
-A single long bar remains intact. Newlines within an anchored passage are
-whitespace, so pasted phrase breaks do not create verses.
+The text is painted beneath a transparent text box: words in ink, and the marks
+that place them — bar lines, skips, runs, the hyphens and underscores inside a
+word — faded back.
 
 ## Aligning words
 
@@ -60,9 +61,9 @@ and tie continuations are skipped automatically. The source does not
 explicitly distinguish a held syllable from an untexted event; generated
 hyphens/underscores describe placement, not a new stored melisma property.
 
-The parser accepts older unanchored verse-per-line text, including `6|` and
-`nl 2:` headers, for paste compatibility. Once using occurrence anchors,
-use `6.1|`, not `6|`. Reopening generates the new canonical form.
+Pasted plain text flows onto the notes in the order it is sung, from the first
+bar played; put `×16 |` in front of it to skip a sixteen-bar intro. Bar numbers
+(`9.1|`, `6|`) are not part of the text; the parser names one if it finds it.
 
 ## Stored rows, languages, and shared words
 
@@ -72,27 +73,37 @@ sang, or its repeat iteration if that is further on (a second ending reached on
 pass 2 sings row 2). So verses keep counting through a D.S./D.C. return, where
 the repeat iteration starts over. A verse with no stored row is **unsung** —
 it generates no text and lights nothing in playback, exactly as the player
-shows it; typing words at that anchor creates the row. (Until 2026-10-18 a
+shows it; typing words at that place creates the row. (Until 2026-10-18 a
 return re-sang row 1, so deleting a return's line silently did nothing: the
 user's call, on *One Of These Things First*, was that unwritten returns are
-unsung. The cost: a repeat written once under `×2` now sings once.) An optional header **after** the anchor can explicitly
-select a language and/or stored-row ordinal: `9.2| nl: …` or `1.1| 2: …`.
-The latter preserves hymn verses and rows that navigation does not select;
-use it also when adding a new row to a score that already has lyrics.
+unsung. The cost: a repeat written once under `×2` now sings once.) A **header line** starts another block of text,
+from the first bar played again: `2:` writes stored row 2 wherever its words
+fall, `nl:` the Dutch rows by each visit's verse, `nl 2:` Dutch row 2. Headers
+keep hymn verses and other rows that no pass sings:
 
-Two anchors can still name one stored syllable — by an explicit row header —
-and conflicting assignments are diagnosed, rather than silently choosing the
-last one. Two mistakes look alike here and are told apart, each named once:
+```
+Shine bright
+2:
+Morn-ing
+```
 
-- **A passage that runs on into the next anchor** (one more `|` pushed its
-  last words into bars the next line writes) is named on its own line, with
-  the words that ran on: *18.3 runs 6 syllables on into 20.3 (“been the end I
-  could be”)…* — move them into that line, or delete its anchor to let the text
-  flow on.
+New rows are declared in the document only where their words alone would not
+keep them — an empty row holding a later one's number, or an order the row ids
+would not sort into — because a Guitar Pro save cannot store a declaration.
+
+Two blocks can name one stored syllable, and conflicting assignments are
+diagnosed rather than silently choosing the last one. Two mistakes look alike
+here and are told apart, each named once:
+
+- **A verse two blocks write differently at one place** is named on the later
+  block: *verse 1 at 1.1 is written twice, differently — in the main text and
+  under “1:”; keep one.* The same word twice is no mistake.
 - **Two passes of a bar that sing the same verse row** store one set of words,
-  so they must agree: *1.1 sings “changed” and 1.2 sings “different”, but both
-  are verse 2 of the same written notes…* Lyrics on events never reached by navigation are retained
-when committing this surface, as are lyrics outside its staff-1 first-voice walk.
+  so they must agree: *1.2 sings “different” and 1.1 sings “changed”, but both
+  are verse 2 of the same written notes…*
+
+Lyrics on events never reached by navigation are retained when committing this
+surface, as are lyrics outside its staff-1 first-voice walk.
 
 ## Design record
 
@@ -115,6 +126,27 @@ the user chose to anchor only where the flow breaks:
 > sound appealing but often lyrics start the bar before the chorus/verse so it
 > would be brittle. I'm hoping that if everything is "nudged along" incorrectly
 > it will be easy to "nudge it back" by removing a gap later.
+
+Anchors went altogether on 2026-10-20, with the margin taking over saying where
+a line is. The owner found the anchored text confusing — `10.3` beside a line
+named its first word's bar, not where the line began — and asked for change:
+
+> I find the current editor confusing so I am open to change - but I want
+> something clearly better.
+
+> Lets say that there is still a line marker but the format is "{performance
+> bar number} (score bar number.passNumber}) with a hover text to explain what
+> these 3 mean.
+
+Considering pinned and unpinned markers, they asked whether a pin would survive
+a save and reopen; it would not (the text is regenerated from the notes, which
+are stored as Guitar Pro) — "Lets remove pinning entirely." Of the
+hover text's closing "This line starts here": "This is obvious after its made
+true so we don't need to say it". Of four mocked-up margins (quiet, stacked,
+faded syntax, rail) they chose the rail, with the faded text. A verse no pass
+sings became a header line restarting from the first bar played, and plain
+pasted text sung order from the first bar played, retiring the verse-per-line
+reading — both the recommended options.
 
 The apply button went on 2026-10-19, after unapplied text was lost to a page
 reload. The user's direction:

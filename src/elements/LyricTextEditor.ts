@@ -1,7 +1,7 @@
 // The lyric text editor — the paste-and-tweak surface of one-surface item 6
 // phase 2 (roadmap/complete/workbench-one-surface-lyrics.md). The buffer is
 // WORKBENCH STATE, not the document: it opens on the canonical projection
-// (serializeLyricText) and parses live into bar-anchored diagnostics. There is
+// (serializeLyricText) and parses live into diagnostics named by bar. There is
 // no apply: a pause in typing, leaving the box, closing the panel or hiding the
 // page COMMITS a clean parse — the host is handed the plan (planLyricEdits)
 // against `doc`, the document the visit opened on, and keeps one undo step per
@@ -35,7 +35,7 @@ import {
 } from '../edit/lyricText.ts';
 
 const LEGEND =
-  'split - · hold fant--as · extend day__ · skip _ · join you~are · bars 9.1| (bar.visit), | next · optional nl 2:';
+  'split - · hold fant--as · extend day__ · skip _ · join you~are · next bar | · bars without words ×4 (or x4) · another verse 2: · language nl:';
 
 /** How long typing must pause before a clean parse is committed. */
 export const LYRIC_COMMIT_PAUSE_MS = 3_000;
@@ -132,9 +132,11 @@ export class LyricTextEditor extends LitElement {
         color: var(--ink-3);
         font-size: 12px;
       }
-      /* The margin beside the text names where each line starts, live: only a run's
-         first line carries an anchor, so the rest are told by the parse, not pinned. */
+      /* The text names no bars: the margin beside it does, live, as a rail — each line a
+         dot labelled with the bar played it starts in and that bar's score bar and pass. */
       .editor {
+        --faint: color-mix(in oklab, var(--ink-3) 55%, var(--bg));
+        --run: color-mix(in oklab, var(--ink-3) 14%, var(--bg));
         position: relative;
         display: flex;
         flex: 1;
@@ -144,38 +146,98 @@ export class LyricTextEditor extends LitElement {
       .gutter {
         position: relative;
         flex: none;
-        width: 6ch;
+        width: 13ch;
         overflow: hidden;
         font: 11px/1 var(--mono);
-        color: var(--ink-3);
-        text-align: right;
       }
-      .gutter span {
+      .start {
         position: absolute;
-        right: 6px;
+        right: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        height: calc(13px * 1.7);
+        white-space: nowrap;
         font-variant-numeric: tabular-nums;
         cursor: pointer;
       }
-      .gutter span:hover {
-        color: var(--ink);
-        text-decoration: underline;
+      .start .played { color: var(--ink-2); font-weight: 600; }
+      .start .visit {
+        color: var(--ink-3);
+        font-size: 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        padding: 1px 4px;
       }
-      .mirror {
-        position: absolute;
-        visibility: hidden;
-        pointer-events: none;
-        top: 0;
+      .start .dot {
+        position: relative;
+        z-index: 1;
+        flex: none;
+        width: 7px;
+        height: 7px;
+        margin-right: -3px;
         box-sizing: border-box;
+        border-radius: 50%;
+        background: var(--ink-2);
+      }
+      /* A line that only crosses bars without words. */
+      .start.silent .dot { background: var(--surface); border: 1.5px solid var(--ink-3); }
+      .start:hover .played, .start:hover .visit { color: var(--ink); }
+      .rail {
+        position: absolute;
+        right: 4.75px;
+        width: 1.5px;
+        background: var(--faint);
+      }
+      /* The next line starts further on than this one ends: bars nobody sings. */
+      .rail.gap { background: repeating-linear-gradient(to bottom, var(--ink-3) 0 2px, transparent 2px 5px); }
+      .tip {
+        position: absolute;
+        z-index: 5;
+        pointer-events: none;
+        white-space: nowrap;
+        font: 12px/1.4 var(--sans);
+        color: var(--surface);
+        background: var(--ink);
+        border-radius: 6px;
+        padding: 6px 9px;
+        box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+      }
+      .tip b { font-weight: 600; }
+      /* What the box draws: its own text is transparent, and this copy, laid out the same,
+         sits beneath it in two inks — words in ink, the marks that place them faded back. */
+      .paint {
+        position: absolute;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: var(--bg);
+      }
+      .paint-inner {
+        box-sizing: border-box;
+        padding: 8px 10px;
         font: 13px/1.7 var(--mono);
+        color: var(--ink);
         white-space: pre-wrap;
         overflow-wrap: break-word;
-        padding: 8px 10px;
-        border: 1px solid transparent;
       }
+      .paint .bar, .paint .skip { color: var(--faint); }
+      .paint .hy { color: var(--ink-3); }
+      .paint .run {
+        color: var(--ink-3);
+        border-radius: 3px;
+        background: var(--run);
+        box-shadow: 0 0 0 2px var(--run);
+      }
+      .paint .head { color: var(--ink-2); font-weight: 600; }
       /* The word the cursor is on, outlined as the score outlines a selected element: the
          box's own selection is not drawn once focus leaves it, and a press on the score takes it. */
       .marks {
         position: absolute;
+        z-index: 2;
         overflow: hidden;
         pointer-events: none;
       }
@@ -187,12 +249,15 @@ export class LyricTextEditor extends LitElement {
         background: color-mix(in srgb, var(--accent) 10%, transparent);
       }
       textarea {
+        position: relative;
+        z-index: 1;
         flex: 1;
         min-width: 0;
         resize: none;
         font: 13px/1.7 var(--mono);
-        color: var(--ink);
-        background: var(--bg);
+        color: transparent;
+        caret-color: var(--ink);
+        background: transparent;
         border: 1px solid var(--line);
         border-radius: 6px;
         padding: 8px 10px;
@@ -201,6 +266,7 @@ export class LyricTextEditor extends LitElement {
       textarea:focus {
         border-color: var(--line-strong);
       }
+      textarea::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
       .diagnostics {
         margin: 0 14px;
         max-height: 25%;
@@ -323,16 +389,16 @@ export class LyricTextEditor extends LitElement {
     if (!span) return false;
     area.setSelectionRange(span.from, span.to);
     // A caret set from outside does not scroll the box: bring its line into view
-    // by the same measuring twin the gutter labels are placed with.
+    // by the painted copy the margin is placed with.
     const line = this.text.slice(0, span.from).split('\n').length - 1;
-    const row = this.renderRoot.querySelector<HTMLElement>('.mirror')?.children[line] as HTMLElement | undefined;
+    const row = this.rows()[line];
     if (row && (row.offsetTop < area.scrollTop || row.offsetTop + row.offsetHeight > area.scrollTop + area.clientHeight)) {
       area.scrollTop = Math.max(0, row.offsetTop - area.clientHeight / 3);
     }
     return true;
   }
 
-  /** Where each line of the text starts in the performance, drawn in the margin beside it. */
+  /** Each bar played's `bar.pass`, by performance ordinal. */
   private labels: string[] = [];
   private labelsFor: MnxStructure | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -340,88 +406,126 @@ export class LyricTextEditor extends LitElement {
   private marked: { from: number; to: number } | null = null;
 
   protected updated() {
-    this.layoutGutter();
+    this.layout();
     const area = this.textarea();
     if (area && !this.resizeObserver && typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(() => this.layoutGutter());
+      this.resizeObserver = new ResizeObserver(() => this.layout());
       this.resizeObserver.observe(area);
     }
   }
 
-  /** Label every line with the visit its first word sings in — a line that opens on its own
-   *  anchor too, so the margin reads as one column — set at the height the text box gives that
-   *  line (a twin of the box measures the wrapping). */
-  private layoutGutter() {
+  /** The painted copy's rows, one per line of the text. */
+  private rows(): HTMLElement[] {
+    return [...this.renderRoot.querySelector('.paint-inner')?.children ?? []] as HTMLElement[];
+  }
+
+  /**
+   * Paint the text beneath the box, and the rail beside it: a dot on each line,
+   * at the height the box gives it, labelled with the bar played the line starts
+   * in and that bar's `bar.pass`. The rail runs on between the lines of a block,
+   * dashed where a line ends on bars nobody sings, and breaks at a header.
+   */
+  private layout() {
     const area = this.textarea();
-    const inner = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
-    const mirror = this.renderRoot.querySelector<HTMLElement>('.mirror');
-    if (!area || !inner || !mirror || !this.doc) return;
-    if (this.labelsFor !== this.doc) { this.labels = lyricVisitLabels(this.doc); this.labelsFor = this.doc; }
+    const gutter = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
+    const paint = this.renderRoot.querySelector<HTMLElement>('.paint');
+    const inner = paint?.firstElementChild as HTMLElement | null | undefined;
+    if (!area || !gutter || !paint || !inner || !this.doc) return;
+    Object.assign(paint.style, {
+      left: `${area.offsetLeft}px`, top: `${area.offsetTop}px`,
+      width: `${area.offsetWidth}px`, height: `${area.offsetHeight}px`
+    });
+    inner.style.width = `${area.clientWidth}px`;
     const lines = this.text.split('\n');
-    const starts: number[] = [];
-    for (let at = 0, i = 0; i < lines.length; at += lines[i]!.length + 1, i++) starts.push(at);
-    const lineOf = (offset: number) => { let lo = 0, hi = starts.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid]! <= offset) lo = mid; else hi = mid - 1; } return lo; };
-    const first = new Map<number, { from: number; to: number; ordinal: number }>();
-    for (const token of this.parsed.tokens) {
-      if (token.ordinal === undefined) continue;
-      const line = lineOf(token.from);
-      if (!first.has(line)) first.set(line, { from: token.from, to: token.to, ordinal: token.ordinal });
-    }
-    mirror.style.width = `${area.clientWidth + 2}px`;
-    mirror.style.left = `${area.offsetLeft}px`;
-    mirror.replaceChildren(...lines.map(line => { const row = document.createElement('div'); row.textContent = line || '\u200b'; return row; }));
-    const rows = [...mirror.children] as HTMLElement[];
-    inner.replaceChildren(...[...first].map(([line, token]) => {
-      const label = document.createElement('span');
-      label.textContent = this.labels[token.ordinal] ?? '';
-      label.title = `Go to ${label.textContent}`;
+    const headers = new Set(this.parsed.headers ?? []);
+    inner.replaceChildren(...lines.map((line, index) => paintLine(line, headers.has(index))));
+    const rows = this.rows();
+    // A row's top, past the box's 1px border.
+    const rowTop = (line: number) => 1 + (rows[line]?.offsetTop ?? 0);
+    const half = (13 * 1.7) / 2;
+    const starts = this.parsed.starts ?? [];
+    const rails = starts.slice(0, -1).flatMap((start, i) => {
+      const next = starts[i + 1]!;
+      if (next.block !== start.block) return [];
+      const rail = document.createElement('div');
+      rail.className = start.gap ? 'rail gap' : 'rail';
+      rail.style.top = `${rowTop(start.textLine) + half}px`;
+      rail.style.height = `${rowTop(next.textLine) - rowTop(start.textLine)}px`;
+      return [rail];
+    });
+    gutter.replaceChildren(...rails, ...starts.map(start => {
+      const label = document.createElement('div');
+      label.className = start.sung ? 'start' : 'start silent';
+      const played = document.createElement('span'), visit = document.createElement('span'), dot = document.createElement('span');
+      played.className = 'played'; played.textContent = String(start.ordinal + 1);
+      visit.className = 'visit'; visit.textContent = this.labels[start.ordinal] ?? '';
+      dot.className = 'dot';
+      label.append(played, visit, dot);
+      label.style.top = `${rowTop(start.textLine)}px`;
+      label.addEventListener('mouseenter', () => this.showTip(label, start.ordinal));
+      label.addEventListener('mouseleave', () => this.showTip(null, 0));
       // A label is a way to the line's first word: the caret goes there, and the cursor with it.
       label.addEventListener('mousedown', event => event.preventDefault());
       label.addEventListener('click', () => {
+        const word = this.parsed.tokens.find(token => token.ordinal !== undefined && atLine(this.text, token.from) === start.textLine);
+        const at = word?.from ?? lineStart(this.text, start.textLine);
         area.focus();
-        area.setSelectionRange(token.from, token.to);
-        this.caretAt(token.from);
+        area.setSelectionRange(at, word?.to ?? at);
+        this.caretAt(at);
       });
-      // The row's top (past the box's 1px border) plus half the gap between a 13px line box (1.7) and this 11px label.
-      label.style.top = `${1 + (rows[line]?.offsetTop ?? 0) + (13 * 1.7 - 11) / 2}px`;
       return label;
     }));
     this.onScroll();
   }
 
-  /** Outline the marked word where the twin lays it out, clipped to the box's text area. */
+  /** The hover card on a margin label: what its two numbers mean. */
+  private showTip(label: HTMLElement | null, ordinal: number) {
+    const editor = this.renderRoot.querySelector<HTMLElement>('.editor');
+    let tip = editor?.querySelector<HTMLElement>('.tip') ?? null;
+    if (!label || !editor) { tip?.remove(); return; }
+    const [bar, pass] = (this.labels[ordinal] ?? '').split('.').map(Number);
+    if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; editor.append(tip); }
+    tip.replaceChildren();
+    const lead = document.createElement('b');
+    lead.textContent = `${ordinalWord(ordinal + 1)} bar played`;
+    tip.append(lead, ` · bar ${bar} of the score, ${ordinalWord(pass ?? 1)} time through`);
+    const r = label.getBoundingClientRect(), e = editor.getBoundingClientRect();
+    tip.style.left = `${r.left - e.left}px`;
+    tip.style.top = `${r.bottom - e.top + 4}px`;
+  }
+
+  /** Outline the marked word where the painted copy lays it out, clipped to the box's text area. */
   private layoutMark() {
     const area = this.textarea();
     const marks = this.renderRoot.querySelector<HTMLElement>('.marks');
-    const mirror = this.renderRoot.querySelector<HTMLElement>('.mirror');
     const mark = marks?.firstElementChild as HTMLElement | null | undefined;
-    if (!area || !marks || !mark || !mirror) return;
+    if (!area || !marks || !mark) return;
     Object.assign(marks.style, {
       left: `${area.offsetLeft + 1}px`, top: `${area.offsetTop + 1}px`,
       width: `${area.clientWidth}px`, height: `${area.clientHeight}px`
     });
     const span = this.marked;
-    const line = span ? this.text.slice(0, span.from).split('\n').length - 1 : -1;
-    const text = (mirror.children[line] as HTMLElement | undefined)?.firstChild;
-    mark.hidden = !span || !text;
-    if (!span || !text) return;
-    const column = span.from - (this.text.lastIndexOf('\n', span.from - 1) + 1);
-    const range = document.createRange();
-    range.setStart(text, Math.min(column, text.textContent!.length));
-    range.setEnd(text, Math.min(column + span.to - span.from, text.textContent!.length));
-    const word = range.getBoundingClientRect(), twin = mirror.getBoundingClientRect();
-    // The twin sits where the box does, unscrolled; the marks layer starts inside the box's border.
+    const line = span ? atLine(this.text, span.from) : -1;
+    const row = this.rows()[line];
+    const column = span ? span.from - lineStart(this.text, line) : 0;
+    const range = span && row ? rangeIn(row, column, column + span.to - span.from) : null;
+    mark.hidden = !range;
+    if (!range) return;
+    // The painted copy scrolls with the box, so the word is where it is drawn.
+    const word = range.getBoundingClientRect(), layer = marks.getBoundingClientRect();
     Object.assign(mark.style, {
-      left: `${word.left - twin.left - 1 - 2}px`,
-      top: `${mirror.offsetTop + word.top - twin.top - (area.offsetTop + 1) - area.scrollTop - 1}px`,
+      left: `${word.left - layer.left - 2}px`, top: `${word.top - layer.top - 1}px`,
       width: `${word.width + 4}px`, height: `${word.height + 2}px`
     });
   }
 
   private onScroll = () => {
     const area = this.textarea();
-    const inner = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
+    const gutter = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
+    const inner = this.renderRoot.querySelector<HTMLElement>('.paint-inner');
+    if (area && gutter) gutter.style.transform = `translateY(${-area.scrollTop}px)`;
     if (area && inner) inner.style.transform = `translateY(${-area.scrollTop}px)`;
+    this.showTip(null, 0);
     this.layoutMark();
   };
 
@@ -431,6 +535,7 @@ export class LyricTextEditor extends LitElement {
 
   private reparse() {
     if (!this.doc) return;
+    if (this.labelsFor !== this.doc) { this.labels = lyricVisitLabels(this.doc); this.labelsFor = this.doc; }
     this.parsed = parseLyricText(this.doc, this.partIndex, this.text);
     this.warnings = lyricPassWarnings(this.doc, this.partIndex, this.parsed);
     this.edits = this.parsed.diagnostics.length === 0
@@ -602,13 +707,13 @@ export class LyricTextEditor extends LitElement {
           @blur=${this.onBlur}
           @scroll=${this.onScroll}
         ></textarea>
-        <div class="mirror" aria-hidden="true"></div>
+        <div class="paint" aria-hidden="true"><div class="paint-inner"></div></div>
         <div class="marks" aria-hidden="true"><span hidden></span></div>
         </div>
         <div class="diagnostics">
           ${shown.map(d => html`
             <span class="diagnostic${d.severity === 'warning' ? ' warning' : ''}">
-              ${d.bar !== undefined ? `bar ${d.bar} — ` : `line ${d.textLine + 1} — `}${d.message}
+              ${d.played !== undefined ? `${d.played} (${this.labels[d.played - 1] ?? d.bar}) — ` : d.bar !== undefined ? `bar ${d.bar} — ` : `line ${d.textLine + 1} — `}${d.message}
             </span>
           `)}
         </div>
@@ -626,4 +731,49 @@ declare global {
   interface HTMLElementTagNameMap {
     'mnx-lyric-text-editor': LyricTextEditor;
   }
+}
+
+/** The 0-based line an offset into the text is on, and where a line begins. */
+const atLine = (text: string, offset: number) => text.slice(0, offset).split('\n').length - 1;
+const lineStart = (text: string, line: number) => text.split('\n').slice(0, line).reduce((at, row) => at + row.length + 1, 0);
+
+/** 1st, 2nd, 3rd, 4th… */
+const ordinalWord = (n: number) =>
+  `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th')}`;
+
+/** A range over characters `from`–`to` of a painted row, whose text is split across spans. */
+function rangeIn(row: Element, from: number, to: number): Range | null {
+  const range = document.createRange();
+  const walker = document.createTreeWalker(row, NodeFilter.SHOW_TEXT);
+  let at = 0, started = false;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const length = node.textContent!.length;
+    if (!started && from <= at + length) { range.setStart(node, from - at); started = true; }
+    if (started && to <= at + length) { range.setEnd(node, to - at); return range; }
+    at += length;
+  }
+  return null;
+}
+
+/** One line of the text, painted: the marks that place words (bar lines, skips, runs of
+ *  empty bars, the hyphens and underscores inside a word) faded back from the words. */
+function paintLine(line: string, header: boolean): HTMLElement {
+  const row = document.createElement('div');
+  const span = (className: string, text: string) => {
+    const el = document.createElement('span'); el.className = className; el.textContent = text; return el;
+  };
+  if (header) { row.append(span('head', line)); return row; }
+  for (const piece of line.split(/(\s+)/)) {
+    if (piece === '' || /^\s+$/.test(piece)) row.append(piece);
+    else if (piece === '|') row.append(span('bar', piece));
+    else if (/^[x×]\d+$/i.test(piece)) row.append(span('run', piece));
+    else if (/^_+$/.test(piece)) row.append(span('skip', piece));
+    else for (const part of piece.split(/(-+|_+|~|^\\)/)) {
+      if (part === '') continue;
+      row.append(/^-+$/.test(part) ? span('hy', part) : /^(_+|\\)$/.test(part) ? span('skip', part) : part);
+    }
+  }
+  // An empty line still takes a row's height.
+  if (!line) row.append('​');
+  return row;
 }

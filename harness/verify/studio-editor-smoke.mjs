@@ -237,15 +237,15 @@ try {
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'a second commit in the same visit made a second undo step');
   await c.evaluate(`${page}.editor.handleIntent({ type: 'redo' })`);
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["sung","song"]');
-  // Text that does not parse cannot be committed: it is kept as a draft and offered back.
-  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'half-'; t.dispatchEvent(new Event('input')); }`);
+  // Text that does not parse — here, a bar number from the old format — cannot be committed: it is kept as a draft and offered back.
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| half'; t.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.close').click()`);
   await wait(`!${lyrics}`);
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["sung","song"]', 'text that does not parse reached the document');
   await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
-  await wait(`${lyrics}?.shadowRoot?.querySelector('textarea')?.value === 'half-'`);
-  // Fixed, it commits like any other text — and the draft goes. (Anchored: an anchor-free caret names no visit.)
-  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| sing song'; t.dispatchEvent(new Event('input')); t.dispatchEvent(new Event('blur')); }`);
+  await wait(`${lyrics}?.shadowRoot?.querySelector('textarea')?.value === '1.1| half'`);
+  // Fixed, it commits like any other text — and the draft goes.
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); t.dispatchEvent(new Event('blur')); }`);
   await wait(`${sung(`${page}.editor.document`)} === '["sing","song"]' && localStorage.getItem('mnx-studio-lyric-draft:${pieceId}:0') === null`);
   // The caret is the cursor: a click on the second word moves the ONE cursor (and the tray) to its note,
   // and the panel draws no box of its own.
@@ -254,14 +254,22 @@ try {
     t.setSelectionRange(at, at); t.dispatchEvent(new MouseEvent('click')); }`);
   await wait(`${page}.editor.session.cursor.onset.num > 0 && ${piece}.querySelector('mnx-player').cursorPlace?.metricOffset.num > 0n`);
   assert.equal(await c.evaluate(`!!${viewer}.shadowRoot.querySelector('svg .enclosure-preview')`), false, 'the lyric caret drew its own cursor');
-  // Every line the margin labels — an anchored one too — is a way to its first word: a click on
-  // the second line's label moves the cursor there.
+  // The margin labels every line with the bar played it starts in and that bar's bar.pass, and each
+  // label is a way to its line's first word: a click on the second line's moves the cursor there.
   await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
-  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| sing\\n song'; t.dispatchEvent(new Event('input')); }`);
-  await wait(`[...${lyrics}.shadowRoot.querySelectorAll('.gutter span')].map(s => s.textContent).join() === '1.1,1.1' && ${page}.editor.session.cursor.onset.num === 0`);
-  await c.evaluate(`${lyrics}.shadowRoot.querySelectorAll('.gutter span')[1].click()`);
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing\\n song'; t.dispatchEvent(new Event('input')); }`);
+  await wait(`[...${lyrics}.shadowRoot.querySelectorAll('.gutter .start')].map(s => s.textContent).join() === '11.1,11.1' && ${page}.editor.session.cursor.onset.num === 0`);
+  // Hovered, a label says what its two numbers mean.
+  await c.evaluate(`${lyrics}.shadowRoot.querySelectorAll('.gutter .start')[1].dispatchEvent(new MouseEvent('mouseenter'))`);
+  assert.equal(await c.evaluate(`${lyrics}.shadowRoot.querySelector('.tip')?.textContent`), '1st bar played · bar 1 of the score, 1st time through');
+  await c.evaluate(`${lyrics}.shadowRoot.querySelectorAll('.gutter .start')[1].dispatchEvent(new MouseEvent('mouseleave'))`);
+  await c.evaluate(`${lyrics}.shadowRoot.querySelectorAll('.gutter .start')[1].click()`);
   await wait(`${page}.editor.session.cursor.onset.num > 0`);
-  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| sing song'; t.dispatchEvent(new Event('input')); }`);
+  // The box's own text is transparent; what shows is the painted copy beneath it, line for line.
+  assert.deepEqual(JSON.parse(await c.evaluate(`JSON.stringify((() => { const r = ${lyrics}.shadowRoot, t = r.querySelector('textarea');
+    return [getComputedStyle(t).color, [...r.querySelectorAll('.paint-inner > div')].map(row => row.textContent).join('\\n') === t.value]; })())`)),
+    ['rgba(0, 0, 0, 0)', true], 'the lyric text is not painted beneath the box');
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
   // Side panels are exclusive, and switching away commits what the lyric panel holds.
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'new words'; t.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${action('Keys')}.click()`);

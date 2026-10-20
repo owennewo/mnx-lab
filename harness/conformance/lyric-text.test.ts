@@ -90,22 +90,25 @@ describe('parse', () => {
     ]);
   });
 
-  it('bar checks resync, numbered checks jump, and both complain honestly', () => {
-    const jumped = parseLyricText(doc, 0, '3| last');
-    expect(jumped.diagnostics).toEqual([]);
-    expect([...jumped.lines[0]!.syllables.keys()]).toEqual([7]);
+  it('bar lines step a bar at a time, a run of empty bars several, and both complain honestly', () => {
+    const stepped = parseLyricText(doc, 0, '| | last');
+    expect(stepped.diagnostics).toEqual([]);
+    expect([...stepped.lines[0]!.syllables.keys()]).toEqual([7]);
+    // `×2` (or `x2`, as typed) is two bars without words: the bar line after it leads into bar 3.
+    for (const run of ['×2 | last', 'x2 | last'])
+      expect([...parseLyricText(doc, 0, run).lines[0]!.syllables.keys()]).toEqual([7]);
 
-    const spilled = parseLyricText(doc, 0, 'a b c d 2|');
-    expect(spilled.diagnostics).toMatchObject([{ textLine: 0, bar: 2, message: expect.stringContaining('too many syllables') }]);
+    const spilled = parseLyricText(doc, 0, 'a b c d |');
+    expect(spilled.diagnostics).toMatchObject([{ textLine: 0, bar: 2, played: 2, message: expect.stringContaining('too many syllables') }]);
 
-    const beyond = parseLyricText(doc, 0, '9| x');
-    expect(beyond.diagnostics[0]).toMatchObject({ message: expect.stringContaining('beyond the music') });
+    const beyond = parseLyricText(doc, 0, '| | | x');
+    expect(beyond.diagnostics[0]).toMatchObject({ message: expect.stringContaining('past the end of the music') });
 
     const overflow = parseLyricText(doc, 0, 'a b c d e f g h i j');
     expect(overflow.diagnostics).toMatchObject([{ message: expect.stringContaining('more syllables than sung notes') }]);
 
-    const midWord = parseLyricText(doc, 0, 'sleep-');
-    expect(midWord.diagnostics).toMatchObject([{ message: expect.stringContaining('mid-word') }]);
+    // Bar numbers are gone: the text runs from the first bar played.
+    expect(parseLyricText(doc, 0, 'one\n3| last').diagnostics).toMatchObject([{ textLine: 1, message: expect.stringContaining('no bar numbers') }]);
   });
 
   it('headers pick language groups and ordinals; lines mint the numeric convention', () => {
@@ -119,8 +122,8 @@ describe('parse', () => {
   });
 
   it('maps tokens to walk entries for the cross-highlight', () => {
-    const parsed = parseLyricText(doc, 0, 'one two\nla la');
-    const spans = parsed.tokens.map(span => ({ entry: span.entryIndex, text: 'one two\nla la'.slice(span.from, span.to) }));
+    const parsed = parseLyricText(doc, 0, 'one two\n2:\nla la');
+    const spans = parsed.tokens.map(span => ({ entry: span.entryIndex, text: 'one two\n2:\nla la'.slice(span.from, span.to) }));
     expect(spans).toEqual([
       { entry: 0, text: 'one' },
       { entry: 1, text: 'two' },
@@ -132,7 +135,8 @@ describe('parse', () => {
 
 describe('serialize', () => {
   it('projects the verse-labels scenario: stacking order, labels stay in metadata', () => {
-    expect(serializeLyricText(verseLabelsDoc(), 0)).toBe('1.1| Shine bright\n1.1| 2: Morn-ing');
+    // A verse no pass reaches (a hymn's) is a block of its own, from the first bar played again.
+    expect(serializeLyricText(verseLabelsDoc(), 0)).toBe('Shine bright\n2:\nMorn-ing');
   });
 
   it('round-trips: parse(serialize(doc)) diffs to nothing', () => {
@@ -146,7 +150,7 @@ describe('serialize', () => {
 
   it('spells bar checks between texted bars and holds melisma with underscores', () => {
     const doc = appliedSongDoc();
-    expect(serializeLyricText(doc, 0)).toBe('1.1| Twin-kle lit- | -tle star_ you~are');
+    expect(serializeLyricText(doc, 0)).toBe('Twin-kle lit- | -tle star_ you~are');
   });
 });
 
@@ -173,9 +177,9 @@ describe('the pass bound (phase 3)', () => {
     doc.global!.measures![2]!.repeatEnd = {};
     const okay = parseLyricText(doc, 0, 'one two\nthree four');
     expect(lyricPassWarnings(doc, 0, okay)).toEqual([]);
-    const spilled = parseLyricText(doc, 0, 'one two\nthree four\nfive six');
+    const spilled = parseLyricText(doc, 0, 'one two\n3:\nfive six');
     expect(lyricPassWarnings(doc, 0, spilled)).toMatchObject([
-      { textLine: 2, bar: 1, severity: 'warning', message: expect.stringContaining('verses 1, 2') }
+      { textLine: 1, bar: 1, severity: 'warning', message: expect.stringContaining('verses 1, 2') }
     ]);
   });
 
@@ -193,8 +197,8 @@ describe('the pass bound (phase 3)', () => {
     doc.global!.measures![1]!.ending = { numbers: [1], duration: 1 };
     doc.global!.measures![1]!.repeatEnd = {};
     doc.global!.measures![2]!.ending = { numbers: [2], duration: 1 };
-    // Verse 1 text on the second ending's bar: it only sings verse 2.
-    const parsed = parseLyricText(doc, 0, '3| last');
+    // Verse 1 text on the second ending's bar (1.1, 2.1, 1.2, then 3.1): it only sings verse 2.
+    const parsed = parseLyricText(doc, 0, '1:\n| | | last');
     expect(lyricPassWarnings(doc, 0, parsed)).toMatchObject([
       { textLine: 0, bar: 3, severity: 'warning', message: expect.stringContaining('verse 2') }
     ]);
@@ -301,7 +305,7 @@ function unchanged(doc: MnxStructure) {
   return text;
 }
 
-describe('performance anchors and canonical wrapping', () => {
+describe('performance order and canonical wrapping', () => {
   it('finishes all four visits to bars 9–12 before bar 13', () => {
     const doc = bars(14);
     doc.global.measures[8]!.repeatStart = {};
@@ -309,49 +313,63 @@ describe('performance anchors and canonical wrapping', () => {
     put(doc, 9, '1', 'first'); put(doc, 12, '1', 'end');
     put(doc, 9, '2', 'second'); put(doc, 10, '3', 'third'); put(doc, 9, '4', 'fourth');
     put(doc, 13, '1', 'after');
-    // One run, anchored once: each later line opens on the `|` that carries it on (9.2, 10.3, 9.4, 13.1).
-    expect(unchanged(doc)).toBe('9.1| first | | | end\n| second\n| | | | | third\n| | | fourth\n| | | | after');
+    // No bar numbers: a lead-in run stands alone, and bars nobody sings close the line before them.
+    const text = unchanged(doc);
+    expect(text).toBe('×8 |\nfirst | ×2 |\nend |\nsecond | ×4 |\nthird | ×2 |\nfourth | ×3 |\nafter');
+    // The margin is told where each line starts (9.1, 12.1, 9.2, 10.3, 9.4, 13.1) and which cross silence.
+    expect(parseLyricText(doc, 0, text).starts!.map(s => [s.ordinal, s.sung, s.gap])).toEqual([
+      [0, false, true], [8, true, true], [11, true, false], [12, true, true], [17, true, true], [20, true, true], [24, true, false]
+    ]);
+  });
+
+  it('a line that opens on a bar line starts in the bar it leads into, and a header starts a block', () => {
+    const doc = bars(3);
+    const parsed = parseLyricText(doc, 0, 'a\n| b\n2:\n| c');
+    expect(parsed.diagnostics).toEqual([]);
+    expect(parsed.starts!.map(s => [s.textLine, s.ordinal, s.block])).toEqual([[0, 0, 0], [1, 1, 0], [3, 1, 1]]);
+    expect(parsed.headers).toEqual([2]);
   });
 
   it('a bar added inside a run nudges every word after it along; taken out again, they come back', () => {
     const doc = bars(8);
     for (let bar = 1; bar <= 6; bar++) put(doc, bar, '1', `w${bar}`);
     const text = unchanged(doc);
-    expect(text).toBe('1.1| w1 | w2 | w3 | w4\n| w5 | w6');
+    expect(text).toBe('w1 | w2 | w3 | w4 |\nw5 | w6');
     const nudged = parseLyricText(doc, 0, text.replace('w2', '| w2'));
     expect(nudged.diagnostics).toEqual([]);
     // w2…w6 each move one bar on — across the line break, into bar 7.
     expect(nudged.lines[0]!.syllables.size).toBe(6);
     const session = new EditorSession(doc);
     session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, nudged) });
-    expect(unchanged(session.doc)).toBe('1.1| w1 | | w2 | w3\n| w4 | w5 | w6');
-    const back = parseLyricText(session.doc, 0, '1.1| w1 | w2 | w3 | w4\n| w5 | w6');
+    expect(unchanged(session.doc)).toBe('w1 | ×1 |\nw2 | w3 | w4 | w5 |\nw6');
+    const back = parseLyricText(session.doc, 0, 'w1 | w2 | w3 | w4 |\nw5 | w6');
     session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, back) });
     expect(unchanged(session.doc)).toBe(text);
   });
 
-  it('only a silence longer than a line starts a new anchored run', () => {
+  it('bars nobody sings are one run, however many, closing the line before them', () => {
     const doc = bars(12);
     put(doc, 1, '1', 'a'); put(doc, 6, '1', 'b'); put(doc, 12, '1', 'c');
-    // Four empty bars are carried by pipes; five are a new run with its own anchor.
-    expect(unchanged(doc)).toBe('1.1| a\n| | | | | b\n12.1| c');
+    expect(unchanged(doc)).toBe('a | ×4 |\nb | ×5 |\nc');
   });
 
   it('bare pipes advance across empty bars and an all-rest bar', () => {
     const doc = bars(4);
     doc.parts[0]!.measures[1]!.sequences[0]!.content = [{ duration: { base: 'whole' }, rest: {} }];
-    const parsed = parseLyricText(doc, 0, '1.1| one | | three | four');
-    expect(parsed.diagnostics).toEqual([]);
-    expect(parsed.lines[0]!.syllables.size).toBe(3);
-    expect(planLyricEdits(doc, 0, parsed).flatMap(e => 'noteKey' in e ? [e.noteKey] : [])).toEqual(['b0n0', 'b2n0', 'b3n0']);
+    for (const text of ['one | | three | four', 'one | ×1 | three | four']) {
+      const parsed = parseLyricText(doc, 0, text);
+      expect(parsed.diagnostics).toEqual([]);
+      expect(parsed.lines[0]!.syllables.size).toBe(3);
+      expect(planLyricEdits(doc, 0, parsed).flatMap(e => 'noteKey' in e ? [e.noteKey] : [])).toEqual(['b0n0', 'b2n0', 'b3n0']);
+    }
   });
 
   it('wraps at four bars and at 80 characters, preserving cross-line syllables', () => {
     const doc = bars(6);
     for (let bar = 1; bar <= 6; bar++) put(doc, bar, '1', `word${bar}`);
-    expect(unchanged(doc)).toBe('1.1| word1 | word2 | word3 | word4\n| word5 | word6');
-    put(doc, 1, '1', 'x'.repeat(70));
-    expect(unchanged(doc).split('\n')[1]).toMatch(/^\| word2/);
+    expect(unchanged(doc)).toBe('word1 | word2 | word3 | word4 |\nword5 | word6');
+    put(doc, 1, '1', 'y'.repeat(75));
+    expect(unchanged(doc).split('\n').slice(0, 2)).toEqual([`${'y'.repeat(75)} |`, 'word2 | word3 | word4 | word5 |']);
     const walk = lyricEventWalk(doc, 0);
     walk[6]!.event.lyrics!.lines!['1'] = { text: 'begin', type: 'start' };
     walk[8]!.event.lyrics!.lines!['1'] = { text: 'end', type: 'end' };
@@ -367,36 +385,31 @@ describe('performance anchors and canonical wrapping', () => {
     doc.global.measures[2]!.jump = { type: 'dsalfine', location: { fraction: [1, 1] } };
     put(doc, 1, '1', 'first'); put(doc, 1, '2', 'second');
     // The return is verse 3, and nothing is written there — so it prints nothing, rather than verse 1 again.
-    expect(unchanged(doc)).toBe('1.1| first\n| | second');
-    const parsed = parseLyricText(doc, 0, '1.1| changed\n1.2| second');
+    expect(unchanged(doc)).toBe('first | ×1 |\nsecond');
+    const parsed = parseLyricText(doc, 0, 'changed | ×1 |\nsecond');
     expect(planLyricEdits(doc, 0, parsed)).toMatchObject([{ line: '1', text: 'changed' }]);
-    // Words typed at the return are its own: a third row, and verse 1 is untouched.
-    const third = parseLyricText(doc, 0, '1.1| first\n1.2| second\n1.3| third');
-    expect(third.newRows).toHaveLength(1);
+    // Words typed at the return (1.3, after 2.2 and 3.1) are its own: a third row, and verse 1 is untouched.
+    const third = parseLyricText(doc, 0, 'first | ×1 |\nsecond | ×2 |\nthird');
+    // A new row with words needs no declaration: its words keep it (a Guitar Pro save could not).
+    expect(third.lines.filter(line => line.minted).map(line => line.ordinal)).toEqual([3]);
+    expect(third.newRows).toBeUndefined();
     expect(planLyricEdits(doc, 0, third).filter(edit => edit.op === 'setSyllable')).toMatchObject([{ text: 'third' }]);
-    // Two anchors naming the same stored row explicitly still have to agree.
-    const conflict = parseLyricText(doc, 0, '1.1| 2: changed\n1.2| different');
+    // A block naming the same stored row explicitly still has to agree with the pass that sings it.
+    const conflict = parseLyricText(doc, 0, '×2 | different\n2:\nchanged');
     expect(conflict.diagnostics.map(d => d.message)).toEqual([
-      '1.1 sings “changed” and 1.2 sings “different”, but both are verse 2 of the same written notes, which hold one set of words — make them match'
+      '1.2 sings “different” and 1.1 sings “changed”, but both are verse 2 of the same written notes, which hold one set of words — make them match'
     ]);
     expect(planLyricEdits(doc, 0, conflict)).toEqual([]);
   });
 
-  it('a passage that runs on into the next anchor is named once, on its own line, with the words that ran on', () => {
+  it('a verse two blocks write differently at one place is named once, on the later block', () => {
     const doc = bars(3);
-    // Three syllables from 1.1 fill bar 1 (two notes) and run one into bar 2, which 2.1 also writes.
-    const parsed = parseLyricText(doc, 0, '1.1| a b c\n2.1| d e');
-    expect(parsed.diagnostics).toEqual([{ textLine: 0, bar: 2,
-      message: '1.1 runs 1 syllable on into 2.1 (“c”), which has words of its own — move them into the 2.1 line, or delete the 2.1| anchor to let the text flow on' }]);
+    const parsed = parseLyricText(doc, 0, 'a b\n1:\nc');
+    expect(parsed.diagnostics).toEqual([{ textLine: 1,
+      message: 'verse 1 at 1.1 is written twice, differently — in the main text and under “1:”; keep one' }]);
     expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
     // The same word at the same place is no disagreement.
-    expect(parseLyricText(doc, 0, '1.1| a b d\n2.1| d e').diagnostics).toEqual([]);
-    // Deleting the anchor lets the words flow on.
-    expect(parseLyricText(doc, 0, '1.1| a b c d e').diagnostics).toEqual([]);
-    // Anchoring one place twice says so.
-    expect(parseLyricText(doc, 0, '2.1| x\n2.1| y').diagnostics.map(d => d.message)).toEqual([
-      '2.1 is anchored twice — keep one 2.1| and put its words together'
-    ]);
+    expect(parseLyricText(doc, 0, 'a b\n1:\na').diagnostics).toEqual([]);
   });
 
   it('first visit to a second ending maps to verse two, not verse one', () => {
@@ -406,12 +419,12 @@ describe('performance anchors and canonical wrapping', () => {
     doc.global.measures[1]!.repeatEnd = {};
     doc.global.measures[2]!.ending = { numbers: [2], duration: 1 };
     put(doc, 1, '1', 'first'); put(doc, 3, '2', 'ending');
-    expect(unchanged(doc)).toBe('1.1| first\n| | | ending');
+    expect(unchanged(doc)).toBe('first | ×2 |\nending');
   });
 
   it('accepts phrase newlines and maps caret offsets back to the original buffer', () => {
     const doc = bars(2);
-    const text = '1.1| one\ntwo |\nthree';
+    const text = 'one\ntwo |\nthree';
     const parsed = parseLyricText(doc, 0, text);
     expect(parsed.diagnostics).toEqual([]);
     expect(parsed.tokens.map(t => [text.slice(t.from, t.to), t.entryIndex])).toEqual([['one', 0], ['two', 1], ['three', 2]]);
@@ -421,24 +434,24 @@ describe('performance anchors and canonical wrapping', () => {
     const doc = bars(2);
     doc.global.measures[0]!.repeatStart = {};
     doc.global.measures[1]!.repeatEnd = {};
-    const parsed = parseLyricText(doc, 0, '1.1| first\n1.2| second');
+    const parsed = parseLyricText(doc, 0, 'first | ×1 |\nsecond');
     expect(parsed.lines.map(l => l.lineId)).toEqual(['1', '2']);
   });
 
-  it('rejects nonexistent occurrences and overflow without offering destructive edits', () => {
+  it('rejects bar numbers, runs past the end, runs among words and overflow without offering destructive edits', () => {
     const doc = bars(2);
-    for (const text of ['1.0| word', '1.2| word', '0.1| word', '3.1| word', '1.1| a b c 2.1| d']) {
+    for (const text of ['1.1| word', 'word 2| more', 'word | | x', '×3 | word', 'a ×1 | b', 'a b c d e', 'a b| c']) {
       const parsed = parseLyricText(doc, 0, text);
-      expect(parsed.diagnostics.length).toBeGreaterThan(0);
+      expect(parsed.diagnostics.length, text).toBeGreaterThan(0);
       expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
     }
-    expect(parseLyricText(doc, 0, '1.1| a b c | d').diagnostics[0]!.message).toContain('too many syllables');
+    expect(parseLyricText(doc, 0, 'a b c | d').diagnostics[0]!.message).toContain('too many syllables');
   });
 
   it('preserves translations and explicit hymn rows', () => {
     const doc = verseLabelsDoc();
     doc.global.lyrics!.lineMetadata!['verse2']!.lang = 'nl';
-    expect(unchanged(doc)).toBe('1.1| Shine bright\n1.1| nl: Morn-ing');
+    expect(unchanged(doc)).toBe('Shine bright\nnl:\nMorn-ing');
   });
 });
 
@@ -448,7 +461,7 @@ it('keeps only events inside a partial-bar navigation visit', () => {
   doc.global.measures[1]!.jump = { type: 'segno', location: { fraction: [1, 1] } };
   put(doc, 1, '1', 'before'); put(doc, 1, '1', 'after', 2);
   // The partial D.S. visit is verse 2, unwritten — it does not sing verse 1's 'after' again.
-  expect(unchanged(doc)).toBe('1.1| before_ after');
+  expect(unchanged(doc)).toBe('before_ after');
 });
 
 it('wraps a hyphenated word across canonical lines without treating the wrap as a word end', () => {
@@ -457,11 +470,11 @@ it('wraps a hyphenated word across canonical lines without treating the wrap as 
   const walk = lyricEventWalk(doc, 0);
   walk[6]!.event.lyrics!.lines!['1'] = { text: 'be', type: 'start' };
   walk[8]!.event.lyrics!.lines!['1'] = { text: 'yond', type: 'end' };
-  expect(unchanged(doc)).toBe('1.1| word | word | word | be-\n| -yond');
+  expect(unchanged(doc)).toBe('word | word | word | be- |\n-yond');
 });
 
-it('rejects ambiguous or malformed numbered markers in anchored text', () => {
-  for (const text of ['1.1| one 2| two', '1.1| one 2.x| two']) {
+it('rejects numbered and malformed bar markers', () => {
+  for (const text of ['one 2| two', 'one 2.x| two']) {
     expect(parseLyricText(bars(2), 0, text).diagnostics.length).toBeGreaterThan(0);
   }
 });
@@ -473,31 +486,34 @@ it('retains the ordinal of a newly entered sparse verse and arbitrary existing r
     doc.global.measures[1]!.repeatEnd = {};
     if (existing) put(doc, 1, 'verse-first', 'old');
     const session = new EditorSession(doc);
-    const parsed = parseLyricText(doc, 0, `${existing ? '1.1| old\n' : ''}1.2| 2: new`);
+    // Verse 2 at bar 1's second visit (1.1, 2.1, then 1.2), named by its header.
+    const parsed = parseLyricText(doc, 0, `${existing ? 'old\n' : ''}2:\n×2 | new`);
     expect(parsed.diagnostics).toEqual([]);
     session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, parsed) });
-    expect(unchanged(session.doc)).toBe(existing ? '1.1| old\n| | new' : '1.2| new');
+    expect(unchanged(session.doc)).toBe(existing ? 'old | ×1 |\nnew' : '×2 |\nnew');
   }
 });
 
-it('escapes header-shaped lyric text in canonical output', () => {
-  const doc = bars(1);
-  put(doc, 1, '1', 'nl:');
-  expect(unchanged(doc)).toBe('1.1| \\nl:');
+it('escapes header-shaped and run-shaped lyric text in canonical output', () => {
+  for (const word of ['nl:', 'x4']) {
+    const doc = bars(1);
+    put(doc, 1, '1', word);
+    expect(unchanged(doc)).toBe(`\\${word}`);
+  }
 });
 
-it('accepts an anchor on a real final bar containing only rests', () => {
+it('accepts a bar line into a real final bar containing only rests', () => {
   const doc = bars(2);
   doc.parts[0]!.measures[1]!.sequences[0]!.content = [{ duration: { base: 'whole' }, rest: {} }];
-  expect(parseLyricText(doc, 0, '2.1|').diagnostics).toEqual([]);
+  expect(parseLyricText(doc, 0, 'one |').diagnostics).toEqual([]);
 });
 
-it('places each anchored word on its performed visit and onset, where the caret moves the cursor', () => {
+it('places each word on its performed visit and onset, where the caret moves the cursor', () => {
   const doc = bars(2);
   doc.global.measures[0]!.repeatStart = {};
   doc.global.measures[0]!.repeatEnd = {};
   // Bar 1 twice: 1.1 is ordinal 0, 1.2 ordinal 1; bar 2 is ordinal 2.
-  const parsed = parseLyricText(doc, 0, '1.1| one two\n1.2| _ three | four');
+  const parsed = parseLyricText(doc, 0, 'one two |\n_ three | four');
   expect(parsed.diagnostics).toEqual([]);
   expect(parsed.tokens.map(t => [t.ordinal, t.onset])).toEqual([[0, [0, 1]], [0, [1, 4]], [1, [1, 4]], [2, [0, 1]]]);
 });

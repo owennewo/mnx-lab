@@ -120,4 +120,5 @@ edits, and accepts an optional zero-based `at=` ordinal in scenario links.
 [Player element and lifecycle](player-element.md).
 
 **Lyric entry** opens on Shift+L. Its [text format](lyric-text.md) follows
-performance order with `bar.occurrence|` anchors and canonical bar-boundary wrapping.
+sung order without bar numbers — the margin's rail says where each line starts — and
+canonical bar-boundary wrapping.

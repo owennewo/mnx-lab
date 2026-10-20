@@ -17,16 +17,17 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 //   extender        day__ next     suffix underscores, one held event each
 //   bare skip       ____           standalone run, one untexted event each
 //   elision         you~are        two words on one event (stored as a space)
-//   occurrence      9.2|          written bar 9, second performance visit
-//   bar check       |             next performed bar, including empty bars
-//   header          nl 2:          optional language / stored-row override after anchor
-//   escape          \              a first syllable that would read as a header
+//   bar line        |             the next bar played, including bars nobody sings
+//   empty bars      ×4  x4         that many bars nobody sings, standing where a bar starts
+//   header          nl 2:          on a line's start: another verse or language, from bar 1 again
+//   escape          \              a first syllable that would read as a header or a run
 //
-// Canonical text wraps at four bars / 80 columns and at navigation boundaries.
-// Legacy unanchored verse-per-line text is accepted for paste compatibility.
-// In anchored text, whitespace is never semantic beyond one boundary. Rests, spaces, grace
-// notes and tie continuations are skipped automatically by the walk, so most
-// pasted text needs no special tokens at all.
+// The text is in the order the words are sung and names no bars: it runs from
+// the first bar played, and the editor's margin says where each line starts.
+// Canonical text ends each line on its bar line and wraps at four bars / 80
+// columns and at navigation boundaries; newlines are whitespace. Rests, spaces,
+// grace notes and tie continuations are skipped automatically by the walk, so
+// most pasted text needs no special tokens at all.
 
 import type { MnxEvent, MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
 import { isTimedEvent } from '../model/mnx.ts';
@@ -194,8 +195,10 @@ function serializeLine(walk: LyricEventEntry[], syllables: Map<number, { text: s
 export interface LyricTextDiagnostic {
   /** 0-based text line the problem sits on. */
   textLine: number;
-  /** 1-based bar, when the problem is bar-anchored. */
+  /** 1-based written bar, when the problem is in one. */
   bar?: number;
+  /** …and the 1-based bar played, which names which visit of it. */
+  played?: number;
   message: string;
   /** Absent = error (blocks apply). `warning` is the blue lane — the pass
    *  bound (decision A): worth naming, never worth refusing over. */
@@ -233,6 +236,10 @@ export interface ParsedLyricText {
   lines: ParsedLyricLine[];
   diagnostics: LyricTextDiagnostic[];
   tokens: LyricTokenSpan[];
+  /** Where each line of the text starts (header-only lines have none). */
+  starts?: LyricLineStart[];
+  /** The text lines that open a block with a header (`2:`, `nl:`). */
+  headers?: number[];
   /** Explicit declarations retain empty preceding rows and stable row order. */
   newRows?: { id: string; lang?: string }[];
   lineOrder?: string[];
@@ -278,9 +285,16 @@ function takeHeader(tokens: RawToken[]): { ordinal?: number; lang?: string; cons
   return null;
 }
 
-function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: string, walk = lyricEventWalk(doc, partIndex), allowOpenWord = false, measureCount?: number): ParsedLyricText {
+/**
+ * The syllable grammar over a walk whose bars are `measureIndex`es: `|` is the
+ * next bar, `×N` that many bars without words, and words land on the walk's
+ * entries in order. `places`, when given, collects the bar each token starts in
+ * (a bar line: the bar it leads into), keyed by the token's offset.
+ */
+function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: string, walk = lyricEventWalk(doc, partIndex),
+  allowOpenWord = false, measureCount?: number, places?: Map<number, number>): Omit<ParsedLyricText, 'diagnostics'> & { diagnostics: (LyricTextDiagnostic & { at?: number })[] } {
   const { groups } = lineGroups(doc, walk);
-  const diagnostics: LyricTextDiagnostic[] = [];
+  const diagnostics: (LyricTextDiagnostic & { at?: number })[] = [];
   const tokens: LyricTokenSpan[] = [];
   const lines: ParsedLyricLine[] = [];
   const counters = new Map<string, number>();
@@ -336,14 +350,30 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
           ? Number(check[1]) - 1
           : (barPointer >= 0 ? barPointer : next > 0 ? walk[next - 1]!.measureIndex : -1) + 1;
         if (resolved >= barCount && barCount > 0)
-          diagnostics.push({ textLine, bar: resolved + 1, message: `bar ${resolved + 1} is beyond the music (${barCount} bars)` });
-        if (lastSyllableBar >= resolved)
-          diagnostics.push({ textLine, bar: resolved + 1, message: `too many syllables before bar ${resolved + 1} — they spill into it` });
+          diagnostics.push({ textLine, at: token.from, message: `a bar line past the end of the music (${barCount} bars)` });
+        else if (lastSyllableBar >= resolved)
+          diagnostics.push({ textLine, at: token.from, bar: resolved + 1, message: 'too many syllables before this bar — they spill into it' });
         while (next < walk.length && walk[next]!.measureIndex < resolved) next++;
         barPointer = resolved;
+        places?.set(token.from, resolved);
+        continue;
+      }
+      const run = EMPTY_RUN.exec(token.text);
+      if (run) {
+        // Bars nobody sings, standing where a bar starts: the next `|` leads past them.
+        const count = Number(run[1]), here = Math.max(barPointer, 0);
+        places?.set(token.from, here);
+        if (count < 1) diagnostics.push({ textLine, at: token.from, message: `“${token.text}” — a run is at least one bar` });
+        else if (lastSyllableBar >= here)
+          diagnostics.push({ textLine, at: token.from, bar: here + 1, message: `“${token.text}” stands for whole bars without words — put it after a |` });
+        else if (barCount > 0 && here + count > barCount)
+          diagnostics.push({ textLine, at: token.from, message: `“${token.text}” runs past the end of the music (${barCount} bars)` });
+        barPointer = here + Math.max(count, 1) - 1;
+        while (next < walk.length && walk[next]!.measureIndex <= barPointer) next++;
         continue;
       }
       if (/^_+$/.test(token.text)) {
+        places?.set(token.from, next < walk.length ? walk[next]!.measureIndex : Math.max(barPointer, 0));
         consumeSkips(token.text.length);
         continue;
       }
@@ -356,7 +386,7 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
       const trailRun = /-+$/.exec(body)?.[0].length ?? 0;
       const core = body.slice(leadRun, trailRun ? -trailRun : undefined);
       if (core === '') {
-        diagnostics.push({ textLine, message: `not a lyric token — “${token.text}”` });
+        diagnostics.push({ textLine, at: token.from, message: `not a lyric token — “${token.text}”` });
         continue;
       }
       if (leadRun > 1) consumeSkips(leadRun - 1);
@@ -382,7 +412,7 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
           joinBefore && joinAfter ? 'middle' : joinAfter ? 'start' : joinBefore ? 'end' : undefined;
         if (next >= walk.length) {
           if (!overflowed) {
-            diagnostics.push({ textLine, message: 'more syllables than sung notes — the rest land nowhere' });
+            diagnostics.push({ textLine, at: token.from, message: 'more syllables than sung notes — the rest land nowhere' });
             overflowed = true;
           }
           break;
@@ -394,7 +424,10 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
         next++;
         consumeSkips(segment.skipsAfter);
       }
-      if (firstEntry !== null) tokens.push({ from: token.from, to: token.to, entryIndex: firstEntry });
+      if (firstEntry !== null) {
+        tokens.push({ from: token.from, to: token.to, entryIndex: firstEntry });
+        places?.set(token.from, walk[firstEntry]!.measureIndex);
+      }
       consumeSkips(extender);
       if (overflowed) break;
     }
@@ -549,7 +582,6 @@ export function planLyricEdits(doc: MnxStructure, partIndex: number, parsed: Par
 /** Four written bars or 80 characters, wrapping only at a bar boundary. */
 const TEXT_BARS = 4;
 const TEXT_COLUMNS = 80;
-const OCCURRENCE_ANCHOR = /^(\d+)\.(\d+)\|$/;
 
 /** Performance identities are independent of the stored lyric-row identity.
  * Returns through navigation may reuse a row; an occurrence is never a verse. */
@@ -602,9 +634,23 @@ function lyricPerformance(doc: MnxStructure, partIndex: number) {
   return { written, visits, walk, sources, starts, onsets };
 }
 
-/** Canonical performance-order text. Explicit row headers preserve hymn verses
- * and other stored rows which navigation never selects; language headers retain
- * the existing language-group convention. They follow the occurrence anchor. */
+/** A run of bars nobody sings: `×4`, or `x4` as typed. */
+const EMPTY_RUN = /^[x×](\d+)$/i;
+/** What anchored text used to start a run with, and a written bar check: neither exists any more. */
+const OLD_BAR_NUMBER = /^\d+(?:\.\d+)?\|$/;
+
+/**
+ * Canonical text, in the order the words are sung. Each block runs from the
+ * first bar played: the main text sings each visit's own verse; a header line
+ * (`2:`, `nl:`, `nl 2:`) starts a verse no pass reaches (a hymn's), or another
+ * language, from the first bar played again. Nothing in the text says which bar
+ * it is in — the margin beside it does, worked out from the bar lines.
+ *
+ * A line ends on the bar line after its last bar, so every line opens on a word.
+ * Bars nobody sings close the line before them as one run (`| ×4 |`), a lead-in
+ * stands on a line of its own (`×16 |`), and trailing silence is left off.
+ * Lines break at repeats and jumps, at four bars, and before 80 characters.
+ */
 export function serializeLyricText(doc: MnxStructure, partIndex: number): string {
   const { written, visits, walk, sources, starts } = lyricPerformance(doc, partIndex);
   const { groups } = lineGroups(doc, written);
@@ -612,20 +658,9 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
   for (const [group, ids] of groups) {
     const represented = new Set<string>();
     const emit = (override?: number) => {
-      // One run of text is ONE passage: anchored once, where it starts, and carried on
-      // line after line with a leading `|` — so a bar added or taken away in it nudges
-      // every word after it along, rather than into the next line's anchor (2026-10-19:
-      // the user's choice, over anchoring at sections, which lyrics often start a bar
-      // before). Lines still break where a reader expects them (a repeat, a jump, four
-      // bars, 80 characters); only a long silence starts a new, anchored passage.
-      let pending = '', lineStart = -1, last = -1, boundary = false;
-      const close = () => { if (pending) result.push(pending); pending = ''; lineStart = last = -1; boundary = false; };
-      visits.forEach((visit, ordinal) => {
-        if (ordinal > 0 && (visit.via || doc.global.measures[visit.measureIndex]?.repeatStart
-          || visit.measureIndex !== visits[ordinal - 1]!.measureIndex + 1)) boundary = true;
-        const row = override ?? visit.verse;
-        const id = ids[row - 1];
-        if (!id) return;
+      const bodies = visits.map((visit, ordinal) => {
+        const id = ids[(override ?? visit.verse) - 1];
+        if (!id) return null;
         const syllables = new Map<number, { text: string; type?: string }>();
         for (let i = starts[ordinal]!; i < starts[ordinal + 1]!; i++) {
           const key = `${id}:${sources[i]}`;
@@ -634,82 +669,99 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
           syllables.set(i - starts[ordinal]!, syllable);
           represented.add(key);
         }
-        if (!syllables.size) return;
-        let body = serializeLine(walk.slice(starts[ordinal], starts[ordinal + 1]).map(e => ({ ...e, measureIndex: 0 })), syllables);
-        if (takeHeader(tokenize(body, 0))) body = `\\${body}`;
-        if (last >= 0 && ordinal - last - 1 > TEXT_BARS) close();
-        if (last < 0) {
-          const header = [group, override === undefined ? '' : String(override)].filter(Boolean).join(' ');
-          pending = `${visit.measureIndex + 1}.${visit.occurrence}| ${header ? `${header}: ` : ''}${body}`;
-          lineStart = ordinal;
-        } else {
-          const addition = ' |'.repeat(ordinal - last) + ` ${body}`;
-          if (boundary || ordinal - lineStart >= TEXT_BARS || pending.length + addition.length > TEXT_COLUMNS) {
-            // A new line of the same passage: it opens on the bar line that carries the text on.
-            result.push(pending);
-            pending = addition.slice(1);
-            lineStart = ordinal;
-          } else pending += addition;
+        if (!syllables.size) return null;
+        const body = serializeLine(walk.slice(starts[ordinal], starts[ordinal + 1]).map(e => ({ ...e, measureIndex: 0 })), syllables);
+        // A first word that would read as a header or a run of empty bars is escaped.
+        const first = tokenize(body, 0);
+        return takeHeader(first) || EMPTY_RUN.test(first[0]?.text ?? '') ? `\\${body}` : body;
+      });
+      if (bodies.every(body => body === null)) return;
+      const header = [group, override === undefined ? '' : String(override)].filter(Boolean).join(' ');
+      if (header) result.push(`${header}:`);
+      let line = '', lineStart = 0, next = 0;
+      const close = () => { if (line) result.push(line); line = ''; };
+      bodies.forEach((body, ordinal) => {
+        if (body === null) return;
+        const gap = ordinal - next;
+        const visit = visits[ordinal]!;
+        const boundary = ordinal > 0 && (visit.via || doc.global.measures[visit.measureIndex]?.repeatStart
+          || visit.measureIndex !== visits[ordinal - 1]!.measureIndex + 1);
+        if (gap > 0) {
+          // Silence closes the line before it — or, before the first words, stands alone.
+          if (line) line += ` | ×${gap} |`; else line = `×${gap} |`;
+          close();
+        } else if (line && (boundary || ordinal - lineStart >= TEXT_BARS || line.length + body.length + 3 > TEXT_COLUMNS)) {
+          line += ' |';
+          close();
         }
-        boundary = false;
-        last = ordinal;
+        if (line) line += ` | ${body}`;
+        else { line = body; lineStart = ordinal; }
+        next = ordinal + 1;
       });
       close();
     };
     emit();
-    // Rows outside the performance mapping are still editable and must never
+    // Rows the performance never reaches are still editable and must never
     // disappear simply because the score has no repeat signs (a hymn).
     ids.forEach((_, index) => emit(index + 1));
   }
   return result.join('\n');
 }
 
-/** Anchored text follows performance order; unanchored legacy text remains a
- * supported paste format. Newlines inside an anchored passage are whitespace.
- * A header after an anchor explicitly selects a stored row or language group. */
+/** Where a line of the text starts: the bar played that its first token sits in. */
+export interface LyricLineStart {
+  /** 0-based line of the text. */
+  textLine: number;
+  /** 0-based bar played (the performance ordinal). */
+  ordinal: number;
+  /** Which block of the text it is in: 0 is the main text, then one per header line. */
+  block: number;
+  /** The line puts words on notes (rather than only crossing empty bars). */
+  sung: boolean;
+  /** The line holds a run of empty bars, so the next line starts further on than it ends. */
+  gap: boolean;
+}
+
+/**
+ * Text in the order the words are sung, back onto the notes. Each block runs
+ * from the first bar played; `|` is the next bar played and `×N` that many bars
+ * nobody sings; newlines are whitespace. A header line (`2:`, `nl:`, `nl 2:`)
+ * starts another block, from the first bar played again, writing that stored
+ * row or language rather than each visit's own verse.
+ */
 export function parseLyricText(doc: MnxStructure, partIndex: number, text: string): ParsedLyricText {
-  const raw = tokenize(text, 0);
-  if (!raw.some(token => OCCURRENCE_ANCHOR.test(token.text))) return parseWrittenLyricText(doc, partIndex, text);
   const { written, visits, walk, sources, onsets } = lyricPerformance(doc, partIndex);
   const { groups } = lineGroups(doc, written);
   const taken = new Set([...groups.values()].flat());
   const minted = new Set<string>();
-  const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
+  const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [], starts: [] };
   const atLine = (offset: number) => text.slice(0, offset).split('\n').length - 1;
   const assigned = new Map<string, { text: string; type?: SyllableType; index: number }>();
-  // Who has written each performed place (a verse row at one sung position), so two
-  // passages that reach the same place are told apart from two passes of a bar that
-  // share the same stored words: they are different mistakes with different fixes.
-  const passages: { label: string; ordinal: number; textLine: number; bar: number }[] = [];
-  const claims = new Map<string, { passage: number; text: string }>();
-  const overruns = new Map<string, { a: number; b: number; words: Map<number, string[]>; differs: boolean }>();
-  const shares = new Map<string, { textLine: number; bar: number; row: number; first: string; second: string; words: [string[], string[]] }>();
   const visitLabel = (index: number) => {
     const visit = visits[walk[index]!.measureIndex]!;
     return `${visit.measureIndex + 1}.${visit.occurrence}`;
   };
-  for (let begin = 0; begin < raw.length;) {
-    const anchor = raw[begin]!;
-    const match = OCCURRENCE_ANCHOR.exec(anchor.text);
-    let end = begin + 1;
-    while (end < raw.length && !OCCURRENCE_ANCHOR.test(raw[end]!.text)) end++;
-    const textLine = atLine(anchor.from);
-    if (!match) {
-      result.diagnostics.push({ textLine, message: 'start the passage with bar.occurrence|, for example 9.1|' });
-      begin = end; continue;
-    }
-    const bar = Number(match[1]), occurrence = Number(match[2]);
-    const ordinal = visits.findIndex(v => v.measureIndex === bar - 1 && v.occurrence === occurrence);
-    if (ordinal < 0) {
-      result.diagnostics.push({ textLine, bar, message: `bar ${bar} has no performance occurrence ${occurrence}` });
-      begin = end; continue;
-    }
-    const chunk = raw.slice(begin + 1, end);
-    const passage = passages.push({ label: `${bar}.${occurrence}`, ordinal, textLine, bar }) - 1;
-    const header = takeHeader(chunk);
+  // The blocks: the main text, then one per header line.
+  const blocks: { header: ReturnType<typeof takeHeader>; textLine: number; name: string; tokens: RawToken[] }[] =
+    [{ header: null, textLine: 0, name: 'the main text', tokens: [] }];
+  let offset = 0;
+  text.split('\n').forEach((line, textLine) => {
+    const tokens = tokenize(line, offset);
+    offset += line.length + 1;
+    const header = takeHeader(tokens);
+    if (header) blocks.push({ header, textLine, name: `“${tokens.slice(0, header.consumed).map(t => t.text).join(' ')}”`, tokens: tokens.slice(header.consumed) });
+    else blocks[blocks.length - 1]!.tokens.push(...tokens);
+  });
+  // Who has written each place (a stored row at one sung position), so two blocks that write
+  // the same words twice are named — and two passes of a bar that share one row's words too.
+  const claims = new Map<string, { block: number; text: string; index: number }>();
+  const twice = new Map<string, { a: number; b: number; row: number; label: string }>();
+  const shares = new Map<string, { textLine: number; bar: number; row: number; first: string; second: string; words: [string[], string[]] }>();
+  blocks.forEach((block, b) => {
+    const { header, textLine } = block;
     if (header?.ordinal !== undefined && (!Number.isSafeInteger(header.ordinal) || header.ordinal < 1)) {
-      result.diagnostics.push({ textLine, bar, message: 'verse number must be a positive integer' });
-      begin = end; continue;
+      result.diagnostics.push({ textLine, message: 'verse number must be a positive integer' });
+      return;
     }
     const group = header?.lang ?? '';
     const ids = groups.get(group) ?? [];
@@ -721,41 +773,59 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       }
       return { id: ids[row - 1]!, row };
     };
-    // Reuse the syllable grammar against a performed walk. The temporary bar
-    // numbers are performance ordinals, never persisted or shown to the user.
-    let buffer = `${ordinal + 1}|`;
+    // Reuse the syllable grammar against the performed walk. Its bar numbers are
+    // performance ordinals; `1|` sets it at the first bar played.
+    let buffer = '1|';
     const offsets: { from: number; to: number; source: RawToken }[] = [];
-    for (const token of chunk.slice(header?.consumed ?? 0)) {
+    for (const token of block.tokens) {
+      if (OLD_BAR_NUMBER.test(token.text)) {
+        result.diagnostics.push({ textLine: atLine(token.from),
+          message: `“${token.text}” — the text has no bar numbers: it runs from the first bar played, | is the next bar and ×4 four bars nobody sings` });
+        continue;
+      }
       if (token.text.endsWith('|') && token.text !== '|') {
-        result.diagnostics.push({ textLine: atLine(token.from), bar,
-          message: 'use bar.occurrence| for an anchor, or | for the next performed bar' });
+        result.diagnostics.push({ textLine: atLine(token.from), message: `put a space before the | in “${token.text}”` });
+        continue;
       }
       const from = buffer.length + 1;
       buffer += ` ${token.text}`;
       offsets.push({ from, to: buffer.length, source: token });
     }
-    const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true, visits.length);
-    result.diagnostics.push(...parsed.diagnostics.map(d => ({ ...d, textLine,
-      ...(d.bar === undefined ? {} : { bar: visits[d.bar - 1]?.measureIndex === undefined ? bar : visits[d.bar - 1]!.measureIndex + 1 }) })));
-    const lines = new Map<string, ParsedLyricLine>();
+    const places = new Map<number, number>();
+    const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true, visits.length, places);
+    const sourceAt = (from: number | undefined) => offsets.find(o => o.from === from)?.source;
+    result.diagnostics.push(...parsed.diagnostics.map(({ at, ...d }) => {
+      const source = sourceAt(at), played = d.bar;
+      const visit = played === undefined ? undefined : visits[played - 1];
+      return { ...d, textLine: source ? atLine(source.from) : textLine,
+        ...(visit ? { bar: visit.measureIndex + 1, played } : {}) };
+    }));
+    // Where each line of this block starts.
+    const sung = new Set(parsed.tokens.map(token => token.from));
+    const byLine = new Map<number, typeof offsets>();
+    for (const offset of offsets) {
+      const at = atLine(offset.source.from);
+      byLine.set(at, [...byLine.get(at) ?? [], offset]);
+    }
+    for (const [at, tokens] of byLine) {
+      // A line starts where its first word or run is; one that opens on a bar line, in the bar it leads into.
+      const lead = tokens.find(t => t.source.text !== '|') ?? tokens[tokens.length - 1]!;
+      const ordinal = places.get(lead.from);
+      if (ordinal !== undefined) result.starts!.push({ textLine: at, ordinal, block: b,
+        sung: tokens.some(t => sung.has(t.from)), gap: tokens.some(t => EMPTY_RUN.test(t.source.text)) });
+    }
+    const rows = new Map<string, ParsedLyricLine>();
     for (const [index, syllable] of parsed.lines[0]?.syllables ?? []) {
       const source = sources[index]!;
       const visit = visits[walk[index]!.measureIndex]!;
       const { id, row } = rowId(visit.verse);
       const place = `${id}:${index}`, claim = claims.get(place);
-      if (claim && claim.passage !== passage) {
-        // Two passages reach the same performed place: one has run on into the other.
-        const [a, b] = passages[claim.passage]!.ordinal <= ordinal ? [claim.passage, passage] : [passage, claim.passage];
-        const pair = `${a}>${b}`;
-        const overrun = overruns.get(pair) ?? { a, b, words: new Map<number, string[]>(), differs: false };
-        overruns.set(pair, overrun);
-        const theirs = a === claim.passage ? claim.text : syllable.text;
-        overrun.words.set(index, [theirs]);
-        // Agreeing about a place is no mistake (as before); one disagreement and the whole run is named.
-        overrun.differs ||= claim.text !== syllable.text;
+      if (claim && claim.block !== b) {
+        // Two blocks write the same row at the same place: agreeing is no mistake.
+        if (claim.text !== syllable.text) twice.set(`${claim.block}>${b}:${id}`, { a: claim.block, b, row, label: visitLabel(index) });
         continue;
       }
-      claims.set(place, { passage, text: syllable.text });
+      claims.set(place, { block: b, text: syllable.text, index });
       const key = `${id}:${source}`;
       const previous = assigned.get(key);
       if (previous && previous.index !== index && (previous.text !== syllable.text || normalizeType(previous.type) !== normalizeType(syllable.type))) {
@@ -766,42 +836,48 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
         share.words[0].push(previous.text); share.words[1].push(syllable.text);
       }
       assigned.set(key, { ...syllable, index });
-      let line = lines.get(id);
+      let line = rows.get(id);
       if (!line) {
         line = { lineId: id, minted: minted.has(id), ...(group ? { lang: group } : {}), ordinal: row, textLine, syllables: new Map() };
-        lines.set(id, line);
+        rows.set(id, line);
       }
       line.syllables.set(source, syllable);
     }
-    result.lines.push(...lines.values());
+    result.lines.push(...rows.values());
     for (const token of parsed.tokens) {
-      const original = offsets.find(offset => offset.from === token.from)?.source;
-      const sung = walk[token.entryIndex], at = sung && onsets.get(sung.event);
+      const original = sourceAt(token.from);
+      const sungAt = walk[token.entryIndex], at = sungAt && onsets.get(sungAt.event);
       if (original) result.tokens.push({ from: original.from, to: original.to, entryIndex: sources[token.entryIndex]!,
-        ...(sung && at ? { ordinal: sung.measureIndex, onset: [Number(at.num), Number(at.den)] as [number, number] } : {}) });
+        ...(sungAt && at ? { ordinal: sungAt.measureIndex, onset: [Number(at.num), Number(at.den)] as [number, number] } : {}) });
     }
-    begin = end;
-  }
+  });
   const quoted = (words: string[]) => `“${words.join(' ')}”`;
-  for (const { a, b, words, differs } of overruns.values()) {
-    if (!differs) continue;
-    const from = passages[a]!, into = passages[b]!, ran = [...words].sort(([x], [y]) => x - y).map(([, [word]]) => word!);
-    result.diagnostics.push({ textLine: from.textLine, bar: into.bar,
-      message: from.ordinal === into.ordinal
-        ? `${into.label} is anchored twice — keep one ${into.label}| and put its words together`
-        : `${from.label} runs ${ran.length} ${ran.length === 1 ? 'syllable' : 'syllables'} on into ${into.label} (${quoted(ran)}), ` +
-          `which has words of its own — move them into the ${into.label} line, or delete the ${into.label}| anchor to let the text flow on` });
+  for (const { a, b, row, label } of twice.values()) {
+    result.diagnostics.push({ textLine: blocks[b]!.textLine,
+      message: `verse ${row} at ${label} is written twice, differently — in ${blocks[a]!.name} and under ${blocks[b]!.name}; keep one` });
   }
   for (const share of shares.values()) {
     result.diagnostics.push({ textLine: share.textLine, bar: share.bar,
       message: `${share.first} sings ${quoted(share.words[0])} and ${share.second} sings ${quoted(share.words[1])}, ` +
         `but both are verse ${share.row} of the same written notes, which hold one set of words — make them match` });
   }
+  result.starts!.sort((x, y) => x.textLine - y.textLine);
+  result.headers = blocks.slice(1).map(block => block.textLine);
+  // New rows are declared only where words alone would not keep them: an empty row holding a
+  // later one's verse number, or an order the ids would not sort into. A declaration nobody
+  // needs is metadata a Guitar Pro save cannot keep.
   if (minted.size) {
-    result.newRows = [...groups].flatMap(([lang, ids]) => ids.filter(id => minted.has(id)).map(id => ({ id, ...(lang ? { lang } : {}) })));
     const existing = new Set([...groups.values()].flat().filter(id => !minted.has(id)));
     const ordered = doc.global.lyrics?.lineOrder ?? [];
-    result.lineOrder = [...ordered, ...[...existing].filter(id => !ordered.includes(id)).sort(), ...minted];
+    const filled = new Set(result.lines.filter(line => line.syllables.size > 0).map(line => line.lineId));
+    const wanted = [...ordered, ...[...existing].filter(id => !ordered.includes(id)).sort(), ...minted];
+    const present = new Set([...existing, ...[...minted].filter(id => filled.has(id))]);
+    const inferred = [...ordered.filter(id => present.has(id)), ...[...present].filter(id => !ordered.includes(id)).sort()];
+    const reordered = inferred.join() !== wanted.filter(id => present.has(id)).join();
+    if (reordered || [...minted].some(id => !filled.has(id))) {
+      result.newRows = [...groups].flatMap(([lang, ids]) => ids.filter(id => minted.has(id)).map(id => ({ id, ...(lang ? { lang } : {}) })));
+      if (reordered) result.lineOrder = wanted;
+    }
   }
   return result;
 }
