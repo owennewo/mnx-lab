@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { EditorSession } from '../../src/edit/session.ts';
 import {
+  coverAt,
   lyricEventWalk,
   lyricPassWarnings,
   parseLyricText,
@@ -517,4 +518,26 @@ it('places each word on its performed visit and onset, where the caret moves the
   const parsed = parseLyricText(doc, 0, 'one two |\n_ three | four');
   expect(parsed.diagnostics).toEqual([]);
   expect(parsed.tokens.map(t => [t.ordinal, t.onset])).toEqual([[0, [0, 1]], [0, [1, 4]], [1, [1, 4]], [2, [0, 1]]]);
+  // The second visit's first note sings nothing: that place is its skip's, not the first visit's word.
+  const first = coverAt(parsed, { ordinal: 1, onset: [0, 1] })!;
+  expect('one two |\n_ three | four'.slice(first.from, first.to)).toBe('_');
+});
+
+it('gives every performed place one token: a word, a skip, a run or the bar line that closes a bar', () => {
+  const doc = bars(6);
+  doc.parts[0]!.measures[4]!.sequences[0]!.content = [{ duration: { base: 'whole' }, rest: {} }];
+  const text = 'one_ | _ two | ×2 | | three';
+  const parsed = parseLyricText(doc, 0, text);
+  expect(parsed.diagnostics).toEqual([]);
+  // A bar line after a bar's last word, or after a run, takes up no time; the one over bar 5's rests does.
+  expect(parsed.covers!.map(c => [text.slice(c.from, c.to), c.ordinal, c.onset, c.until && [c.until.ordinal, c.until.onset]])).toEqual([
+    ['one_', 0, [0, 1], [1, [0, 1]]],
+    ['_', 1, [0, 1], [1, [1, 4]]],
+    ['two', 1, [1, 4], [2, [0, 1]]],
+    ['×2', 2, [0, 1], [4, [0, 1]]],
+    ['|', 4, [0, 1], [5, [0, 1]]],
+    ['three', 5, [0, 1], [5, [1, 4]]]
+  ]);
+  const at = (ordinal: number, onset: [number, number]) => { const c = coverAt(parsed, { ordinal, onset }); return c && text.slice(c.from, c.to); };
+  expect([at(0, [1, 4]), at(1, [0, 1]), at(3, [1, 4]), at(4, [1, 2]), at(5, [1, 4])]).toEqual(['one_', '_', '×2', '|', undefined]);
 });

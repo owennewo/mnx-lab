@@ -517,6 +517,22 @@ try {
   }
   await press(' ', 'Space', 32);
   await until(`find(document, 'mnx-player').snapshot?.state !== 'playing'`, 'Space did not pause');
+  // A place nobody sings is still one token's: the cursor on a skipped note outlines the `_`, and in
+  // a bar without words the `×1` — the same answer the playhead gets, with the line lit.
+  await run(`const ed = find(document, 'mnx-lyric-text-editor'), area = ed.renderRoot.querySelector('textarea');
+    area.value = 'Sun _ glide down | ×1 | wa-ter car-ry | me safe-ly home'; area.dispatchEvent(new Event('input')); ed.commit(); return true;`);
+  await settle(c);
+  const outlined = async () => JSON.parse(await run(`const ed = find(document, 'mnx-lyric-text-editor').renderRoot, area = ed.querySelector('textarea');
+    return JSON.stringify({ hidden: ed.querySelector('.marks .word').hidden, word: area.value.slice(area.selectionStart, area.selectionEnd),
+      lit: ed.querySelector('.paint-inner > .now')?.textContent ?? null });`));
+  await press('Home', 'Home', 36);
+  assert.equal((await outlined()).word, 'Sun', 'Home did not outline the first word');
+  await press('ArrowRight', 'ArrowRight', 39);
+  const skip = await outlined();
+  assert.ok(!skip.hidden && skip.word === '_' && skip.lit?.startsWith('Sun _'), `the cursor on a skipped note does not outline its _: ${JSON.stringify(skip)}`);
+  for (let i = 0; i < 3; i++) await press('ArrowRight', 'ArrowRight', 39);
+  const run1 = await outlined();
+  assert.ok(!run1.hidden && run1.word === '×1' && run1.lit?.startsWith('Sun _'), `the cursor in a bar without words does not outline its ×1: ${JSON.stringify(run1)}`);
   await run(`find(document, 'mnx-lyric-text-editor').dispatchEvent(new CustomEvent('lyric-editor-close')); return true;`);
   await settle(c);
 
@@ -580,7 +596,7 @@ try {
   assert.equal(await run(`return window.scrollY === 0 && document.documentElement.scrollTop === 0;`), true,
     'Space scrolled the page: the surface did not take the keystroke');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there, the outline following the next press, a chord's other note and the music, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there, the outline following the next press, a chord's other note and the music, a skipped note and a bar without words outlined as their _ and ×1, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
 } finally {
   ws?.close();
   chrome.kill();

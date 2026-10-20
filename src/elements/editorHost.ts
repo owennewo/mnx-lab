@@ -313,14 +313,14 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const suspended = () => options.suspended?.() ?? false;
   /** The inspector is ours too; unclaimed focus only for a host that asked for it. */
   const hasKeyboard = () => focusWithin(scope) || (lyrics !== null && focusWithin(lyrics)) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
-  /** The cursor's place as the lyric text names one — for a note the text gives no word. */
+  /** The cursor's performed place, as the lyric text names one. */
   const lyricPlace = (): LyricPlace | null => {
     const start = session.playStart;
     return start ? { ordinal: start.ordinal, onset: [start.onset.num, start.onset.den] } : null;
   };
   const showLyricWord = () => {
     lyricsPlace = cursorPlace();
-    return lyrics?.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal, lyricPlace()) ?? false;
+    return lyrics?.showPlace(lyricPlace()) ?? false;
   };
   const draw = () => {
     if (disposed) return;
@@ -435,10 +435,10 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // is the player arriving, not the playhead moving.
     const moved = lastHead !== '' && headKey(head) !== lastHead;
     lastHead = headKey(head);
-    // Playing, the lyric panel's outline follows the sung word as the score's lyric does.
+    // Playing, the lyric panel follows the playhead's place as the score's lyric does.
     if (now && lyrics) {
       const onset = head && onsetOf(head.offset);
-      lyrics.follow(head && onset ? { ordinal: head.ordinal, onset: [onset.num, onset.den] } : null);
+      lyrics.showPlace(head && onset ? { ordinal: head.ordinal, onset: [onset.num, onset.den] } : null, false);
     }
     if (now !== playing) {
       playing = now;
@@ -585,7 +585,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
-    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '', focusOrdinal: session.performedOrdinal ?? null, focusPlace: lyricPlace(), draft: options.lyricDrafts?.read(partIndex) ?? null });
+    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusPlace: lyricPlace(), draft: options.lyricDrafts?.read(partIndex) ?? null });
     lyricStep = null;
     /** The panel plans against the document its visit opened on. If something else moved the
      *  document since (an edit on the score, an undo), it plans against that instead — and

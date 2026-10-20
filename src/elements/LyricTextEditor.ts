@@ -14,21 +14,24 @@
 // typing previews the words on the score once it pauses (LYRIC_PREVIEW_PAUSE_MS).
 // Keyboard ownership needs no precedence wiring — a focused textarea is isTextEntry and the page keymap
 // yields; clicking the score hands the keys back without closing the drawer.
-// The caret IS the editor's cursor: a caret on a word sends its visit and
-// onset (lyric-editor-caret) and the host moves the one cursor there — the
-// playback cursor with it. The panel draws no cursor of its own. A click or
+// The caret IS the editor's cursor: a caret on a token sends the performed place
+// it starts (lyric-editor-caret) and the host moves the one cursor there — the
+// playback cursor with it. The other way, a place — the cursor's, or the playhead's
+// while playing — outlines the one token that holds it (`coverAt`). The panel
+// draws no cursor of its own. A click or
 // an arrow moves it at once; typing moves it at the pause, with the preview.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome, scrollbars } from './tokens.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import {
-  lyricEventWalk,
+  coverAt,
   lyricVisitLabels,
   lyricPassWarnings,
   parseLyricText,
   planLyricEdits,
   serializeLyricText,
+  type LyricPlace,
   type LyricPlanEdit,
   type LyricTextDiagnostic,
   type ParsedLyricText
@@ -54,8 +57,7 @@ export const LYRIC_COMMIT_PAUSE_MS = 3_000;
  *  score catches up when the typing stops. */
 export const LYRIC_PREVIEW_PAUSE_MS = 250;
 
-/** A performed place as the text's tokens name one: a visit, and an onset into its bar in whole notes. */
-export interface LyricPlace { ordinal: number; onset: [number, number] }
+export type { LyricPlace };
 
 /** What the host is told: `edits` to commit; `accepted` is set by the host when they landed. */
 export interface LyricCommitDetail { edits: LyricPlanEdit[]; accepted: boolean }
@@ -66,11 +68,7 @@ export class LyricTextEditor extends LitElement {
   @property({ type: Number }) partIndex = 0;
   /** The part's display name, for the header. */
   @property({ type: String }) partLabel = '';
-  /** Opens with the caret on this note's token, when it has one. */
-  @property({ type: String }) focusNoteKey = '';
-  /** …on this performed visit of it, when the text names that visit. */
-  @property({ type: Number }) focusOrdinal: number | null = null;
-  /** …or the word sung at this place, when that note has none (a chord's other notes carry no word). */
+  /** Opens with the caret on the token that holds this performed place — the cursor's. */
   @property({ attribute: false }) focusPlace: LyricPlace | null = null;
   /** The music is playing: the panel stays open, read-only, until it pauses — nothing is written while it plays. */
   @property({ type: Boolean }) playing = false;
@@ -443,55 +441,29 @@ export class LyricTextEditor extends LitElement {
     // Open at the caller's note: place the caret on its token — once the text
     // set above has been rendered into the box, or the range lands on an empty
     // box and the render that fills it leaves the caret at the end.
-    void this.updateComplete.then(() => this.showWord(this.focusNoteKey, this.focusOrdinal, this.focusPlace));
+    void this.updateComplete.then(() => this.showPlace(this.focusPlace));
   }
 
   /**
-   * Put the caret on a note's word — on this visit of it, when the text names
-   * that visit — and bring it into view. Used when the panel opens and when a
-   * syllable is pressed on the score while it is open
-   * (core-editor-click-targets.md): the cursor is already there, so nothing
-   * is sent back until the caret moves. A note the text gives no word — a chord's
-   * other notes, another voice — shows the word sung at `place`, the score's own
-   * answer. False when there is none, and then no word is outlined.
+   * Outline the token whose stretch of the performance holds `place` — a word, or
+   * the `_`, `×4` or `|` that a blank place is — and bring its line into view. The
+   * cursor and the playhead are both a place, so the panel answers them alike, as
+   * the score's lyric does. Paused (`select`), the caret goes onto it, so typing
+   * starts there: used when the panel opens and when the cursor moves while the
+   * box is not being typed in, and nothing is sent back until the caret moves.
+   * Playing, the caret stays where it was. False when no token holds the place.
    */
-  showWord(noteKey: string, ordinal: number | null, place: LyricPlace | null = null): boolean {
+  showPlace(place: LyricPlace | null, select = true): boolean {
     const area = this.textarea();
-    if (!area || !this.doc) return false;
-    const walk = lyricEventWalk(this.doc, this.partIndex);
-    const entryIndex = walk.findIndex(entry => entry.noteKey === noteKey);
-    const tokens = this.parsed.tokens.filter(token => token.entryIndex === entryIndex);
-    const span = tokens.find(token => token.ordinal === ordinal) ?? tokens[0] ?? (place ? this.wordAt(place, true) : undefined);
-    this.marked = span ?? null;
+    if (!area) return false;
+    const cover = place ? coverAt(this.parsed, place) : undefined;
+    if (!select && (cover?.from ?? null) === (this.marked?.from ?? null)) return !!cover;
+    this.marked = cover ?? null;
     this.layoutMark();
-    if (!span) return false;
-    area.setSelectionRange(span.from, span.to);
-    this.reveal(span.from);
+    if (!cover) return false;
+    if (select) area.setSelectionRange(cover.from, cover.to);
+    this.reveal(cover.from);
     return true;
-  }
-
-  /**
-   * While the music plays, the outline follows the word being sung, as the score's
-   * lyric does: the caret stays where it was, and the box scrolls to keep the word in view.
-   */
-  follow(place: LyricPlace | null) {
-    const span = place ? this.wordAt(place, false) : undefined;
-    if ((span?.from ?? null) === (this.marked?.from ?? null)) return;
-    this.marked = span ?? null;
-    this.layoutMark();
-    if (span) this.reveal(span.from);
-  }
-
-  /** The word a visit sings at `place` — `exact`, or the last it starts at or before. */
-  private wordAt(place: LyricPlace, exact: boolean) {
-    const after = (a: [number, number], b: [number, number]) => a[0] * b[1] > b[0] * a[1];
-    let best: (typeof this.parsed.tokens)[number] | undefined;
-    for (const token of this.parsed.tokens) {
-      if (token.ordinal !== place.ordinal || !token.onset) continue;
-      if (exact ? token.onset[0] * place.onset[1] !== place.onset[0] * token.onset[1] : after(token.onset, place.onset)) continue;
-      if (!best || after(token.onset, best.onset!)) best = token;
-    }
-    return best;
   }
 
   /** A caret set from outside does not scroll the box: bring its line into view
@@ -605,7 +577,7 @@ export class LyricTextEditor extends LitElement {
       // A label is a way to the line's first word: the caret goes there, and the cursor with it.
       label.addEventListener('mousedown', event => event.preventDefault());
       label.addEventListener('click', () => {
-        const word = this.parsed.tokens.find(token => token.ordinal !== undefined && atLine(this.text, token.from) === start.textLine);
+        const word = this.parsed.covers?.find(cover => atLine(this.text, cover.from) === start.textLine);
         const at = word?.from ?? lineStart(this.text, start.textLine);
         area.focus();
         area.setSelectionRange(at, word?.to ?? at);
@@ -732,10 +704,9 @@ export class LyricTextEditor extends LitElement {
     }
   }
 
-  /** The performed word the caret is in, if any — the one the cursor goes to, and the one outlined. */
+  /** The token the caret is in that takes up performed time, if any — where the cursor goes, and what is outlined. */
   private caretWord(caret: number) {
-    const span = this.parsed.tokens.find(token => caret >= token.from && caret <= token.to);
-    return span?.ordinal === undefined || !span.onset ? null : { ...span, ordinal: span.ordinal, onset: span.onset };
+    return this.parsed.covers?.find(cover => caret >= cover.from && caret <= cover.to) ?? null;
   }
 
   /** Caret → the word's performed place → the host moves the editor's cursor there. */

@@ -235,10 +235,28 @@ export interface LyricTokenSpan {
   onset?: [number, number];
 }
 
+/** A performed place as the text names one: a visit, and an onset into its bar (whole notes). */
+export interface LyricPlace { ordinal: number; onset: [number, number] }
+
+/**
+ * A token of anchored text and the stretch of the performance it takes up: a word
+ * its notes (held ones too), `_` its notes, `×4` its bars, `|` the unsung rest of
+ * its bar. It runs from where it starts until the next token of its block begins
+ * (`until`; null when nothing follows in the music) — so every performed place a
+ * block reaches is one token's, sung or not.
+ */
+export interface LyricCover extends LyricPlace {
+  from: number;
+  to: number;
+  until: LyricPlace | null;
+}
+
 export interface ParsedLyricText {
   lines: ParsedLyricLine[];
   diagnostics: LyricTextDiagnostic[];
   tokens: LyricTokenSpan[];
+  /** The tokens that take up performed time, block by block, each in the order it is sung. */
+  covers?: LyricCover[];
   /** Where each line of the text starts (header-only lines have none). */
   starts?: LyricLineStart[];
   /** The text lines that open a block with a header (`2:`, `nl:`). */
@@ -292,10 +310,12 @@ function takeHeader(tokens: RawToken[]): { ordinal?: number; lang?: string; cons
  * The syllable grammar over a walk whose bars are `measureIndex`es: `|` is the
  * next bar, `×N` that many bars without words, and words land on the walk's
  * entries in order. `places`, when given, collects the bar each token starts in
- * (a bar line: the bar it leads into), keyed by the token's offset.
+ * (a bar line: the bar it leads into), keyed by the token's offset. `covers`,
+ * when given, collects where each token starts taking up time — the walk entry
+ * it starts on, or the bar — and, last, where the line's tokens stop (`at` -1).
  */
 function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: string, walk = lyricEventWalk(doc, partIndex),
-  allowOpenWord = false, measureCount?: number, places?: Map<number, number>): Omit<ParsedLyricText, 'diagnostics'> & { diagnostics: (LyricTextDiagnostic & { at?: number })[] } {
+  allowOpenWord = false, measureCount?: number, places?: Map<number, number>, covers?: TokenStart[]): Omit<ParsedLyricText, 'diagnostics'> & { diagnostics: (LyricTextDiagnostic & { at?: number })[] } {
   const { groups } = lineGroups(doc, walk);
   const diagnostics: (LyricTextDiagnostic & { at?: number })[] = [];
   const tokens: LyricTokenSpan[] = [];
@@ -338,6 +358,12 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
     let barPointer = -1; // 0-based bar the walk has been asserted through
     let lastSyllableBar = -1;
     let overflowed = false;
+    // The last bar some token has taken up time in — a bar line closes only a bar nothing else has.
+    let coveredBar = -1;
+    const coverFrom = (at: number, start: number) => {
+      covers?.push({ at, entry: start });
+      if (next > start) coveredBar = Math.max(coveredBar, walk[next - 1]!.measureIndex);
+    };
 
     const consumeSkips = (count: number) => {
       next = Math.min(next + count, walk.length);
@@ -345,6 +371,7 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
 
     for (let i = header?.consumed ?? 0; i < rawTokens.length; i++) {
       const token = rawTokens[i]!;
+      const before = next;
       const check = /^(\d*)\|$/.exec(token.text);
       if (check) {
         // `N|` asserts bar N; a bare `|` asserts "the current bar is done" —
@@ -359,6 +386,9 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
         while (next < walk.length && walk[next]!.measureIndex < resolved) next++;
         barPointer = resolved;
         places?.set(token.from, resolved);
+        // The rest of the bar it closes: the notes it passed over, or a bar nothing else took up.
+        if (before < next) coverFrom(token.from, before);
+        else if (resolved - 1 > coveredBar) { covers?.push({ at: token.from, bar: resolved - 1 }); coveredBar = resolved - 1; }
         continue;
       }
       const run = EMPTY_RUN.exec(token.text);
@@ -366,6 +396,8 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
         // Bars nobody sings, standing where a bar starts: the next `|` leads past them.
         const count = Number(run[1]), here = Math.max(barPointer, 0);
         places?.set(token.from, here);
+        covers?.push({ at: token.from, bar: here });
+        coveredBar = Math.max(coveredBar, here + Math.max(count, 1) - 1);
         if (count < 1) diagnostics.push({ textLine, at: token.from, message: `“${token.text}” — a run is at least one bar` });
         else if (lastSyllableBar >= here)
           diagnostics.push({ textLine, at: token.from, bar: here + 1, message: `“${token.text}” stands for whole bars without words — put it after a |` });
@@ -378,6 +410,7 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
       if (/^_+$/.test(token.text)) {
         places?.set(token.from, next < walk.length ? walk[next]!.measureIndex : Math.max(barPointer, 0));
         consumeSkips(token.text.length);
+        if (before < walk.length) coverFrom(token.from, before);
         continue;
       }
       // A word token: optional escape, leading/trailing hyphen runs, internal
@@ -432,9 +465,11 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
         places?.set(token.from, walk[firstEntry]!.measureIndex);
       }
       consumeSkips(extender);
+      if (firstEntry !== null) coverFrom(token.from, before);
       if (overflowed) break;
     }
 
+    covers?.push({ at: -1, entry: next });
     if (!allowOpenWord && trailingHyphenOpen(rawTokens, header?.consumed ?? 0))
       diagnostics.push({ textLine, message: 'the line ends mid-word (a trailing hyphen with nothing after)' });
     lines.push({ lineId, minted: wasMinted, ...(header?.lang ? { lang: header.lang } : {}), ordinal, textLine, syllables });
@@ -637,6 +672,9 @@ function lyricPerformance(doc: MnxStructure, partIndex: number) {
   return { written, visits, walk, sources, starts, onsets };
 }
 
+/** Where a token starts taking up time: on a walk entry, or at the start of a bar. */
+type TokenStart = { at: number; entry: number; bar?: undefined } | { at: number; bar: number; entry?: undefined };
+
 /** A run of bars nobody sings: `×4`, or `x4` as typed. */
 const EMPTY_RUN = /^[x×](\d+)$/i;
 /** What anchored text used to start a run with, and a written bar check: neither exists any more. */
@@ -737,7 +775,7 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
   const { groups } = lineGroups(doc, written);
   const taken = new Set([...groups.values()].flat());
   const minted = new Set<string>();
-  const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [], starts: [] };
+  const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [], starts: [], covers: [] };
   const atLine = (offset: number) => text.slice(0, offset).split('\n').length - 1;
   const assigned = new Map<string, { text: string; type?: SyllableType; index: number }>();
   const visitLabel = (index: number) => {
@@ -795,8 +833,27 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       offsets.push({ from, to: buffer.length, source: token });
     }
     const places = new Map<number, number>();
-    const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true, visits.length, places);
+    const starts: TokenStart[] = [];
+    const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true, visits.length, places, starts);
     const sourceAt = (from: number | undefined) => offsets.find(o => o.from === from)?.source;
+    // The block's tokens over the performance: each from its start until the next one's. A token that
+    // starts no later than the one before it takes up no time of its own (a bar line after a bar's
+    // last word), and is no place's.
+    const placeOf = (start: TokenStart): LyricPlace | null => {
+      if (start.bar !== undefined) return start.bar >= 0 && start.bar < visits.length ? { ordinal: start.bar, onset: visits[start.bar]!.from ?? [0, 1] } : null;
+      const entry = walk[start.entry], at = entry && onsets.get(entry.event);
+      return entry && at ? { ordinal: entry.measureIndex, onset: [Number(at.num), Number(at.den)] } : null;
+    };
+    const covers: LyricCover[] = [];
+    for (const start of starts) {
+      const place = placeOf(start), source = start.at < 0 ? undefined : sourceAt(start.at);
+      const last = covers[covers.length - 1];
+      if (start.at < 0) { if (last) last.until = place && placeAfter(place, last) ? place : null; continue; }
+      if (!source || !place || (last && !placeAfter(place, last))) continue;
+      if (last) last.until = place;
+      covers.push({ from: source.from, to: source.to, ...place, until: null });
+    }
+    result.covers!.push(...covers);
     result.diagnostics.push(...parsed.diagnostics.map(({ at, ...d }) => {
       const source = sourceAt(at), played = d.bar;
       const visit = played === undefined ? undefined : visits[played - 1];
@@ -884,4 +941,14 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     }
   }
   return result;
+}
+
+/** Is `a` later in the performance than `b`? */
+export function placeAfter(a: LyricPlace, b: LyricPlace): boolean {
+  return a.ordinal !== b.ordinal ? a.ordinal > b.ordinal : a.onset[0] * b.onset[1] > b.onset[0] * a.onset[1];
+}
+
+/** The token whose stretch of the performance holds `place` — the first block's that reaches it. */
+export function coverAt(parsed: ParsedLyricText, place: LyricPlace): LyricCover | undefined {
+  return parsed.covers?.find(cover => !placeAfter(cover, place) && (cover.until === null || placeAfter(cover.until, place)));
 }
