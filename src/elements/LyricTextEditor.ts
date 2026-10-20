@@ -172,6 +172,20 @@ export class LyricTextEditor extends LitElement {
         padding: 8px 10px;
         border: 1px solid transparent;
       }
+      /* The word the cursor is on, outlined as the score outlines a selected element: the
+         box's own selection is not drawn once focus leaves it, and a press on the score takes it. */
+      .marks {
+        position: absolute;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .marks span {
+        position: absolute;
+        box-sizing: border-box;
+        border: 1px solid var(--accent);
+        border-radius: 3px;
+        background: color-mix(in srgb, var(--accent) 10%, transparent);
+      }
       textarea {
         flex: 1;
         min-width: 0;
@@ -294,15 +308,18 @@ export class LyricTextEditor extends LitElement {
    * that visit — and bring it into view. Used when the panel opens and when a
    * syllable is pressed on the score while it is open
    * (core-editor-click-targets.md): the cursor is already there, so nothing
-   * is sent back until the caret moves. False when the note has no word here.
+   * is sent back until the caret moves. False when the note has no word here,
+   * and then no word is outlined.
    */
   showWord(noteKey: string, ordinal: number | null): boolean {
     const area = this.textarea();
-    if (!area || !noteKey || !this.doc) return false;
+    if (!area || !this.doc) return false;
     const walk = lyricEventWalk(this.doc, this.partIndex);
     const entryIndex = walk.findIndex(entry => entry.noteKey === noteKey);
     const tokens = this.parsed.tokens.filter(token => token.entryIndex === entryIndex);
     const span = tokens.find(token => token.ordinal === ordinal) ?? tokens[0];
+    this.marked = span ?? null;
+    this.layoutMark();
     if (!span) return false;
     area.setSelectionRange(span.from, span.to);
     // A caret set from outside does not scroll the box: bring its line into view
@@ -319,6 +336,8 @@ export class LyricTextEditor extends LitElement {
   private labels: string[] = [];
   private labelsFor: MnxStructure | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  /** The word outlined: the caret's, or the one the host last showed. */
+  private marked: { from: number; to: number } | null = null;
 
   protected updated() {
     this.layoutGutter();
@@ -329,8 +348,9 @@ export class LyricTextEditor extends LitElement {
     }
   }
 
-  /** Label every line that does not open on its own anchor with the visit its first word sings in,
-   *  set at the height the text box gives that line (a twin of the box measures the wrapping). */
+  /** Label every line with the visit its first word sings in — a line that opens on its own
+   *  anchor too, so the margin reads as one column — set at the height the text box gives that
+   *  line (a twin of the box measures the wrapping). */
   private layoutGutter() {
     const area = this.textarea();
     const inner = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
@@ -351,7 +371,7 @@ export class LyricTextEditor extends LitElement {
     mirror.style.left = `${area.offsetLeft}px`;
     mirror.replaceChildren(...lines.map(line => { const row = document.createElement('div'); row.textContent = line || '\u200b'; return row; }));
     const rows = [...mirror.children] as HTMLElement[];
-    inner.replaceChildren(...[...first].filter(([line]) => !/^\s*\d+\.\d+\|/.test(lines[line]!)).map(([line, token]) => {
+    inner.replaceChildren(...[...first].map(([line, token]) => {
       const label = document.createElement('span');
       label.textContent = this.labels[token.ordinal] ?? '';
       label.title = `Go to ${label.textContent}`;
@@ -369,10 +389,40 @@ export class LyricTextEditor extends LitElement {
     this.onScroll();
   }
 
+  /** Outline the marked word where the twin lays it out, clipped to the box's text area. */
+  private layoutMark() {
+    const area = this.textarea();
+    const marks = this.renderRoot.querySelector<HTMLElement>('.marks');
+    const mirror = this.renderRoot.querySelector<HTMLElement>('.mirror');
+    const mark = marks?.firstElementChild as HTMLElement | null | undefined;
+    if (!area || !marks || !mark || !mirror) return;
+    Object.assign(marks.style, {
+      left: `${area.offsetLeft + 1}px`, top: `${area.offsetTop + 1}px`,
+      width: `${area.clientWidth}px`, height: `${area.clientHeight}px`
+    });
+    const span = this.marked;
+    const line = span ? this.text.slice(0, span.from).split('\n').length - 1 : -1;
+    const text = (mirror.children[line] as HTMLElement | undefined)?.firstChild;
+    mark.hidden = !span || !text;
+    if (!span || !text) return;
+    const column = span.from - (this.text.lastIndexOf('\n', span.from - 1) + 1);
+    const range = document.createRange();
+    range.setStart(text, Math.min(column, text.textContent!.length));
+    range.setEnd(text, Math.min(column + span.to - span.from, text.textContent!.length));
+    const word = range.getBoundingClientRect(), twin = mirror.getBoundingClientRect();
+    // The twin sits where the box does, unscrolled; the marks layer starts inside the box's border.
+    Object.assign(mark.style, {
+      left: `${word.left - twin.left - 1 - 2}px`,
+      top: `${mirror.offsetTop + word.top - twin.top - (area.offsetTop + 1) - area.scrollTop - 1}px`,
+      width: `${word.width + 4}px`, height: `${word.height + 2}px`
+    });
+  }
+
   private onScroll = () => {
     const area = this.textarea();
     const inner = this.renderRoot.querySelector<HTMLElement>('.gutter-inner');
     if (area && inner) inner.style.transform = `translateY(${-area.scrollTop}px)`;
+    this.layoutMark();
   };
 
   private textarea(): HTMLTextAreaElement | null {
@@ -405,12 +455,20 @@ export class LyricTextEditor extends LitElement {
     }
   }
 
+  /** The performed word the caret is in, if any — the one the cursor goes to, and the one outlined. */
+  private caretWord(caret: number) {
+    const span = this.parsed.tokens.find(token => caret >= token.from && caret <= token.to);
+    return span?.ordinal === undefined || !span.onset ? null : { ...span, ordinal: span.ordinal, onset: span.onset };
+  }
+
   /** Caret → the word's performed place → the host moves the editor's cursor there. */
   private caretAt(caret: number) {
-    const span = this.parsed.tokens.find(token => caret >= token.from && caret <= token.to);
+    const span = this.caretWord(caret);
+    this.marked = span;
+    this.layoutMark();
     // Sent on every caret move, the same word too: the cursor may have moved off it meanwhile, and a
     // place the cursor already holds settles without seeking.
-    if (span?.ordinal === undefined || !span.onset) return;
+    if (!span) return;
     this.dispatchEvent(new CustomEvent('lyric-editor-caret', {
       detail: { ordinal: span.ordinal, onset: span.onset },
       bubbles: true,
@@ -424,6 +482,8 @@ export class LyricTextEditor extends LitElement {
     this.text = area.value;
     this.touched = this.pending = true;
     this.reparse();
+    // The outline follows the typing at once (the render this input causes lays it out); the cursor waits.
+    this.marked = this.caretWord(area.selectionStart);
     // The cursor follows the typing at the pause, with the preview — in the same
     // frame, so the score is laid out once, not on every word the caret enters.
     this.typed = true;
@@ -543,6 +603,7 @@ export class LyricTextEditor extends LitElement {
           @scroll=${this.onScroll}
         ></textarea>
         <div class="mirror" aria-hidden="true"></div>
+        <div class="marks" aria-hidden="true"><span hidden></span></div>
         </div>
         <div class="diagnostics">
           ${shown.map(d => html`

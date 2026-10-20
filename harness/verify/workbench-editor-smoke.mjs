@@ -475,6 +475,27 @@ try {
     'did',
     'the lyric panel did not open with the caret on the pressed word'
   );
+  // The word is outlined in the panel, not only selected: a press on the score takes
+  // focus from the box, and an unfocused box draws no selection.
+  const markOf = `const ed = find(document, 'mnx-lyric-text-editor').renderRoot, area = ed.querySelector('textarea');
+    const mark = ed.querySelector('.marks span'), m = mark.getBoundingClientRect(), a = area.getBoundingClientRect();
+    const g = document.createElement('canvas').getContext('2d'); g.font = getComputedStyle(area).font;
+    return JSON.stringify({ hidden: mark.hidden, inside: m.left >= a.left && m.right <= a.right && m.top >= a.top && m.bottom <= a.bottom,
+      chars: (m.width - 4) / g.measureText('M').width, left: m.left, top: m.top,
+      word: area.value.slice(area.selectionStart, area.selectionEnd), focused: ed.activeElement === area });`;
+  const opened = JSON.parse(await run(markOf));
+  assert.ok(!opened.hidden && opened.inside && Math.abs(opened.chars - 3) < 0.5, `the pressed word is not outlined in the lyric panel: ${JSON.stringify(opened)}`);
+  // …and the outline follows a press on another syllable while the box is not being typed in.
+  const next = JSON.parse(await run(`
+    const el = [...viewer().renderRoot.querySelectorAll('#projection-container svg text.lyric[data-lyric-line="1"]')]
+      .find(t => t.textContent.length > 1 && t.textContent !== 'did' && t.getAttribute('data-playback-id') !== ${JSON.stringify(word.key)});
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2, text: el.textContent });`));
+  await clickAt(next.x, next.y);
+  await settle(c);
+  const moved = JSON.parse(await run(markOf));
+  assert.ok(!moved.hidden && !moved.focused && moved.word === next.text && (moved.left !== opened.left || moved.top !== opened.top)
+    && Math.abs(moved.chars - next.text.length) < 0.5, `a press on "${next.text}" did not move the panel's outline to it: ${JSON.stringify(moved)}`);
   await run(`find(document, 'mnx-lyric-text-editor').dispatchEvent(new CustomEvent('lyric-editor-close')); return true;`);
   await settle(c);
 
@@ -538,7 +559,7 @@ try {
   assert.equal(await run(`return window.scrollY === 0 && document.documentElement.scrollTop === 0;`), true,
     'Space scrolled the page: the surface did not take the keystroke');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there and the outline following the next press, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
 } finally {
   ws?.close();
   chrome.kill();

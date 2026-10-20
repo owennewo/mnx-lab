@@ -255,6 +255,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   let inspector: RungInspector | null = null;
   let inspectorError: string | null = null;
   let lyrics: LyricTextEditor | null = null;
+  /** Where the cursor stood when the lyric panel last outlined its word. */
+  let lyricsPlace = '';
   /**
    * The element a press selected (core-editor-click-targets.md), and where the
    * cursor stood when it did: the selection is the element's only while the
@@ -311,6 +313,10 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const suspended = () => options.suspended?.() ?? false;
   /** The inspector is ours too; unclaimed focus only for a host that asked for it. */
   const hasKeyboard = () => focusWithin(scope) || (lyrics !== null && focusWithin(lyrics)) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
+  const showLyricWord = () => {
+    lyricsPlace = cursorPlace();
+    return lyrics?.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal) ?? false;
+  };
   const draw = () => {
     if (disposed) return;
     if (focused && (cursorHidden || focused.place !== cursorPlace())) focused = null;
@@ -322,6 +328,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     playback?.place?.(start && !playing && !cursorHidden && !suspended() ? toPosition(start) : null);
     // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard.
     viewer.selectionInactive = !hasKeyboard();
+    // The lyric panel outlines the cursor's word — following it while nobody is typing there.
+    if (lyrics && !playing && !lyrics.matches(':focus-within') && lyricsPlace !== cursorPlace()) showLyricWord();
     if (inspector) {
       const built = buildInspectorView(options.title?.() ?? '', session, cursorHidden);
       const view = options.inspector?.extend?.(built) ?? built;
@@ -798,7 +806,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     focused = { press, place: cursorPlace() };
     if (press.kind === 'lyric' && lyrics) {
       // The panel shows one part: a word of another reopens it there.
-      if (lyrics.partIndex === (session.cursor.partIndex ?? 0)) lyrics.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal);
+      if (lyrics.partIndex === (session.cursor.partIndex ?? 0)) showLyricWord();
       else { closeLyrics(false); openLyrics(); }
     }
     draw();
@@ -812,7 +820,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const activateElement = (press: ElementPress) => {
     if (focused?.press.key !== press.key && !selectElement(press)) return;
     if (press.kind === 'lyric') {
-      if (lyrics) { lyrics.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal); lyrics.focus(); }
+      if (lyrics) { showLyricWord(); lyrics.focus(); }
       else openLyrics();
     } else {
       closeInspector(false);
