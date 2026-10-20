@@ -432,6 +432,28 @@ describe('performance order and canonical wrapping', () => {
     expect(parsed.tokens.map(t => [text.slice(t.from, t.to), t.entryIndex])).toEqual([['one', 0], ['two', 1], ['three', 2]]);
   });
 
+  it('copied text is a backup of the words: cleared, then pasted back, every verse returns to its notes', () => {
+    const doc = bars(3);
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[0]!.segno = { location: { fraction: [0, 1] } };
+    doc.global.measures[1]!.repeatEnd = {};
+    doc.global.measures[1]!.fine = { location: { fraction: [1, 1] } };
+    doc.global.measures[2]!.jump = { type: 'dsalfine', location: { fraction: [1, 1] } };
+    put(doc, 1, '1', 'one'); put(doc, 1, '2', 'two'); put(doc, 2, '1', 'first', 1); put(doc, 2, '2', 'second', 1);
+    put(doc, 3, '1', 'then'); put(doc, 1, '3', 'third');
+    const session = new EditorSession(doc);
+    const copied = serializeLyricText(session.doc, 0);
+    expect(copied).toBe('one | _ first |\ntwo | _ second | then |\nthird');
+    const before = session.doc.parts.map(part => part.measures.map(measure => measure.sequences.map(sequence => sequence.content)));
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, '')) })).toBe(true);
+    expect(serializeLyricText(session.doc, 0)).toBe('');
+    const pasted = parseLyricText(session.doc, 0, copied);
+    expect(pasted.diagnostics).toEqual([]);
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, pasted) })).toBe(true);
+    expect(serializeLyricText(session.doc, 0)).toBe(copied);
+    expect(session.doc.parts.map(part => part.measures.map(measure => measure.sequences.map(sequence => sequence.content)))).toEqual(before);
+  });
+
   it('mints separate verse rows when pasting into a repeated score without lyrics', () => {
     const doc = bars(2);
     doc.global.measures[0]!.repeatStart = {};

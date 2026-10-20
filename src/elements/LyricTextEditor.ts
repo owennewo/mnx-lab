@@ -20,7 +20,7 @@
 // while playing — outlines the one token that holds it (`coverAt`). The panel
 // draws no cursor of its own. A click or
 // an arrow moves it at once; typing moves it at the pause, with the preview.
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, svg, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome, scrollbars } from './tokens.ts';
 import type { MnxStructure } from '../model/mnx.ts';
@@ -84,6 +84,7 @@ export class LyricTextEditor extends LitElement {
   @state() private pending = false;
   /** The marks card, behind the header's ?, is open. */
   @state() private marksOpen = false;
+  @state() private copied = false;
   /** The text was typed in during this visit (or brought back from a draft). */
   private touched = false;
   private commitTimer: ReturnType<typeof setTimeout> | undefined;
@@ -809,6 +810,19 @@ export class LyricTextEditor extends LitElement {
     if (area) this.caretAt(area.selectionStart);
   };
 
+  /** The whole text, as typed: pasted back over the same notes, it puts every verse back. */
+  private async copy() {
+    const area = this.textarea();
+    try { await navigator.clipboard.writeText(area?.value ?? this.text); }
+    catch {
+      // No clipboard here: leave it selected for the keyboard's own copy.
+      area?.focus(); area?.select();
+      return;
+    }
+    this.copied = true;
+    setTimeout(() => { this.copied = false; }, 1500);
+  }
+
   private close() {
     this.commit();
     this.dispatchEvent(new CustomEvent('lyric-editor-close', { bubbles: true, composed: true }));
@@ -842,6 +856,14 @@ export class LyricTextEditor extends LitElement {
               <button class="issues" title="Go to the first" @mousedown=${keepFocus} @click=${() => this.goTo(errors[0]!)}>
                 ${errors.length} to fix${this.pending ? ' · not in the score yet' : ''}
               </button>` : nothing}</span>
+            <button class="icon copy" aria-label=${this.copied ? 'Copied' : 'Copy lyrics'} title=${this.copied ? 'Copied' : 'Copy lyrics'}
+              @mousedown=${keepFocus} @click=${() => void this.copy()}>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                ${this.copied
+                  ? svg`<path d="M4.5 10.5l3.5 3.5 7.5-8"></path>`
+                  : svg`<rect x="7" y="7" width="9" height="10" rx="1.5"></rect><path d="M13 7V4.5A1.5 1.5 0 0 0 11.5 3h-6A1.5 1.5 0 0 0 4 4.5v8A1.5 1.5 0 0 0 5.5 14H7"></path>`}
+              </svg>
+            </button>
             <button class="icon marks-toggle" aria-label="Lyric marks" title="Lyric marks" aria-controls="marks"
               aria-expanded=${String(this.marksOpen)} @mousedown=${keepFocus} @click=${() => { this.marksOpen = !this.marksOpen; }}>
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">

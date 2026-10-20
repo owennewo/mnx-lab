@@ -533,6 +533,12 @@ try {
   for (let i = 0; i < 3; i++) await press('ArrowRight', 'ArrowRight', 39);
   const run1 = await outlined();
   assert.ok(!run1.hidden && run1.word === '×1' && run1.lit?.startsWith('Sun _'), `the cursor in a bar without words does not outline its ×1: ${JSON.stringify(run1)}`);
+  // The copy button hands over the whole text, as typed — the backup a paste puts back.
+  const copiedText = JSON.parse(await run(`const ed = find(document, 'mnx-lyric-text-editor').renderRoot;
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.copiedLyrics = text; } } });
+    ed.querySelector('button.copy').click(); await new Promise(r => setTimeout(r, 50)); await find(document, 'mnx-lyric-text-editor').updateComplete;
+    return JSON.stringify({ copied: window.copiedLyrics ?? null, text: ed.querySelector('textarea').value, label: ed.querySelector('button.copy').getAttribute('aria-label') });`));
+  assert.ok(copiedText.copied === copiedText.text && copiedText.text.startsWith('Sun _') && copiedText.label === 'Copied', `the copy button did not copy the lyric text: ${JSON.stringify(copiedText)}`);
   await run(`find(document, 'mnx-lyric-text-editor').dispatchEvent(new CustomEvent('lyric-editor-close')); return true;`);
   await settle(c);
 
@@ -596,7 +602,7 @@ try {
   assert.equal(await run(`return window.scrollY === 0 && document.documentElement.scrollTop === 0;`), true,
     'Space scrolled the page: the surface did not take the keystroke');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there, the outline following the next press, a chord's other note and the music, a skipped note and a bar without words outlined as their _ and ×1, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there, the outline following the next press, a chord's other note and the music, a skipped note and a bar without words outlined as their _ and ×1, the copy button handing over the text, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
 } finally {
   ws?.close();
   chrome.kill();
