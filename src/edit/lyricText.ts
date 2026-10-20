@@ -200,6 +200,9 @@ export interface LyricTextDiagnostic {
   /** …and the 1-based bar played, which names which visit of it. */
   played?: number;
   message: string;
+  /** The token it is about, as offsets into the text, when it is about one. */
+  from?: number;
+  to?: number;
   /** Absent = error (blocks apply). `warning` is the blue lane — the pass
    *  bound (decision A): worth naming, never worth refusing over. */
   severity?: 'warning';
@@ -779,12 +782,12 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     const offsets: { from: number; to: number; source: RawToken }[] = [];
     for (const token of block.tokens) {
       if (OLD_BAR_NUMBER.test(token.text)) {
-        result.diagnostics.push({ textLine: atLine(token.from),
+        result.diagnostics.push({ textLine: atLine(token.from), from: token.from, to: token.to,
           message: `“${token.text}” — the text has no bar numbers: it runs from the first bar played, | is the next bar and ×4 four bars nobody sings` });
         continue;
       }
       if (token.text.endsWith('|') && token.text !== '|') {
-        result.diagnostics.push({ textLine: atLine(token.from), message: `put a space before the | in “${token.text}”` });
+        result.diagnostics.push({ textLine: atLine(token.from), from: token.from, to: token.to, message: `put a space before the | in “${token.text}”` });
         continue;
       }
       const from = buffer.length + 1;
@@ -798,6 +801,7 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
       const source = sourceAt(at), played = d.bar;
       const visit = played === undefined ? undefined : visits[played - 1];
       return { ...d, textLine: source ? atLine(source.from) : textLine,
+        ...(source ? { from: source.from, to: source.to } : {}),
         ...(visit ? { bar: visit.measureIndex + 1, played } : {}) };
     }));
     // Where each line of this block starts.

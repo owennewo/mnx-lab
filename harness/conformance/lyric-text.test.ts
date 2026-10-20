@@ -99,7 +99,8 @@ describe('parse', () => {
       expect([...parseLyricText(doc, 0, run).lines[0]!.syllables.keys()]).toEqual([7]);
 
     const spilled = parseLyricText(doc, 0, 'a b c d |');
-    expect(spilled.diagnostics).toMatchObject([{ textLine: 0, bar: 2, played: 2, message: expect.stringContaining('too many syllables') }]);
+    // …named on the bar line it spills over, so the panel can mark that token.
+    expect(spilled.diagnostics).toMatchObject([{ textLine: 0, bar: 2, played: 2, from: 8, to: 9, message: expect.stringContaining('too many syllables') }]);
 
     const beyond = parseLyricText(doc, 0, '| | | x');
     expect(beyond.diagnostics[0]).toMatchObject({ message: expect.stringContaining('past the end of the music') });
@@ -108,7 +109,7 @@ describe('parse', () => {
     expect(overflow.diagnostics).toMatchObject([{ message: expect.stringContaining('more syllables than sung notes') }]);
 
     // Bar numbers are gone: the text runs from the first bar played.
-    expect(parseLyricText(doc, 0, 'one\n3| last').diagnostics).toMatchObject([{ textLine: 1, message: expect.stringContaining('no bar numbers') }]);
+    expect(parseLyricText(doc, 0, 'one\n3| last').diagnostics).toMatchObject([{ textLine: 1, from: 4, to: 6, message: expect.stringContaining('no bar numbers') }]);
   });
 
   it('headers pick language groups and ordinals; lines mint the numeric convention', () => {

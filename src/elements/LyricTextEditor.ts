@@ -34,8 +34,18 @@ import {
   type ParsedLyricText
 } from '../edit/lyricText.ts';
 
-const LEGEND =
-  'split - · hold fant--as · extend day__ · skip _ · join you~are · next bar | · bars without words ×4 (or x4) · another verse 2: · language nl:';
+/** The marks the text places words with — behind the header's ?, not under the box. */
+const MARKS: readonly { mark: string; example: string; meaning: string }[] = [
+  { mark: '-', example: 'fant-as-tic', meaning: 'split a word' },
+  { mark: '--', example: 'fant--as', meaning: 'hold a syllable on' },
+  { mark: '__', example: 'day__', meaning: 'extend a word' },
+  { mark: '_', example: '__', meaning: 'skip a note, each' },
+  { mark: '~', example: 'you~are', meaning: 'two words, one note' },
+  { mark: '|', example: 'a | b', meaning: 'next bar' },
+  { mark: '×4', example: '×4 or x4', meaning: 'bars without words' },
+  { mark: '2:', example: '2:', meaning: 'another verse' },
+  { mark: 'nl:', example: 'nl 2:', meaning: 'language' }
+];
 
 /** How long typing must pause before a clean parse is committed. */
 export const LYRIC_COMMIT_PAUSE_MS = 3_000;
@@ -69,6 +79,8 @@ export class LyricTextEditor extends LitElement {
   @state() private edits: LyricPlanEdit[] = [];
   /** The box holds text the document has not been given yet. */
   @state() private pending = false;
+  /** The marks card, behind the header's ?, is open. */
+  @state() private marksOpen = false;
   /** The text was typed in during this visit (or brought back from a draft). */
   private touched = false;
   private commitTimer: ReturnType<typeof setTimeout> | undefined;
@@ -111,17 +123,22 @@ export class LyricTextEditor extends LitElement {
         outline: none;
         display: flex;
         flex-direction: column;
+        /* The blue lane (decision A): worth naming, never worth refusing over.
+           No blue token exists in the shared palette yet, so the pair is local
+           — matched to the renderer's warning-badge hue. */
+        --warning-ink: light-dark(oklch(0.45 0.13 250), oklch(0.72 0.11 250));
       }
       header {
         display: flex;
         align-items: center;
         flex: none;
-        min-height: 40px;
+        min-height: 44px;
         gap: 8px;
-        padding: 0 8px 0 16px;
+        padding: 0 4px 0 16px;
         border-bottom: 1px solid var(--line);
       }
       header .title {
+        font-size: 14px;
         font-weight: 600;
       }
       header .part {
@@ -141,18 +158,20 @@ export class LyricTextEditor extends LitElement {
         display: flex;
         flex: 1;
         min-height: 5em;
-        margin: 10px 14px 6px 0;
       }
+      /* The panel is the box: no frame of its own, and the margin a tinted column beside it. */
       .gutter {
         position: relative;
         flex: none;
-        width: 13ch;
+        width: calc(13ch + 12px);
         overflow: hidden;
         font: 11px/1 var(--mono);
+        background: var(--bg-context);
+        border-right: 1px solid var(--line);
       }
       .start {
         position: absolute;
-        right: 4px;
+        right: 12px;
         display: flex;
         align-items: center;
         gap: 5px;
@@ -169,6 +188,9 @@ export class LyricTextEditor extends LitElement {
         border-radius: 8px;
         padding: 1px 4px;
       }
+      /* The cursor's line, lit across the box as the score's current row is. */
+      .start.now .played, .start.now .visit { color: var(--accent-fg); }
+      .start.now .visit { border-color: color-mix(in oklab, var(--accent) 45%, var(--surface)); }
       .start .dot {
         position: relative;
         z-index: 1;
@@ -182,10 +204,28 @@ export class LyricTextEditor extends LitElement {
       }
       /* A line that only crosses bars without words. */
       .start.silent .dot { background: var(--surface); border: 1.5px solid var(--ink-3); }
+      .start.now .dot { background: var(--accent); }
+      /* A line the text cannot place: a ring in the margin, red for an error, blue for a warning. */
+      .start.error .dot, .start.warning .dot, .flag {
+        width: 9px;
+        height: 9px;
+        margin-right: -4px;
+        background: var(--surface);
+        border: 2px solid var(--accent);
+      }
+      .start.warning .dot, .flag.warning { border-color: var(--warning-ink); }
+      .flag {
+        position: absolute;
+        right: 8px;
+        z-index: 1;
+        box-sizing: border-box;
+        border-radius: 50%;
+        margin: 0;
+      }
       .start:hover .played, .start:hover .visit { color: var(--ink); }
       .rail {
         position: absolute;
-        right: 4.75px;
+        right: 12.75px;
         width: 1.5px;
         background: var(--faint);
       }
@@ -204,6 +244,7 @@ export class LyricTextEditor extends LitElement {
         box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
       }
       .tip b { font-weight: 600; }
+      .tip .problem { display: block; max-width: 34ch; white-space: normal; margin-bottom: 3px; }
       /* What the box draws: its own text is transparent, and this copy, laid out the same,
          sits beneath it in two inks — words in ink, the marks that place them faded back. */
       .paint {
@@ -213,12 +254,11 @@ export class LyricTextEditor extends LitElement {
         pointer-events: none;
         box-sizing: border-box;
         border: 1px solid transparent;
-        border-radius: 6px;
-        background: var(--bg);
+        background: var(--surface);
       }
       .paint-inner {
         box-sizing: border-box;
-        padding: 8px 10px;
+        padding: 12px 16px 12px 14px;
         font: 13px/1.7 var(--mono);
         color: var(--ink);
         white-space: pre-wrap;
@@ -233,6 +273,10 @@ export class LyricTextEditor extends LitElement {
         box-shadow: 0 0 0 2px var(--run);
       }
       .paint .head { color: var(--ink-2); font-weight: 600; }
+      .paint-inner > .now {
+        background: var(--row-current);
+        box-shadow: -14px 0 0 var(--row-current), 16px 0 0 var(--row-current);
+      }
       /* The word the cursor is on, outlined as the score outlines a selected element: the
          box's own selection is not drawn once focus leaves it, and a press on the score takes it. */
       .marks {
@@ -241,7 +285,12 @@ export class LyricTextEditor extends LitElement {
         overflow: hidden;
         pointer-events: none;
       }
-      .marks span {
+      /* Under each token an error is about. */
+      .marks .squiggle {
+        position: absolute;
+        border-bottom: 2px solid var(--accent);
+      }
+      .marks .word {
         position: absolute;
         box-sizing: border-box;
         border: 1px solid var(--accent);
@@ -258,75 +307,98 @@ export class LyricTextEditor extends LitElement {
         color: transparent;
         caret-color: var(--ink);
         background: transparent;
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        padding: 8px 10px;
+        border: 1px solid transparent;
+        border-radius: 0;
+        padding: 12px 16px 12px 14px;
         outline: none;
       }
-      textarea:focus {
-        border-color: var(--line-strong);
-      }
       textarea::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+      /* What the text cannot place, named by bar: each a way to the token it is about. */
       .diagnostics {
-        margin: 0 14px;
         max-height: 25%;
         overflow: auto;
         flex: none;
         display: flex;
         flex-direction: column;
-        gap: 2px;
-      }
-      .diagnostic {
-        font-size: 12px;
-        color: var(--accent);
-      }
-      /* The blue lane (decision A): worth naming, never worth refusing over.
-         No blue token exists in the shared palette yet, so the pair is local
-         — matched to the renderer's warning-badge hue. */
-      .diagnostic.warning {
-        color: light-dark(oklch(0.45 0.13 250), oklch(0.72 0.11 250));
-      }
-      footer {
-        display: flex;
-        flex: none;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
+        padding: 4px 0;
         border-top: 1px solid var(--line);
       }
-      .legend {
-        flex: 1 0 100%;
-        font-size: 11px;
-        color: var(--ink-3);
+      .diagnostic {
+        text-align: left;
+        font-size: 12px;
+        line-height: 1.4;
+        padding: 4px 16px;
+        color: var(--accent-fg);
       }
-      button {
-        font: inherit;
-        padding: 4px 14px;
-        border-radius: 6px;
-        border: 1px solid var(--line-strong);
-        background: var(--surface);
-        color: var(--ink);
-        cursor: pointer;
-      }
-      button.close {
+      .diagnostic:hover { background: var(--row-current); }
+      .diagnostic.warning { color: var(--warning-ink); }
+      .diagnostic .at { font-weight: 600; font-variant-numeric: tabular-nums; }
+      .tools {
         margin-left: auto;
-        flex: none;
-        width: 28px;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .issues {
         height: 28px;
-        padding: 0;
-        border: 0;
-        background: transparent;
+        margin-right: 4px;
+        padding: 0 10px;
+        border-radius: var(--radius-pill);
+        background: color-mix(in oklab, var(--accent) 10%, var(--surface));
+        color: var(--accent-fg);
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .icon {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-control);
+        color: var(--ink-2);
+      }
+      .icon:hover, .icon[aria-expanded='true'] { background: var(--bg); color: var(--ink); }
+      .icon svg { width: 18px; height: 18px; }
+      /* The marks, kept behind the ? until they are wanted. */
+      .marks-card {
+        position: absolute;
+        z-index: 6;
+        top: 48px;
+        right: 8px;
+        width: min(320px, calc(100% - 16px));
+        padding: 12px 16px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        box-shadow: 0 10px 30px rgb(0 0 0 / 0.14);
+        font-size: 12px;
+      }
+      .marks-card h2 { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+      .marks-card table { width: 100%; border-collapse: collapse; }
+      .marks-card td { padding: 3px 0; color: var(--ink-2); vertical-align: baseline; }
+      .marks-card td:first-child { width: 3.5em; }
+      .marks-card td:nth-child(2) { width: 8.5em; font-family: var(--mono); }
+      .marks-card kbd {
+        display: inline-block;
+        min-width: 2.4em;
+        padding: 2px 4px;
+        text-align: center;
+        font: 600 12px/1.2 var(--mono);
+        color: var(--ink);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-chip);
+      }
+      .marks-card p {
+        margin: 8px 0 0;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
         color: var(--ink-3);
-        font-size: 20px;
+        font-size: 11px;
       }
       button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-      .status {
-        margin-right: auto;
-        font-size: 12px;
-        color: var(--ink-3);
-      }
       button:disabled {
         opacity: 0.5;
         cursor: default;
@@ -388,14 +460,37 @@ export class LyricTextEditor extends LitElement {
     this.layoutMark();
     if (!span) return false;
     area.setSelectionRange(span.from, span.to);
-    // A caret set from outside does not scroll the box: bring its line into view
-    // by the painted copy the margin is placed with.
-    const line = this.text.slice(0, span.from).split('\n').length - 1;
-    const row = this.rows()[line];
-    if (row && (row.offsetTop < area.scrollTop || row.offsetTop + row.offsetHeight > area.scrollTop + area.clientHeight)) {
+    this.reveal(span.from);
+    return true;
+  }
+
+  /** A caret set from outside does not scroll the box: bring its line into view
+   *  by the painted copy the margin is placed with. */
+  private reveal(offset: number) {
+    const area = this.textarea();
+    const row = this.rows()[atLine(this.text, offset)];
+    if (area && row && (row.offsetTop < area.scrollTop || row.offsetTop + row.offsetHeight > area.scrollTop + area.clientHeight)) {
       area.scrollTop = Math.max(0, row.offsetTop - area.clientHeight / 3);
     }
-    return true;
+  }
+
+  /** A problem is a way to what it is about: the caret selects its token, or goes to its line. */
+  private goTo(problem: LyricTextDiagnostic) {
+    const area = this.textarea();
+    if (!area) return;
+    const from = problem.from ?? lineStart(this.text, problem.textLine);
+    area.focus();
+    area.setSelectionRange(from, problem.to ?? from);
+    this.reveal(from);
+    this.caretAt(from);
+  }
+
+  /** Each line's problems, errors first — what its margin ring and tip say. */
+  private problemsByLine(): Map<number, LyricTextDiagnostic[]> {
+    const lines = new Map<number, LyricTextDiagnostic[]>();
+    for (const problem of [...this.parsed.diagnostics, ...this.warnings])
+      lines.set(problem.textLine, [...lines.get(problem.textLine) ?? [], problem]);
+    return lines;
   }
 
   /** Each bar played's `bar.pass`, by performance ordinal. */
@@ -453,17 +548,30 @@ export class LyricTextEditor extends LitElement {
       rail.style.height = `${rowTop(next.textLine) - rowTop(start.textLine)}px`;
       return [rail];
     });
-    gutter.replaceChildren(...rails, ...starts.map(start => {
+    const problems = this.problemsByLine();
+    const ring = (line: number) => problems.get(line)?.some(p => p.severity !== 'warning') ? 'error' : 'warning';
+    const labelled = new Set(starts.map(start => start.textLine));
+    const flags = [...problems.keys()].filter(line => !labelled.has(line)).map(line => {
+      const flag = document.createElement('div');
+      flag.className = `flag ${ring(line)}`;
+      flag.style.top = `${rowTop(line) + half - 4.5}px`;
+      flag.addEventListener('mouseenter', () => this.showTip(flag, null, problems.get(line)!));
+      flag.addEventListener('mouseleave', () => this.showTip(null, null, []));
+      return flag;
+    });
+    gutter.replaceChildren(...rails, ...flags, ...starts.map(start => {
       const label = document.createElement('div');
       label.className = start.sung ? 'start' : 'start silent';
+      if (problems.has(start.textLine)) label.classList.add(ring(start.textLine));
+      label.dataset.line = String(start.textLine);
       const played = document.createElement('span'), visit = document.createElement('span'), dot = document.createElement('span');
       played.className = 'played'; played.textContent = String(start.ordinal + 1);
       visit.className = 'visit'; visit.textContent = this.labels[start.ordinal] ?? '';
       dot.className = 'dot';
       label.append(played, visit, dot);
       label.style.top = `${rowTop(start.textLine)}px`;
-      label.addEventListener('mouseenter', () => this.showTip(label, start.ordinal));
-      label.addEventListener('mouseleave', () => this.showTip(null, 0));
+      label.addEventListener('mouseenter', () => this.showTip(label, start.ordinal, problems.get(start.textLine) ?? []));
+      label.addEventListener('mouseleave', () => this.showTip(null, null, []));
       // A label is a way to the line's first word: the caret goes there, and the cursor with it.
       label.addEventListener('mousedown', event => event.preventDefault());
       label.addEventListener('click', () => {
@@ -478,41 +586,75 @@ export class LyricTextEditor extends LitElement {
     this.onScroll();
   }
 
-  /** The hover card on a margin label: what its two numbers mean. */
-  private showTip(label: HTMLElement | null, ordinal: number) {
+  /** The hover card on a margin mark: the line's problems, then what a label's two numbers mean. */
+  private showTip(label: HTMLElement | null, ordinal: number | null, problems: LyricTextDiagnostic[]) {
     const editor = this.renderRoot.querySelector<HTMLElement>('.editor');
     let tip = editor?.querySelector<HTMLElement>('.tip') ?? null;
     if (!label || !editor) { tip?.remove(); return; }
-    const [bar, pass] = (this.labels[ordinal] ?? '').split('.').map(Number);
     if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; editor.append(tip); }
-    tip.replaceChildren();
-    const lead = document.createElement('b');
-    lead.textContent = `${ordinalWord(ordinal + 1)} bar played`;
-    tip.append(lead, ` · bar ${bar} of the score, ${ordinalWord(pass ?? 1)} time through`);
+    tip.replaceChildren(...problems.map(problem => {
+      const line = document.createElement('span');
+      line.className = 'problem'; line.textContent = problem.message;
+      return line;
+    }));
+    if (ordinal !== null) {
+      const [bar, pass] = (this.labels[ordinal] ?? '').split('.').map(Number);
+      const lead = document.createElement('b');
+      lead.textContent = `${ordinalWord(ordinal + 1)} bar played`;
+      tip.append(lead, ` · bar ${bar} of the score, ${ordinalWord(pass ?? 1)} time through`);
+    }
     const r = label.getBoundingClientRect(), e = editor.getBoundingClientRect();
     tip.style.left = `${r.left - e.left}px`;
     tip.style.top = `${r.bottom - e.top + 4}px`;
   }
 
-  /** Outline the marked word where the painted copy lays it out, clipped to the box's text area. */
+  /**
+   * Outline the marked word where the painted copy lays it out, clipped to the box's
+   * text area; light its line, in the box and the margin; and underline each token a
+   * problem is about (a whole line, for an error that names none).
+   */
   private layoutMark() {
     const area = this.textarea();
     const marks = this.renderRoot.querySelector<HTMLElement>('.marks');
-    const mark = marks?.firstElementChild as HTMLElement | null | undefined;
+    const mark = marks?.querySelector<HTMLElement>('.word');
     if (!area || !marks || !mark) return;
     Object.assign(marks.style, {
       left: `${area.offsetLeft + 1}px`, top: `${area.offsetTop + 1}px`,
       width: `${area.clientWidth}px`, height: `${area.clientHeight}px`
     });
+    const rows = this.rows();
     const span = this.marked;
     const line = span ? atLine(this.text, span.from) : -1;
-    const row = this.rows()[line];
-    const column = span ? span.from - lineStart(this.text, line) : 0;
-    const range = span && row ? rangeIn(row, column, column + span.to - span.from) : null;
+    rows.forEach((row, index) => row.classList.toggle('now', index === line));
+    for (const label of this.renderRoot.querySelectorAll<HTMLElement>('.gutter .start'))
+      label.classList.toggle('now', label.dataset.line === String(line));
+    // The painted copy scrolls with the box, so a token is where it is drawn.
+    const layer = marks.getBoundingClientRect();
+    const rangeOf = (from: number, to: number) => {
+      const at = atLine(this.text, from), row = rows[at], start = lineStart(this.text, at);
+      return row ? rangeIn(row, from - start, to - start) : null;
+    };
+    marks.querySelectorAll('.squiggle').forEach(squiggle => squiggle.remove());
+    for (const problem of this.parsed.diagnostics) {
+      let { from, to } = problem;
+      if (from === undefined || to === undefined) {
+        const start = lineStart(this.text, problem.textLine), text = this.text.split('\n')[problem.textLine] ?? '';
+        from = start + (text.length - text.trimStart().length); to = start + text.trimEnd().length;
+      }
+      const range = to > from ? rangeOf(from, to) : null;
+      for (const rect of range?.getClientRects() ?? []) {
+        const squiggle = document.createElement('span');
+        squiggle.className = 'squiggle';
+        Object.assign(squiggle.style, {
+          left: `${rect.left - layer.left}px`, top: `${rect.bottom - layer.top - 1}px`, width: `${rect.width}px`
+        });
+        marks.append(squiggle);
+      }
+    }
+    const range = span ? rangeOf(span.from, span.to) : null;
     mark.hidden = !range;
     if (!range) return;
-    // The painted copy scrolls with the box, so the word is where it is drawn.
-    const word = range.getBoundingClientRect(), layer = marks.getBoundingClientRect();
+    const word = range.getBoundingClientRect();
     Object.assign(mark.style, {
       left: `${word.left - layer.left - 2}px`, top: `${word.top - layer.top - 1}px`,
       width: `${word.width + 4}px`, height: `${word.height + 2}px`
@@ -525,7 +667,7 @@ export class LyricTextEditor extends LitElement {
     const inner = this.renderRoot.querySelector<HTMLElement>('.paint-inner');
     if (area && gutter) gutter.style.transform = `translateY(${-area.scrollTop}px)`;
     if (area && inner) inner.style.transform = `translateY(${-area.scrollTop}px)`;
-    this.showTip(null, 0);
+    this.showTip(null, null, []);
     this.layoutMark();
   };
 
@@ -679,20 +821,48 @@ export class LyricTextEditor extends LitElement {
     this.typed = false;
     if (event.key === 'Escape') {
       event.preventDefault();
-      this.close();
+      if (this.marksOpen) this.marksOpen = false;
+      else this.close();
     }
   };
 
   render() {
-    const blocked = this.parsed.diagnostics.length > 0;
-    const shown = [...this.parsed.diagnostics, ...this.warnings];
+    const errors = this.parsed.diagnostics;
+    const shown = [...errors, ...this.warnings];
+    // A press on the header's controls or a problem keeps the caret in the box.
+    const keepFocus = (event: Event) => event.preventDefault();
     return html`
       <div class="card" role="complementary" aria-label="Lyrics" tabindex="-1" @keydown=${this.onKey}>
         <header>
-          <span class="title">lyrics</span>
+          <span class="title">Lyrics</span>
           ${this.partLabel ? html`<span class="part">${this.partLabel}</span>` : nothing}
-          <button class="close" aria-label="Close lyrics" title="Close lyrics (Escape)" @click=${() => this.close()}>×</button>
+          <div class="tools">
+            <span role="status">${errors.length ? html`
+              <button class="issues" title="Go to the first" @mousedown=${keepFocus} @click=${() => this.goTo(errors[0]!)}>
+                ${errors.length} to fix${this.pending ? ' · not in the score yet' : ''}
+              </button>` : nothing}</span>
+            <button class="icon marks-toggle" aria-label="Lyric marks" title="Lyric marks" aria-controls="marks"
+              aria-expanded=${String(this.marksOpen)} @mousedown=${keepFocus} @click=${() => { this.marksOpen = !this.marksOpen; }}>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                <circle cx="10" cy="10" r="7.5"></circle><path d="M7.8 7.9a2.3 2.3 0 0 1 4.4.9c0 1.5-2.2 1.9-2.2 3.2"></path>
+                <circle cx="10" cy="14.4" r="0.5" fill="currentColor"></circle>
+              </svg>
+            </button>
+            <button class="icon close" aria-label="Close lyrics" title="Close lyrics (Escape)" @click=${() => this.close()}>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                <path d="M5 5l10 10M15 5L5 15"></path>
+              </svg>
+            </button>
+          </div>
         </header>
+        ${this.marksOpen ? html`
+          <div class="marks-card" id="marks" role="dialog" aria-label="Lyric marks">
+            <h2>Marks</h2>
+            <table>
+              ${MARKS.map(m => html`<tr><td><kbd>${m.mark}</kbd></td><td>${m.example}</td><td>${m.meaning}</td></tr>`)}
+            </table>
+            <p>Each line’s margin label is the bar played it starts in, then that bar of the score and its pass.</p>
+          </div>` : nothing}
         <div class="editor">
         <div class="gutter" aria-hidden="true"><div class="gutter-inner"></div></div>
         <textarea
@@ -708,20 +878,16 @@ export class LyricTextEditor extends LitElement {
           @scroll=${this.onScroll}
         ></textarea>
         <div class="paint" aria-hidden="true"><div class="paint-inner"></div></div>
-        <div class="marks" aria-hidden="true"><span hidden></span></div>
+        <div class="marks" aria-hidden="true"><span class="word" hidden></span></div>
         </div>
-        <div class="diagnostics">
-          ${shown.map(d => html`
-            <span class="diagnostic${d.severity === 'warning' ? ' warning' : ''}">
-              ${d.played !== undefined ? `${d.played} (${this.labels[d.played - 1] ?? d.bar}) — ` : d.bar !== undefined ? `bar ${d.bar} — ` : `line ${d.textLine + 1} — `}${d.message}
-            </span>
-          `)}
-        </div>
-        <footer>
-          <span class="legend">${LEGEND}</span>
-          <span class="status" role="status">${this.pending && blocked ? 'not in the score yet — fix the errors above' : ''}</span>
-          <button @click=${() => this.close()}>close</button>
-        </footer>
+        ${shown.length ? html`
+          <div class="diagnostics">
+            ${shown.map(d => html`
+              <button class="diagnostic${d.severity === 'warning' ? ' warning' : ''}" @mousedown=${keepFocus} @click=${() => this.goTo(d)}>
+                <span class="at">${d.played !== undefined ? `${d.played} (${this.labels[d.played - 1] ?? d.bar})` : d.bar !== undefined ? `bar ${d.bar}` : `line ${d.textLine + 1}`}</span> — ${d.message}
+              </button>
+            `)}
+          </div>` : nothing}
       </div>
     `;
   }
