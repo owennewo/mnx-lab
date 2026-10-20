@@ -41,7 +41,7 @@ export class RecordingBackend implements PlaybackBackend {
   private wrapping = false;
   private issue?: string;
   private invalidSync?: string;
-  private written = new Map<number, WrittenOccurrence[]>();
+  private written: WrittenByVisit = new Map();
   constructor(readonly id: string, private readonly media: MediaPort, performance: Performance,
     private sync: RecordingSyncMap | null, syncIssue?: string) {
     this.invalidSync = syncIssue;
@@ -49,11 +49,7 @@ export class RecordingBackend implements PlaybackBackend {
     this.unsubscribe = media.subscribe(event => this.onMedia(event));
   }
   private index(performance: Performance) {
-    this.written = new Map();
-    for (const w of performance.written) {
-      const group = this.written.get(w.ordinal) ?? [];
-      group.push(w); this.written.set(w.ordinal, group);
-    }
+    this.written = writtenByVisit(performance);
   }
   /** An edit: a new performance for the same media. The written index is
    *  rebuilt and the sync swapped; the port — an element, an iframe — is not
@@ -92,9 +88,7 @@ export class RecordingBackend implements PlaybackBackend {
       ? this.media.duration : undefined;
     const state = this.stopped ? 'stopped' : this.media.paused ? 'paused'
       : this.waiting || this.media.seeking ? 'buffering' : 'playing';
-    const highlight = !position || hidden || state === 'stopped' ? [] : (this.written.get(position.ordinal) ?? [])
-      .filter(w => compare(position.metricOffset, w.metricOffset) >= 0 && compare(position.metricOffset, add(w.metricOffset, w.metricDuration)) < 0)
-      .map(w => ({ noteKey: w.noteKey, ordinal: w.ordinal }));
+    const highlight = !position || hidden || state === 'stopped' ? [] : soundingAt(this.written, position);
     return { sourceId: this.id, kind: this.media.kind ?? 'audio', state, scorePosition: position, highlight, hidePlayhead: hidden,
       rate: this.media.rate, volume: this.media.volume, mediaTime: this.media.currentTime,
       mediaPhase,
@@ -227,4 +221,23 @@ export class RecordingBackend implements PlaybackBackend {
     this.closed = true; ++this.generation; this.intent = false;
     this.unsubscribe(); this.listeners.clear(); this.media.dispose();
   }
+}
+
+/** A performance's written notes grouped by the performed visit they sound in. */
+export type WrittenByVisit = ReadonlyMap<number, readonly WrittenOccurrence[]>;
+
+export function writtenByVisit(performance: Performance): WrittenByVisit {
+  const byVisit = new Map<number, WrittenOccurrence[]>();
+  for (const w of performance.written) {
+    const group = byVisit.get(w.ordinal) ?? [];
+    group.push(w); byVisit.set(w.ordinal, group);
+  }
+  return byVisit;
+}
+
+/** The notes sounding at a place in the score: begun there or earlier in the visit, not yet released. */
+export function soundingAt(written: WrittenByVisit, position: ScorePosition): { noteKey: string; ordinal: number }[] {
+  return (written.get(position.ordinal) ?? [])
+    .filter(w => compare(position.metricOffset, w.metricOffset) >= 0 && compare(position.metricOffset, add(w.metricOffset, w.metricDuration)) < 0)
+    .map(w => ({ noteKey: w.noteKey, ordinal: w.ordinal }));
 }

@@ -5,7 +5,7 @@ import type { Performance, PerformanceMeasure } from '../audio/performanceTypes.
 import type { LoopRegion } from '../audio/transport.ts';
 import { PlaybackSession, type PlaybackSnapshot } from '../audio/playbackSession.ts';
 import { type RecordingSource, type PlaybackBackend, type ScorePosition, type ScoreLoop } from '../audio/playbackBackend.ts';
-import { RecordingBackend } from '../audio/recordingBackend.ts';
+import { RecordingBackend, soundingAt, writtenByVisit, type WrittenByVisit } from '../audio/recordingBackend.ts';
 import { NativeYouTubePort } from '../audio/native/youtube.ts';
 import { youtubeVideoId } from '../audio/youtubeUrl.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
@@ -761,6 +761,8 @@ export class Player extends LitElement {
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
+    // The parked cursor decides what is lit, so a move of it is published like a move of the playhead.
+    if (changed.has('cursorPlace')) this.publish();
     // A host video pane draws the notice and the video's failure from here: either changing redraws it.
     if (changed.has('youtubeNotice') || this.youtubeError !== this.shownYouTubeError) {
       this.shownYouTubeError = this.youtubeError;
@@ -817,6 +819,8 @@ export class Player extends LitElement {
     if (changed.has('partMix')) this.auditioner?.setPartMix(this.partMix);
     if (changed.has('sampleRate') && changed.get('sampleRate') !== this.sampleRate) this.dropAuditioner();
   }
+  /** The performance's notes by visit, for the parked cursor's lamp. */
+  private writtenCache: { performance: Performance; byVisit: WrittenByVisit } | null = null;
   /** Rests built once per document; the publish runs every beat. */
   private restCache: { doc: MnxStructure; spans: readonly RestSpan[] } | null = null;
 
@@ -847,19 +851,31 @@ export class Player extends LitElement {
       .map(span => ({ noteKey: span.key, ordinal: position.ordinal }));
   }
 
+  private soundingAt(at: ScorePosition): PlaybackOccurrence[] {
+    const performance = this.performance!;
+    if (this.writtenCache?.performance !== performance) this.writtenCache = { performance, byVisit: writtenByVisit(performance) };
+    return soundingAt(this.writtenCache.byVisit, at);
+  }
+
   private publish() {
     const status = this.status;
     const visible = status && !status.hidePlayhead && (status.state !== 'stopped' || status.highlight.length > 0);
     const current = status?.transport && this.performance ? measureAt(this.performance, status.transport.position)?.ordinal
       : status?.scorePosition?.ordinal;
-    const ordinal = visible && current !== undefined && current < (this.performance?.measures.length ?? 0) ? current : null;
+    // Not playing, the cursor's exact place is what sounds and which visit it is: a playhead read
+    // back from a recording's clock lands a hair short of the note it was parked on, which lit the
+    // note before — and at a bar's first note, the visit before, and so the wrong verse's row.
+    const parked = visible ? this.parkedCursor : null;
+    const ordinal = parked ? parked.ordinal
+      : visible && current !== undefined && current < (this.performance?.measures.length ?? 0) ? current : null;
     const bounds = status?.mediaBounds;
     const recordingBookends = bounds && !status?.syncIssue ? {
       preRollSeconds: Math.max(0, bounds.startSeconds),
       postRollSeconds: Math.max(0, (bounds.durationSeconds ?? bounds.endSeconds) - bounds.endSeconds)
     } : null;
     const detail: PlaybackUpdate = { documentId: this.documentId, ordinal,
-      highlight: [...(status?.highlight ?? []), ...this.restsUnderPlayhead(visible ? status?.scorePosition ?? null : null)],
+      highlight: parked ? [...this.soundingAt(parked), ...this.restsUnderPlayhead(parked)]
+        : [...(status?.highlight ?? []), ...this.restsUnderPlayhead(visible ? status?.scorePosition ?? null : null)],
       playing: status?.wantsPlayback ?? false, recordingBookends, mediaPhase: status?.mediaPhase ?? null };
     this.wakeLock.want(status?.wantsPlayback ?? false);
     this.dispatchEvent(new CustomEvent('playback-position', { detail: {
