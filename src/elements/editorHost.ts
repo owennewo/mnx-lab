@@ -61,7 +61,7 @@ import { buildInspectorView, type InspectorView } from './inspectorRows.ts';
 import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from './inspectorMount.ts';
 import type { OverlayAnchor } from './overlayPlacement.ts';
 import type { RungInspector } from './RungInspector.ts';
-import type { LyricCommitDetail, LyricTextEditor } from './LyricTextEditor.ts';
+import type { LyricCommitDetail, LyricPlace, LyricTextEditor } from './LyricTextEditor.ts';
 import './RungInspector.ts';
 import './LyricTextEditor.ts';
 import './EditorSurfaces.ts';
@@ -313,9 +313,14 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const suspended = () => options.suspended?.() ?? false;
   /** The inspector is ours too; unclaimed focus only for a host that asked for it. */
   const hasKeyboard = () => focusWithin(scope) || (lyrics !== null && focusWithin(lyrics)) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
+  /** The cursor's place as the lyric text names one — for a note the text gives no word. */
+  const lyricPlace = (): LyricPlace | null => {
+    const start = session.playStart;
+    return start ? { ordinal: start.ordinal, onset: [start.onset.num, start.onset.den] } : null;
+  };
   const showLyricWord = () => {
     lyricsPlace = cursorPlace();
-    return lyrics?.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal) ?? false;
+    return lyrics?.showWord(session.selectedNoteKeys[0] ?? '', session.performedOrdinal, lyricPlace()) ?? false;
   };
   const draw = () => {
     if (disposed) return;
@@ -430,6 +435,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // is the player arriving, not the playhead moving.
     const moved = lastHead !== '' && headKey(head) !== lastHead;
     lastHead = headKey(head);
+    // Playing, the lyric panel's outline follows the sung word as the score's lyric does.
+    if (now && lyrics) {
+      const onset = head && onsetOf(head.offset);
+      lyrics.follow(head && onset ? { ordinal: head.ordinal, onset: [onset.num, onset.den] } : null);
+    }
     if (now !== playing) {
       playing = now;
       if (now) {
@@ -456,6 +466,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
         const visit = target === null ? undefined : session.passModel.entries[target];
         if (visit) seekNow({ ordinal: visit.ordinal, onset: entryStart(visit) });
         else if (head) park(head);
+        // The outline followed the music; paused, it is the cursor's word again.
+        lyricsPlace = '';
       }
       if (lyrics) lyrics.playing = playing;
       draw();
@@ -573,7 +585,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
-    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '', focusOrdinal: session.performedOrdinal ?? null, draft: options.lyricDrafts?.read(partIndex) ?? null });
+    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '', focusOrdinal: session.performedOrdinal ?? null, focusPlace: lyricPlace(), draft: options.lyricDrafts?.read(partIndex) ?? null });
     lyricStep = null;
     /** The panel plans against the document its visit opened on. If something else moved the
      *  document since (an edit on the score, an undo), it plans against that instead — and

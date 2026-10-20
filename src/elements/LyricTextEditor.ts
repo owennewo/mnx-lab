@@ -54,6 +54,9 @@ export const LYRIC_COMMIT_PAUSE_MS = 3_000;
  *  score catches up when the typing stops. */
 export const LYRIC_PREVIEW_PAUSE_MS = 250;
 
+/** A performed place as the text's tokens name one: a visit, and an onset into its bar in whole notes. */
+export interface LyricPlace { ordinal: number; onset: [number, number] }
+
 /** What the host is told: `edits` to commit; `accepted` is set by the host when they landed. */
 export interface LyricCommitDetail { edits: LyricPlanEdit[]; accepted: boolean }
 
@@ -67,6 +70,8 @@ export class LyricTextEditor extends LitElement {
   @property({ type: String }) focusNoteKey = '';
   /** …on this performed visit of it, when the text names that visit. */
   @property({ type: Number }) focusOrdinal: number | null = null;
+  /** …or the word sung at this place, when that note has none (a chord's other notes carry no word). */
+  @property({ attribute: false }) focusPlace: LyricPlace | null = null;
   /** The music is playing: the panel stays open, read-only, until it pauses — nothing is written while it plays. */
   @property({ type: Boolean }) playing = false;
   /** Text a previous visit could not commit, offered in place of the document's own. */
@@ -438,7 +443,7 @@ export class LyricTextEditor extends LitElement {
     // Open at the caller's note: place the caret on its token — once the text
     // set above has been rendered into the box, or the range lands on an empty
     // box and the render that fills it leaves the caret at the end.
-    void this.updateComplete.then(() => this.showWord(this.focusNoteKey, this.focusOrdinal));
+    void this.updateComplete.then(() => this.showWord(this.focusNoteKey, this.focusOrdinal, this.focusPlace));
   }
 
   /**
@@ -446,22 +451,47 @@ export class LyricTextEditor extends LitElement {
    * that visit — and bring it into view. Used when the panel opens and when a
    * syllable is pressed on the score while it is open
    * (core-editor-click-targets.md): the cursor is already there, so nothing
-   * is sent back until the caret moves. False when the note has no word here,
-   * and then no word is outlined.
+   * is sent back until the caret moves. A note the text gives no word — a chord's
+   * other notes, another voice — shows the word sung at `place`, the score's own
+   * answer. False when there is none, and then no word is outlined.
    */
-  showWord(noteKey: string, ordinal: number | null): boolean {
+  showWord(noteKey: string, ordinal: number | null, place: LyricPlace | null = null): boolean {
     const area = this.textarea();
     if (!area || !this.doc) return false;
     const walk = lyricEventWalk(this.doc, this.partIndex);
     const entryIndex = walk.findIndex(entry => entry.noteKey === noteKey);
     const tokens = this.parsed.tokens.filter(token => token.entryIndex === entryIndex);
-    const span = tokens.find(token => token.ordinal === ordinal) ?? tokens[0];
+    const span = tokens.find(token => token.ordinal === ordinal) ?? tokens[0] ?? (place ? this.wordAt(place, true) : undefined);
     this.marked = span ?? null;
     this.layoutMark();
     if (!span) return false;
     area.setSelectionRange(span.from, span.to);
     this.reveal(span.from);
     return true;
+  }
+
+  /**
+   * While the music plays, the outline follows the word being sung, as the score's
+   * lyric does: the caret stays where it was, and the box scrolls to keep the word in view.
+   */
+  follow(place: LyricPlace | null) {
+    const span = place ? this.wordAt(place, false) : undefined;
+    if ((span?.from ?? null) === (this.marked?.from ?? null)) return;
+    this.marked = span ?? null;
+    this.layoutMark();
+    if (span) this.reveal(span.from);
+  }
+
+  /** The word a visit sings at `place` — `exact`, or the last it starts at or before. */
+  private wordAt(place: LyricPlace, exact: boolean) {
+    const after = (a: [number, number], b: [number, number]) => a[0] * b[1] > b[0] * a[1];
+    let best: (typeof this.parsed.tokens)[number] | undefined;
+    for (const token of this.parsed.tokens) {
+      if (token.ordinal !== place.ordinal || !token.onset) continue;
+      if (exact ? token.onset[0] * place.onset[1] !== place.onset[0] * token.onset[1] : after(token.onset, place.onset)) continue;
+      if (!best || after(token.onset, best.onset!)) best = token;
+    }
+    return best;
   }
 
   /** A caret set from outside does not scroll the box: bring its line into view

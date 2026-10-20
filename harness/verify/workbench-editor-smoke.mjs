@@ -496,6 +496,27 @@ try {
   const moved = JSON.parse(await run(markOf));
   assert.ok(!moved.hidden && !moved.focused && moved.word === next.text && (moved.left !== opened.left || moved.top !== opened.top)
     && Math.abs(moved.chars - next.text.length) < 0.5, `a press on "${next.text}" did not move the panel's outline to it: ${JSON.stringify(moved)}`);
+  // A note of that event the word is not stored on — a chord's other note — still outlines it, as the score lights it.
+  const ops = await run(`return page().editor.session.appliedOps.length;`);
+  await press('ArrowUp', 'ArrowUp', 38);
+  await press('7', 'Digit7', 55, 0, '7');
+  await until(`page().editor.session.appliedOps.length > ${ops}`, 'the chord note was never entered');
+  await settle(c);
+  const chord = JSON.parse(await run(markOf));
+  assert.ok(!chord.hidden && chord.left === moved.left && chord.top === moved.top,
+    `the cursor on the chord's other note outlines no word in the lyric panel: ${JSON.stringify({ chord, moved })}`);
+  await press('z', 'KeyZ', 90, 2);
+  // Playing, the outline follows the sung word, as the score's lyric does.
+  await press(' ', 'Space', 32);
+  await until(`find(document, 'mnx-player').snapshot?.state === 'playing'`, 'Space did not start playback with the lyric panel open');
+  for (let i = 0; i < 100; i++) {
+    const now = JSON.parse(await run(markOf));
+    if (!now.hidden && (now.left !== moved.left || now.top !== moved.top)) break;
+    if (i === 99) assert.fail(`the lyric panel's outline did not follow the music: ${JSON.stringify(now)}`);
+    await delay(100);
+  }
+  await press(' ', 'Space', 32);
+  await until(`find(document, 'mnx-player').snapshot?.state !== 'playing'`, 'Space did not pause');
   await run(`find(document, 'mnx-lyric-text-editor').dispatchEvent(new CustomEvent('lyric-editor-close')); return true;`);
   await settle(c);
 
@@ -559,7 +580,7 @@ try {
   assert.equal(await run(`return window.scrollY === 0 && document.documentElement.scrollTop === 0;`), true,
     'Space scrolled the page: the surface did not take the keystroke');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there and the outline following the next press, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, a press on dead paper doing nothing, a repeat count selected and amended ×3→×4 from its pill, a syllable selected and opened in the lyric panel with its word outlined there, the outline following the next press, a chord's other note and the music, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
 } finally {
   ws?.close();
   chrome.kill();
