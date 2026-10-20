@@ -345,6 +345,33 @@ describe('lyrics', () => {
     expect(continued(back, '1')).toEqual(continued(original, '1'));
   });
 
+  it('keeps a verse the declared lineOrder does not list, in the row it is shown in', async () => {
+    // The lyric panel adds verses without declaring them; the renderer stacks
+    // unlisted ids after the declared ones, sorted, and the file must agree.
+    const event = (lines: Record<string, string>) => ({
+      duration: { base: 'quarter' as const },
+      lyrics: { lines: Object.fromEntries(Object.entries(lines).map(([id, text]) => [id, { text }])) },
+      notes: [{ pitch: { step: 'E' as const, octave: 4 }, _x: { mnxLab: { string: 1, fret: 0 } } }]
+    });
+    const doc: MnxStructure = {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }], lyrics: { lineOrder: ['1'], lineMetadata: { '9': {}, '10': {} } } },
+      parts: [
+        {
+          measures: [{ sequences: [{ voice: 'v1', content: [
+            event({ '1': 'one' }), event({ '9': 'nine' }), event({ '10': 'ten' }), event({ '1': 'more' })
+          ] }] }],
+          _x: { mnxLab: { tab: { staffKind: 'both' } } }
+        }
+      ]
+    };
+    const back = importGuitarPro(exportGuitarPro(doc));
+    expect(back.global.lyrics?.lineOrder).toEqual(['1', '2', '3']);
+    expect(verse(back, '1').map(s => s.text)).toEqual(['one', 'more']);
+    expect(verse(back, '2').map(s => s.text)).toEqual(['ten']);
+    expect(verse(back, '3').map(s => s.text)).toEqual(['nine']);
+  });
+
   it('escapes spaces inside a syllable so Guitar Pro does not split it', async () => {
     // A raw space would be read as a syllable break by Guitar Pro's parser.
     const doc: MnxStructure = {

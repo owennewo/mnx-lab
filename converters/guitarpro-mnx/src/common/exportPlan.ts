@@ -17,23 +17,23 @@ import { mnxDurationToWholes } from './duration.js';
  */
 
 /**
- * Verse order for lyric lines: the document's declared `lineOrder` when present,
- * otherwise the line ids in first-appearance order. Guitar Pro identifies verses
- * only by position, so this ordering IS the mapping.
+ * Verse order for lyric lines: the document's declared `lineOrder`, then every
+ * other line id an event uses, sorted — the renderer's stacking rule
+ * (`orderedLyricLineIds`, src/engine/layout/lyricRuns.ts), so each verse is
+ * written in the row it is shown in. Guitar Pro identifies verses only by
+ * position, so this ordering IS the mapping, and an id left out of it is a
+ * verse the file never stores.
  */
 export function resolveLyricLineOrder(mnx: MnxStructure): string[] {
-  const declared = mnx.global?.lyrics?.lineOrder;
-  if (declared?.length) return [...declared];
-
-  const seen: string[] = [];
+  const declared = mnx.global?.lyrics?.lineOrder ?? [];
+  const used = new Set<string>();
   for (const part of mnx.parts)
     for (const measure of part.measures)
       for (const sequence of measure.sequences ?? [])
         for (const item of sequence.content ?? [])
           if (isTimedEvent(item))
-            for (const id of Object.keys(item.lyrics?.lines ?? {}))
-              if (!seen.includes(id)) seen.push(id);
-  return seen;
+            for (const id of Object.keys(item.lyrics?.lines ?? {})) used.add(id);
+  return [...new Set(declared), ...[...used].filter(id => !declared.includes(id)).sort()];
 }
 
 /**

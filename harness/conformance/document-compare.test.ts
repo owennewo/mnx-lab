@@ -89,6 +89,22 @@ describe('document comparison: what is not a difference', () => {
     expect(compareDocuments(part(strings), part(retuned)).length).toBeGreaterThan(0);
   });
 
+  it('a verse is its row: renumbered verses compare clean, a moved one does not', () => {
+    const sung = (lines: [string, string][], lyrics?: object) => ({
+      ...score(), global: { ...score().global, ...(lyrics ? { lyrics } : {}) },
+      parts: [{ ...score().parts[0], measures: [{ sequences: [{ content: lines.map(([id, text]) =>
+        ({ duration: { base: 'quarter' }, lyrics: { lines: { [id]: { text } } }, notes: [{ pitch: { step: 'C', octave: 4 } }] })) }] }] }]
+    });
+    // As the lyric panel leaves it (two verses unlisted, '10' sorting before '9'), and as Guitar Pro reads it back.
+    const edited = sung([['1', 'one'], ['9', 'nine'], ['10', 'ten']], { lineOrder: ['1'], lineMetadata: { '9': {}, '10': {} } });
+    const stored = sung([['1', 'one'], ['3', 'nine'], ['2', 'ten']], { lineOrder: ['1', '2', '3'] });
+    expect(compareDocuments(edited, stored)).toEqual([]);
+    const moved = sung([['1', 'one'], ['2', 'nine'], ['3', 'ten']], { lineOrder: ['1', '2', '3'] });
+    expect(compareDocuments(edited, moved).length).toBeGreaterThan(0);
+    const lang = sung([['1', 'one']], { lineMetadata: { '1': { lang: 'fr' } } });
+    expect(compareDocuments(lang, sung([['1', 'one']]))).toEqual([{ path: ['global', 'lyrics'], kind: 'lost', before: { lineMetadata: { '#1': { lang: 'fr' } } } }]);
+  });
+
   it('key order is not a difference, and canonicalising never mutates', () => {
     const original = score();
     const before = JSON.stringify(original);

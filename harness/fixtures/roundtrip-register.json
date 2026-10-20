@@ -200,7 +200,7 @@
       "count": 3
     },
     {
-      "path": "global/lyrics/lineMetadata",
+      "path": "global/lyrics",
       "kind": "lost",
       "documents": 2,
       "count": 2
@@ -254,12 +254,6 @@
       "count": 3
     },
     {
-      "path": "global/lyrics/lineOrder/[]",
-      "kind": "changed",
-      "documents": 1,
-      "count": 2
-    },
-    {
       "path": "global/measures/[]/fermata",
       "kind": "lost",
       "documents": 1,
@@ -273,18 +267,6 @@
     },
     {
       "path": "parts/[]/measures/[]/directions",
-      "kind": "lost",
-      "documents": 1,
-      "count": 2
-    },
-    {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse1",
-      "kind": "lost",
-      "documents": 1,
-      "count": 2
-    },
-    {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse2",
       "kind": "lost",
       "documents": 1,
       "count": 2
@@ -610,7 +592,7 @@
       "count": 4
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
       "kind": "gained",
       "documents": 3,
       "count": 7
@@ -628,7 +610,7 @@
       "count": 55
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2/type",
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2/type",
       "kind": "gained",
       "documents": 2,
       "count": 5
@@ -638,12 +620,6 @@
       "kind": "gained",
       "documents": 2,
       "count": 3
-    },
-    {
-      "path": "global/lyrics",
-      "kind": "gained",
-      "documents": 2,
-      "count": 2
     },
     {
       "path": "parts/[]/_x/mnxLab/tab",
@@ -658,25 +634,13 @@
       "count": 3
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/4/type",
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#4/type",
       "kind": "gained",
       "documents": 1,
       "count": 3
     },
     {
       "path": "global/measures/[]/segno/id",
-      "kind": "gained",
-      "documents": 1,
-      "count": 2
-    },
-    {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1",
-      "kind": "gained",
-      "documents": 1,
-      "count": 2
-    },
-    {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2",
       "kind": "gained",
       "documents": 1,
       "count": 2
@@ -718,7 +682,7 @@
       "count": 1
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/3/type",
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#3/type",
       "kind": "gained",
       "documents": 1,
       "count": 1
@@ -1619,7 +1583,7 @@
         "verdict": "differs",
         "differences": [
           {
-            "path": "global/lyrics/lineMetadata",
+            "path": "global/lyrics",
             "kind": "lost",
             "count": 1
           },
@@ -1634,22 +1598,22 @@
             "count": 1
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
             "kind": "gained",
             "count": 3
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2/type",
             "kind": "gained",
             "count": 3
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/3/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#3/type",
             "kind": "gained",
             "count": 1
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/4/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#4/type",
             "kind": "gained",
             "count": 3
           },
@@ -1679,11 +1643,6 @@
         "verdict": "gains",
         "differences": [
           {
-            "path": "global/lyrics",
-            "kind": "gained",
-            "count": 1
-          },
-          {
             "path": "global/measures/[]/key",
             "kind": "gained",
             "count": 1
@@ -1694,7 +1653,7 @@
             "count": 1
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
             "kind": "gained",
             "count": 2
           },
@@ -1724,11 +1683,6 @@
         "verdict": "gains",
         "differences": [
           {
-            "path": "global/lyrics",
-            "kind": "gained",
-            "count": 1
-          },
-          {
             "path": "global/measures/[]/key",
             "kind": "gained",
             "count": 1
@@ -1739,12 +1693,12 @@
             "count": 1
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
             "kind": "gained",
             "count": 2
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2/type",
             "kind": "gained",
             "count": 2
           },
@@ -6018,14 +5972,9 @@
         "verdict": "differs",
         "differences": [
           {
-            "path": "global/lyrics/lineMetadata",
+            "path": "global/lyrics",
             "kind": "lost",
             "count": 1
-          },
-          {
-            "path": "global/lyrics/lineOrder/[]",
-            "kind": "changed",
-            "count": 2
           },
           {
             "path": "global/measures/[]/key",
@@ -6036,26 +5985,6 @@
             "path": "parts/[]/_x",
             "kind": "gained",
             "count": 1
-          },
-          {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1",
-            "kind": "gained",
-            "count": 2
-          },
-          {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2",
-            "kind": "gained",
-            "count": 2
-          },
-          {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse1",
-            "kind": "lost",
-            "count": 2
-          },
-          {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse2",
-            "kind": "lost",
-            "count": 2
           },
           {
             "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",

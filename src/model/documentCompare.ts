@@ -20,6 +20,13 @@
  *  - A part's `_x.mnxLab.strings` is ordered by string number: each entry names
  *    its own string, so the array's order says nothing (the setup grammar
  *    recites low string first, every importer writes string 1 first).
+ *  - A verse is its ROW, not its line id: ids are renamed to their place in the
+ *    stacking order (`lineOrder` first, then the rest sorted — the renderer's
+ *    rule, `orderedLyricLineIds`), and the order is then dropped, since the
+ *    names carry it. Guitar Pro numbers verses by position, so a save renames
+ *    them; a verse that moves to another row still differs. An empty
+ *    `lineMetadata` entry for a sung verse is dropped too: its words hold its
+ *    row, so it says nothing.
  *  - A reference that resolves to nothing is left exactly as spelled, so a
  *    dangling target still differs from a good one; a DUPLICATED id resolves to
  *    nothing in particular, so it and its references stay as spelled too.
@@ -87,6 +94,32 @@ function eachReference(object: JsonObject, rewrite: (id: string) => string): voi
   }
 }
 
+/** Renames sung verses to their rows, in place: see the module comment. */
+function canonicalizeVerses(document: Json): void {
+  const lines: JsonObject[] = [];
+  walk(document, [], object => { if (isObject(object.lyrics) && isObject(object.lyrics.lines)) lines.push(object.lyrics.lines); });
+  const global = isObject(document) && isObject(document.global) ? document.global : null;
+  const lyrics = global && isObject(global.lyrics) ? global.lyrics : null;
+  const order = Array.isArray(lyrics?.lineOrder) ? lyrics.lineOrder.filter((id): id is string => typeof id === 'string') : [];
+  const used = new Set(lines.flatMap(Object.keys));
+  const rows = [...new Set(order.filter(id => used.has(id))), ...[...used].filter(id => !order.includes(id)).sort()];
+  const row = new Map(rows.map((id, index) => [id, `#${index + 1}`]));
+  const rename = (object: JsonObject) => Object.fromEntries(Object.entries(object).map(([id, value]) => [row.get(id) ?? id, value]));
+  for (const object of lines) {
+    const renamed = rename(object);
+    for (const key of Object.keys(object)) delete object[key];
+    Object.assign(object, renamed);
+  }
+  if (!global || !lyrics) return;
+  const unsung = order.filter(id => !used.has(id));
+  if (unsung.length) lyrics.lineOrder = unsung; else delete lyrics.lineOrder;
+  if (isObject(lyrics.lineMetadata)) {
+    const kept = Object.entries(lyrics.lineMetadata).filter(([id, value]) => !(used.has(id) && isObject(value) && !Object.keys(value).length));
+    if (kept.length) lyrics.lineMetadata = rename(Object.fromEntries(kept)); else delete lyrics.lineMetadata;
+  }
+  if (!Object.keys(lyrics).length) delete global.lyrics;
+}
+
 /** The comparison form of a document: see the module comment. Never mutates. */
 export function canonicalizeDocument<T>(document: T): T {
   const clone = structuredClone(document) as Json;
@@ -95,6 +128,7 @@ export function canonicalizeDocument<T>(document: T): T {
     if (!Object.keys(clone._x.mnxLab).length) delete clone._x.mnxLab;
     if (!Object.keys(clone._x).length) delete clone._x;
   }
+  canonicalizeVerses(clone);
 
   const declared = new Map<string, string>();
   const ambiguous = new Set<string>();
