@@ -426,9 +426,10 @@ try {
     else pass('Esc closes the editor');
     await press('L', 'KeyL', 76, 8);
     ly = JSON.parse(await cdp.evaluate(LYRIC));
-    // The canonical form may add bar checks the typed text lacked; the honest
-    // assertions are that the verse landed and the buffer diffs to nothing.
-    if (!/^Hush/.test(ly.text ?? '')) fail(`reopening reads “${ly.text}” — closing did not commit the verse`);
+    // The canonical form may add bar checks the typed text lacked, and names the
+    // score's section (its Head) on a line of its own; the honest assertions are
+    // that the verse landed and the buffer diffs to nothing.
+    if (!/^\[H Head\]\nHush/.test(ly.text ?? '')) fail(`reopening reads “${ly.text}” — closing did not commit the verse`);
     else if (ly.changes !== 0) fail('the reopened buffer diffs against its own document — the round trip is broken');
     else pass(`closing committed the verse; reopened on the document’s own serialization (“${ly.text}”)`);
     await press('Escape', 'Escape', 27);

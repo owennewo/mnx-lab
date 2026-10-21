@@ -34,6 +34,8 @@
 // editor binding's `onChange`; previews (an older version, the lyric editor's
 // scratch) set `this.doc` directly and are never told to the save session.
 import { LitElement, css, html, nothing } from 'lit';
+import type { LyricPlace } from '../../../src/elements/LyricTextEditor.ts';
+import { rational, type Rational } from '../../../src/model/time.ts';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot, type ProjectedTag } from '../../../src/storage/libraryClient.ts';
@@ -93,6 +95,11 @@ const RUNG_NAMES: Record<string, string> = { note: 'a note', event: 'a beat', vo
 /** Unsaved edits, on this device only, until the next checkpoint. One store for every piece. */
 const recoveryStore = indexedDbRecoveryStore<MnxStructure>();
 
+/** How long a finger rests on a syllable before the lyrics open. */
+const LONG_PRESS_MS = 500;
+/** A playhead's offset into its bar as the lyric panel's place spells it, to 1/3840 of a whole. */
+const onsetOf = (offset: Rational): [number, number] => [Number((offset.num * 3840n) / offset.den), 3840];
+
 /** Lyric text this device could not commit yet (it does not parse), per piece and part — the panel offers it back. */
 const lyricDrafts = (pieceId: string) => {
   const key = (part: number) => `mnx-studio-lyric-draft:${pieceId}:${part}`;
@@ -125,6 +132,9 @@ export class PiecePage extends LitElement {
   @state() private masterVolume = 0.7;
   @state() private saveOpen = false;
   @state() private keysOpen = false;
+  /** The lyric panel, for reading, where this device plays and does not edit: opened by a long press on a word. */
+  @state() private lyricsOpen = false;
+  @state() private lyricsAt: { partIndex: number; place: LyricPlace } | null = null;
   /** The page's one transient line: what a copy, cut or paste did, why an edit was refused,
    *  or that the piece plays other than as written. It names the last outcome and leaves. */
   @state() private notice: { message: string; tone: 'info' | 'warning' } | null = null;
@@ -465,6 +475,7 @@ export class PiecePage extends LitElement {
     void this.flushSync();
     void this.flushPrefs();
     ++this.generation;
+    this.unfollow?.(); this.unfollow = null; this.cancelPress();
     this.binding?.dispose();
     this.binding = null;
     super.disconnectedCallback();
@@ -477,6 +488,13 @@ export class PiecePage extends LitElement {
     if (changed.has('pieceId')) void this.load();
     let fresh = false;
     if (!this.binding && this.player && this.viewer) {
+      if (this.playOnly && !this.pressBound) {
+        this.pressBound = true;
+        this.viewer.addEventListener('pointerdown', this.onPressStart, true);
+        this.viewer.addEventListener('pointermove', this.onPressMove, true);
+        for (const type of ['pointerup', 'pointercancel', 'pointerleave']) this.viewer.addEventListener(type, this.cancelPress, true);
+        this.viewer.addEventListener('contextmenu', this.onContextMenu, true);
+      }
       this.binding = bindPlayback(this, this.viewer, this.player);
       this.masterVolume = this.player.masterVolume;
       fresh = true;
@@ -494,6 +512,7 @@ export class PiecePage extends LitElement {
     void this.flushSync();
     void this.flushPrefs();
     const generation = ++this.generation;
+    this.unfollow?.(); this.unfollow = null; this.lyricsOpen = false; this.lyricsAt = null;
     this.binding?.dispose(); this.binding = null;
     this.player?.stop();
     if (this.player) this.player.performance = null;
@@ -960,14 +979,71 @@ export class PiecePage extends LitElement {
 
   // ── the side panels: one at a time ──────────────────────────────────────
 
-  private openPanel(which: 'edit' | 'mix' | 'recording' | 'save' | 'keys' | null) {
+  private openPanel(which: 'edit' | 'mix' | 'recording' | 'save' | 'keys' | 'lyrics' | null) {
     this.editor?.closeSurfaces();
+    this.lyricsOpen = which === 'lyrics';
     this.keysOpen = which === 'keys';
     this.saveOpen = which === 'save';
     this.editOpen = which === 'edit';
     this.mixOpen = which === 'mix';
     this.recordingsOpen = which === 'recording';
   }
+  // ── the lyrics, for reading, on a device that plays ─────────────────────
+  // Studio does not edit on a touch device (roadmap/rejected/studio-editor-touch.md), but reading
+  // the words is not editing: a long press on a syllable opens the lyric panel there, read-only,
+  // and it follows the music as the score's own lyric does. A tap on a word in it seeks there.
+
+  private pressBound = false;
+  private pressTimer: ReturnType<typeof setTimeout> | undefined;
+  private pressFrom: { x: number; y: number } | null = null;
+  private unfollow: (() => void) | null = null;
+
+  /** The drawn syllable (or a verse row's empty place under a note) a press is on. */
+  private static syllableAt(event: Event): { key: string; line: string } | null {
+    const ink = event.composedPath().find((node): node is Element =>
+      node instanceof Element && node.matches('.lyric[data-playback-id], .lyric-gap[data-playback-id]'));
+    return ink ? { key: ink.getAttribute('data-playback-id')!, line: ink.getAttribute('data-lyric-line') ?? '' } : null;
+  }
+  private readonly onPressStart = (event: PointerEvent) => {
+    this.cancelPress();
+    const syllable = PiecePage.syllableAt(event);
+    if (!syllable || !event.isPrimary) return;
+    this.pressFrom = { x: event.clientX, y: event.clientY };
+    this.pressTimer = setTimeout(() => { this.pressTimer = undefined; void this.openLyrics(syllable.key, syllable.line); }, LONG_PRESS_MS);
+  };
+  /** A finger that moves is scrolling or zooming, not pressing. */
+  private readonly onPressMove = (event: PointerEvent) => {
+    if (this.pressFrom && Math.hypot(event.clientX - this.pressFrom.x, event.clientY - this.pressFrom.y) > 10) this.cancelPress();
+  };
+  private readonly cancelPress = () => { clearTimeout(this.pressTimer); this.pressTimer = undefined; this.pressFrom = null; };
+  /** On a syllable a long press is the lyrics', not the system's menu. */
+  private readonly onContextMenu = (event: Event) => { if (PiecePage.syllableAt(event)) event.preventDefault(); };
+
+  private async openLyrics(noteKey: string, lineId: string) {
+    const doc = this.doc?.mnxJson;
+    if (!doc) return;
+    const [{ lyricPlaceOfSyllable }] = await Promise.all([
+      import('../../../src/edit/lyricText.ts'), import('../../../src/elements/LyricTextEditor.ts')
+    ]);
+    const at = lyricPlaceOfSyllable(doc, noteKey, lineId);
+    if (!at || this.doc?.mnxJson !== doc) return;
+    this.openPanel('lyrics');
+    this.lyricsAt = at;
+    // Paused, the playhead goes to the word, so the score and the panel point at one place.
+    if (!this.binding?.cursor.playing) this.seekTo(at.place);
+    this.unfollow ??= this.binding?.cursor.subscribe(this.followLyrics) ?? null;
+  }
+  private seekTo(place: LyricPlace) {
+    this.binding?.cursor.seek({ ordinal: place.ordinal, offset: rational(BigInt(place.onset[0]), BigInt(place.onset[1])) });
+  }
+  /** The panel follows the playhead, as the score's lyric lamp does. */
+  private readonly followLyrics = () => {
+    const panel = this.renderRoot.querySelector('mnx-lyric-text-editor');
+    const head = this.binding?.cursor.playhead;
+    if (!panel || !head) return;
+    panel.showPlace({ ordinal: head.ordinal, onset: onsetOf(head.offset) }, false);
+  };
+
   /** A pick in the Mix panel plays from there; the panel stays open, since what you mix depends on it. */
   private async chooseSource(id: string) {
     await this.player?.selectSource(id);
@@ -1247,6 +1323,16 @@ export class PiecePage extends LitElement {
               @redo=${() => this.redoEdit()}
               @piece-delete=${() => void this.deletePiece()}
               @close=${() => (this.editOpen = false)}></mnx-studio-edit-piece>`
+          : nothing}
+        ${this.lyricsOpen && this.lyricsAt && this.doc
+          ? html`<mnx-lyric-text-editor slot="side"
+              .doc=${this.doc.mnxJson}
+              .partIndex=${this.lyricsAt.partIndex}
+              .partLabel=${this.doc.mnxJson.parts[this.lyricsAt.partIndex]?.name ?? ''}
+              .focusPlace=${this.lyricsAt.place}
+              .readOnly=${true}
+              @lyric-editor-caret=${(e: CustomEvent<LyricPlace>) => { if (!this.binding?.cursor.playing) this.seekTo(e.detail); }}
+              @lyric-editor-close=${() => (this.lyricsOpen = false)}></mnx-lyric-text-editor>`
           : nothing}
         ${this.keysOpen && this.editor
           ? html`<mnx-studio-keys slot="side"

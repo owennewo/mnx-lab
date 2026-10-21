@@ -236,7 +236,7 @@ export class ScoreFrame extends LitElement {
          SCROLL CONTAINER — the host gives the frame a height and the score
          scrolls inside, so the mark sits on the pane's corner rather than the
          document's. */
-      .workspace { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
+      .workspace { position: relative; display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
       .video-pane { display: flex; flex-direction: column; flex: none; min-width: 200px; overflow: auto; }
       .video-surface { width: 100%; height: var(--video-height); flex: 0 1 var(--video-height); min-height: 200px; }
       .video-controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; flex: none; }

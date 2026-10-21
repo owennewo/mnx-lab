@@ -6,7 +6,10 @@ import { readFileSync } from 'node:fs';
 import { EditorSession } from '../../src/edit/session.ts';
 import {
   coverAt,
+  isLyricSectionLine,
   lyricEventWalk,
+  lyricPlaceOfSyllable,
+  lyricSections,
   lyricPassWarnings,
   parseLyricText,
   planLyricEdits,
@@ -452,6 +455,50 @@ describe('performance order and canonical wrapping', () => {
     expect(session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, pasted) })).toBe(true);
     expect(serializeLyricText(session.doc, 0)).toBe(copied);
     expect(session.doc.parts.map(part => part.measures.map(measure => measure.sequences.map(sequence => sequence.content)))).toEqual(before);
+  });
+
+  it('names each pass into a section on a line of its own, splitting the empty bars around it, and reads it as nothing', () => {
+    const doc = bars(6);
+    doc.global.measures[0]!.section = { label: 'Verse' };
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[1]!.repeatEnd = {};
+    doc.global.measures[3]!.section = { label: 'Bridge' };
+    put(doc, 1, '1', 'one'); put(doc, 1, '2', 'two'); put(doc, 6, '1', 'end');
+    // The repeat is one pass into the Verse, so neither section needs its pass named.
+    expect(lyricSections(doc).map(section => [section.line, section.ordinal, section.times])).toEqual([
+      ['[V Verse]', 0, 2], ['[B Bridge]', 5, 1]
+    ]);
+    const text = unchanged(doc);
+    expect(text).toBe('[V Verse]\none | ×1 |\ntwo | ×2 |\n[B Bridge]\n×2 |\nend');
+    expect(text.split('\n').filter(isLyricSectionLine)).toEqual(['[V Verse]', '[B Bridge]']);
+    // A section line typed by hand, or deleted, changes no words.
+    const edited = parseLyricText(doc, 0, text.replace('[B Bridge]', '[X whatever]'));
+    expect(edited.diagnostics).toEqual([]);
+    expect(planLyricEdits(doc, 0, edited)).toEqual([]);
+    expect(planLyricEdits(doc, 0, parseLyricText(doc, 0, text.replace('[V Verse]\n', '')))).toEqual([]);
+  });
+
+  it('numbers the passes into a section a jump returns to', () => {
+    const doc = bars(3);
+    doc.global.measures[0]!.section = { label: 'Verse' };
+    doc.global.measures[0]!.segno = { location: { fraction: [0, 1] } };
+    doc.global.measures[2]!.section = { label: 'Bridge' };
+    doc.global.measures[2]!.jump = { type: 'dsalfine', location: { fraction: [1, 1] } };
+    doc.global.measures[1]!.fine = { location: { fraction: [1, 1] } };
+    expect(lyricSections(doc).map(section => section.line)).toEqual(['[V1 Verse]', '[B Bridge]', '[V2 Verse]']);
+  });
+
+  it('a syllable drawn in the score is the place its verse is sung', () => {
+    const doc = bars(2);
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[0]!.repeatEnd = {};
+    put(doc, 1, '1', 'first', 1); put(doc, 1, '2', 'second', 1);
+    // Bar 1's second note, sung by verse 2 on the second time through: the bar played second.
+    expect(lyricPlaceOfSyllable(doc, 'b0n1', '2')).toEqual({ partIndex: 0, place: { ordinal: 1, onset: [1, 4] } });
+    expect(lyricPlaceOfSyllable(doc, 'b0n1', '1')?.place.ordinal).toBe(0);
+    // In an unrolled view the drawn key names the bar played itself.
+    expect(lyricPlaceOfSyllable(doc, 'w1:b0n1', '1')?.place.ordinal).toBe(1);
+    expect(lyricPlaceOfSyllable(doc, 'nowhere', '1')).toBeNull();
   });
 
   it('mints separate verse rows when pasting into a repeated score without lyrics', () => {

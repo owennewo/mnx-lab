@@ -44,8 +44,10 @@ try {
    for(let i=0;i<60&&!(viewer.playbackState?.highlight.length>0);i++)await delay(50);
    check(player.playback.state==='playing'&&viewer.playbackState.highlight.length>0,'Studio media did not follow');
    const frame=page.shadowRoot.querySelector('mnx-score-frame');
-   // The position readout is the tray's (the frame's own went with its edge grips).
-   check(/^\\d+\\.\\d/.test(player.shadowRoot.querySelector('output .place > span')?.textContent ?? ''),'Tray did not read media position');
+   // The position readout is the tray's (the frame's own went with its edge grips): BAR a bar
+   // number (its time through raised), BEAT the beat beside it.
+   check(/^\\d+$/.test(player.shadowRoot.querySelector('.field.pos output .place > span')?.textContent ?? '')
+     && /^\\d/.test(player.shadowRoot.querySelector('.field.beat output .place > span')?.textContent ?? ''),'Tray did not read media position');
    await player.seekScorePosition({ordinal:1,metricOffset:{num:0n,den:1n}});check(Math.abs(player.playback.mediaTime-6)<.1,'HTTP audio could not seek');
    await delay(900);check(JSON.stringify(saved)===JSON.stringify([['first',{source:'audio'}]]),'Studio did not store the source it was left on: '+JSON.stringify(saved));
    // The video divider is kept beside the source, as the frame's share.

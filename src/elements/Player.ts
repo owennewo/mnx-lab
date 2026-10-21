@@ -76,6 +76,9 @@ const NO_DOCUMENT = { parts: [] } as unknown as MnxStructure;
 /** How long an edit's note waits for the performance that sounds it (`Player.audition`). */
 const PENDING_AUDITION_MS = 2000;
 
+/** Past this many passes a bar draws as one gauge rather than a lane each, so it never outgrows the tray. */
+const GAUGE_PASSES = 6;
+
 @customElement('mnx-player')
 export class Player extends LitElement {
   @property({ attribute: false }) performance: Performance | null = null;
@@ -295,11 +298,16 @@ export class Player extends LitElement {
     }
     /* The readout stays a one-cell grid: the widest label it can print is
        stacked under it, invisible, so the rail beside it never moves. */
-    .field.pos .box {
+    .field.pos .box,
+    .field.beat .box {
       display: grid;
       align-items: center;
       padding-left: 6px;
       font-size: 15px;
+    }
+    /* The beat, beside the bar under a label of its own: no word needed in the number. */
+    .field.beat .box {
+      color: var(--ink-2);
     }
     button,
     select,
@@ -440,6 +448,35 @@ export class Player extends LitElement {
     .place .beat {
       color: var(--ink-3);
     }
+    .field.pos {
+      position: relative;
+    }
+    .field.pos[data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 10px);
+      display: none;
+      padding: 6px 10px;
+      white-space: nowrap;
+      font: 500 12px/1 var(--sans);
+      color: var(--ink);
+      background: var(--player-ground);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.22);
+      z-index: 6;
+      pointer-events: none;
+    }
+    .field.pos[data-tip]:hover::after {
+      display: block;
+    }
+    .place sup {
+      font-size: 0.7em;
+      line-height: 0;
+      vertical-align: 0.55em;
+      margin-left: 1px;
+    }
     output.none {
       font: inherit;
       color: var(--ink-3);
@@ -488,6 +525,56 @@ export class Player extends LitElement {
       border: 0;
       border-radius: 1px;
       background: var(--tray-cell, var(--line));
+    }
+    /* A bar played more than six times: one gauge, filled by the passes played. */
+    .gauge {
+      position: relative;
+      display: block;
+      flex: 1 1 0;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 1px;
+      background: linear-gradient(to bottom,
+        color-mix(in oklab, var(--accent), var(--player-ground) 45%) var(--fill),
+        var(--tray-cell, var(--line)) var(--fill));
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink), transparent 70%);
+    }
+    .gauge .mark {
+      position: absolute;
+      left: -1px;
+      right: -1px;
+      top: var(--at);
+      height: max(3px, var(--pass));
+      background: var(--accent);
+    }
+    .gauge:hover,
+    .gauge:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 1px;
+      z-index: 2;
+    }
+    .gauge::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 24px);
+      transform: translateX(-50%);
+      display: none;
+      padding: 6px 10px;
+      white-space: nowrap;
+      font: 500 12px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+      background: var(--player-ground);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.22);
+      z-index: 6;
+    }
+    .gauge:hover::after,
+    .gauge:focus-visible::after {
+      display: block;
     }
     .lane.partial {
       width: var(--w);
@@ -1170,17 +1257,38 @@ export class Player extends LitElement {
   private static stroke(d: string, px = 18) {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
   }
-  /** The live readout prints the bar and its visit as the lyric text names
-   *  them — `9.2` — then the beat, dimmed, then a hold or grace when the
-   *  playhead is inside one. `of 6` stays in the lane's hover card and the
-   *  output's accessible name. */
+  /** The live readout, in two fields: BAR prints the bar with its time through raised (`9²`),
+   *  BEAT the beat, then a hold or grace when the playhead is inside one. Each sizes itself by
+   *  the widest it can print, so neither moves as the beat ticks. `of 6` stays in the hover
+   *  cards and the accessible name. */
   private readout() {
     if (!this.performance) return nothing;
     const parts = this.positionParts;
     if (!parts) return this.positionLabel;
+    const [bar] = Player.bare(placeLabel(parts)).split(' · ');
+    // A bar the performance plays once needs no time through.
+    return html`<span class="place"><span>${Player.barPass(parts.occurrences > 1 ? bar ?? '' : parts.bar)}</span><span class="widest" aria-hidden="true">${Player.barPass(Player.bare(this.widestPlace).split(' · ')[0] ?? '')}</span></span>`;
+  }
+  private beatReadout() {
+    const parts = this.positionParts;
+    if (!parts) return nothing;
     const tail = parts.insertion ? ` · ${parts.insertion}` : '';
-    const [bar, beat] = Player.bare(placeLabel(parts)).split(' · ');
-    return html`<span class="place"><span>${bar} · <span class="beat">${beat}</span></span><span class="widest" aria-hidden="true">${Player.bare(this.widestPlace)}</span></span>${tail}`;
+    const widest = Player.bare(this.widest).split(' · ').slice(1).join(' · ').replace(/^beat /, '');
+    return html`<span class="place"><span>${parts.beat}${tail}</span><span class="widest" aria-hidden="true">${widest}</span></span>`;
+  }
+  /** `9.2` as the readout prints it: the bar, its time through raised — `9²`. */
+  private static barPass(bar: string) {
+    const [written, pass] = bar.split('.');
+    return html`${written}${pass ? html`<sup>${pass}</sup>` : nothing}`;
+  }
+  /** The readout's hover card, worded as the lyric margin's: which bar played, and which bar
+   *  of the score and time through it that is. */
+  private placeTip(): string | null {
+    const parts = this.positionParts;
+    if (!parts) return null;
+    const nth = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th')}`;
+    const times = parts.occurrences > 1 ? `, ${nth(parts.occurrence)} time through of ${parts.occurrences}` : '';
+    return `${nth(parts.ordinal + 1)} bar played · bar ${parts.bar} of the score${times}`;
   }
   /** The readout sits under its BAR label, so it drops the `#` the rail's cards and the accessible name keep. */
   private static bare(label: string) { return label.replace(/^# /, ''); }
@@ -1268,7 +1376,7 @@ export class Player extends LitElement {
       ${model.labels.map((l) => html`<div class="lab" style=${`grid-column: ${l.at + 1} / span ${l.span};`}>${l.text}</div>`)}
       ${model.cells.map(
         (cell, i) => html`<div class=${cell.first ? 'cell first' : 'cell'} style=${`grid-column: ${i + 1};`}>
-          ${cell.lanes.map(
+          ${cell.lanes.length > GAUGE_PASSES ? this.gauge(cell.lanes, current) : cell.lanes.map(
             (lane) => html`<button
               type="button"
               class=${[
@@ -1287,6 +1395,30 @@ export class Player extends LitElement {
         </div>`,
       )}
     </div>`;
+  }
+
+  /**
+   * A bar played more than GAUGE_PASSES times, as one gauge rather than a lane per pass: it
+   * fills from the top as its passes are played, the playhead's pass a mark across it. A
+   * press seeks to the pass at that height, and the card names the pass under the pointer.
+   */
+  private gauge(lanes: { ordinal: number; tip: string }[], current: number) {
+    const played = lanes.filter(lane => lane.ordinal < current).length;
+    const now = lanes.findIndex(lane => lane.ordinal === current);
+    const at = (event: MouseEvent) => {
+      const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      return lanes[Math.min(lanes.length - 1, Math.max(0, Math.floor((event.clientY - box.top) / box.height * lanes.length)))]!;
+    };
+    return html`<button
+      type="button"
+      class="gauge"
+      style=${`--fill: ${(played / lanes.length * 100).toFixed(2)}%; --at: ${(Math.max(0, now) / lanes.length * 100).toFixed(2)}%; --pass: ${(100 / lanes.length).toFixed(2)}%;`}
+      aria-label=${`${lanes[0]?.tip.split(' · ')[0] ?? ''} · ${lanes.length} times`}
+      aria-current=${now >= 0 ? 'true' : nothing}
+      data-tip=${(now >= 0 ? lanes[now] : lanes[Math.min(played, lanes.length - 1)])?.tip ?? ''}
+      @mousemove=${(event: MouseEvent) => (event.currentTarget as HTMLElement).setAttribute('data-tip', at(event).tip)}
+      @click=${(event: MouseEvent) => this.seek(at(event).ordinal)}
+    >${now >= 0 ? html`<span class="mark"></span>` : nothing}</button>`;
   }
 
   // ── the sync bar ────────────────────────────────────────────────────────
@@ -1563,13 +1695,13 @@ export class Player extends LitElement {
           ${Player.glyph('M6 6h12v12H6z', 14)}
         </button>
         ${this.performance
-          ? html`<div class="field pos"><span class="lab" aria-hidden="true">${this.syncMode ? 'Time' : 'Bar'}</span
+          ? html`<div class="field pos" data-tip=${this.syncMode ? nothing : this.placeTip() ?? nothing}><span class="lab" aria-hidden="true">${this.syncMode ? 'Time' : 'Bar'}</span
               ><output class="box" aria-live="off" aria-label=${this.positionLabel}
               >${this.syncMode
                 ? html`<span>${Player.mediaClock(this.status?.mediaTime ?? 0)}</span><span class="widest" aria-hidden="true">88:88.8</span>`
-                : html`<span>${this.readout()}</span
-                    ><span class="widest" aria-hidden="true">${Player.bare(this.widest)}</span>`}</output
-            ></div>`
+                : this.readout()}</output
+            ></div>${this.syncMode || !this.positionParts ? nothing : html`<div class="field beat"><span class="lab" aria-hidden="true">Beat</span
+              ><output class="box" aria-hidden="true">${this.beatReadout()}</output></div>`}`
           : html`<output aria-live="off" class="none">Nothing to play</output>`}
         ${this.syncToggle()}
         ${this.syncMode ? this.syncBar() : this.rail()}

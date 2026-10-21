@@ -254,11 +254,12 @@ try {
     t.setSelectionRange(at, at); t.dispatchEvent(new MouseEvent('click')); }`);
   await wait(`${page}.editor.session.cursor.onset.num > 0 && ${piece}.querySelector('mnx-player').cursorPlace?.metricOffset.num > 0n`);
   assert.equal(await c.evaluate(`!!${viewer}.shadowRoot.querySelector('svg .enclosure-preview')`), false, 'the lyric caret drew its own cursor');
-  // The margin labels every line with the bar played it starts in and that bar's bar.pass, and each
-  // label is a way to its line's first word: a click on the second line's moves the cursor there.
+  // The margin labels every line with the bar of the score it starts in — its time through raised
+  // only where the bar is played more than once, so this bar is plain `1` — and each label is a
+  // way to its line's first word: a click on the second line's moves the cursor there.
   await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing\\n song'; t.dispatchEvent(new Event('input')); }`);
-  await wait(`[...${lyrics}.shadowRoot.querySelectorAll('.gutter .start')].map(s => s.textContent).join() === '11.1,11.1' && ${page}.editor.session.cursor.onset.num === 0`);
+  await wait(`[...${lyrics}.shadowRoot.querySelectorAll('.gutter .start')].map(s => s.textContent).join() === '1,1' && ${page}.editor.session.cursor.onset.num === 0`);
   // Hovered, a label says what its two numbers mean.
   await c.evaluate(`${lyrics}.shadowRoot.querySelectorAll('.gutter .start')[1].dispatchEvent(new MouseEvent('mouseenter'))`);
   assert.equal(await c.evaluate(`${lyrics}.shadowRoot.querySelector('.tip')?.textContent`), '1st bar played · bar 1 of the score, 1st time through');

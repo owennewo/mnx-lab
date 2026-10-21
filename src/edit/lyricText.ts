@@ -21,6 +21,8 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 //   empty bars      ×4  x4         that many bars nobody sings, standing where a bar starts
 //   header          nl 2:          on a line's start: another verse or language, from bar 1 again
 //   escape          \              a first syllable that would read as a header or a run
+//   section         [V2 Verse]     a line of its own where a pass into a section begins — written
+//                                  from the score, read as nothing
 //
 // The text is in the order the words are sung and names no bars: it runs from
 // the first bar played, and the editor's margin says where each line starts.
@@ -672,6 +674,90 @@ function lyricPerformance(doc: MnxStructure, partIndex: number) {
   return { written, visits, walk, sources, starts, onsets };
 }
 
+/**
+ * A pass into one of the score's sections, where the performance enters it: from another
+ * section, or by a jump (a D.S. back to its first bar); a repeat inside it is the same pass.
+ * A section is a measure's `section` label, else its rehearsal mark, else a coda sign ("Coda"),
+ * and runs until the next. It is named by its name's first letter and which pass this is.
+ */
+export interface LyricSection {
+  /** 0-based bar played it begins on. */
+  ordinal: number;
+  name: string;
+  /** `V2`: the name's first letter, and the pass through this section when it has more than one (`B`). */
+  letter: string;
+  pass: number;
+  /** How many passes into this section the performance makes. */
+  passes: number;
+  /** The bar it begins on, and which time through that bar. */
+  bar: number;
+  occurrence: number;
+  /** Times the pass plays its first bar (a repeat inside it). */
+  times: number;
+  /** The line of text that stands for it. */
+  line: string;
+}
+
+/** A line that stands for a section: written by the serializer, skipped by the parser. */
+const SECTION_LINE = /^[ \t]*\[[^\]\n]*\][ \t]*$/;
+export const isLyricSectionLine = (line: string) => SECTION_LINE.test(line);
+
+export function lyricSections(doc: MnxStructure): LyricSection[] {
+  const regions: ({ start: number; name: string } | null)[] = [];
+  let current: { start: number; name: string } | null = null;
+  (doc.global?.measures ?? []).forEach((measure, index) => {
+    const coda = measure._x?.mnxLab?.navigation?.marks?.some(mark => mark.kind === 'coda');
+    const name = measure.section?.label ?? measure.rehearsal?.label ?? (coda ? 'Coda' : null);
+    if (name?.trim()) current = { start: index, name: name.replace(/[\[\]\n]/g, '').trim() };
+    regions[index] = current;
+  });
+  const visits = linearizePasses(doc).entries;
+  const sections: (LyricSection & { region: object })[] = [];
+  const counts = new Map<string, number>();
+  visits.forEach((visit, ordinal) => {
+    const region = regions[visit.measureIndex];
+    if (!region) return;
+    const before = ordinal > 0 ? regions[visits[ordinal - 1]!.measureIndex] : null;
+    const last = sections[sections.length - 1];
+    if (region === before && !(visit.via === 'jump' && visit.measureIndex === region.start)) {
+      if (last?.region === region && visit.measureIndex === region.start) last.times++;
+      return;
+    }
+    const pass = (counts.get(region.name) ?? 0) + 1;
+    counts.set(region.name, pass);
+    sections.push({ region, ordinal, name: region.name, letter: '', pass, passes: 0, bar: visit.measureIndex + 1,
+      occurrence: visit.occurrence, times: 1, line: '' });
+  });
+  // The pass is named only where there is more than one: a section played once is just its letter.
+  return sections.map(({ region: _region, ...section }) => {
+    const passes = counts.get(section.name) ?? 1;
+    const letter = `${(section.name.match(/[\p{L}\p{N}]/u)?.[0] ?? '?').toUpperCase()}${passes > 1 ? section.pass : ''}`;
+    return { ...section, passes, letter, line: `[${letter} ${section.name}]` };
+  });
+}
+
+/**
+ * The place a syllable drawn in the score stands for: the part it is in, the bar played and the
+ * onset of its note. A drawn syllable names its note (`data-playback-id`, qualified by the bar
+ * played in an unrolled view) and its verse row; of that note's visits, the one that sings that
+ * row is the place — the first, when none does (a row no pass reaches).
+ */
+export function lyricPlaceOfSyllable(doc: MnxStructure, noteKey: string, lineId: string): { partIndex: number; place: LyricPlace } | null {
+  const qualified = /^w(0|[1-9][0-9]*):(.*)$/s.exec(noteKey);
+  const key = qualified ? qualified[2]! : noteKey, ordinal = qualified ? Number(qualified[1]) : null;
+  for (let partIndex = 0; partIndex < doc.parts.length; partIndex++) {
+    const { written, visits, walk, onsets } = lyricPerformance(doc, partIndex);
+    const hits = walk.filter(entry => entry.noteKey === key || entry.event.notes?.[0]?.id === key);
+    if (!hits.length) continue;
+    const row = [...lineGroups(doc, written).groups.values()].map(ids => ids.indexOf(lineId) + 1).find(at => at > 0) ?? 0;
+    const hit = (ordinal !== null ? hits.find(entry => entry.measureIndex === ordinal) : undefined)
+      ?? hits.find(entry => visits[entry.measureIndex]?.verse === row) ?? hits[0]!;
+    const onset = onsets.get(hit.event) ?? ZERO;
+    return { partIndex, place: { ordinal: hit.measureIndex, onset: [Number(onset.num), Number(onset.den)] } };
+  }
+  return null;
+}
+
 /** Where a token starts taking up time: on a walk entry, or at the start of a bar. */
 type TokenStart = { at: number; entry: number; bar?: undefined } | { at: number; bar: number; entry?: undefined };
 
@@ -695,6 +781,7 @@ const OLD_BAR_NUMBER = /^\d+(?:\.\d+)?\|$/;
 export function serializeLyricText(doc: MnxStructure, partIndex: number): string {
   const { written, visits, walk, sources, starts } = lyricPerformance(doc, partIndex);
   const { groups } = lineGroups(doc, written);
+  const sections = new Map(lyricSections(doc).map(section => [section.ordinal, section.line]));
   const result: string[] = [];
   for (const [group, ids] of groups) {
     const represented = new Set<string>();
@@ -714,16 +801,30 @@ export function serializeLyricText(doc: MnxStructure, partIndex: number): string
         const body = serializeLine(walk.slice(starts[ordinal], starts[ordinal + 1]).map(e => ({ ...e, measureIndex: 0 })), syllables);
         // A first word that would read as a header or a run of empty bars is escaped.
         const first = tokenize(body, 0);
-        return takeHeader(first) || EMPTY_RUN.test(first[0]?.text ?? '') ? `\\${body}` : body;
+        return takeHeader(first) || EMPTY_RUN.test(first[0]?.text ?? '') || isLyricSectionLine(body) ? `\\${body}` : body;
       });
       if (bodies.every(body => body === null)) return;
       const header = [group, override === undefined ? '' : String(override)].filter(Boolean).join(' ');
       if (header) result.push(`${header}:`);
       let line = '', lineStart = 0, next = 0;
       const close = () => { if (line) result.push(line); line = ''; };
+      // The main text names each section where its pass begins, on a line of its own: the
+      // bars nobody sings before it close the line they follow, and the rest open the next.
+      const guides = header ? new Map<number, string>() : sections;
       bodies.forEach((body, ordinal) => {
         if (body === null) return;
-        const gap = ordinal - next;
+        let from = next;
+        for (let at = next; at <= ordinal; at++) {
+          const guide = guides.get(at);
+          if (guide === undefined) continue;
+          const run = at - from;
+          if (run > 0) { if (line) line += ` | ×${run} |`; else line = `×${run} |`; }
+          else if (line) line += ' |';
+          close();
+          result.push(guide);
+          from = at;
+        }
+        const gap = ordinal - from;
         const visit = visits[ordinal]!;
         const boundary = ordinal > 0 && (visit.via || doc.global.measures[visit.measureIndex]?.repeatStart
           || visit.measureIndex !== visits[ordinal - 1]!.measureIndex + 1);
@@ -787,7 +888,8 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     [{ header: null, textLine: 0, name: 'the main text', tokens: [] }];
   let offset = 0;
   text.split('\n').forEach((line, textLine) => {
-    const tokens = tokenize(line, offset);
+    // A section's line says where the score's sections are; it puts nothing on a note.
+    const tokens = isLyricSectionLine(line) ? [] : tokenize(line, offset);
     offset += line.length + 1;
     const header = takeHeader(tokens);
     if (header) blocks.push({ header, textLine, name: `“${tokens.slice(0, header.consumed).map(t => t.text).join(' ')}”`, tokens: tokens.slice(header.consumed) });
