@@ -42,6 +42,9 @@ import { promisify } from 'node:util';
 const run = promisify(execFile);
 const root = fileURLToPath(new URL('../', import.meta.url));
 const DATABASE = 'mnx-studio-library', BUCKET = 'mnx-studio-library';
+// Off-site backups: a bucket of their own, bound to no Worker, so no app code or
+// sweep can reach them. Created once by hand (`wrangler r2 bucket create`).
+const BACKUP_BUCKET = 'mnx-studio-backups';
 const TABLES = ['pieces', 'renditions', 'recordings', 'tags', 'tag_aliases', 'piece_views', 'd1_migrations'];
 const RECORDING_FIELDS = ['kind', 'name', 'r2_key', 'sha256', 'bytes', 'mime', 'external_id', 'syncpoints', 'source_id'];
 const COLUMNS = {
@@ -273,8 +276,8 @@ function primaryState() {
  * one transaction, and blobs move without booting a miniflare per object. The
  * deployed one is reached through the wrangler CLI.
  */
+const wrangler = async args => (await run(join(root, 'node_modules/.bin/wrangler'), args, { cwd: root, maxBuffer: 256 * 1024 * 1024, env: { ...process.env, WRANGLER_SEND_METRICS: 'false' } })).stdout;
 function side(label, persist) {
-  const wrangler = async args => (await run(join(root, 'node_modules/.bin/wrangler'), args, { cwd: root, maxBuffer: 256 * 1024 * 1024, env: { ...process.env, WRANGLER_SEND_METRICS: 'false' } })).stdout;
   if (persist) {
     let proxy;
     const env = async () => (proxy ??= await (await import('wrangler')).getPlatformProxy({ configPath: join(root, 'wrangler.jsonc'), persist: { path: join(persist, 'v3') }, envFiles: [] })).env;
@@ -286,7 +289,11 @@ function side(label, persist) {
       },
       async execute(list) { const db = (await env()).LIBRARY_DB; await db.batch(list.map(({ sql, params }) => db.prepare(sql).bind(...params))); },
       // `d1 export` takes no --persist-to: the D1 state directory is the backup, restored by copying it back.
-      async backupTo(dir) { await cp(join(persist, 'v3/d1'), join(dir, `${label}-d1`), { recursive: true }); },
+      async backupTo(dir) {
+        await cp(join(persist, 'v3/d1'), join(dir, `${label}-d1`), { recursive: true });
+        await run('tar', ['-czf', `${label}-d1.tar.gz`, `${label}-d1`], { cwd: dir });
+        return `${label}-d1.tar.gz`;
+      },
       async get(key, file) { const object = await (await env()).LIBRARY_BUCKET.get(key); if (!object) throw new Error(`${label}: ${key} is missing`); await writeFile(file, Buffer.from(await object.arrayBuffer())); },
       async put(key, file, mime) { await (await env()).LIBRARY_BUCKET.put(key, await readFile(file), mime ? { httpMetadata: { contentType: mime } } : {}); },
       async close() { await proxy?.dispose(); },
@@ -306,11 +313,25 @@ function side(label, persist) {
     },
     // Data only: wrangler's schema dump does not load back (it creates pieces before
     // the renditions they reference). Restore onto a migrated database, minus d1_migrations.
-    async backupTo(dir) { await wrangler(['d1', 'export', DATABASE, '--remote', '--no-schema', '--output', join(dir, `${label}.sql`)]); },
+    async backupTo(dir) { await wrangler(['d1', 'export', DATABASE, '--remote', '--no-schema', '--output', join(dir, `${label}.sql`)]); return `${label}.sql`; },
     async get(key, file) { await wrangler(['r2', 'object', 'get', `${BUCKET}/${key}`, '--remote', '--file', file]); },
     async put(key, file, mime) { await wrangler(['r2', 'object', 'put', `${BUCKET}/${key}`, '--remote', '--file', file, ...(mime ? ['--content-type', mime] : [])]); },
     async close() {},
   };
+}
+
+/** Copies backup files to the off-site bucket under `prefix`, each read back and compared. */
+async function offsite(dir, prefix, files) {
+  const scratch = await mkdtemp(join(tmpdir(), 'library-sync-check-'));
+  try {
+    for (const name of files) {
+      const key = `${BACKUP_BUCKET}/${prefix}/${name}`, back = join(scratch, name);
+      await wrangler(['r2', 'object', 'put', key, '--remote', '--file', join(dir, name)]);
+      await wrangler(['r2', 'object', 'get', key, '--remote', '--file', back]);
+      const [sent, got] = await Promise.all([readFile(join(dir, name)), readFile(back)]);
+      if (!sent.equals(got)) throw new Error(`Off-site backup ${key} did not read back intact`);
+    }
+  } finally { await rm(scratch, { recursive: true, force: true }); }
 }
 
 /** At most `size` at once; the first failure stops the queue. */
@@ -354,7 +375,10 @@ const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--loc
   Plans a two-way sync between the local dev library and the deployed one and
   prints it. --apply writes it, after backing both databases up to --backup
   (default ~/.cache/mnx-lab/library-sync/<time>): a local library's D1 state
-  directory, copied; the deployed one's data, exported. --local-state defaults to the
+  directory, copied and packed; the deployed one's data, exported. When the
+  deployed library takes part, the backups are also copied to the R2 bucket
+  ${BACKUP_BUCKET} under library-sync/<time>/ and read back before anything is
+  written; what was applied follows them there. --local-state defaults to the
   primary checkout's .wrangler/state; --remote-state replaces the deployed
   library with a local one (a rehearsal).`;
 
@@ -369,11 +393,11 @@ async function main(argv) {
   if (flags.has('--apply') && !flags.has('--writers-stopped')) throw new Error('Stop every writer to BOTH libraries (dev servers on the local state, studio tabs on the deployed site), then pass --writers-stopped.');
   const local = side('local', values['--local-state'] ?? await primaryState());
   const remote = side('remote', values['--remote-state'] ?? null);
-  try { await sync(local, remote, flags.has('--apply'), values['--backup']); }
+  try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state']); }
   finally { await Promise.all([local.close(), remote.close()]); }
 }
 
-async function sync(local, remote, apply, backup) {
+async function sync(local, remote, apply, backup, deployed) {
   const names = { a: 'local', b: 'remote' };
   console.error(`local:  ${local.describe}\nremote: ${remote.describe}`);
   const [a, b] = await Promise.all([local.snapshot(), remote.snapshot()]);
@@ -381,10 +405,12 @@ async function sync(local, remote, apply, backup) {
   console.log(report(plan, names));
   if (!apply || empty(plan)) return;
 
-  backup ??= join(homedir(), '.cache/mnx-lab/library-sync', new Date().toISOString().replace(/[:.]/g, '-'));
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-'), prefix = `library-sync/${stamp}`;
+  backup ??= join(homedir(), '.cache/mnx-lab/library-sync', stamp);
   await mkdir(backup, { recursive: true });
-  await Promise.all([local.backupTo(backup), remote.backupTo(backup)]);
+  const files = await Promise.all([local.backupTo(backup), remote.backupTo(backup)]);
   console.error(`\nbackup: ${backup}`);
+  if (deployed) { await offsite(backup, prefix, files); console.error(`off-site: r2://${BACKUP_BUCKET}/${prefix}/ (${files.join(', ')})`); }
   // Nothing may have moved since the plan was read.
   const [a2, b2] = await Promise.all([local.snapshot(), remote.snapshot()]);
   if (JSON.stringify([a, b]) !== JSON.stringify([a2, b2])) throw new Error('A library changed while planning — a writer is still running. Nothing was written.');
@@ -394,13 +420,17 @@ async function sync(local, remote, apply, backup) {
     await copyBlobs(remote, local, plan.into.a.blobs, scratch);
     await copyBlobs(local, remote, plan.into.b.blobs, scratch);
   } finally { await rm(scratch, { recursive: true, force: true }); }
+  const applied = [];
   for (const [target, change] of [[local, plan.into.a], [remote, plan.into.b]]) {
     const list = statements(change);
     if (!list.length) continue;
-    await writeFile(join(backup, `applied-${target.label}.sql`), renderSql(list));
+    applied.push(`applied-${target.label}.sql`);
+    await writeFile(join(backup, applied.at(-1)), renderSql(list));
     await target.execute(list);
     console.error(`${target.label}: ${list.length} statements`);
   }
+  // The record of what changed joins the backups; the writes are done whether or not it arrives.
+  if (deployed && applied.length) await offsite(backup, prefix, applied).catch(e => console.error(`off-site copy of ${applied} failed (${e.message}); it is in ${backup}`));
 
   const after = planSync(...await Promise.all([local.snapshot(), remote.snapshot()]), names);
   if (!empty(after)) { console.log(`\nNOT converged — run again to finish, or read what remains:${report(after, names)}`); process.exitCode = 1; }

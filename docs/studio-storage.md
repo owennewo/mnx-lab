@@ -577,7 +577,10 @@ Stop every writer first: the primary checkout's `npm run dev`, which holds the l
 open, and any studio tab on the deployed site. `--apply` backs both up before writing (to
 `~/.cache/mnx-lab/library-sync/<time>/`, or `--backup`): a copy of the local D1 directory,
 and a data-only export of the deployed one. A data-only export is used because wrangler's
-schema dump does not load back. It refuses to write if either library moved since the plan
+schema dump does not load back. Both are also copied to the R2 bucket `mnx-studio-backups`
+under `library-sync/<time>/`, and read back intact, before anything is written. That bucket
+is bound to no Worker, so no app code or sweep can reach it. The SQL each side received
+follows the backups there. It refuses to write if either library moved since the plan
 was read, and it ends by re-planning: anything left over is printed, and running it again
 finishes the job.
 
