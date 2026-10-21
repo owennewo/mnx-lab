@@ -560,6 +560,35 @@ to make deliberately when the DO starts, in studio's own backend rules.
 6. **Writes are ordered and atomic**: blobs first, then one D1 batch under compare-and-set.
    An import never deletes.
 
+## Two libraries: `npm run sync:library` (2026-10-21)
+
+The local dev library (the primary checkout's `.wrangler/state`) and the deployed one drift
+apart when each is imported into or edited on its own. Because piece and rendition ids are
+deterministic, the same slice is the same rows in both, and `tools/library-sync.mjs`
+reconciles them row by row, in both directions:
+
+```bash
+npm run sync:library                                   # the plan: what moves each way, and any conflicts
+npm run sync:library -- --apply --writers-stopped      # back both up, write, re-plan (must come back empty)
+npm run sync:library -- --remote-state <dir> ...       # rehearse against a local stand-in for the deployed one
+```
+
+Stop every writer first: the primary checkout's `npm run dev`, which holds the local D1
+open, and any studio tab on the deployed site. `--apply` backs both up before writing (to
+`~/.cache/mnx-lab/library-sync/<time>/`, or `--backup`): a copy of the local D1 directory,
+and a data-only export of the deployed one. A data-only export is used because wrangler's
+schema dump does not load back. It refuses to write if either library moved since the plan
+was read, and it ends by re-planning: anything left over is printed, and running it again
+finishes the job.
+
+Each kind of row has one rule, in the tool's header. The canonical pointer **fast-forwards**
+along `derived_from`, and two sides that each saved past a common version are a conflict,
+reported and left alone (both lines of renditions are still copied). Recordings and piece
+settings follow the newer row. `revision` is never compared across libraries, because it is
+each library's own compare-and-set counter. **Deletion does not propagate**: there are no
+tombstones, so a row removed on one side comes back from the other. Read the plan before
+applying it.
+
 ## Out of scope here
 
 - The sync protocol (push/pull, client replica, offline queue) and the DO's internal schema.
