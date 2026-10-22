@@ -1133,7 +1133,7 @@ export class PiecePage extends LitElement {
     const touched = this.hiddenParts.length > 0 || Object.keys(this.partMix).length > 0;
     return {
       ...(this.selectedRecordingId ? { source: this.selectedRecordingId } : {}),
-      ...(this.chosenRecordingId ? { chosen: this.chosenRecordingId } : {}),
+      ...(this.chosenRecordingId && this.chosenRecordingId !== this.selectedRecordingId ? { chosen: this.chosenRecordingId } : {}),
       layers: this.layers,
       ...(this.videoDividerPercent !== null ? { videoDividerPercent: this.videoDividerPercent } : {}),
       // The rendition the mix was left against — provenance for `count`, and

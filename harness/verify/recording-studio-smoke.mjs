@@ -49,10 +49,10 @@ try {
    check(/^\\d+$/.test(player.shadowRoot.querySelector('.field.pos output .place > span')?.textContent ?? '')
      && /^\\d/.test(player.shadowRoot.querySelector('.field.beat output .place > span')?.textContent ?? ''),'Tray did not read media position');
    await player.seekScorePosition({ordinal:1,metricOffset:{num:0n,den:1n}});check(Math.abs(player.playback.mediaTime-6)<.1,'HTTP audio could not seek');
-   await delay(900);check(JSON.stringify(saved)===JSON.stringify([['first',{source:'audio'}]]),'Studio did not store the source it was left on: '+JSON.stringify(saved));
+   await delay(900);const layers={synth:true,click:false,clickLevel:0.6,recordingLevel:1};check(JSON.stringify(saved)===JSON.stringify([['first',{source:'audio',layers}]]),'Studio did not store the source it was left on: '+JSON.stringify(saved));
    // The video divider is kept beside the source, as the frame's share.
    frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}));await delay(900);
-   check(JSON.stringify(saved.at(-1))===JSON.stringify(['first',{source:'audio',videoDividerPercent:75}]),'Studio did not store the video divider: '+JSON.stringify(saved));
+   check(JSON.stringify(saved.at(-1))===JSON.stringify(['first',{source:'audio',layers,videoDividerPercent:75}]),'Studio did not store the video divider: '+JSON.stringify(saved));
    page.pieceId='kept';for(let i=0;i<100&&player.sourceId!=='audio';i++)await delay(50);
    check(player.sourceId==='audio','Stored source was not cued on open');
    for(let i=0;i<100&&frame.videoDividerPercent!==60;i++)await delay(50);check(frame.videoDividerPercent===60,'Stored video divider was not restored on open');
