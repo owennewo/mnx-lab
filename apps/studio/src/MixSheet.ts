@@ -117,6 +117,7 @@ export class MixSheet extends LitElement {
       background: var(--tray-cell, light-dark(oklch(0.91 0.012 75), oklch(0.3 0.008 70))); color: var(--ink-3); }
     .layer:hover:not(:disabled):not([aria-pressed='true']) { color: var(--ink); }
     .layer[aria-pressed='true'] { background: var(--ink); color: var(--paper, #fff); }
+    .layer[aria-pressed='true']:hover { color: color-mix(in oklab, var(--paper, #fff), var(--ink) 45%); }
     .rows { display: flex; flex-direction: column; }
     .rows.off { opacity: 0.55; }
     /* Every row one grid, so every slider is the same length and lines up. */

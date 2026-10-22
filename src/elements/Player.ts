@@ -359,6 +359,10 @@ export class Player extends LitElement {
       background: var(--ink);
       color: var(--player-ground);
     }
+    /* On, a hover dims the glyph to mid grey: still legible, and plainly a response. */
+    .field.layers .box button[aria-pressed='true']:hover {
+      color: color-mix(in oklab, var(--player-ground), var(--ink) 45%);
+    }
     .meter {
       display: flex;
       gap: 2px;
