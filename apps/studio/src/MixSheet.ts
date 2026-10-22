@@ -115,7 +115,7 @@ export class MixSheet extends LitElement {
     .head .grow { flex: 1; }
     .layer { display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px; border: 0; font: 600 12px/1 var(--sans, inherit);
       background: var(--tray-cell, light-dark(oklch(0.91 0.012 75), oklch(0.3 0.008 70))); color: var(--ink-3); }
-    .layer:hover:not(:disabled) { color: var(--ink); }
+    .layer:hover:not(:disabled):not([aria-pressed='true']) { color: var(--ink); }
     .layer[aria-pressed='true'] { background: var(--ink); color: var(--paper, #fff); }
     .rows { display: flex; flex-direction: column; }
     .rows.off { opacity: 0.55; }

@@ -147,6 +147,9 @@ export class Player extends LitElement {
   private appliedSync = new Map<string, string>();
   private clickTrack?: ClickTrack;
   private get loading() { return this.status?.loading ?? false; }
+  /** Loading has gone on long enough to say so (`updated`). */
+  @state() private preparingShown = false;
+  private preparingTimer: ReturnType<typeof setTimeout> | undefined;
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: PlaybackSnapshot | undefined;
   @state() private localError = '';
@@ -195,6 +198,7 @@ export class Player extends LitElement {
     css`
     :host {
       display: block;
+      position: relative;
       container-type: inline-size;
       font: 14px/1.4 var(--sans);
       color: var(--ink);
@@ -348,7 +352,7 @@ export class Player extends LitElement {
       background: var(--tray-cell, var(--line));
       color: var(--ink-3);
     }
-    .field.layers .box button[data-layer]:hover {
+    .field.layers .box button[data-layer]:not([aria-pressed='true']):hover {
       color: var(--ink);
     }
     .field.layers .box button[aria-pressed='true'] {
@@ -463,9 +467,21 @@ export class Player extends LitElement {
     @media (prefers-reduced-motion: reduce) {
       button.primary.strained { animation: none; box-shadow: 0 0 0 2px var(--player-ground), 0 0 0 4px oklch(0.78 0.16 75); }
     }
-    /* A prepared synth starts in tens of milliseconds: say "Preparing" only if it takes longer. */
+    /* Shown only once preparing has taken a while (preparingShown), and floated over the score
+       above the tray: a line of its own moved the tray for the moment a video takes to cue. */
     p.preparing {
-      animation: preparing 0.15s ease 0.35s both;
+      position: absolute;
+      left: 12px;
+      bottom: calc(100% + 8px);
+      z-index: 5;
+      margin: 0;
+      padding: 5px 10px;
+      font: 600 12px/1 var(--sans);
+      color: var(--player-ground);
+      background: var(--ink);
+      border-radius: 2px;
+      pointer-events: none;
+      animation: preparing 0.15s ease both;
     }
     @keyframes preparing {
       from { opacity: 0; }
@@ -1166,6 +1182,7 @@ export class Player extends LitElement {
     if (this.hasUpdated) this.install();
   }
   disconnectedCallback() {
+    clearTimeout(this.preparingTimer); this.preparingTimer = undefined;
     document.removeEventListener('pointerdown', this.onClickAway);
     this.removeEventListener('keydown', this.onKeydown);
     this.removeEventListener('keyup', this.onKeyup);
@@ -1190,6 +1207,14 @@ export class Player extends LitElement {
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
+    // A prepared synth starts in tens of milliseconds, a video in a few hundred: say "Preparing"
+    // only if it takes longer. Rendered hidden and faded in instead, the line held an empty bar
+    // open under the tray in the meantime.
+    if (this.loading && this.preparingTimer === undefined && !this.preparingShown)
+      this.preparingTimer = setTimeout(() => { this.preparingTimer = undefined; this.preparingShown = this.loading; }, 350);
+    if (!this.loading && (this.preparingTimer !== undefined || this.preparingShown)) {
+      clearTimeout(this.preparingTimer); this.preparingTimer = undefined; this.preparingShown = false;
+    }
     // The parked cursor decides what is lit, so a move of it is published like a move of the playhead.
     if (changed.has('cursorPlace')) this.publish();
     // A host video pane draws the notice and the video's failure from here: either changing redraws it.
@@ -2482,7 +2507,7 @@ export class Player extends LitElement {
         <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}
       ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
-      ${this.loading
+      ${this.loading && this.preparingShown
         ? html`<p role="status" class="preparing">
             Preparing audio…
           </p>`
