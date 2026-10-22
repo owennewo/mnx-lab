@@ -80,6 +80,9 @@ export class LyricTextEditor extends LitElement {
   @property({ type: Boolean }) readOnly = false;
   /** Text a previous visit could not commit, offered in place of the document's own. */
   @property({ attribute: false }) draft: string | null = null;
+  /** Opening takes the keyboard — false for a panel the host put back on its own (a remembered
+   *  one, on load), which nobody has asked to type in yet. */
+  @property({ attribute: false }) takeFocus = true;
 
   @state() private text = '';
   @state() private parsed: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
@@ -121,9 +124,17 @@ export class LyricTextEditor extends LitElement {
         height: 100%;
         z-index: auto;
       }
+      /* The frame's left column, under the video: as wide as the column, as tall as what is left of it. */
+      :host([slot='lyrics']) {
+        position: relative;
+        inset: auto;
+        width: auto;
+        z-index: auto;
+      }
+      :host([slot='lyrics']) .card { border-left: 0; border-top: 1px solid var(--frame-line, var(--line)); }
       /* A phone: the panel lies over the score and the video, above the tray, until it closes. */
       @media (max-width: 700px) {
-        :host([slot='side']) { position: absolute; inset: 0; width: auto; z-index: 5; }
+        :host([slot='side']), :host([slot='lyrics']) { position: absolute; inset: 0; width: auto; z-index: 5; }
       }
       .card {
         position: relative;
@@ -495,7 +506,7 @@ export class LyricTextEditor extends LitElement {
     }
     const area = this.textarea();
     if (!area) return;
-    area.focus();
+    if (this.takeFocus) area.focus();
     // Open at the caller's note: place the caret on its token — once the text
     // set above has been rendered into the box, or the range lands on an empty
     // box and the render that fills it leaves the caret at the end.

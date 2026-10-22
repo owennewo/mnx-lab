@@ -139,6 +139,9 @@ export type PiecePreferences = {
   /** The synth and the click, and the levels (roadmap/inprogress/studio-mix-layers.md). */
   layers?: MixLayers;
   videoDividerPercent?: number;
+  /** The lyrics left open (true) or put away (false) in the frame's left column. Absent until
+   *  the owner chooses: a piece with lyrics then opens with them, one without does not. */
+  lyrics?: boolean;
   rendition?: string;
   parts?: { hidden: readonly number[]; mix: PartMix; count: number };
 };
@@ -152,6 +155,7 @@ export function normalizePiecePrefs(raw: unknown): PiecePreferences {
     ...(typeof source.chosen === 'string' && source.chosen ? { chosen: source.chosen } : {}),
     ...(source.layers && typeof source.layers === 'object' ? { layers: normalizeLayers(source.layers) } : {}),
     ...(typeof divider === 'number' && divider > 0 && divider <= 100 ? { videoDividerPercent: divider } : {}),
+    ...(typeof source.lyrics === 'boolean' ? { lyrics: source.lyrics } : {}),
     ...(typeof source.rendition === 'string' && source.rendition ? { rendition: source.rendition } : {}),
     ...(parts && count !== null ? { parts: { ...normalizeParts(parts), count } } : {}),
   };

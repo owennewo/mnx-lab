@@ -62,6 +62,12 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  * every drag (on release) or arrow-key step leaves as `video-divider-change`
  * (detail: the new percentage).
  *
+ * The video's pane is the frame's LEFT COLUMN, and a host may put lyrics in it
+ * (slot `lyrics`), under the video when there is one and on their own when there
+ * is not: the column shows while either is there. A host that keeps the video's
+ * Terms and Close video elsewhere (studio: the library page, the Mix toggle)
+ * turns the row under the video off with `videoControls`.
+ *
  * The progress line reads the slotted `<mnx-player>`: its
  * `playback-state-changed` frames bubble through the frame. The player is the
  * host's — the frame never creates one — so the binding the host already made
@@ -128,7 +134,11 @@ export class ScoreFrame extends LitElement {
   /** Where the video divider sits, as a percentage of the frame's width —
    *  the host's to restore. Null keeps the default pane width. */
   @property({ type: Number, attribute: 'video-divider-percent' }) videoDividerPercent: number | null = null;
+  /** Terms and privacy and Close video, under the video — the host's to drop when it has them elsewhere. */
+  @property({ type: Boolean, attribute: 'video-controls' }) videoControls = true;
   @state() private videoOpen = false;
+  /** Something is in the `lyrics` slot: the left column shows for it alone. */
+  @state() private lyricsShown = false;
   @state() private videoWidth = 320;
   private videoObserver: ResizeObserver | null = null;
   /** Watches the slotted scroller's content box: a vertical scrollbar coming
@@ -149,6 +159,10 @@ export class ScoreFrame extends LitElement {
     }
     this.style.setProperty('--score-scrollbar', `${Math.max(0, width)}px`);
   }
+  private readonly onLyricsSlot = (event: Event) => {
+    this.lyricsShown = (event.target as HTMLSlotElement).assignedElements().length > 0;
+    if (this.lyricsShown) this.fitVideo();
+  };
   private get videoMaximum() { return Math.max(200, this.clientWidth * 0.75); }
   private resizeVideo(width: number) { this.videoWidth = Math.max(200, Math.min(this.videoMaximum, width)); }
   /** A placed divider is a proportion, so the pane keeps its share of a window
@@ -248,6 +262,8 @@ export class ScoreFrame extends LitElement {
       .youtube-notice button, .youtube-error button { margin: 4px 4px 0 0; padding: 8px; color: inherit; background: var(--frame-bar); border: 1px solid var(--ink-muted); border-radius: 3px; cursor: pointer; }
       .video-divider { flex: 0 0 8px; cursor: col-resize; touch-action: none; background: var(--frame-ground); }
       .video-divider:hover, .video-divider:focus-visible { background: var(--ink-muted); outline: 2px solid var(--ink); outline-offset: -2px; }
+      /* Lyrics fill the column under the video, and scroll themselves. */
+      ::slotted([slot='lyrics']) { flex: 1 1 0; min-height: 200px; }
       .video-pane[hidden], .video-divider[hidden], .video-surface[hidden], .video-controls[hidden] { display: none; }
       .pane {
         min-width: 0;
@@ -1029,19 +1045,20 @@ export class ScoreFrame extends LitElement {
     return html`
       ${this.focused ? nothing : this.topStrip()}
       <div class="workspace">
-        <aside class="video-pane" aria-label="YouTube video" ?hidden=${!this.videoOpen}
+        <aside class="video-pane" aria-label=${!this.lyricsShown ? 'YouTube video' : this.videoOpen ? 'Video and lyrics' : 'Lyrics'} ?hidden=${!this.videoOpen && !this.lyricsShown}
           style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
           <div class="video-surface" ?hidden=${this.player?.playback?.kind !== 'youtube'}></div>
           ${this.player?.renderYouTubeError() ?? nothing}
-          <div class="video-controls" ?hidden=${this.player?.playback?.kind !== 'youtube'}>
+          <div class="video-controls" ?hidden=${!this.videoControls || this.player?.playback?.kind !== 'youtube'}>
             <button class="btn ghost" @click=${() => this.player?.showYouTubeNotice()}>Terms and privacy</button>
             <button class="btn ghost" @click=${() => { this.player?.pause(); void this.player?.selectSource('synth'); }}>Close video</button>
           </div>
           ${this.player?.renderYouTubeNotice() ?? nothing}
+          <slot name="lyrics" @slotchange=${this.onLyricsSlot}></slot>
         </aside>
         <div class="video-divider" role="separator" tabindex="0" aria-label="Video pane width" aria-orientation="vertical"
           aria-valuemin="200" aria-valuemax=${Math.round(this.videoMaximum)} aria-valuenow=${Math.round(this.videoWidth)}
-          ?hidden=${!this.videoOpen} @pointerdown=${this.dragVideo} @keydown=${this.resizeVideoKey}></div>
+          ?hidden=${!this.videoOpen && !this.lyricsShown} @pointerdown=${this.dragVideo} @keydown=${this.resizeVideoKey}></div>
       <div class="pane">
         <div class="score"><slot @slotchange=${this.onScoreSlot}></slot></div>
         ${this.focusMark()}

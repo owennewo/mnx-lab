@@ -30,6 +30,11 @@
 // then versions, revert and delete (roadmap/complete/studio-piece-lifecycle.md);
 // then the editor's mount — notes from the keyboard, the rung inspector on Enter,
 // the lyric editor on Shift+L (roadmap/complete/core-editor-element-promotion.md).
+// 2026-10-22: the lyrics left the side slot for the frame's left column, under the
+// video (or on their own), and stay open beside whatever side panel is up. Open or
+// put away is the owner's choice per piece, kept with the piece's preferences; until
+// they choose, a piece with lyrics opens with them. Terms and privacy went to the
+// library page, and Close video to the Mix panel's recording toggle, which it repeated.
 // Every document change arrives through ONE door, `showDocument`, from the
 // editor binding's `onChange`; previews (an older version, the lyric editor's
 // scratch) set `this.doc` directly and are never told to the save session.
@@ -58,6 +63,7 @@ import type { RenderScale } from '../../../src/engine/render/scale.ts';
 import { openLocalFile } from '../../../src/importers/localFile.ts';
 import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import { normalizeDisplayPreferences } from '../../../src/elements/displayDefaults.ts';
+import { documentLyricLineCount } from '../../../src/engine/layout/lyricRuns.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { MixLayers, Player, SyncEdit } from '../../../src/elements/Player.ts';
@@ -111,6 +117,14 @@ const lyricDrafts = (pieceId: string) => {
   };
 };
 const pencilGlyph = html`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13 7l4 4"></path></svg>`;
+
+/** Whether a document has any lyrics, asked once per document object. */
+const lyricsOf = new WeakMap<MnxStructure, boolean>();
+const hasLyrics = (doc: MnxStructure) => {
+  let known = lyricsOf.get(doc);
+  if (known === undefined) lyricsOf.set(doc, known = documentLyricLineCount(doc) > 0);
+  return known;
+};
 
 @customElement('mnx-studio-piece')
 export class PiecePage extends LitElement {
@@ -175,6 +189,12 @@ export class PiecePage extends LitElement {
   @state() private chosenRecordingId: string | null = null;
   /** Where the video divider was left (percent of the frame's width); null until placed. */
   @state() private videoDividerPercent: number | null = null;
+  /** The owner's choice for this piece: lyrics open or put away. Null until they make one. */
+  private lyricsChoice: boolean | null = null;
+  /** The piece's stored preferences have been read, so `lyricsChoice` is known: nothing puts the lyrics back before. */
+  private prefsRead = false;
+  /** The editor's lyric panel is up — mirrored here, since the frame's left column is drawn from it. */
+  @state() private editorLyrics = false;
   @state() private addingRecording = false;
   @state() private recordingWarning: { id: string; message: string } | null = null;
   @state() private theme: ThemeSetting = readTheme();
@@ -234,6 +254,8 @@ export class PiecePage extends LitElement {
   private prefsTimer: ReturnType<typeof setTimeout> | undefined;
   /** What the library holds, canonically serialized, so an unchanged setup writes nothing. */
   private savedPrefs = '';
+  /** The last preferences write: each waits for the one before, so an older choice never lands after a newer one. */
+  private prefsWrite: Promise<unknown> = Promise.resolve();
   // ── editing and saving (roadmap: studio-save-pipeline) ───────────────────
   /** The editor's mount (src/elements/editorHost.ts), loaded only for a piece that can be edited: one history for notes and metadata alike. */
   private editor: EditorBinding | null = null;
@@ -269,6 +291,27 @@ export class PiecePage extends LitElement {
     mnx-score-frame {
       height: 100%;
     }
+    /* Lyrics put away under a video: one quiet row to bring them back, in place of the panel. */
+    mnx-score-frame > .lyrics-bar {
+      flex: none;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 44px;
+      padding: 0 12px;
+      border: 0;
+      border-top: 1px solid var(--frame-line, var(--line));
+      background: transparent;
+      color: var(--ink-dim);
+      font: inherit;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+    }
+    mnx-score-frame > .lyrics-bar span { flex: 1; }
+    mnx-score-frame > .lyrics-bar:hover { color: var(--ink); }
+    mnx-score-frame > .lyrics-bar kbd { font: inherit; font-size: 12px; padding: 1px 5px; border: 1px solid var(--line); border-radius: 3px; }
     /* The viewer is its own scroll container at the pane's full height; its
        5px of padding must count inside that height, or the pane overflows by
        10px and grows a second scrollbar beside the viewer's own. */
@@ -507,7 +550,7 @@ export class PiecePage extends LitElement {
     if (this.binding && this.doc && (fresh || changed.has('doc'))) this.present(this.doc);
     // The pane, the lock or an older version on screen changed what the keys may do and where the cursor may show.
     if (this.editor && (changed.has('view') || changed.has('viewing') || changed.has('readOnly')))
-      void this.viewer?.updateComplete.then(() => this.editor?.refresh());
+      void this.viewer?.updateComplete.then(() => { this.editor?.refresh(); this.restoreLyrics(); });
     this.syncViewerViews();
   }
 
@@ -529,6 +572,7 @@ export class PiecePage extends LitElement {
     this.editOpen = false; this.recordingsOpen = false; this.mixOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
     this.layers = DEFAULT_LAYERS; this.chosenRecordingId = null;
     this.videoDividerPercent = null;
+    this.lyricsChoice = null; this.prefsRead = false;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
       const readPair = () => Promise.all([
@@ -648,7 +692,8 @@ export class PiecePage extends LitElement {
       documentId: '', onChange: doc => this.showDocument(doc),
       overlay: this.renderRoot.querySelector<HTMLElement>('.editor-overlay') ?? undefined,
       lyricPanel: this.renderRoot.querySelector<HTMLElement>('mnx-score-frame') ?? undefined,
-      onOpenLyrics: () => this.openPanel(null),
+      lyricSlot: 'lyrics',
+      onLyricsChoice: open => { this.lyricsChoice = open; this.editorLyrics = open; this.schedulePrefs(); },
       title: () => (this.doc ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? 'Untitled',
       // The lyric editor's live preview: drawn by the viewer alone — never played, never told to the save
       // session. Putting it away waits for the frame in hand: a commit's document reaches the viewer through
@@ -661,7 +706,10 @@ export class PiecePage extends LitElement {
       lyricDrafts: lyricDrafts(this.pieceId),
       clipboard: selectionClipboard,
       onNotice: notice => this.showNotice(notice.message),
-      onState: () => { if (this.keysOpen || this.editOpen) this.requestUpdate(); },
+      onState: () => {
+        if (this.keysOpen || this.editOpen) this.requestUpdate();
+        this.editorLyrics = !!this.editor?.lyricsOpen;
+      },
       onRefused: (intent, reason) => this.sayRefused(intent, reason),
       readOnly: () => this.readOnly, suspended: () => !!this.viewing,
       // One cursor (core-single-cursor.md): the edit cursor is the playhead.
@@ -985,15 +1033,36 @@ export class PiecePage extends LitElement {
 
   // ── the side panels: one at a time ──────────────────────────────────────
 
-  private openPanel(which: 'edit' | 'mix' | 'recording' | 'save' | 'keys' | 'lyrics' | null) {
-    this.editor?.closeSurfaces();
-    this.lyricsOpen = which === 'lyrics';
+  private openPanel(which: 'edit' | 'mix' | 'recording' | 'save' | 'keys' | null) {
+    // The inspector gives way to a side panel; the lyrics are in the left column, and stay.
+    this.editor?.closeInspector();
     this.keysOpen = which === 'keys';
     this.saveOpen = which === 'save';
     this.editOpen = which === 'edit';
     this.mixOpen = which === 'mix';
     this.recordingsOpen = which === 'recording';
   }
+  // ── the lyrics in the left column ───────────────────────────────────────
+
+  /** Whether the lyrics belong open on this piece: the owner's choice, else whether there are any. */
+  private wantsLyrics(): boolean {
+    return this.lyricsChoice ?? (!!this.doc && hasLyrics(this.doc.mnxJson));
+  }
+  /** Put the lyrics back where the owner left them, without taking the keyboard: on opening the
+   *  piece, and after an older version or a lock that put them away has gone. */
+  private restoreLyrics() {
+    if (this.prefsRead && this.editor && !this.editor.lyricsOpen && this.wantsLyrics()) this.editor.openLyrics({ focus: false });
+    this.editorLyrics = !!this.editor?.lyricsOpen;
+  }
+  /** The way back to lyrics put away under a video — Shift+L's, by pointer. */
+  private showLyrics() {
+    this.editor?.openLyrics();
+    if (!this.editor?.lyricsOpen) return;
+    this.lyricsChoice = true;
+    this.editorLyrics = true;
+    this.schedulePrefs();
+  }
+
   // ── the lyrics, for reading, on a device that plays ─────────────────────
   // Studio does not edit on a touch device (roadmap/rejected/studio-editor-touch.md), but reading
   // the words is not editing: a long press on a syllable opens the lyric panel there, read-only,
@@ -1033,7 +1102,7 @@ export class PiecePage extends LitElement {
     ]);
     const at = lyricPlaceOfSyllable(doc, noteKey, lineId);
     if (!at || this.doc?.mnxJson !== doc) return;
-    this.openPanel('lyrics');
+    this.lyricsOpen = true;
     this.lyricsAt = at;
     // Paused, the playhead goes to the word, so the score and the panel point at one place.
     if (!this.binding?.cursor.playing) this.seekTo(at.place);
@@ -1100,6 +1169,9 @@ export class PiecePage extends LitElement {
     const stored = normalizePiecePrefs(snapshot?.prefs);
     this.savedPrefs = canonicalJson(stored);
     this.videoDividerPercent = stored.videoDividerPercent ?? null;
+    this.lyricsChoice = stored.lyrics ?? null;
+    this.prefsRead = true;
+    this.restoreLyrics();
     const playing = stored.source && this.recordings.some(r => r.id === stored.source) ? stored.source : undefined;
     // Stored before the layers: a recording that played, played alone.
     this.layers = stored.layers ?? { ...DEFAULT_LAYERS, synth: !playing };
@@ -1136,6 +1208,7 @@ export class PiecePage extends LitElement {
       ...(this.chosenRecordingId && this.chosenRecordingId !== this.selectedRecordingId ? { chosen: this.chosenRecordingId } : {}),
       layers: this.layers,
       ...(this.videoDividerPercent !== null ? { videoDividerPercent: this.videoDividerPercent } : {}),
+      ...(this.lyricsChoice !== null ? { lyrics: this.lyricsChoice } : {}),
       // The rendition the mix was left against — provenance for `count`, and
       // meaningless without it.
       ...(touched && this.snapshot?.piece.canonical_rendition_id ? { rendition: this.snapshot.piece.canonical_rendition_id } : {}),
@@ -1158,7 +1231,9 @@ export class PiecePage extends LitElement {
     this.savedPrefs = text;
     // A convenience, never a gate: a failed write is retried by the next change
     // and is never shown — the piece and its edits are unaffected either way.
-    try { await this.client.savePrefs(pending.piece, pending.prefs); }
+    const write = this.prefsWrite.then(() => this.client.savePrefs(pending.piece, pending.prefs));
+    this.prefsWrite = write.catch(() => {});
+    try { await write; }
     catch { if (this.pieceId === pending.piece) this.savedPrefs = ''; }
   }
 
@@ -1227,6 +1302,7 @@ export class PiecePage extends LitElement {
         .staffView=${false}
         .focused=${this.focused}
         .videoDividerPercent=${this.videoDividerPercent}
+        .videoControls=${false}
         @focus-change=${this.onFocusChange}
         @video-divider-change=${this.onVideoDividerChange}
         @view-change=${this.onViewChange}
@@ -1355,8 +1431,13 @@ export class PiecePage extends LitElement {
               @piece-delete=${() => void this.deletePiece()}
               @close=${() => (this.editOpen = false)}></mnx-studio-edit-piece>`
           : nothing}
+        ${this.editor && !this.editorLyrics && activeRecording?.kind === 'youtube' && this.doc && hasLyrics(this.doc.mnxJson)
+          ? html`<button slot="lyrics" class="lyrics-bar" type="button" title="Show lyrics (Shift+L)" @click=${() => this.showLyrics()}>
+              <span>Lyrics</span><kbd>⇧L</kbd>
+            </button>`
+          : nothing}
         ${this.lyricsOpen && this.lyricsAt && this.doc
-          ? html`<mnx-lyric-text-editor slot="side"
+          ? html`<mnx-lyric-text-editor slot="lyrics"
               .doc=${this.doc.mnxJson}
               .partIndex=${this.lyricsAt.partIndex}
               .partLabel=${this.doc.mnxJson.parts[this.lyricsAt.partIndex]?.name ?? ''}

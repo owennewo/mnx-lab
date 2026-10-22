@@ -56,7 +56,10 @@ also update the shared playback state.
 `ScoreFrame` now ships in both embed formats as well as the library. A frame opens its
 player strip when a YouTube source/notice is selected. The video lives in a separate pane to the left of the score,
 outside the score's scroll container. Terms and privacy and Close video controls
-sit directly beneath the embed in that pane. The initial disclosure shares that left
+sit directly beneath the embed in that pane — unless the host turns them off with
+`videoControls` (studio does: Terms are linked from the library page's footer, and the
+Mix panel's recording toggle is Close video). The pane is the frame's left column, and a
+host may put lyrics under the video in its `lyrics` slot (studio does). The initial disclosure shares that left
 pane beneath the video controls while the video loads. Reopening it keeps the same
 position. Drag its divider to resize from 200 pixels to
 75% of the frame width. The focused divider also accepts Left/Right (20-pixel steps)

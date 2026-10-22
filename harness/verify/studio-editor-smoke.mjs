@@ -200,7 +200,7 @@ try {
   console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation');
 
   // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy, and is committed when typing pauses.
-  const lyrics = `${piece}.querySelector('mnx-score-frame > mnx-lyric-text-editor[slot="side"]')`;
+  const lyrics = `${piece}.querySelector('mnx-score-frame > mnx-lyric-text-editor[slot="lyrics"]')`;
   const sung = doc => `JSON.stringify(${doc}.parts[0].measures[0].sequences[0].content.map(e => Object.values(e.lyrics?.lines ?? {}).map(l => l.text)).flat())`;
   // Let the meter section's save land first: the claim below is that the
   // preview leaves a settled chip alone, and a save still in flight is not settled.
@@ -211,10 +211,10 @@ try {
   const lyricPanelBounds = await c.evaluate(`(() => {
     const panel = ${lyrics}.getBoundingClientRect(), score = ${viewer}.getBoundingClientRect();
     const area = ${lyrics}.shadowRoot.querySelector('textarea').getBoundingClientRect();
-    return { beside: panel.left >= score.right - 1, tall: area.height > panel.height / 2,
-      inFrame: panel.right <= ${piece}.querySelector('mnx-score-frame').getBoundingClientRect().right + 1 };
+    return { beside: panel.right <= score.left + 1, tall: area.height > panel.height / 2,
+      inFrame: panel.left >= ${piece}.querySelector('mnx-score-frame').getBoundingClientRect().left - 1 };
   })()`);
-  assert.deepEqual(lyricPanelBounds, { beside: true, tall: true, inFrame: true }, 'lyrics must sit beside the score with a full-height editor');
+  assert.deepEqual(lyricPanelBounds, { beside: true, tall: true, inFrame: true }, 'lyrics must sit in the left column, left of the score, with a full-height editor');
   assert.equal(await c.evaluate(`${viewer}.selectionInactive`), false, 'the lyric panel lost editor keyboard ownership');
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
   await wait(`${sung(`${viewer}.mnxDoc.mnxJson`)} === '["sing","song"]'`);
@@ -271,14 +271,25 @@ try {
     return [getComputedStyle(t).color, [...r.querySelectorAll('.paint-inner > div')].map(row => row.textContent).join('\\n') === t.value]; })())`)),
     ['rgba(0, 0, 0, 0)', true], 'the lyric text is not painted beneath the box');
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
-  // Side panels are exclusive, and switching away commits what the lyric panel holds.
-  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'new words'; t.dispatchEvent(new Event('input')); }`);
+  // The lyrics stay open beside a side panel: the Keys sheet opened above is still up, and closing it leaves them.
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'new words'; t.dispatchEvent(new Event('input')); t.dispatchEvent(new Event('blur')); }`);
+  await wait(`!!${lyrics} && !!${keys} && ${sung(`${piece}.querySelector('mnx-player').document`)} === '["new","words"]'`);
   await c.evaluate(`${action('Keys')}.click()`);
-  await wait(`!${lyrics} && !!${keys} && ${sung(`${piece}.querySelector('mnx-player').document`)} === '["new","words"]'`);
+  await wait(`!${keys} && !!${lyrics}`);
+  // Shift+L puts the lyrics away and brings them back; the choice is the piece's, kept with its preferences.
   await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
-  await wait(`!!${lyrics} && !${keys}`);
+  await wait(`!${lyrics}`);
+  await key('KeyL', { shift: true });
+  await wait(`!!${lyrics}`);
   await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.close').click()`);
   await wait(`!${lyrics}`);
+  // Kept with the piece's preferences, which are written once the changes pause.
+  const remembered = async () => (await (await api(`/pieces/${pieceId}`)).json()).snapshot.prefs?.lyrics;
+  const rememberedAs = async value => {
+    for (let i = 0; i < 50 && await remembered() !== value; i++) await new Promise(r => setTimeout(r, 100));
+    assert.equal(await remembered(), value, `the lyrics were not kept ${value ? 'open' : 'put away'} with the piece`);
+  };
+  await rememberedAs(false);
 
   // Copy a note, paste it two beats on; the page says what happened.
   await c.evaluate(`${viewer}.focus()`);
@@ -317,6 +328,15 @@ try {
   assert.equal(await c.evaluate(`${piece}.querySelector('mnx-player').document.global.measures.length`), 17);
   assert.deepEqual(await c.evaluate(`JSON.stringify(${piece}.querySelector('mnx-player').document.global.measures[0].time)`), '{"count":3,"unit":4}');
   assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '["new","words"]', 'the lyrics did not survive the stored .gp');
-  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then committed by a pause, a blur and a close (one step per visit, unparsed text kept as a draft), a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
+  // The piece has lyrics now, but they were put away last: they stay away. Brought back, they open
+  // with the piece after the next reload too — and leave the keyboard with the score.
+  assert.equal(await c.evaluate(`!!${lyrics}`), false, 'lyrics put away came back on reload');
+  await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
+  await wait(`!!${lyrics}`);
+  await rememberedAs(true);
+  await c.send('Page.reload');
+  await wait(`!!${page}?.editor && !!${lyrics}?.shadowRoot?.querySelector('textarea')`);
+  assert.equal(await c.evaluate(`${lyrics}.matches(':focus-within')`), false, 'lyrics put back on load took the keyboard');
+  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then committed by a pause, a blur and a close (one step per visit, unparsed text kept as a draft), the lyrics beside a side panel, put away and brought back by Shift+L and kept so across reloads, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

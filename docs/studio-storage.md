@@ -312,7 +312,8 @@ CREATE TABLE piece_views (
 Beside WHEN a piece was last opened, the same row keeps HOW it was last set up: the source
 that was playing (`synth` or a recording id), where the video divider was left
 (`videoDividerPercent`, a share of the score frame's width, so it fits whatever window
-reopens it) and the Instruments sheet's hidden parts and mix, the sound of each part
+reopens it), whether the lyrics were left open in the left column (`lyrics`, absent
+until the owner chooses — a piece with lyrics then opens with them) and the Instruments sheet's hidden parts and mix, the sound of each part
 included — on the synth's host, its instrument too (a factory design, an imported part rig, or the old player's sound). Server-side for the reason `opened_at` is — a nylon
 guitar chosen on the laptop is still chosen on the tablet — and per owner, because it is a
 preference, not a property of the piece that everyone sharing it would see. Migration

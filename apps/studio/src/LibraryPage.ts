@@ -90,6 +90,9 @@ export class LibraryPage extends LitElement {
     .head { display: flex; align-items: baseline; gap: 12px; }
     h1 { font-size: 1.4rem; font-weight: 600; margin: 0; }
     .muted { color: var(--ink-dim); }
+    /* What playing a linked video agrees to — here rather than under every piece's video. */
+    .legal { margin: auto 0 0; padding-top: 24px; color: var(--ink-dim); font-size: 13px; }
+    .legal a { text-decoration: underline; }
     .chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border: 1px solid var(--line); border-radius: 3px; background: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60)); font-size: 13px; }
     .chip .dim { color: var(--ink-dim); }
@@ -471,6 +474,10 @@ export class LibraryPage extends LitElement {
         </li>`)}</ul>
         ${!this.busy && !this.error && !shown.length ? html`<p class="muted">${this.filters.length || this.query ? 'No matching pieces.' : 'Your library is empty.'}</p>` : nothing}
         ${this.next && !this.query ? html`<div><button ?disabled=${this.busy} @click=${() => this.load(true)}>More</button></div>` : nothing}
+        <footer class="legal">Videos play through YouTube:
+          <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a> ·
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>
+        </footer>
       </div>
     `;
   }

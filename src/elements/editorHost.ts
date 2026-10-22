@@ -119,8 +119,18 @@ export interface EditorBindingOptions {
   overlay?: HTMLElement;
   /** A score frame whose side slot hosts the lyric panel in flow. */
   lyricPanel?: HTMLElement;
+  /** Which of `lyricPanel`'s slots the panel takes: `side` (beside the score, with the host's other
+   *  side panels) unless the host names another — studio's is `lyrics`, the frame's left column. */
+  lyricSlot?: string;
   /** Let the shell put away other side panels before lyrics opens. */
   onOpenLyrics?: () => void;
+  /**
+   * The person opened the lyric panel or put it away — Shift+L, its close button or Escape, a
+   * syllable double-pressed — for a host that remembers the choice. The panel coming or going
+   * for any other reason (the host's own `openLyrics`, an older version on screen, a lock) is
+   * not their choice and is not reported.
+   */
+  onLyricsChoice?(open: boolean): void;
   /** What the inspector's top crumb calls the document. Asked when it opens. */
   title?(): string;
   /** A document to DRAW without it becoming the document — the lyric editor's live preview; null puts the real one back. */
@@ -219,8 +229,13 @@ export interface EditorBinding {
   sessionMoved(): void;
   /** Enter's door, for a host surface that opens it by pointer. Needs an `overlay`. */
   openInspector(): void;
-  /** Shift+L's door, for a host's palette. Needs an `overlay`. */
-  openLyrics(): void;
+  /** Shift+L's door, for a host's palette. Needs an `overlay`. `focus: false` opens it without
+   *  taking the keyboard — a host putting back a panel the person left open. */
+  openLyrics(options?: { focus?: boolean }): void;
+  /** The lyric panel is open. */
+  readonly lyricsOpen: boolean;
+  /** The rung inspector alone: a host surface taking the keyboard leaves the lyric panel where it is. */
+  closeInspector(): void;
   /** A host overlay is taking the keyboard: two surfaces wanting the same keys is one too many. */
   closeSurfaces(): void;
   undo(): boolean;
@@ -566,7 +581,6 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const openInspector = (pill?: string) => {
     if (!surfaces || inspector || cursorHidden || suspended()) return;
     tabDigits.flush();
-    closeLyrics(false);
     followProjection();
     const el = document_.createElement('mnx-rung-inspector');
     el.mirrored = anchor ? mirrorOverlayAt(anchor, paneWidth) : false;
@@ -596,13 +610,15 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (refocus) scope.focus();
     draw();
   }
-  const openLyrics = () => {
-    if (!surfaces || lyrics || suspended() || readOnly()) return;
+  /** The panel is a place beside the score, not a popover: the inspector over the score and the
+   *  lyric panel are open together, each until it is put away. */
+  const openLyrics = (focus = true): boolean => {
+    if (!surfaces || lyrics || suspended() || readOnly()) return false;
     tabDigits.flush();
-    closeInspector(false);
     options.onOpenLyrics?.();
     const el = document_.createElement('mnx-lyric-text-editor');
-    if (options.lyricPanel) el.slot = 'side';
+    if (options.lyricPanel) el.slot = options.lyricSlot ?? 'side';
+    el.takeFocus = focus;
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
     const partIndex = session.cursor.partIndex ?? 0;
@@ -654,9 +670,10 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       options.onPreview?.(null);
     });
     el.addEventListener('lyric-editor-draft', e => options.lyricDrafts?.write(partIndex, (e as CustomEvent<{ text: string | null }>).detail.text));
-    el.addEventListener('lyric-editor-close', () => closeLyrics());
+    el.addEventListener('lyric-editor-close', () => { closeLyrics(); options.onLyricsChoice?.(false); });
     lyrics = el;
     (options.lyricPanel ?? surfaces).append(el);
+    return true;
   };
   /** The viewer's enclosure rect, in the overlay's own coordinates: where the inspector hangs. */
   const onAnchored = (event: Event) => {
@@ -717,10 +734,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     const stroke = strokeOf(event);
     const action = resolveKeyAction(stroke, layers());
     if (playing && playback) {
-      // Nothing is written while the music plays: a fret, the inspector, the lyric editor, cut and paste all wait.
+      // Nothing is written while the music plays: a fret, the inspector, cut and paste all wait. The lyric
+      // panel is read-only while it plays, so Shift+L still shows it and puts it away.
       const shellWhilePlaying = resolveShellAction(stroke);
       if (action?.type === 'tabDigit') { event.preventDefault(); refusePlaying({ type: 'enterFret', fret: action.digit }); return; }
-      if ((shellWhilePlaying === 'commitPending' && surfaces) || (shellWhilePlaying === 'lyricTextEditor' && surfaces)
+      if ((shellWhilePlaying === 'commitPending' && surfaces)
         || ((shellWhilePlaying === 'cutSelection' || shellWhilePlaying === 'pasteSelection') && options.clipboard)) {
         event.preventDefault(); refusePlaying({ type: 'undo' }); return;
       }
@@ -742,7 +760,12 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       else if (shell === 'commitPending' && surfaces && !cursorHidden) { event.preventDefault(); if (focused) activateElement(focused.press); else openInspector(); }
       return;
     }
-    if (shell === 'lyricTextEditor' && surfaces) { event.preventDefault(); tabDigits.flush(); openLyrics(); return; }
+    // Shift+L opens the lyric panel, and puts it away again.
+    if (shell === 'lyricTextEditor' && surfaces) {
+      event.preventDefault(); tabDigits.flush();
+      if (lyrics) { closeLyrics(); options.onLyricsChoice?.(false); } else if (openLyrics()) options.onLyricsChoice?.(true);
+      return;
+    }
     if ((shell === 'copySelection' || shell === 'cutSelection' || shell === 'pasteSelection') && options.clipboard) {
       // A live TEXT selection means the person is addressing the prose, not the score.
       const text = document_.getSelection();
@@ -854,7 +877,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (focused?.press.key !== press.key && !selectElement(press)) return;
     if (press.kind === 'lyric') {
       if (lyrics) { showLyricWord(); lyrics.focus(); }
-      else openLyrics();
+      else if (openLyrics()) options.onLyricsChoice?.(true);
     } else {
       closeInspector(false);
       openInspector(PILL_OF[press.kind]);
@@ -950,7 +973,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     get hasKeyboard() { return hasKeyboard(); },
     sessionMoved: () => { tabDigits.flush(); cursorHidden = false; settle(); },
     openInspector: () => { if (hasKeyboard()) openInspector(); },
-    openLyrics,
+    openLyrics: ({ focus = true } = {}) => { openLyrics(focus); },
+    get lyricsOpen() { return lyrics !== null; },
+    closeInspector: () => closeInspector(false),
     closeSurfaces: () => { closeInspector(false); closeLyrics(false); },
     handleIntent: intent => { tabDigits.flush(); return dispatch(intent); },
     undo: () => undoAction(),
