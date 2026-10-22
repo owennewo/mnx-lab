@@ -151,3 +151,43 @@ to do — each is a gap to close.
 - **Next**: gaps 1 and 7 are small `align.ts` commands (`audio --video`, `attach`); gap 2
   belongs in the report; gap 6 is the larger one (a plan-of-parts restructure that writes a
   checkpoint) and earns its place when a second run needs it.
+
+## Run 5 — 2026-10-22 — Smells Like Teen Spirit (a piece made from the screen)
+
+- **Recording** YouTube `uJmRqAa9Hrk`, 182 s, Nikola Milovanovic's classical guitar
+  arrangement, standard tuning, E minor (Nirvana's F minor a semitone down), ~96 bpm. No piece
+  existed: the owner asked for one to be made from the video.
+- **Method**: the video shows the arranger's notation + tab for 4–95 s, then nothing (the second
+  half is a repeat). `screen.py pages` found the panel and its six pages unaided (4K stream);
+  the 33 bars were read by eye into tab text and built (`build`), the preview compared with the
+  pages, then judged against the audio **before** the piece was made; `create`, `attach`,
+  `fetch` (the stored score read back byte-identical), `sync --write`.
+- **The score's notation ≠ the performance**: the first ending's `:|` (bars 29–32) returns, by
+  the notation, to the `|:` at bar 21; he plays back to bar 5. Measured first by chroma
+  self-similarity (the second half = the first shifted 80.3 s = 32 bars), confirmed by the
+  search. Written as segno 5 / To Coda 28 / D.S. al Coda 32 / coda 33, keeping the arranger's
+  `|: 21–24 :|` (`passes.ts` does not nest repeats). Sections added: Intro, Verse, Pre-chorus,
+  Chorus, Interlude, Ending.
+- **Found**: 65 of 65 performed bars in the score's order; 90% of score notes by pitch class
+  (89% exact) against 13% chance — the widest margin yet; downbeats median 13 ms, 90th
+  percentile 31 ms; 93–100 bpm until a final ritardando (72 bpm). Key fit +0, tuning +33 cents.
+  One weak bar: the last bar 28 (2/9), a ritardando no straight stretch fits — its bar lines
+  are right.
+- **Gates**: none fired. The search first stopped one bar short: the final chord lands 0.8 s
+  after the tempo it could reach.
+- **Written**: piece `ccef043db55deb0d` (revision 2), 65 segments, 66 cuts (62 snapped),
+  5.15–168.68 s.
+- **Fixed on the way** (each was improvised first):
+  1. No way to make a piece from a transcription → tab text (`tabText.ts`) + `build` /
+     `create` / `attach`.
+  2. Finding and saving the on-screen score → `screen.py pages`.
+  3. `audio` needed a piece (run 4's gap 1) → `audio --video <url>`.
+  4. A held-back ending → `close_ending` places the last bar or two at their downbeat's exact
+     pitches; a selftest case fails without it. Jansch regression unchanged (45 cuts, max
+     20 ms / mean 2 ms from the stored sync).
+- **Lessons**: reading errors come from placing a digit on the wrong tab line in a downscaled
+  image — calibrate each page on a bar the notation confirms, and zoom ×2 when in doubt (one
+  page here needed it). Build and run the bar search before making the piece: the numbers say
+  whether the reading is right while it is still a text file.
+- **Owner**: (pending)
+- **Time**: one session; reading the 33 bars was most of it.
