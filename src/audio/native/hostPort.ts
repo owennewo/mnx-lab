@@ -53,6 +53,10 @@ export class NativeHostPort implements HostPort {
   private fetching: Promise<{ module: HostModule; assets: HostAssets }> | undefined;
   private setup: Setup | undefined;
   private volume: number;
+  /** The synth's and the click's levels under the master (roadmap/inprogress/studio-mix-layers.md). */
+  private levels = { synth: 1, click: 1 };
+  private synthGain: GainNode | undefined;
+  private clickGain: GainNode | undefined;
   private disposed = false;
   private loadListener: ((report: LoadReport) => void) | undefined;
   /** Play has been asked for since the last idle: the prepared context stays running. */
@@ -154,7 +158,11 @@ export class NativeHostPort implements HostPort {
     if (this.disposed) { host.dispose(); return; }
     this.output = new GainNode(context, { gain: this.volume });
     this.output.connect(context.destination);
-    host.connect(this.output);
+    this.synthGain = new GainNode(context, { gain: this.levels.synth });
+    this.synthGain.connect(this.output);
+    this.clickGain = new GainNode(context, { gain: this.levels.click });
+    this.clickGain.connect(this.output);
+    host.connect(this.synthGain);
     host.on('diagnostic', (d: Diagnostic) => this.options.onDiagnostic?.(d));
     host.on('load', (load: { busy: number; peakMs: number; peakKind?: string; kinds?: LoadReport['kinds']; skipsTotal?: number; skippedMsTotal?: number }) => {
       // Chrome counts output underruns where it can (AudioContext.playbackStats); elsewhere load alone.
@@ -180,10 +188,11 @@ export class NativeHostPort implements HostPort {
   }
   /** Clicks sent and not yet heard, so a cancel can take them back. */
   private clicks: { at: number; osc: OscillatorNode }[] = [];
-  /** A practice's click (hostBackend.ts): the sync bar's sound (native/click.ts), into the master
-   *  gain beside the host, so the volume carries it; late by the limiter's look-ahead, as the host is. */
-  click(at: number, accent: boolean) {
-    const context = this.context, output = this.output;
+  /** The click (hostBackend.ts): the sync bar's sound (native/click.ts), beside the host under the
+   *  master gain, so the volume carries it; late by the limiter's look-ahead, as the host is. The
+   *  click layer's level governs it, except a count-in's, which the loop asked for. */
+  click(at: number, accent: boolean, countIn = false) {
+    const context = this.context, output = countIn ? this.output : this.clickGain;
     if (!context || !output) return;
     const when = at + this.lookahead;
     const osc = new OscillatorNode(context, { type: 'triangle', frequency: accent ? 1760 : 1175 });
@@ -199,6 +208,12 @@ export class NativeHostPort implements HostPort {
   setVolume(volume: number) {
     this.volume = volume;
     if (this.output && this.context) this.output.gain.setTargetAtTime(volume, this.context.currentTime, 0.01);
+  }
+  setLevels(levels: { synth: number; click: number }) {
+    this.levels = { ...levels };
+    if (!this.context) return;
+    this.synthGain?.gain.setTargetAtTime(levels.synth, this.context.currentTime, 0.01);
+    this.clickGain?.gain.setTargetAtTime(levels.click, this.context.currentTime, 0.01);
   }
   private readonly reject = (error: unknown) => {
     if (!this.disposed) this.options.onError?.(error instanceof Error ? error.message : String(error));

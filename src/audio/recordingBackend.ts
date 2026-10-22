@@ -42,9 +42,13 @@ export class RecordingBackend implements PlaybackBackend {
   private issue?: string;
   private invalidSync?: string;
   private written: WrittenByVisit = new Map();
+  /** The master volume, and the recording's own level under it (studio-mix-layers.md). */
+  private volume: number;
+  private level = 1;
   constructor(readonly id: string, private readonly media: MediaPort, performance: Performance,
     private sync: RecordingSyncMap | null, syncIssue?: string) {
     this.invalidSync = syncIssue;
+    this.volume = media.volume;
     this.index(performance);
     this.unsubscribe = media.subscribe(event => this.onMedia(event));
   }
@@ -90,7 +94,7 @@ export class RecordingBackend implements PlaybackBackend {
       : this.waiting || this.media.seeking ? 'buffering' : 'playing';
     const highlight = !position || hidden || state === 'stopped' ? [] : soundingAt(this.written, position);
     return { sourceId: this.id, kind: this.media.kind ?? 'audio', state, scorePosition: position, highlight, hidePlayhead: hidden,
-      rate: this.media.rate, volume: this.media.volume, mediaTime: this.media.currentTime,
+      rate: this.media.rate, volume: this.volume, mediaTime: this.media.currentTime,
       mediaPhase,
       ...(this.sync ? { mediaBounds: { startSeconds: this.sync.bounds.startSeconds,
         endSeconds: this.sync.bounds.endSeconds, ...(durationSeconds === undefined ? {} : { durationSeconds }) } } : {}),
@@ -188,7 +192,11 @@ export class RecordingBackend implements PlaybackBackend {
     this.emit();
   }
   setRate(rate: number) { const value = this.media.setRate(rate); this.emit(); return value; }
-  setVolume(volume: number) { const value = this.media.setVolume(volume); this.emit(); return value; }
+  setVolume(volume: number) { this.volume = volume; this.media.setVolume(volume * this.level); this.emit(); return volume; }
+  /** The recording's level under the master, 0–1. */
+  setLevel(level: number) { this.level = Math.min(1, Math.max(0, level)); this.media.setVolume(this.volume * this.level); this.emit(); }
+  /** The sync the score follows, when it has a usable one: what the synth plays along to. */
+  get syncMap(): RecordingSyncMap | null { return this.invalidSync ? null : this.sync; }
   setLoop(loop?: ScoreLoop) {
     ++this.generation;
     if (!loop) { this.loop = undefined; return; }

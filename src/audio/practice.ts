@@ -5,7 +5,8 @@
  * time through" is one loop and a passage across a repeat sign plays in performed order.
  * The options say how it is practised: a count-in before it, how many repeats, a gap of
  * silence between them, a speed trainer that raises the rate every few repeats, and what
- * happens when the repeats are done:
+ * happens when the repeats are done (a click through it is the mix's, not the loop's:
+ * `beatGrid`, roadmap/inprogress/studio-mix-layers.md):
  *
  * - **stop** — playback stops, parked at the loop's start;
  * - **continue** — the music carries on from the loop's end to the end of the piece;
@@ -17,6 +18,8 @@
  * the visits of its loop (`LoopRegion.visits`), in performance positions.
  */
 import type { Performance } from './performanceTypes.ts';
+import type { MnxStructure } from '../model/mnx.ts';
+import { defaultBeatUnit } from '../model/syncSegments.ts';
 import type { LoopRegion, LoopVisit } from './transport.ts';
 import { add, compare, multiply, rational, subtract, type Rational } from './time.ts';
 
@@ -33,11 +36,9 @@ export interface PracticeOptions {
   /** Bars of silence between one repeat and the next. */
   gap: number;
   trainer: SpeedTrainer | null;
-  /** Click every beat through the passage. */
-  click: boolean;
 }
 /** A loop and nothing more: the passage, again and again, seamlessly. */
-export const PLAIN_LOOP: PracticeOptions = Object.freeze({ countIn: 0, repeats: null, then: 'stop', gap: 0, trainer: null, click: false });
+export const PLAIN_LOOP: PracticeOptions = Object.freeze({ countIn: 0, repeats: null, then: 'stop', gap: 0, trainer: null });
 export const DEFAULT_TRAINER: SpeedTrainer = Object.freeze({ start: 0.7, step: 0.05, every: 2, ceiling: 1 });
 
 /** A loop's bars: performed ordinals, first and last inclusive. */
@@ -97,6 +98,19 @@ export const quarterBeats = (performance: Performance): MeterOf => ordinal => {
   const quarters = m ? multiply(m.metricDuration, rational(4n)) : rational(4n);
   return { count: Math.max(1, Number(quarters.num / quarters.den)), beat: rational(1n, 4n) };
 };
+/** The document's meter: a bar counted in the beat its time signature implies (the sync bar's
+ *  beat, `defaultBeatUnit`), the signature in force where the bar is written. */
+export function documentMeter(performance: Performance, document: Pick<MnxStructure, 'global'> | undefined): MeterOf {
+  const globals = document?.global.measures ?? [];
+  return ordinal => {
+    const m = performance.measures[ordinal];
+    let time: { count: number; unit: number } | undefined;
+    for (let i = m?.measureIndex ?? 0; i >= 0 && !time; i--) time = globals[i]?.time ?? undefined;
+    const [n, d] = defaultBeatUnit(time);
+    const count = time ? Math.max(1, Math.round(time.count / time.unit / (n / d))) : 4;
+    return { count, beat: rational(BigInt(n), BigInt(d)) };
+  };
+}
 
 /**
  * The transport's loop for a practice: the visits of `practiceTakes`, each spanning its bars
@@ -116,17 +130,6 @@ export function practiceRegion(performance: Performance, loop: LoopBars, options
     const take = takes[k]!, from = measures[take.bars.first]!, to = measures[take.bars.last]!;
     const meter = meterOf(take.bars.first);
     const bar = multiply(meter.beat, rational(BigInt(meter.count)));
-    const clicks: { at: Rational; accent: boolean }[] = [];
-    if (options.click)
-      for (let o = take.bars.first; o <= take.bars.last; o++) {
-        const m = measures[o]!, { count, beat } = meterOf(o);
-        // A visit that starts mid-bar (a jump into it) counts from the bar's start all the same.
-        const barStart = subtract(m.position, m.from);
-        for (let i = 0; i < count; i++) {
-          const at = add(barStart, multiply(beat, rational(BigInt(i))));
-          if (compare(at, m.position) >= 0 && compare(at, add(m.position, m.duration)) < 0) clicks.push({ at, accent: i === 0 });
-        }
-      }
     return {
       start: from.position,
       end: add(to.position, to.duration),
@@ -137,11 +140,32 @@ export function practiceRegion(performance: Performance, loop: LoopBars, options
       countIn: multiply(bar, rational(BigInt(options.countIn))),
       beat: meter.beat,
       perBar: meter.count,
-      clicks,
       runOut: take.runOut,
       take,
     };
   };
   if (!visit(0)) throw new RangeError('A practice has at least one take.');
   return { start: first.position, end: add(last.position, last.duration), visits: visit };
+}
+
+/** A beat of the performance: where it falls in the performance and in the score. */
+export interface Beat { position: Rational; ordinal: number; metricOffset: Rational; accent: boolean }
+/**
+ * Every beat the performance plays, in order: each performed bar counted from its start in its
+ * meter, the first beat of the bar accented. A visit that starts or stops mid-bar (a jump into
+ * it, a partial navigation) keeps only the beats it plays. The click layer sounds these, on the
+ * synth's clock or through a recording's sync (roadmap/inprogress/studio-mix-layers.md).
+ */
+export function beatGrid(performance: Performance, meterOf: MeterOf = quarterBeats(performance)): Beat[] {
+  const beats: Beat[] = [];
+  performance.measures.forEach((m, o) => {
+    const { count, beat } = meterOf(o);
+    const barStart = subtract(m.position, m.from);
+    for (let i = 0; i < count; i++) {
+      const offset = multiply(beat, rational(BigInt(i))), at = add(barStart, offset);
+      if (compare(at, m.position) >= 0 && compare(at, add(m.position, m.duration)) < 0)
+        beats.push({ position: at, ordinal: o, metricOffset: offset, accent: i === 0 });
+    }
+  });
+  return beats;
 }

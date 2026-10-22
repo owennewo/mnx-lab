@@ -41,8 +41,6 @@ export interface LoopVisit {
   /** A count-in's beat, in whole notes, and its beats to the bar (the first of each is accented). */
   beat: Rational;
   perBar: number;
-  /** A click on these positions through the passage; empty when the click is off. */
-  clicks: readonly { at: Rational; accent: boolean }[];
   /** It plays on to its end, and nothing follows it. */
   runOut: boolean;
   /** The practice's own account of it, carried for the player's labels. */
@@ -80,8 +78,6 @@ export interface PlannedVisit {
   readonly looped: boolean;
   /** The count-in's clicks before it, in the clock's time. */
   readonly countClicks: readonly { audio: number; accent: boolean }[];
-  /** The passage's clicks, as positions. */
-  readonly clicks: readonly { at: Rational; accent: boolean }[];
 }
 export interface TransportSnapshot {
   state: 'stopped' | 'paused' | 'playing';
@@ -173,7 +169,7 @@ interface Visit {
 }
 /** A loop with no practice: the region, seamlessly, forever. */
 const seamless = (loop: LoopRegion): LoopVisit => ({ start: loop.start, end: loop.end, lead: ZERO, counted: false, countIn: ZERO,
-  beat: rational(1n, 4n), perBar: 4, clicks: [], runOut: false });
+  beat: rational(1n, 4n), perBar: 4, runOut: false });
 interface Notice {
   audioTime: number;
   kind: 'onset' | 'end';
@@ -532,7 +528,7 @@ export class Transport {
         countClicks.push({ audio: v.leadAudio + (v.audio - v.leadAudio) * i / beats, accent: i % Math.max(1, v.spec.perBar) === 0 });
     }
     return { k: v.k, from: v.from, until: v.until, rate: v.rate, leadAudio: v.leadAudio, audio: v.audio, endAudio: v.endAudio,
-      looped: v.spec !== undefined && !v.spec.runOut, countClicks, clicks: v.spec?.clicks.filter(c => compare(c.at, v.from) >= 0) ?? [] };
+      looped: v.spec !== undefined && !v.spec.runOut, countClicks };
   }
   private audioAt(p: Rational, v: Visit) {
     return v.audio + (this.tempo.secondsAt(p) - this.tempo.secondsAt(v.from)) / v.rate;

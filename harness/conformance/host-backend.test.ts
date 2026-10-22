@@ -236,11 +236,12 @@ it('a loop repeats its notes as new notes, visit after visit, exactly a loop apa
   expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
 }, 60_000);
 
-it('a practice counts in with clicks a lead ahead, plays its repeats at the trainer\'s rates, and clicks through the passage', async () => {
+it('a practice counts in with clicks a lead ahead, plays its repeats at the trainer\'s rates, and the click layer clicks through the passage', async () => {
   const { backend, port, run, flush, performance, stream } = rig(scenario('lab/document/twelve-bar-blues'));
   await run(0.1);
   const trainer = { start: 0.5, step: 0.5, every: 1, ceiling: 1 };
-  backend.transport.setLoop(practiceRegion(performance, { first: 0, last: 0 }, { ...PLAIN_LOOP, countIn: 1, repeats: 2, trainer, click: true }, 1));
+  backend.transport.setLoop(practiceRegion(performance, { first: 0, last: 0 }, { ...PLAIN_LOOP, countIn: 1, repeats: 2, trainer }, 1));
+  backend.setLayers({ synth: true, click: true, clickLevel: 1 });
   const start = port.now();
   await backend.play(); await flush();
   const m = performance.measures[0]!;

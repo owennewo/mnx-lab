@@ -19,6 +19,12 @@
  * follow one another exactly, as the transport's do; notes crossing the loop's end are cut
  * there (the transport releases every voice at a visit's end). Note ids carry the plan's
  * generation and the visit, so a repeat is a new note, not an edit of one already played.
+ *
+ * Layers (roadmap/inprogress/studio-mix-layers.md): the synth's notes and the click on every
+ * beat each have a level under the master (`setLayers`); a port that can set them hears the
+ * click scheduled always and switched by its level, so it comes in on the beat it is turned on.
+ * While a recording leads, `followMedia` plays the same notes and beats along the recording's clock
+ * instead (src/audio/mediaFollow.ts), on this host, its routing and its part mix.
  */
 import type { Control, Note, Setup, Technique } from '@mnx-lab/synth/contract';
 import { Transport, type Clock, type TransportEvent } from './transport.ts';
@@ -34,6 +40,9 @@ import { hostSetup, type HostSetup } from './hostSetup.ts';
 import { StrainMonitor, type LoadReport } from './hostStrain.ts';
 import { playbackTrace, type TraceProfile } from './playbackTrace.ts';
 import { ZERO, compare } from './time.ts';
+import { beatGrid, documentMeter, type Beat } from './practice.ts';
+import { MediaFollower, mediaWarp, warpNotes, type FollowEvents, type MediaReading } from './mediaFollow.ts';
+import type { RecordingSyncMap } from './recordingSync.ts';
 
 /** What the backend needs of an instrument host and its audio output. */
 export interface HostPort {
@@ -61,9 +70,12 @@ export interface HostPort {
    *  platform reports: on a phone or tablet under a large buffer that was 40 ms against a
    *  measured second (roadmap core-synth-performance). */
   heard?(): number | undefined;
-  /** Optional: a metronome click at host time `at` (a count-in, or the click through a loop). A
-   *  cancel takes back those not yet heard, as it does notes. Without it a practice counts in silently. */
-  click?(at: number, accent: boolean): void;
+  /** Optional: a metronome click at host time `at` — the click layer's beat, or a count-in's
+   *  (`countIn`, heard whatever the click layer's level). A cancel takes back those not yet heard,
+   *  as it does notes. Without it a practice counts in silently. */
+  click?(at: number, accent: boolean, countIn?: boolean): void;
+  /** Optional: the synth's and the click's levels under the master, 0–1. */
+  setLevels?(levels: { synth: number; click: number }): void;
   /** Optional: the host's per-part cost metering, started at play and read at stop (playbackTrace.ts). */
   profile?(action: 'start' | 'snapshot'): Promise<unknown>;
 }
@@ -76,14 +88,23 @@ export interface HostBackendOptions {
   aheadSeconds?: number;
   /** Timers for the transport's poll (defaults to the global ones). */
   timers?: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
+  /** A monotonic clock in seconds, read with each media reading while following (default: the page's). */
+  monotonic?: () => number;
 }
+/** What the synth follows while a recording leads: the media's clock, and its sync. */
+export interface FollowSource {
+  read(): MediaReading | null;
+  readonly sync: RecordingSyncMap;
+}
+/** The layers this host plays: the synth's notes, and the click with its level. */
+export interface HostLayers { synth: boolean; click: boolean; clickLevel: number }
 
 /** The stream's controls are its tempo changes (contractStream.ts). */
 type Tempo = { id: string; at: number; type: 'tempo'; bpm: number };
 /** A visit as the host plays it: score seconds `vs`–`ve`, from transport time `va`, at `speed`; `cut`: a loop's, its notes cut at `ve`. */
 interface Visit { k: number; vs: number; ve: number; va: number; speed: number; cut: boolean; started: boolean; emitted: Set<string>;
   /** Its clicks in transport time, and how many are sent. */
-  clicks: { at: number; accent: boolean }[]; clicked: number }
+  clicks: { at: number; accent: boolean; countIn: boolean }[]; clicked: number }
 interface Plan {
   gen: number;
   /** The transport's visit (`Transport.planned`) being supplied. */
@@ -129,6 +150,12 @@ export class HostBackend implements PlaybackBackend {
   private routed!: HostSetup;
   private notes: Note[] = [];
   private tempos: Tempo[] = [];
+  /** Every beat, and its synth second. */
+  private beats: (Beat & { seconds: number })[] = [];
+  private layers: HostLayers = { synth: true, click: false, clickLevel: 1 };
+  private readonly timers: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
+  private readonly monotonic: () => number;
+  private following: { source: FollowSource; follower: MediaFollower; timer: unknown } | undefined;
   private readonly lead: number;
   private readonly ahead: number;
   private readonly clock: Clock;
@@ -166,7 +193,8 @@ export class HostBackend implements PlaybackBackend {
     this.volume = options.volume ?? 0.7;
     this.lead = options.leadSeconds ?? LEAD;
     this.ahead = options.aheadSeconds ?? AHEAD;
-    const timers = options.timers ?? globalTimers;
+    const timers = this.timers = options.timers ?? globalTimers;
+    this.monotonic = options.monotonic ?? (() => globalThis.performance.now() / 1000);
     this.clock = {
       now: () => {
         if (this.frozen === undefined) {
@@ -241,8 +269,13 @@ export class HostBackend implements PlaybackBackend {
     this.stream = performanceToStream(this.performance, { partOf: this.routed.partOf, document: this.document });
     this.notes = [...this.stream.notes].sort((a, b) => a.at - b.at || (a.id < b.id ? -1 : 1));
     this.tempos = (this.stream.controls as Tempo[]).filter(c => c.type === 'tempo').sort((a, b) => a.at - b.at);
+    this.beats = beatGrid(this.performance, documentMeter(this.performance, this.document))
+      .map(b => ({ ...b, seconds: this.stream.secondsAt(b.position) }));
     this.port.configure(this.routed.setup);
   }
+  /** The click's beats are sent while the click is on — and always where the port's levels
+   *  switch it, so turning it on mid-play is heard from the next beat. */
+  private get clicking() { return this.layers.click || this.port.setLevels !== undefined; }
   private makeTransport(performance: Performance) {
     const transport = new Transport(performance, this.clock, this.sink, { lookaheadSeconds: TRANSPORT_LOOKAHEAD, onEvent: event => {
       if (this.closed || transport !== this.live) return;
@@ -289,8 +322,9 @@ export class HostBackend implements PlaybackBackend {
     const v = this.live.planned(index);
     if (!v) return undefined;
     const vs = this.stream.secondsAt(v.from), ve = this.stream.secondsAt(v.until);
-    const clicks = [...v.countClicks.map(c => ({ at: c.audio, accent: c.accent })),
-      ...v.clicks.map(c => ({ at: v.audio + (this.stream.secondsAt(c.at) - vs) / v.rate, accent: c.accent }))];
+    const clicks = [...v.countClicks.map(c => ({ at: c.audio, accent: c.accent, countIn: true })),
+      ...(this.clicking ? this.beats.filter(b => b.seconds >= vs && b.seconds < ve)
+        .map(b => ({ at: v.audio + (b.seconds - vs) / v.rate, accent: b.accent, countIn: false })) : [])];
     return { k: v.k < 0 ? 0 : v.k, vs, ve, va: v.audio, speed: v.rate, cut: v.looped, started: false, emitted: new Set(), clicks, clicked: 0 };
   }
   private bpmAt(seconds: number) {
@@ -322,7 +356,7 @@ export class HostBackend implements PlaybackBackend {
       }
       for (; v.clicked < v.clicks.length && v.clicks[v.clicked]!.at < to; v.clicked++) {
         const c = v.clicks[v.clicked]!;
-        this.port.click?.(c.at + this.lead, c.accent);
+        this.port.click?.(c.at + this.lead, c.accent, c.countIn);
       }
       let full = false;
       for (; p.cursor < this.notes.length; p.cursor++) {
@@ -409,6 +443,53 @@ export class HostBackend implements PlaybackBackend {
     return true;
   }
 
+  /** The synth's notes and the click, on or off, and the click's level. */
+  setLayers(layers: HostLayers) {
+    if (this.closed) return;
+    this.layers = { ...layers };
+    this.port.setLevels?.({ synth: layers.synth ? 1 : 0, click: layers.click ? layers.clickLevel : 0 });
+  }
+
+  /**
+   * Play along with a recording while it leads (null: stop). Its clock is read every 25 ms;
+   * the notes and the beats are moved onto its timeline through its sync, once per call — so
+   * a new sync, or a new performance, is a new call.
+   */
+  followMedia(source: FollowSource | null) {
+    if (this.closed) return;
+    if (!source) {
+      if (!this.following) return;
+      this.timers.clearTimeout(this.following.timer);
+      this.following.follower.stop();
+      this.following = undefined;
+      return;
+    }
+    const events = this.followEvents(source.sync);
+    if (this.following) { this.following.source = source; this.following.follower.replace(events); return; }
+    const port = this.port;
+    const follower = new MediaFollower({
+      now: () => port.now(), schedule: batch => port.schedule(batch), cancel: c => port.cancel(c), idle: () => port.idle?.(),
+      unlock: () => port.unlock(), click: (at, accent) => port.click?.(at, accent),
+    }, events);
+    const tick = () => {
+      const following = this.following;
+      if (this.closed || !following) return;
+      following.follower.tick(this.monotonic(), following.source.read());
+      following.timer = this.timers.setTimeout(tick, 25);
+    };
+    this.following = { source, follower, timer: undefined };
+    tick();
+  }
+  private followEvents(sync: RecordingSyncMap): FollowEvents {
+    const warp = mediaWarp(this.performance, this.stream.secondsAt, sync);
+    const clicks = this.clicking ? this.beats.flatMap(b => {
+      const at = sync.secondsAt({ ordinal: b.ordinal, metricOffset: b.metricOffset });
+      return at.ok ? [{ at: at.value, accent: b.accent }] : [];
+    }) : [];
+    return { notes: warpNotes(this.notes, warp), clicks,
+      bpmAt: media => { const synth = warp.toSynth(media); return synth === null ? 120 : this.bpmAt(synth) / warp.slope(synth); } };
+  }
+
   /** The mix moved: the parts' strips are reconfigured in place (no pause). */
   setPartMix(mix: PartMix) {
     if (this.closed) return;
@@ -479,6 +560,7 @@ export class HostBackend implements PlaybackBackend {
   dispose() {
     if (this.closed) return;
     this.endTrace();
+    this.followMedia(null);
     this.closed = true;
     this.clock.clearTimeout(this.auditionTimer);
     this.listeners.clear();
