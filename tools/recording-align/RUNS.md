@@ -193,5 +193,5 @@ to do — each is a gap to close.
   match — every string, fret, rhythm, tie and voice. The PDF has no `|:` at bar 5 either, so
   the return to bar 5 is the performer's, not a misreading. The screen-reading method's first
   oracle check: no errors in 33 bars.
-- **Owner**: (pending)
+- **Owner**: "Wow - you did brilliantly" (2026-10-22, after the PDF check).
 - **Time**: one session; reading the 33 bars was most of it.
