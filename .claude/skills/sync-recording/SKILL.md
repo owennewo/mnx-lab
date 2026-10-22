@@ -62,7 +62,8 @@ When the owner wants a piece made from a video that shows its notation (lesson a
 videos often scroll the arranger's score along the bottom), read that rather than
 transcribing the audio — tab names string and fret outright. Say first that an on-screen
 arrangement is usually the arranger's sold work, and that reading it into the private
-library is the owner's call.
+library is the owner's call. When the owner has bought the score, its PDF is the oracle:
+check the reading against it bar by bar before making the piece.
 
 1. **Pages.** Download the best stream (`yt-dlp -f 'bv*[height<=2160]'`) to `$OUT/video/`,
    then `$SCREEN pages --video <file> --out $OUT`. Note when the score is on screen: a panel

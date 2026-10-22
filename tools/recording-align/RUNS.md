@@ -189,5 +189,9 @@ to do — each is a gap to close.
   image — calibrate each page on a bar the notation confirms, and zoom ×2 when in doubt (one
   page here needed it). Build and run the bar search before making the piece: the numbers say
   whether the reading is right while it is still a text file.
+- **Checked against the arranger's PDF** (the owner bought it, after the run): all 33 bars
+  match — every string, fret, rhythm, tie and voice. The PDF has no `|:` at bar 5 either, so
+  the return to bar 5 is the performer's, not a misreading. The screen-reading method's first
+  oracle check: no errors in 33 bars.
 - **Owner**: (pending)
 - **Time**: one session; reading the 33 bars was most of it.
