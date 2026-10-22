@@ -1,15 +1,14 @@
-// The Mix panel on a piece: what plays, and how it sounds. It opens from the tray's
-// "Mix · <what plays>" field and stands in the frame's side slot like the other sheets,
-// tall and narrow. From the Studio tray & header canvas, round 4 (2026-10-16), which
-// merged the Source and Instruments sheets: the choice of what plays leads, at the top,
-// and the faders sit at the bottom, by the tray, with the Master — the tray's volume —
-// last, under the parts it governs.
+// The Mix panel on a piece: what plays, and how it sounds. It opens from the tray's Mix field
+// and stands in the frame's side slot like the other sheets, tall and narrow.
 //
-// With the synth playing, each part is a channel: the eye (take it off the score; it keeps
-// playing), its instrument, its level, mute and solo. A recording plays as one sound, so
-// its parts only show or hide, and their mix waits for the synth. The synth's settings
-// for this device (Full or Light, sounding notes as you select them) are buried behind a
-// button on the Synth row.
+// Three layers, each headed by the same toggle the tray shows (Mix panel: recordings as
+// channels, 2026-10-22; roadmap/inprogress/studio-mix-layers.md): the RECORDING — on, it leads
+// and its video shows; the radio to choose it only when the piece has more than one — the SYNTH,
+// a row per part (the eye takes it off the score; its instrument; its level), and the CLICK on
+// every beat. The synth and the click play along with a recording that leads, through its sync.
+// No mute or solo: the toggles and the levels are the whole mix. The Master — the tray's volume
+// — is last, by the tray. The synth's settings for this device (Full or Light, sounding notes as
+// you select them) are behind a button on the Synth heading.
 //
 // It owns nothing: every change leaves as an event for the page to store and hand to the
 // viewer and the player. Instruments play on the synth (core-campaign-synth.md Phase 6):
@@ -19,6 +18,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { LibraryRecording } from '../../../src/storage/libraryClient.ts';
 import type { MnxDocument } from '../../../src/model/mnx.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
+import type { MixLayers } from '../../../src/elements/Player.ts';
 import { BASIC_KEYS, BASIC_KIT, parsePartRig, type FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import type { RoutedPart } from '../../../src/audio/hostSetup.ts';
 import { linearizePasses } from '../../../src/model/passes.ts';
@@ -42,6 +42,13 @@ const cross = html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" s
 const pencil = line('M4 20h4l10-10-4-4L4 16v4zM13 7l4 4', 13);
 const plus = line('M12 5v14M5 12h14', 13);
 const sliders = svg`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>`;
+const glyph = (d: string, px: number) => svg`<svg width=${px} height=${px} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${d}></path></svg>`;
+const ICON = {
+  video: 'M5 5h14a2.5 2.5 0 0 1 2.5 2.5v9a2.5 2.5 0 0 1-2.5 2.5H5a2.5 2.5 0 0 1-2.5-2.5v-9A2.5 2.5 0 0 1 5 5zM10 9l5 3-5 3z',
+  audio: 'M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2',
+  synth: 'M3 5h18v14H3zM9 5v9M15 5v9',
+  click: 'M7 21h10L14 4h-4L7 21zM12 15l6-9',
+};
 const eye = (off: boolean) => svg`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle>${off ? svg`<path d="M4 4l16 16"></path>` : nothing}</svg>`;
 
 @customElement('mnx-studio-mix')
@@ -50,8 +57,11 @@ export class MixSheet extends LitElement {
   /** The piece's playable recordings, as the library stores them. */
   @property({ attribute: false }) recordings: readonly LibraryRecording[] = [];
   @property({ attribute: false }) document: MnxDocument | null = null;
-  /** `synth` or the id of the recording playing (or asked for). */
+  /** `synth` or the id of the recording playing (or asked for): the recording layer is on. */
   @property() activeId = 'synth';
+  /** The recording the layer plays when it is on: the one playing, else the last chosen. */
+  @property() chosenId: string | null = null;
+  @property({ attribute: false }) layers: MixLayers = { synth: true, click: false, clickLevel: 0.6, recordingLevel: 1 };
   /** The live score-follow warning for the active recording. */
   @property() syncWarning = '';
   @property({ type: Boolean }) canAdd = false;
@@ -62,8 +72,6 @@ export class MixSheet extends LitElement {
   /** Part indices off the score (not `hidden`, which every element already owns). */
   @property({ attribute: false }) hiddenParts: readonly number[] = [];
   @property({ attribute: false }) mix: PartMix = {};
-  /** False while a recording plays: it has no parts to mix. */
-  @property({ type: Boolean }) mixAvailable = true;
   /** How each part is routed, why when it is not what was asked, and the guitar designs. */
   @property({ attribute: false }) routing: readonly RoutedPart[] = [];
   @property({ attribute: false }) routingNotes: readonly { partIndex: number; message: string }[] = [];
@@ -98,32 +106,51 @@ export class MixSheet extends LitElement {
     header { display: flex; align-items: center; height: 40px; flex: none; padding: 0 8px 0 16px; }
     header b { flex: 1; font-size: 15px; font-weight: 600; }
     button.plain { border: 0; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; color: var(--ink-3); }
-    .label { display: flex; align-items: baseline; gap: 8px; padding: 2px 16px 6px; font: 600 10px/1 var(--sans, inherit); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
-    .label small { font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-faint, var(--ink-3)); }
+    button.plain:hover, button.plain[aria-expanded='true'] { color: var(--ink); background: var(--frame-press, var(--hover)); }
 
-    /* ── play from ── */
-    .sources { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
-    .source { display: flex; align-items: stretch; min-height: 36px; box-sizing: border-box; border: 1px solid transparent; }
-    .source.on { border-color: var(--ink); background: var(--paper, light-dark(#fff, oklch(0.25 0.006 70))); }
-    .pick { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border: 0; text-align: left; }
+    /* ── a layer: its toggle (the tray's), then its rows ── */
+    section { display: flex; flex-direction: column; gap: 4px; padding: 8px 12px 10px; }
+    section + section { border-top: 1px solid var(--frame-line, var(--line)); }
+    .head { display: flex; align-items: center; gap: 10px; min-height: 30px; }
+    .head .grow { flex: 1; }
+    .layer { display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px; border: 0; font: 600 12px/1 var(--sans, inherit);
+      background: var(--tray-cell, light-dark(oklch(0.91 0.012 75), oklch(0.3 0.008 70))); color: var(--ink-3); }
+    .layer:hover:not(:disabled) { color: var(--ink); }
+    .layer[aria-pressed='true'] { background: var(--ink); color: var(--paper, #fff); }
+    .rows { display: flex; flex-direction: column; }
+    .rows.off { opacity: 0.55; }
+    /* Every row one grid, so every slider is the same length and lines up. */
+    .ch { display: grid; grid-template-columns: 28px minmax(0, 1fr) 150px; align-items: center; column-gap: 8px; min-height: 46px;
+      border-bottom: 1px solid light-dark(oklch(0.92 0.008 70), oklch(0.28 0.006 70)); }
+    .ch:last-child { border-bottom: 0; }
+    .ch > .icon { display: grid; place-items: center; color: var(--ink-2); }
+    .name { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .name b { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .off .name b { color: var(--ink-3); }
+    .sub { align-self: flex-start; max-width: 100%; display: flex; align-items: center; gap: 4px; padding: 0; border: 0; font-size: 12px; color: var(--ink-3);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    button.sub:hover { color: var(--ink); }
+    .sub.warn { color: light-dark(#a12121, #ffb4ab); }
+    span.sub { cursor: default; }
+    .sub > span { overflow: hidden; text-overflow: ellipsis; }
+    /* The instrument as a quiet line under the name: a select without its box. */
+    .sound { max-width: 100%; margin-left: -3px; padding: 0; border: 0; background: transparent; font: 12px/1.2 var(--sans, inherit); color: var(--ink-3); cursor: pointer; text-overflow: ellipsis; }
+    .sound:hover { color: var(--ink); }
+    .sound option, .sound optgroup { color: var(--ink); background-color: var(--surface, #fff); }
+    input[type='range'] { width: 100%; margin: 0; accent-color: var(--accent); }
+    .eye { width: 28px; height: 28px; padding: 0; border: 0; display: grid; place-items: center; color: var(--ink-2); }
+    .eye[aria-pressed='true'] { color: var(--ink-faint, var(--ink-3)); }
+    .note { grid-column: 2 / -1; padding-bottom: 8px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
+    .note.problem { color: light-dark(#a3341f, #f0907c); }
+    .pick { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 6px; border: 0; text-align: left; font-size: 13px; color: var(--ink-2); }
+    .pick[aria-checked='true'] { color: var(--ink); font-weight: 600; }
     .dot { width: 12px; height: 12px; flex: none; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--ink-3); }
     [aria-checked='true'] .dot { border: 3.5px solid var(--accent); }
-    .text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    .first { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
-    .first b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .on .first b { font-weight: 600; }
-    .sub { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .sub.warn, .stats.warn { color: light-dark(#a12121, #ffb4ab); }
-    .stats { font-size: 12px; line-height: 1.3; color: var(--ink-2); }
-    .side { width: 34px; flex: none; padding: 0; border: 0; display: grid; place-items: center; color: var(--ink-3); }
-    .side:hover, .side[aria-expanded='true'] { color: var(--ink); background: var(--frame-press, var(--hover)); }
-    .on .side { border-left: 1px solid var(--frame-line, var(--line)); }
     .diagnostic ul { margin: 4px 0 0; padding-left: 18px; }
     .diagnostic { margin: 2px 0 4px; font-size: 13px; padding: 10px; background: light-dark(#efeeeb, #343330); line-height: 1.5; }
-    .add { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border: 0; font-size: 13px; color: var(--ink-2); text-align: left; }
-    .add:hover { color: var(--ink); }
+    .empty { margin: 0; padding: 4px 6px 2px; font-size: 12px; color: var(--ink-3); }
 
-    /* ── the synth's settings, behind the Synth row ── */
+    /* ── the synth's settings, behind the Synth heading ── */
     .pop {
       position: absolute; z-index: 6; right: 12px; width: 290px; box-sizing: border-box;
       display: flex; flex-direction: column; gap: 9px; padding: 10px 12px; font-size: 13px;
@@ -145,39 +172,17 @@ export class MixSheet extends LitElement {
     .pop p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
     .pop a { color: var(--ink-2); }
 
-    /* ── the mix: parts, then the master, by the tray ── */
-    .grow { flex: 1; min-height: 16px; }
-    .parts { display: flex; flex-direction: column; padding: 0 12px; }
-    .part, .master { display: grid; grid-template-columns: 28px minmax(0, 1fr) 92px 26px 26px 26px; align-items: center; gap: 6px; min-height: 46px; }
-    .part { border-top: 1px solid light-dark(oklch(0.92 0.008 70), oklch(0.28 0.006 70)); }
-    .part.compact { grid-template-columns: 28px minmax(0, 1fr) auto; min-height: 36px; }
-    .eye { width: 28px; height: 28px; padding: 0; border: 0; display: grid; place-items: center; color: var(--ink-2); }
-    .eye[aria-pressed='true'] { color: var(--ink-faint, var(--ink-3)); }
-    .name { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-    .name b { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .off .name b, .off > b { color: var(--ink-3); }
-    .compact > b { font-size: 13px; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .compact > span { font-size: 12px; color: var(--ink-3); }
-    /* The instrument as a quiet line under the name: a select without its box. */
-    .sound { max-width: 100%; margin-left: -3px; padding: 0; border: 0; background: transparent; font: 12px/1.2 var(--sans, inherit); color: var(--ink-3); cursor: pointer; text-overflow: ellipsis; }
-    .sound:hover { color: var(--ink); }
-    .sound option, .sound optgroup { color: var(--ink); background-color: var(--surface, #fff); }
-    input[type='range'] { width: 92px; margin: 0; accent-color: var(--accent); }
-    .muted input[type='range'], .master input[type='range'] { accent-color: var(--ink-3); }
-    .master input[type='range'] { accent-color: var(--ink); }
-    .val { font: 500 12px/1 var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; }
-    .ms { width: 26px; height: 26px; padding: 0; font: 700 11px/1 var(--sans, inherit); color: var(--ink-2); }
-    .ms[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper, #fff); }
-    .ms.solo[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .note { grid-column: 2 / -1; padding-bottom: 8px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
-    .note.problem { color: light-dark(#a3341f, #f0907c); }
+    .fill { flex: 1; min-height: 16px; }
     .master {
-      flex: none; margin-top: 2px; padding: 0 12px;
+      flex: none; padding: 0 12px;
       background: var(--frame-bar, light-dark(oklch(0.948 0.012 75), oklch(0.245 0.008 70)));
       border-top: 1px solid var(--frame-line, var(--line));
     }
-    .master b { font: 600 11px/1 var(--sans, inherit); letter-spacing: 0.1em; text-transform: uppercase; }
-    .master .val { color: var(--ink); font-weight: 600; }
+    .master .ch { border: 0; min-height: 50px; }
+    .master .name { flex-direction: row; align-items: baseline; justify-content: space-between; }
+    .master .name b { font: 600 11px/1 var(--sans, inherit); letter-spacing: 0.1em; text-transform: uppercase; }
+    .master .val { font: 600 12px/1 var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; }
+    .master input[type='range'] { accent-color: var(--ink); }
     input[type='file'] { display: none; }
   `;
 
@@ -222,20 +227,45 @@ export class MixSheet extends LitElement {
   }
   private toggleSettings(button: HTMLElement) {
     if (this.settingsAt !== null) { this.settingsAt = null; return; }
-    const row = button.closest('.source') as HTMLElement;
-    this.settingsAt = row.getBoundingClientRect().bottom - this.getBoundingClientRect().top + 4;
+    const head = button.closest('.head') as HTMLElement;
+    this.settingsAt = head.getBoundingClientRect().bottom - this.getBoundingClientRect().top + 4;
+  }
+  private setLayers(patch: Partial<MixLayers>) { this.emit<MixLayers>('layers-change', { ...this.layers, ...patch }); }
+  /** A row's level: every slider the same length (the row's last column). */
+  private level(label: string, value: number, set: (value: number) => void) {
+    return html`<input type="range" min="0" max="1" step="0.05" aria-label=${label} title=${String(Math.round(value * 100))}
+      .value=${String(value)} @input=${(e: Event) => set(Number((e.target as HTMLInputElement).value))} />`;
+  }
+  /** A layer's toggle: the tray's, as the section's heading. */
+  private layerToggle(layer: string, on: boolean, icon: string, label: string, title: string, act: () => void, disabled = false) {
+    return html`<button class="layer" type="button" data-layer=${layer} aria-pressed=${on} ?disabled=${disabled}
+      aria-label=${`${label}: ${on ? 'on' : 'off'}`} title=${title} @click=${act}>${glyph(icon, 15)}${label}</button>`;
   }
 
-  private synthRow() {
-    const on = this.activeId === 'synth';
-    return html`<div class=${on ? 'source on' : 'source'}>
-      <button class="pick" type="button" role="radio" aria-checked=${on} data-source="synth" @click=${() => this.emit('source-choose', { id: 'synth' })}>
-        <span class="dot"></span>
-        <span class="first"><b>Synth</b><span class="sub">${this.recordings.length || !this.canAdd ? 'each part an instrument' : 'add a recording below'}</span></span>
-      </button>
-      <button class="side" type="button" data-settings aria-label="Synth settings" title="Synth settings" aria-expanded=${this.settingsAt !== null}
-        @click=${(e: Event) => this.toggleSettings(e.currentTarget as HTMLElement)}>${sliders}</button>
-    </div>`;
+  // ── the recording ──────────────────────────────────────────────────────
+
+  /** The recording the layer plays: the one playing, else the last chosen, else the first. */
+  private get chosen(): LibraryRecording | undefined {
+    return this.recordings.find(r => r.id === this.activeId) ?? this.recordings.find(r => r.id === this.chosenId) ?? this.recordings[0];
+  }
+  private recordingSection() {
+    const chosen = this.chosen, on = this.activeId !== 'synth' && !!chosen;
+    const icon = chosen?.kind === 'audio' ? ICON.audio : ICON.video;
+    return html`<section aria-label="Recordings">
+      <div class="head">
+        ${this.layerToggle('recording', on, icon, 'Recordings', !chosen ? 'Add a recording first' : on ? 'Turn the recording off' : `Play ${chosen.name ?? 'the recording'}`,
+          () => this.emit('recording-toggle', { on: !on }), !chosen)}
+        <span class="grow"></span>
+        ${this.canAdd ? html`<button class="plain" type="button" aria-label="Add recording" title="Add a recording" @click=${() => this.emit('recording-add')}>${plus}</button>` : nothing}
+      </div>
+      ${!chosen
+        ? html`<p class="empty">${this.canAdd ? 'None yet: add a YouTube video or an audio file to play along to.' : 'None.'}</p>`
+        : html`<div class=${on ? 'rows' : 'rows off'}>
+            ${this.recordings.length > 1 ? html`<div role="radiogroup" aria-label="Which recording">${this.recordings.map(r => html`<button class="pick" type="button" role="radio"
+              aria-checked=${r.id === chosen.id} data-source=${r.id} @click=${() => this.emit('recording-choose', { id: r.id })}><span class="dot"></span>${r.name ?? 'Unnamed recording'}</button>`)}</div>` : nothing}
+            ${this.recordingRow(chosen, on)}
+          </div>`}
+    </section>`;
   }
 
   /** Why the score plays other than as written, or not at all: the synth plays this
@@ -248,31 +278,32 @@ export class MixSheet extends LitElement {
       ${notes.length === 1 ? notes[0] : html`<ul>${notes.map(n => html`<li>${n}</li>`)}</ul>`}</div>`;
   }
 
-  private recordingRow(row: LibraryRecording) {
-    const active = row.id === this.activeId;
+  private recordingRow(row: LibraryRecording, on: boolean) {
     const summary = syncSummary(row, this.compiled, this.passes);
     const name = row.name ?? 'Unnamed recording';
     const outOfDate = this.outOfDate(row);
-    const follows = this.follows(summary, active, outOfDate);
+    const follows = this.follows(summary, on, outOfDate);
     const alarm = follows === 'sync warning' || follows === 'may be out of date';
-    const warning = active && (this.syncWarning || summary.warning || summary.dropped);
     const points = summary.points.length;
-    return html`<div class=${active ? 'source on' : 'source'}>
-        <button class="pick" type="button" role="radio" aria-checked=${active} data-source=${row.id}
-          @click=${() => this.emit('source-choose', { id: row.id, warning: !!(summary.warning || summary.dropped) })}>
-          <span class="dot"></span>
-          <span class="text">
-            <span class="first"><b>${name}</b><span class=${!active && alarm ? 'sub warn' : 'sub'}>${row.kind === 'youtube' ? 'Video' : 'Audio'}${active ? '' : ` · ${follows}`}</span></span>
-            ${active ? html`<span class=${alarm ? 'stats warn' : 'stats'}>${follows}${points ? ` · ${points} sync ${points === 1 ? 'point' : 'points'}` : ''}</span>` : nothing}
-          </span>
-        </button>
-        <button class="side" type="button" data-edit=${row.id} aria-label=${`Edit ${name}`} title="Edit details" @click=${() => this.emit('recording-edit', { id: row.id })}>${pencil}</button>
+    const sub = `${row.kind === 'youtube' ? 'Video' : 'Audio'} · ${follows}${points ? ` · ${points} sync ${points === 1 ? 'point' : 'points'}` : ''}`;
+    const warning = on && (this.syncWarning || summary.warning || summary.dropped);
+    // The synth and the click follow the recording's sync: without one they have nothing to go by.
+    const alone = on && (this.layers.synth || this.layers.click) && (!points || summary.warning);
+    return html`<div class="ch" role="group" aria-label=${name}>
+        <span class="icon">${glyph(row.kind === 'youtube' ? ICON.video : ICON.audio, 18)}</span>
+        <span class="name"><b title=${name}>${name}</b>
+          <button class=${alarm ? 'sub warn' : 'sub'} type="button" data-edit=${row.id} aria-label=${`Edit ${name}`} title="Edit the recording and its sync"
+            @click=${() => this.emit('recording-edit', { id: row.id })}><span>${sub}</span>${pencil}</button></span>
+        ${this.level(`${name} level`, this.layers.recordingLevel, value => this.setLayers({ recordingLevel: value }))}
       </div>
-      ${outOfDate && active
+      ${outOfDate && on
         ? html`<div class="diagnostic" role="status" data-out-of-date><strong>May be out of date:</strong> the score's bars have changed since this sync was made. It counts bars by number, so everything after the change may now be early or late. Make a new sync in the sync bar to replace it.</div>`
         : nothing}
       ${warning
         ? html`<div class="diagnostic" role="status"><strong>Sync warning:</strong> ${this.syncWarning || (summary.warning ? summary.message : `${summary.dropped} out-of-range sync ${summary.dropped === 1 ? 'point' : 'points'} dropped.`)} Score following and seeking may be unavailable.</div>`
+        : nothing}
+      ${alone && !warning
+        ? html`<div class="diagnostic" role="status" data-unsynced>The synth and the click play along once this recording is synced to the score: open the sync bar in the tray.</div>`
         : nothing}`;
   }
 
@@ -294,8 +325,9 @@ export class MixSheet extends LitElement {
   // ── the mix ────────────────────────────────────────────────────────────
 
   private setMix(index: number, change: Partial<PartMixEntry>) {
-    const next: PartMix = { ...this.mix, [index]: { ...this.mix[index], ...change } };
-    this.emit<PartMix>('mix-change', next);
+    // No mute or solo here: one left from before the panel lost them goes with the next change.
+    const { muted: _muted, solo: _solo, ...entry } = { ...this.mix[index], ...change };
+    this.emit<PartMix>('mix-change', { ...this.mix, [index]: entry });
   }
   private toggleHidden(index: number) {
     const next = this.hiddenParts.includes(index) ? this.hiddenParts.filter((i) => i !== index) : [...this.hiddenParts, index];
@@ -362,54 +394,57 @@ export class MixSheet extends LitElement {
   private partRow(part: MixPart, visibleCount: number) {
     const hidden = this.hiddenParts.includes(part.index);
     const lastVisible = !hidden && visibleCount === 1;
-    if (!this.mixAvailable) {
-      return html`<div class=${hidden ? 'part compact off' : 'part compact'} role="group" aria-label=${part.name}>
-        ${this.eyeButton(part, hidden, lastVisible)}<b>${part.name}</b><span>${hidden ? 'hidden' : 'on the score'}</span>
-      </div>`;
-    }
     const entry = this.mix[part.index] ?? {};
-    const muted = entry.muted ?? false, solo = entry.solo ?? false;
-    const level = Math.round((entry.volume ?? 1) * 100);
-    return html`<div class=${[ 'part', hidden ? 'off' : '', muted ? 'muted' : ''].join(' ')} role="group" aria-label=${part.name}>
+    return html`<div class="ch" role="group" aria-label=${part.name}>
       ${this.eyeButton(part, hidden, lastVisible)}
       <span class="name"><b title=${part.detail}>${part.name}</b>${this.instrument(part, entry)}</span>
-      <input type="range" min="0" max="1" step="0.05" aria-label=${`${part.name} volume`} ?disabled=${muted}
-        .value=${String(entry.volume ?? 1)}
-        @input=${(e: Event) => this.setMix(part.index, { volume: Number((e.target as HTMLInputElement).value) })} />
-      <span class="val">${muted ? '—' : level}</span>
-      <button class="ms" type="button" aria-pressed=${muted} aria-label=${muted ? `Unmute ${part.name}` : `Mute ${part.name}`} title=${muted ? 'Unmute' : 'Mute'}
-        @click=${() => this.setMix(part.index, { muted: !muted })}>M</button>
-      <button class="ms solo" type="button" aria-pressed=${solo} aria-label=${solo ? `Unsolo ${part.name}` : `Solo ${part.name}`} title=${solo ? 'Unsolo' : 'Solo: hear only the soloed parts'}
-        @click=${() => this.setMix(part.index, { solo: !solo })}>S</button>
+      ${this.level(`${part.name} volume`, entry.volume ?? 1, value => this.setMix(part.index, { volume: value }))}
       ${this.note(part)}
     </div>`;
+  }
+  private synthSection(visibleCount: number) {
+    const on = this.layers.synth;
+    return html`<section aria-label="Synth">
+      <div class="head">
+        ${this.layerToggle('synth', on, ICON.synth, 'Synth', on ? 'Turn the synth off' : 'Play the synth', () => this.setLayers({ synth: !on }))}
+        <span class="grow"></span>
+        <button class="plain" type="button" data-settings aria-label="Synth settings" title="Synth settings" aria-expanded=${this.settingsAt !== null}
+          @click=${(e: Event) => this.toggleSettings(e.currentTarget as HTMLElement)}>${sliders}</button>
+      </div>
+      ${this.playbackNotes()}
+      <div class=${on ? 'rows' : 'rows off'}>${this.parts.map((part) => this.partRow(part, visibleCount))}</div>
+    </section>`;
+  }
+  private clickSection() {
+    const on = this.layers.click;
+    return html`<section aria-label="Click">
+      <div class="head">${this.layerToggle('click', on, ICON.click, 'Click', on ? 'Turn the click off' : 'Play the click', () => this.setLayers({ click: !on }))}</div>
+      <div class=${on ? 'rows' : 'rows off'}>
+        <div class="ch" role="group" aria-label="Click">
+          <span class="icon">${glyph(ICON.click, 16)}</span>
+          <span class="name"><b>Click</b><span class="sub">every beat, the bar's first louder</span></span>
+          ${this.level('Click level', this.layers.clickLevel, value => this.setLayers({ clickLevel: value }))}
+        </div>
+      </div>
+    </section>`;
   }
 
   render() {
     const visibleCount = this.parts.filter((p) => !this.hiddenParts.includes(p.index)).length;
-    const level = Math.round(this.master * 100), silent = this.master === 0;
     return html`
       <div class="scroll">
         <header><b>Mix</b><button class="plain" type="button" aria-label="Close mix" @click=${() => this.emit('close')}>${cross}</button></header>
-        <div class="label">Play from</div>
-        <div class="sources" role="radiogroup" aria-label="Play from">
-          ${this.synthRow()}
-          ${this.playbackNotes()}
-          ${this.recordings.map((row) => this.recordingRow(row))}
-          ${this.canAdd ? html`<button class="add" type="button" aria-label="Add recording" @click=${() => this.emit('recording-add')}>${plus}<span>Add recording</span></button>` : nothing}
-        </div>
-        <div class="grow"></div>
-        <div class="label">Mix${this.mixAvailable ? nothing : html`<small>one sound · parts only show or hide</small>`}</div>
-        <div class="parts">${this.parts.map((part) => this.partRow(part, visibleCount))}</div>
+        ${this.recordingSection()}
+        ${this.synthSection(visibleCount)}
+        ${this.clickSection()}
+        <div class="fill"></div>
       </div>
       <div class="master" role="group" aria-label="Master">
-        <span></span><b>Master</b>
-        <input type="range" min="0" max="1" step="0.05" aria-label="Master volume" .value=${String(this.master)}
-          @input=${(e: Event) => this.emit<number>('master-change', Number((e.target as HTMLInputElement).value))} />
-        <span class="val">${level}</span>
-        <button class="ms" type="button" aria-pressed=${silent} aria-label=${silent ? 'Unmute everything' : 'Mute everything'} title=${silent ? 'Unmute' : 'Mute everything'}
-          @click=${() => this.emit('master-mute')}>M</button>
-        <span></span>
+        <div class="ch">
+          <span></span>
+          <span class="name"><b>Master</b><span class="val">${Math.round(this.master * 100)}</span></span>
+          ${this.level('Master volume', this.master, value => this.emit<number>('master-change', value))}
+        </div>
       </div>
       ${this.settings()}
     `;

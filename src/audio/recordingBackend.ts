@@ -194,7 +194,7 @@ export class RecordingBackend implements PlaybackBackend {
   setRate(rate: number) { const value = this.media.setRate(rate); this.emit(); return value; }
   setVolume(volume: number) { this.volume = volume; this.media.setVolume(volume * this.level); this.emit(); return volume; }
   /** The recording's level under the master, 0–1. */
-  setLevel(level: number) { this.level = Math.min(1, Math.max(0, level)); this.media.setVolume(this.volume * this.level); this.emit(); }
+  setLevel(level: number) { this.level = Math.min(1, Math.max(0, level)); this.media.setVolume(this.volume * this.level); }
   /** The sync the score follows, when it has a usable one: what the synth plays along to. */
   get syncMap(): RecordingSyncMap | null { return this.invalidSync ? null : this.sync; }
   setLoop(loop?: ScoreLoop) {

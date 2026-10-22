@@ -60,7 +60,7 @@ import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import { normalizeDisplayPreferences } from '../../../src/elements/displayDefaults.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
-import type { Player, SyncEdit } from '../../../src/elements/Player.ts';
+import type { MixLayers, Player, SyncEdit } from '../../../src/elements/Player.ts';
 import { isImportedSync, storedScoreShape, storedSyncSegments } from '../../../src/model/recordingAttachment.ts';
 import { performedShape } from '../../../src/audio/scoreShape.ts';
 import { SYNC_SEGMENTS_FORMAT, type StudioSyncPayload } from '../../../src/model/syncSegments.ts';
@@ -82,7 +82,7 @@ import type { FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import { loadFactoryDesigns } from '../../../src/audio/native/hostPort.ts';
 import { playbackNotes, playbackNotice } from './playbackNotes.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, SOUND_KEY, AUDITION_KEY, write, readSound, readAuditionNotes, soundRate, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, SOUND_KEY, AUDITION_KEY, write, readSound, readAuditionNotes, soundRate, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, DEFAULT_LAYERS, type PiecePreferences } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -168,6 +168,11 @@ export class PiecePage extends LitElement {
   /** What is playing — a recording has no parts to mix. */
   @state() private playbackKind: string | undefined;
   @state() private selectedRecordingId: string | null = null;
+  /** The mix's layers (roadmap/inprogress/studio-mix-layers.md); whether the recording plays is
+   *  `selectedRecordingId`. */
+  @state() private layers: MixLayers = DEFAULT_LAYERS;
+  /** The recording the layer plays when it is turned on: the last chosen (null: the first). */
+  @state() private chosenRecordingId: string | null = null;
   /** Where the video divider was left (percent of the frame's width); null until placed. */
   @state() private videoDividerPercent: number | null = null;
   @state() private addingRecording = false;
@@ -522,6 +527,7 @@ export class PiecePage extends LitElement {
     this.playbackNoticeSaid = '';
     this.loading = true;
     this.editOpen = false; this.recordingsOpen = false; this.mixOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
+    this.layers = DEFAULT_LAYERS; this.chosenRecordingId = null;
     this.videoDividerPercent = null;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
@@ -1048,6 +1054,21 @@ export class PiecePage extends LitElement {
   private async chooseSource(id: string) {
     await this.player?.selectSource(id);
   }
+  private setLayers(layers: MixLayers) {
+    this.layers = layers;
+    this.schedulePrefs();
+  }
+  /** The recording layer on (its chosen recording leads) or off (the synth leads). */
+  private toggleRecording(on: boolean) {
+    const chosen = this.recordings.find(r => r.id === this.chosenRecordingId) ?? this.recordings[0];
+    void this.chooseSource(on && chosen ? chosen.id : 'synth');
+  }
+  /** Which recording the layer plays; playing, the switch is made now. */
+  private chooseRecording(id: string) {
+    this.chosenRecordingId = id;
+    this.schedulePrefs();
+    if (this.selectedRecordingId && this.selectedRecordingId !== id) void this.chooseSource(id);
+  }
   /** The editor on one recording, read fresh so its revision is current. */
   private async editRecording(id: string) {
     const generation = this.generation;
@@ -1079,6 +1100,10 @@ export class PiecePage extends LitElement {
     const stored = normalizePiecePrefs(snapshot?.prefs);
     this.savedPrefs = canonicalJson(stored);
     this.videoDividerPercent = stored.videoDividerPercent ?? null;
+    const playing = stored.source && this.recordings.some(r => r.id === stored.source) ? stored.source : undefined;
+    // Stored before the layers: a recording that played, played alone.
+    this.layers = stored.layers ?? { ...DEFAULT_LAYERS, synth: !playing };
+    this.chosenRecordingId = [stored.chosen, playing].find(id => id && this.recordings.some(r => r.id === id)) ?? null;
     if (stored.parts && stored.parts.count === partCount) {
       this.hiddenParts = stored.parts.hidden;
       this.partMix = stored.parts.mix;
@@ -1108,6 +1133,8 @@ export class PiecePage extends LitElement {
     const touched = this.hiddenParts.length > 0 || Object.keys(this.partMix).length > 0;
     return {
       ...(this.selectedRecordingId ? { source: this.selectedRecordingId } : {}),
+      ...(this.chosenRecordingId ? { chosen: this.chosenRecordingId } : {}),
+      layers: this.layers,
       ...(this.videoDividerPercent !== null ? { videoDividerPercent: this.videoDividerPercent } : {}),
       // The rendition the mix was left against — provenance for `count`, and
       // meaningless without it.
@@ -1280,6 +1307,8 @@ export class PiecePage extends LitElement {
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
           .mixer=${this.doc ? { label: mixLabel, open: this.mixOpen || this.recordingsOpen } : null}
+          .layers=${this.layers} .recordingChoice=${this.chosenRecordingId}
+          @layers-change=${(e: CustomEvent<MixLayers>) => this.setLayers(e.detail)}
           @mixer-toggle=${() => this.openPanel(this.mixOpen ? null : 'mix')}
           @volume-changed=${(e: CustomEvent<{ volume: number }>) => (this.masterVolume = e.detail.volume)}
           .partMix=${this.partMix} .sampleRate=${soundRate(this.sound)} .auditionNotes=${this.auditionNotes} .sourceControl=${false}
@@ -1292,6 +1321,7 @@ export class PiecePage extends LitElement {
           }}
           @source-selected=${(e: CustomEvent<{ id: string }>) => {
             this.selectedRecordingId = e.detail.id === 'synth' ? null : e.detail.id;
+            if (e.detail.id !== 'synth') this.chosenRecordingId = e.detail.id;
             this.schedulePrefs();
           }}>
         </mnx-player>
@@ -1303,6 +1333,7 @@ export class PiecePage extends LitElement {
             const wasPlaying = this.editingRecordingId !== null && this.editingRecordingId === this.selectedRecordingId;
             this.addingRecording = false; this.editingRecordingId = null; this.openPanel('mix');
             if (wasPlaying) { this.selectedRecordingId = null; void this.player?.selectSource('synth'); }
+            if (!this.recordings.some(r => r.id === this.chosenRecordingId)) this.chosenRecordingId = null;
           }}
           @back=${() => this.openPanel('mix')}
           @close=${() => (this.recordingsOpen = false)}></mnx-studio-recordings>`) : nothing}
@@ -1364,6 +1395,8 @@ export class PiecePage extends LitElement {
               .recordings=${playable}
               .document=${this.doc}
               .activeId=${activeId}
+              .chosenId=${this.chosenRecordingId}
+              .layers=${this.layers}
               .syncWarning=${this.recordingWarning?.id === activeId ? this.recordingWarning.message : ''}
               .canAdd=${!!this.snapshot}
               .scoreShape=${this.scoreShape}
@@ -1373,17 +1406,17 @@ export class PiecePage extends LitElement {
               .designs=${this.factoryDesigns}
               .hiddenParts=${this.hiddenParts}
               .mix=${this.partMix}
-              .mixAvailable=${!this.playbackKind || this.playbackKind === 'synth'}
               .master=${this.masterVolume}
               .sound=${this.sound}
               .auditionNotes=${this.auditionNotes}
-              @source-choose=${(e: CustomEvent<{ id: string }>) => void this.chooseSource(e.detail.id)}
+              @recording-toggle=${(e: CustomEvent<{ on: boolean }>) => this.toggleRecording(e.detail.on)}
+              @recording-choose=${(e: CustomEvent<{ id: string }>) => this.chooseRecording(e.detail.id)}
+              @layers-change=${(e: CustomEvent<MixLayers>) => this.setLayers(e.detail)}
               @recording-edit=${(e: CustomEvent<{ id: string }>) => void this.editRecording(e.detail.id)}
               @recording-add=${() => this.addRecording()}
               @hidden-change=${(e: CustomEvent<number[]>) => this.setParts(e.detail, this.partMix)}
               @mix-change=${(e: CustomEvent<PartMix>) => this.setParts(this.hiddenParts, e.detail)}
               @master-change=${(e: CustomEvent<number>) => this.player?.setMasterVolume(e.detail)}
-              @master-mute=${() => this.player?.toggleMasterMute()}
               @sound-change=${(e: CustomEvent<'full' | 'light'>) => { this.sound = e.detail; write(SOUND_KEY, this.sound === 'light' ? 'light' : null); }}
               @audition-change=${(e: CustomEvent<boolean>) => { this.auditionNotes = e.detail; write(AUDITION_KEY, e.detail ? null : 'off'); }}
               @close=${() => (this.mixOpen = false)}></mnx-studio-mix>`

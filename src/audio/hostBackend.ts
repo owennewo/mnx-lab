@@ -232,6 +232,7 @@ export class HostBackend implements PlaybackBackend {
       dispose: () => {},
     };
     this.port.setVolume(this.volume);
+    this.port.setLevels?.({ synth: 1, click: 0 });
     // The host gets ready while the score is read, not on play.
     void this.port.preload?.().catch(() => {});
     // Strain matters only while playing and sounding — from the first note plus one report
@@ -443,6 +444,8 @@ export class HostBackend implements PlaybackBackend {
     return true;
   }
 
+  /** From a user gesture: the host's audio running, before a recording it follows starts. */
+  wake() { return this.port.unlock(); }
   /** The synth's notes and the click, on or off, and the click's level. */
   setLayers(layers: HostLayers) {
     if (this.closed) return;

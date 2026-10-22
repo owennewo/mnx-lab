@@ -9,7 +9,7 @@ import { RecordingBackend, soundingAt, writtenByVisit, type WrittenByVisit } fro
 import { NativeYouTubePort } from '../audio/native/youtube.ts';
 import { youtubeVideoId } from '../audio/youtubeUrl.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
-import { HostBackend } from '../audio/hostBackend.ts';
+import { HostBackend, type HostLayers } from '../audio/hostBackend.ts';
 import { NativeHostPort } from '../audio/native/hostPort.ts';
 import { createRecordingSync } from '../audio/recordingSync.ts';
 import { scorePositionAt } from '../audio/scorePosition.ts';
@@ -17,8 +17,8 @@ import { linearizePasses } from '../model/passes.ts';
 import { restSpansOf, restsAt, type RestSpan } from '../model/restSpans.ts';
 import type { PartMix } from '../audio/partMix.ts';
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
-import { ZERO, compare, rational, type Rational } from '../audio/time.ts';
-import { DEFAULT_TRAINER, PLAIN_LOOP, practiceRegion, type LoopBars, type MeterOf, type PracticeOptions, type PracticeThen } from '../audio/practice.ts';
+import { ZERO, compare, type Rational } from '../audio/time.ts';
+import { DEFAULT_TRAINER, PLAIN_LOOP, documentMeter, practiceRegion, type LoopBars, type MeterOf, type PracticeOptions, type PracticeThen } from '../audio/practice.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackOccurrence, PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
@@ -30,6 +30,10 @@ import { isTextEntry, realTarget } from './keyScope.ts';
 import './SyncBar.ts';
 
 /** What a host persists when the sync bar commits an edit. */
+/** The mix's layers (roadmap/inprogress/studio-mix-layers.md): the synth's notes and the click,
+ *  each on or off, the click's level, and the recording's level under the master. Whether a
+ *  recording plays is the source: one selected leads; `synth` means none does. */
+export interface MixLayers extends HostLayers { recordingLevel: number }
 export interface SyncEdit { sourceId: string; segments: SyncSegments; syncpoints: SoundsliceSyncpoint[] | null }
 
 /** The tray's stacked form, for the control line `scope` names — written once,
@@ -106,6 +110,13 @@ export class Player extends LitElement {
    *  handle — "Mix · <what plays>" — and a click asks the host to open it (`mixer-toggle`)
    *  instead of opening the volume overlay. `open` presses the field. */
   @property({ attribute: false }) mixer: { label: string; open: boolean } | null = null;
+  /** A host with layers (studio): the synth plays along with a recording that leads, the click
+   *  sounds every beat, and the tray's Mix field toggles the three (`layers-change`; the
+   *  recording's toggle selects it, or the synth). Null: the synth plays only when it leads, as
+   *  a player with no mixer always has. */
+  @property({ attribute: false }) layers: MixLayers | null = null;
+  /** The recording the tray's toggle turns on (the host's last choice); null: the first. */
+  @property({ attribute: false }) recordingChoice: string | null = null;
   /** Host supplies recording management; standalone players omit the add action. */
   @property({ type: Boolean }) canAddRecording = false;
   /** A host recording panel owns score-alignment warnings. */
@@ -120,7 +131,7 @@ export class Player extends LitElement {
   @state() private loopBars: LoopBars | null = null;
   /** The bars the practice is playing — the loop's, or where Advance has moved it to. */
   @state() private shownBars: LoopBars | null = null;
-  /** How the loop is practised: count-in, repeats, then, gap, trainer, click. */
+  /** How the loop is practised: count-in, repeats, then, gap, trainer. */
   @state() private practice: PracticeOptions = PLAIN_LOOP;
   /** A loop handle being dragged, and the bars it would make. */
   @state() private dragBars: { bars: LoopBars; edge: 'first' | 'last' } | null = null;
@@ -150,10 +161,14 @@ export class Player extends LitElement {
   static readonly RATE_STEP = 0.05;
   @state() private volume = 0.7;
   private session?: PlaybackSession;
-  /** With a recording as the source the session has no synth: a stopped one of the player's own
-   *  sounds the notes the cursor lands on (roadmap: core-note-audition). Made on the first such
-   *  note, kept while a recording is the source, dropped when the synth is again. */
+  /** With a recording as the source the session has no synth: one of the player's own sounds
+   *  the notes the cursor lands on (roadmap: core-note-audition) and plays the synth and the
+   *  click along with the recording (`layers`). Made when first wanted, kept while a recording is
+   *  the source, dropped when the synth is again. */
   private auditioner?: HostBackend;
+  /** What `applyLayers` last applied, so a session's frequent frames cost nothing. */
+  private applied: { backend?: PlaybackBackend; key?: string; sync?: unknown; companion?: HostBackend } = {};
+  private applying = false;
   /** A note an edit made or changed, sounded once the edit reaches the performance. */
   private pendingAudition?: { noteKey: string; ordinal: number; at: number };
   private revision = 0;
@@ -295,6 +310,50 @@ export class Player extends LitElement {
     }
     .field.mix.on .lab {
       color: var(--ink);
+    }
+    /* With layers (studio-mix-layers.md): three icon toggles under the label, then the master
+       level, which opens the panel. */
+    .field.layers {
+      max-width: 220px;
+    }
+    .field.layers .box {
+      padding: 0;
+      gap: 2px;
+    }
+    .field.layers .box button.mix-open {
+      width: auto;
+      min-width: 52px;
+      margin-left: 4px;
+      padding: 0 6px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      box-shadow: inset 0 0 0 1px var(--line-strong);
+      color: var(--ink);
+      font: 600 13px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+    }
+    .field.layers .box button.mix-open[aria-expanded='true'] {
+      box-shadow: inset 0 0 0 1px var(--ink-3);
+    }
+    .field.layers .box button[data-layer] {
+      width: 42px;
+      height: 100%;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 0;
+      background: var(--tray-cell, var(--line));
+      color: var(--ink-3);
+    }
+    .field.layers .box button[data-layer]:hover {
+      color: var(--ink);
+    }
+    .field.layers .box button[aria-pressed='true'] {
+      background: var(--ink);
+      color: var(--player-ground);
     }
     .meter {
       display: flex;
@@ -1188,6 +1247,7 @@ export class Player extends LitElement {
       this.session.backend.setPartMix(this.partMix);
     if (changed.has('partMix')) this.auditioner?.setPartMix(this.partMix);
     if (changed.has('sampleRate') && changed.get('sampleRate') !== this.sampleRate) this.dropAuditioner();
+    if (changed.has('layers') || changed.has('sampleRate')) this.applyLayers();
   }
   /** The performance's notes by visit, for the parked cursor's lamp. */
   private writtenCache: { performance: Performance; byVisit: WrittenByVisit } | null = null;
@@ -1330,10 +1390,54 @@ export class Player extends LitElement {
       this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.refreshDerivedSync(); this.followPractice(); this.publish();
       if (this.session.backend instanceof HostBackend) this.dropAuditioner();
       else this.auditioner?.setVolume(this.volume);
+      this.applyLayers();
     });
     this.session.setRate(this.rate); this.session.setVolume(this.volume);
     this.session.stop();
+    this.applied = {}; this.applyLayers();
     this.status = this.session.snapshot; this.publish();
+  }
+  /**
+   * The layers onto the backends: the synth's and the click's levels on the synth that leads;
+   * with a recording leading, its level, and the companion synth following it through its sync
+   * while the synth or the click is on. Without a usable sync there is nothing to follow by.
+   */
+  private applyLayers() {
+    const backend = this.session?.backend, layers = this.layers;
+    if (!backend || !layers || this.applying) return;
+    // What is applied is noted first: a backend that notifies as it is set must not loop back here.
+    this.applying = true;
+    try {
+      const key = JSON.stringify(layers), before = this.applied, fresh = before.backend !== backend || before.key !== key;
+      if (backend instanceof HostBackend) {
+        this.applied = { backend, key };
+        if (fresh) backend.setLayers(layers);
+        return;
+      }
+      if (!(backend instanceof RecordingBackend)) return;
+      const sync = backend.syncMap;
+      if (!(layers.synth || layers.click) || !sync || !this.performance) {
+        this.applied = { backend, key };
+        if (fresh) backend.setLevel(layers.recordingLevel);
+        this.auditioner?.followMedia(null);
+        return;
+      }
+      const companion = this.companion();
+      this.applied = { backend, key, sync, companion };
+      if (fresh) backend.setLevel(layers.recordingLevel);
+      if (fresh || before.companion !== companion) companion.setLayers(layers);
+      if (fresh || before.companion !== companion || before.sync !== sync) {
+        companion.followMedia({ sync, read: () => {
+          const s = backend.snapshot;
+          return s.mediaTime === undefined ? null : { mediaTime: s.mediaTime, rate: s.rate, playing: s.state === 'playing' };
+        } });
+      }
+    } finally { this.applying = false; }
+  }
+  /** The player's own synth while a recording is the source (`auditioner`). */
+  private companion() {
+    return this.auditioner ??= new HostBackend(this.performance!, this.document ?? NO_DOCUMENT,
+      new NativeHostPort({ volume: this.volume, sampleRate: this.sampleRate }), { volume: this.volume, partMix: this.partMix }, () => {});
   }
   /**
    * An edit: the same document with a new performance. The session and its backend stay;
@@ -1437,6 +1541,8 @@ export class Player extends LitElement {
     this.localError = '';
     if (this.status?.needsStart && this.status.alignmentIssue) { await this.session?.start(); return; }
     await this.toLoopStart();
+    // Within the gesture: a synth following a recording needs its audio running.
+    if (this.applied.companion && this.applied.sync) void this.applied.companion.wake().catch(() => {});
     await this.session?.play();
   }
   /** A loop set, Play starts at its first bar — the bars it has got to, at the repeat it had
@@ -1461,11 +1567,9 @@ export class Player extends LitElement {
     const backend = this.session?.backend;
     if (backend instanceof HostBackend) { this.dropAuditioner(); return backend.audition(noteKey, ordinal); }
     if (!this.performance) return false;
-    this.auditioner ??= new HostBackend(this.performance, this.document ?? NO_DOCUMENT,
-      new NativeHostPort({ volume: this.volume, sampleRate: this.sampleRate }), { volume: this.volume, partMix: this.partMix }, () => {});
-    return this.auditioner.audition(noteKey, ordinal);
+    return this.companion().audition(noteKey, ordinal);
   }
-  private dropAuditioner() { this.auditioner?.dispose(); this.auditioner = undefined; }
+  private dropAuditioner() { this.auditioner?.dispose(); this.auditioner = undefined; this.applied = { ...this.applied, companion: undefined }; }
   stop() { this.localError = ''; this.session?.stop(); }
   toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
   private hideYouTubeNotice() {
@@ -1903,17 +2007,7 @@ export class Player extends LitElement {
     };
   }
   /** Each bar's count: the beats of its time signature (compound time counted in dotted beats). */
-  private meterOf(): MeterOf {
-    const performance = this.performance!, globals = this.document?.global.measures ?? [];
-    return ordinal => {
-      const m = performance.measures[ordinal];
-      let time: { count: number; unit: number } | undefined;
-      for (let i = m?.measureIndex ?? 0; i >= 0 && !time; i--) time = globals[i]?.time ?? undefined;
-      const [n, d] = defaultBeatUnit(time);
-      const count = time ? Math.max(1, Math.round(time.count / time.unit / (n / d))) : 4;
-      return { count, beat: rational(BigInt(n), BigInt(d)) };
-    };
-  }
+  private meterOf(): MeterOf { return documentMeter(this.performance!, this.document); }
   /** The practice moved on (Advance) or ended: the loop follows it. */
   private followPractice() {
     const loop = this.status?.transport?.loop, take = loop?.visit.take?.bars;
@@ -1967,7 +2061,6 @@ export class Player extends LitElement {
         gap: int(o.gap, 0, 1, 0),
         trainer: t && typeof t === 'object' && [t.start, t.step, t.every, t.ceiling].every(v => typeof v === 'number' && Number.isFinite(v))
           ? { start: Player.snapRate(t.start), step: Math.min(0.25, Math.max(0.05, t.step)), every: int(t.every, 1, 8, 2), ceiling: Player.snapRate(Math.max(t.start, t.ceiling)) } : null,
-        click: o.click === true,
       };
     } catch { return PLAIN_LOOP; }
   }
@@ -2043,9 +2136,8 @@ export class Player extends LitElement {
             ${stepper('Every', `${t.every} rep.`, () => trainer({ every: t.every - 1 }), () => trainer({ every: t.every + 1 }))}
             ${stepper('Up to', pct(t.ceiling), () => trainer({ ceiling: t.ceiling - 0.05 }), () => trainer({ ceiling: t.ceiling + 0.05 }))}
           </div>
-          ${playing && take ? html`<p class="note">Now ${pct(take.rate)}</p>` : nothing}` : nothing}
-        <label class="check"><input type="checkbox" .checked=${o.click} @change=${(e: Event) => set({ click: (e.target as HTMLInputElement).checked })}>Click through the loop</label>`
-      : html`<p class="note">A recording loops these bars as they are. Count-in, repeats, the speed trainer and the click play with the synth.</p>`}
+          ${playing && take ? html`<p class="note">Now ${pct(take.rate)}</p>` : nothing}` : nothing}`
+      : html`<p class="note">A recording loops these bars as they are. Count-in, repeats and the speed trainer play with the synth.</p>`}
     </div>`;
   }
 
@@ -2230,7 +2322,53 @@ export class Player extends LitElement {
     ><span class="lab" aria-hidden="true">Mix · ${mixer.label}</span><span class="box"><span class="meter" aria-hidden="true">${Player.METER.map((step) => html`<span class=${this.volume >= step ? 'lit' : ''}></span>`)}</span><span>${level}</span>${Player.stroke(mixer.open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6', 10)}</span></button>`;
   }
 
+  /** The recording the tray's toggle plays: the one playing, else the host's choice, else the first. */
+  private get chosenRecording() {
+    return this.recordings.find(r => r.id === this.sourceId) ?? this.recordings.find(r => r.id === this.recordingChoice) ?? this.recordings[0];
+  }
+  /** What the layers sound, as the tray's label says it: "Video + Synth", or "silent". */
+  get layersLabel() {
+    const layers = this.layers, chosen = this.chosenRecording;
+    if (!layers) return '';
+    const heard = [this.sourceId !== 'synth' && chosen ? (chosen.kind === 'youtube' ? 'Video' : 'Audio') : '',
+      layers.synth ? 'Synth' : '', layers.click ? 'Click' : ''].filter(Boolean);
+    return heard.length ? heard.join(' + ') : 'silent';
+  }
+  private setLayer(layer: 'synth' | 'click', on: boolean) {
+    if (!this.layers) return;
+    this.layers = { ...this.layers, [layer]: on };
+    this.dispatchEvent(new CustomEvent<MixLayers>('layers-change', { detail: this.layers, bubbles: true, composed: true }));
+  }
+  /** The recording on (selected, so it leads) or off (the synth leads). */
+  private toggleRecording() {
+    const chosen = this.chosenRecording;
+    if (this.sourceId !== 'synth') void this.selectSource('synth');
+    else if (chosen) void this.selectSource(chosen.id);
+  }
+  private static readonly LAYER_ICONS = {
+    video: 'M5 5h14a2.5 2.5 0 0 1 2.5 2.5v9a2.5 2.5 0 0 1-2.5 2.5H5a2.5 2.5 0 0 1-2.5-2.5v-9A2.5 2.5 0 0 1 5 5zM10 9l5 3-5 3z',
+    audio: 'M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2',
+    synth: 'M3 5h18v14H3zM9 5v9M15 5v9',
+    click: 'M7 21h10L14 4h-4L7 21zM12 15l6-9',
+  };
+  /** The tray's Mix field with layers: a toggle each for the recording, the synth and the click. */
+  private layersControl(mixer: { label: string; open: boolean }, layers: MixLayers) {
+    const chosen = this.chosenRecording, recordingOn = this.sourceId !== 'synth', level = Math.round(this.volume * 100);
+    const toggle = (layer: string, on: boolean, icon: string, name: string, act: () => void) => html`<button type="button" aria-pressed=${on}
+      data-layer=${layer} aria-label=${`${name}: ${on ? 'on' : 'off'}`} title=${`${on ? 'Turn off' : 'Play'} ${name}`} @click=${act}>${Player.stroke(icon, 20)}</button>`;
+    return html`<span class="field layers"><span class="lab" aria-hidden="true">Mix · ${this.layersLabel}</span><span class="box" role="group" aria-label="Mix">
+        ${chosen ? toggle('recording', recordingOn, chosen.kind === 'youtube' ? Player.LAYER_ICONS.video : Player.LAYER_ICONS.audio, chosen.name, () => this.toggleRecording()) : nothing}
+        ${toggle('synth', layers.synth, Player.LAYER_ICONS.synth, 'the synth', () => this.setLayer('synth', !layers.synth))}
+        ${toggle('click', layers.click, Player.LAYER_ICONS.click, 'the click', () => this.setLayer('click', !layers.click))}
+        <button type="button" class="mix-open" data-mix-open aria-expanded=${mixer.open}
+          aria-label=${`Mix: ${this.layersLabel}, master ${level}`} title="The mix, and the master volume"
+          @click=${() => this.dispatchEvent(new CustomEvent('mixer-toggle', { bubbles: true, composed: true }))}
+        ><span>${level}</span>${Player.stroke(mixer.open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6', 10)}</button>
+      </span></span>`;
+  }
+
   private volumeControl() {
+    if (this.mixer && this.layers) return this.layersControl(this.mixer, this.layers);
     if (this.mixer) return this.mixerControl(this.mixer);
     const open = this.openPop === 'volume';
     const muted = this.volume === 0;

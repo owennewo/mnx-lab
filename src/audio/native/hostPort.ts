@@ -54,7 +54,7 @@ export class NativeHostPort implements HostPort {
   private setup: Setup | undefined;
   private volume: number;
   /** The synth's and the click's levels under the master (roadmap/inprogress/studio-mix-layers.md). */
-  private levels = { synth: 1, click: 1 };
+  private levels = { synth: 1, click: 0 };
   private synthGain: GainNode | undefined;
   private clickGain: GainNode | undefined;
   private disposed = false;

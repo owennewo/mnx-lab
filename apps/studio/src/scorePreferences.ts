@@ -7,6 +7,7 @@ import {
   normalizeDisplayPreferences
 } from '../../../src/elements/displayDefaults.ts';
 import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
+import type { MixLayers } from '../../../src/elements/Player.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
 import { normalizeInstrument } from '../../../src/audio/hostInstruments.ts';
 import { clampStaffSp } from '../../../src/engine/render/scale.ts';
@@ -106,13 +107,12 @@ export function normalizeParts(raw: unknown): PartsPreference {
   for (const [key, value] of Object.entries(source.mix && typeof source.mix === 'object' ? source.mix : {})) {
     const index = Number(key);
     if (!Number.isInteger(index) || index < 0 || !value || typeof value !== 'object') continue;
-    // A `sound` (the retired sink's sample packs) is dropped: the part plays its default.
-    const { volume, muted, solo } = value as Record<string, unknown>;
+    // A `sound` (the retired sink's sample packs) is dropped: the part plays its default. So is a
+    // mute or a solo: the Mix panel has neither now (studio-mix-layers.md), so nothing could undo one.
+    const { volume } = value as Record<string, unknown>;
     const instrument = normalizeInstrument((value as Record<string, unknown>).instrument);
     mix[index] = {
       ...(typeof volume === 'number' && volume >= 0 && volume <= 1 ? { volume } : {}),
-      ...(muted === true ? { muted } : {}),
-      ...(solo === true ? { solo } : {}),
       ...(instrument ? { instrument } : {}),
     };
   }
@@ -132,7 +132,12 @@ export function readParts(pieceId: string): PartsPreference {
  *  count no longer matches the document is dropped rather than misapplied — the
  *  source, which is named by id, survives that. */
 export type PiecePreferences = {
+  /** The recording playing — the recording layer on. */
   source?: string;
+  /** The recording the layer plays when it is turned on, when that is not the first. */
+  chosen?: string;
+  /** The synth and the click, and the levels (roadmap/inprogress/studio-mix-layers.md). */
+  layers?: MixLayers;
   videoDividerPercent?: number;
   rendition?: string;
   parts?: { hidden: readonly number[]; mix: PartMix; count: number };
@@ -144,9 +149,24 @@ export function normalizePiecePrefs(raw: unknown): PiecePreferences {
   const divider = source.videoDividerPercent;
   return {
     ...(typeof source.source === 'string' && source.source ? { source: source.source } : {}),
+    ...(typeof source.chosen === 'string' && source.chosen ? { chosen: source.chosen } : {}),
+    ...(source.layers && typeof source.layers === 'object' ? { layers: normalizeLayers(source.layers) } : {}),
     ...(typeof divider === 'number' && divider > 0 && divider <= 100 ? { videoDividerPercent: divider } : {}),
     ...(typeof source.rendition === 'string' && source.rendition ? { rendition: source.rendition } : {}),
     ...(parts && count !== null ? { parts: { ...normalizeParts(parts), count } } : {}),
+  };
+}
+/** The layers a piece opens with when nothing is stored: the synth, no click — and, where a
+ *  recording was stored as what plays, the recording alone, as before the layers. */
+export const DEFAULT_LAYERS: MixLayers = Object.freeze({ synth: true, click: false, clickLevel: 0.6, recordingLevel: 1 });
+export function normalizeLayers(raw: unknown): MixLayers {
+  const source = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const level = (v: unknown, d: number) => typeof v === 'number' && v >= 0 && v <= 1 ? v : d;
+  return {
+    synth: typeof source.synth === 'boolean' ? source.synth : DEFAULT_LAYERS.synth,
+    click: typeof source.click === 'boolean' ? source.click : DEFAULT_LAYERS.click,
+    clickLevel: level(source.clickLevel, DEFAULT_LAYERS.clickLevel),
+    recordingLevel: level(source.recordingLevel, DEFAULT_LAYERS.recordingLevel),
   };
 }
 /** Key order never decides whether preferences changed. */
