@@ -265,9 +265,8 @@ def found_fraction(rows, written, heard_start, heard_pitch, shift=0.0, tol=0.07)
     return ex / max(total, 1), pcf / max(total, 1), total
 
 
-def structure(out):
-    score, heard = load(out, 'score.json'), load(out, 'notes.json')
-    end_seconds = max(n['end'] for n in heard) + 0.5
+def find_path(score, heard, end_seconds):
+    """The bar search, coarse then fine, then the ending it cannot reach on its own."""
     # Pass 1, coarse and wide: the score's marked tempo is not trusted.
     coarse = tempo_grid(40, 320, 1.05)
     rows, _ = search(score, heard, 0.03, coarse, 1, end_seconds)
@@ -276,8 +275,48 @@ def structure(out):
     centre = float(np.median([240 / coarse[r[3]] for r in rows]))
     # Pass 2, fine, around what pass 1 heard.
     dt = 0.01 if end_seconds < 240 else 0.02
-    fine = tempo_grid(centre / 1.3, centre * 1.3, 1.015)
-    rows, total = search(score, heard, dt, fine, 2, end_seconds)
+    rows, total = search(score, heard, dt, tempo_grid(centre / 1.3, centre * 1.3, 1.015), 2, end_seconds)
+    rows, closed = close_ending(rows, score, heard)
+    return rows, total, closed
+
+
+def close_ending(rows, score, heard, missing_at_most=2, window=0.15):
+    """A held-back ending. The search moves its tempo a step or two a bar, so a final
+    ritardando or a chord placed late leaves it a bar or two short of the score's end. When
+    the path follows the score's order and only that much is missing, each missing bar starts
+    at the first onset where most of its downbeat's exact pitches sound within `window`
+    (exact, not pitch class: the bar before often shares the chord's pitch classes), and the
+    bar before ends there. Returns the rows and how many were placed this way."""
+    order, written = score['order'], score['written']
+    missing = len(order) - len(rows)
+    if not 0 < missing <= missing_at_most or [r[0] for r in rows] != order[:len(rows)]:
+        return rows, 0
+    starts = np.array([n['start'] for n in heard])
+    pitches = np.array([n['pitch'] for n in heard])
+    rows, closed = list(rows), 0
+    for bar in order[len(rows):]:
+        prev, s0, e0, wi = rows[-1]
+        down = {midi for off, midi in written[str(bar)]['notes'] if off == 0}
+        if not down:
+            break
+        best = None
+        for t in starts[(starts >= s0 + 0.6 * (e0 - s0)) & (starts <= e0 + (e0 - s0))]:
+            sounding = set(pitches[(starts >= t - 0.01) & (starts <= t + window)].tolist()) & down
+            if len(sounding) * 2 >= len(down) and (best is None or len(sounding) > best[1]):
+                best = (float(t), len(sounding))
+        if best is None:
+            break
+        whole = (e0 - s0) / written[str(prev)]['duration']
+        rows[-1] = (prev, s0, best[0], wi)
+        rows.append((bar, best[0], best[0] + written[str(bar)]['duration'] * whole, wi))
+        closed += 1
+    return rows, closed
+
+
+def structure(out):
+    score, heard = load(out, 'score.json'), load(out, 'notes.json')
+    end_seconds = max(n['end'] for n in heard) + 0.5
+    rows, total, closed = find_path(score, heard, end_seconds)
     heard_start = np.array([n['start'] for n in heard])
     heard_pitch = np.array([n['pitch'] for n in heard])
     written = score['written']
@@ -311,6 +350,7 @@ def structure(out):
         'downbeat90Ms': 1000 * float(np.percentile(offsets, 90)) if offsets else None,
         'tempoMin': min(tempos), 'tempoMax': max(tempos), 'tempoMedian': float(np.median(tempos)),
         'followsScoreOrder': follows, 'performedOrdinals': len(order),
+        'closedEnding': closed,
         'departures': [{'row': i, 'from': report_rows[i - 1]['bar'], 'to': report_rows[i]['bar']} for i in departures],
         'weakBars': [{'row': i, **r} for i, r in enumerate(report_rows) if r['notes'] >= 3 and r['found'] / r['notes'] < 0.6],
     }
@@ -322,6 +362,7 @@ def structure(out):
              f"- **Order:** {' '.join(str(r['bar']) for r in report_rows)}",
              f"- **Follows the score's performed order:** {'yes' if follows else 'NO'} ({len(report_rows)} of {len(order)} performed bars)",
              f"- **Span:** {summary['start']:.2f}–{summary['end']:.2f} s of {summary['audioEnd']:.2f} s heard",
+             *([f"- **Held-back ending:** the last {closed} bar(s) placed at their downbeat's notes, past the search's reach"] if closed else []),
              f"- **Notes found:** {pcf:.0%} by pitch class, {ex:.0%} exact, of {notes}; chance {chance:.0%}",
              f"- **Downbeats:** {len(offsets)} heard, median {summary['downbeatMedianMs'] or 0:.0f} ms, 90th percentile {summary['downbeat90Ms'] or 0:.0f} ms",
              f"- **Tempo:** {summary['tempoMin']:.0f}–{summary['tempoMax']:.0f} bpm (median {summary['tempoMedian']:.0f})", '',
@@ -329,7 +370,7 @@ def structure(out):
     lines += [f"| {i} | {r['bar']} | {r['start']:.2f} | {r['end']:.2f} | {r['qbpm']:.0f} | {r['found']}/{r['notes']} |" for i, r in enumerate(report_rows)]
     with open(os.path.join(out, 'report.md'), 'w') as f:
         f.write('\n'.join(lines) + '\n')
-    print('\n'.join(lines[:9]))
+    print('\n'.join(lines[:9 + bool(closed)]))
     if departures:
         print('DEPARTURES: ' + ', '.join(f"row {d['row']}: {d['from']}→{d['to']}" for d in summary['departures']))
     if summary['weakBars']:
@@ -355,11 +396,14 @@ def selftest(_out):
         'drifting tempo': (order, 1.05, 0.004),
         'stops early': (order[:13], 1.2, 0.0),
         'skips the repeat': (list(range(1, 13)), 1.1, 0.0),
+        'holds back the end': (order, 1.15, 0.0, 1.5),
     }
-    for name, (played, whole, drift) in cases.items():
+    for name, (played, whole, drift, *held) in cases.items():
         heard, truth, t = [], [], 1.0 + rng.uniform(0, 1)
         for b in played:
             w = whole * (1 + drift) ** len(truth)
+            if held and len(truth) >= len(played) - 2:
+                w *= held[0]                                                   # a final ritardando: the last two bars
             truth.append((b, t))
             for off, midi in written[str(b)]['notes']:
                 if rng.random() < 0.12:
@@ -373,10 +417,7 @@ def selftest(_out):
             t += written[str(b)]['duration'] * w
         heard.sort(key=lambda n: n['start'])
         end = t + 1.5
-        coarse = tempo_grid(40, 320, 1.05)
-        rows, _ = search(score, heard, 0.03, coarse, 1, end)
-        centre = float(np.median([240 / coarse[r[3]] for r in rows]))
-        rows, _ = search(score, heard, 0.01, tempo_grid(centre / 1.3, centre * 1.3, 1.015), 2, end)
+        rows, _, _ = find_path(score, heard, end)
         got = [r[0] for r in rows]
         worst = max(abs(r[1] - tt) for r, (_, tt) in zip(rows, truth)) if len(rows) == len(truth) else float('inf')
         ok = got == played and worst < 0.05

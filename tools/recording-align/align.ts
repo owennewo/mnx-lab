@@ -8,13 +8,21 @@
 //
 //   fetch  --piece <id> [--recording <id>]   the piece, its stored score and the recording to align
 //   score                                     the performed score: bar order, notes, structural starts
-//   audio                                     the recording's audio as mono 22.05 kHz WAV (yt-dlp / the library)
+//   audio  [--video <url>]                    the recording's audio as mono 22.05 kHz WAV (yt-dlp / the library)
 //   sync   [--write] [--replace]              the sync from structure.json; written only with --write
 //
+// A piece that does not exist yet — written as tab text (tabText.ts), say read off a video:
+//
+//   build  [--text <file>] [--width <sp>]    tab text → checked score: score.gp as studio would store it,
+//                                             score.mnx.json read back from it, preview.png to compare
+//   create [--write]                          make the piece from score.gp (writes piece.json)
+//   attach --video <url> [--write]            put a YouTube recording on that piece
+//
 // Every command reads and writes files in --out, so each step can be inspected and rerun.
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createHash, randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cleanRoom.ts';
 import { upgradeTabExtension } from '../../src/model/upgradeTabExtension.ts';
@@ -22,6 +30,13 @@ import { linearizePasses } from '../../src/model/passes.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { segmentsFromBarStarts, syncpointsFromSegments, SYNC_SEGMENTS_FORMAT } from '../../src/model/syncSegments.ts';
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
+import { checkStorage } from '../../src/importers/storageCheckCore.ts';
+import { derivedLibraryTags } from '../../src/model/libraryTags.ts';
+import { computeBothSystem } from '../../src/engine/headless.ts';
+import { initSmufl } from '../../harness/helpers/corpusPrimitives.ts';
+import { renderSvgToString } from '../../harness/helpers/svgString.ts';
+import { validateConversion } from '../library-ingest.mjs';
+import { buildTabText } from './tabText.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -112,14 +127,17 @@ function score() {
 
 /** The recording's audio, in a directory of its own (downloaded data stays apart from code). */
 async function audio() {
-  const { recording } = readJson('piece.json');
+  // --video: a video not (yet) on a piece — a candidate, or the source of a piece still to be made.
+  const video = option('video');
+  const { recording } = video ? { recording: { kind: 'youtube', external_id: null } } : readJson('piece.json');
   const dir = join(out, 'audio');
   mkdirSync(dir, { recursive: true });
   const raw = join(dir, 'source.wav');
   if (recording.kind === 'youtube') {
+    const url = video ?? `https://www.youtube.com/watch?v=${recording.external_id}`;
     const meta = execFileSync('yt-dlp', ['-q', '--no-playlist', '-x', '--audio-format', 'wav', '--print', '%(title)s | %(duration)s s | %(uploader)s', '--no-simulate',
-      '-o', join(dir, 'source.%(ext)s'), `https://www.youtube.com/watch?v=${recording.external_id}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    console.log(`youtube ${recording.external_id}: ${meta.trim()}`);
+      '-o', join(dir, 'source.%(ext)s'), url], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    console.log(`youtube ${url}: ${meta.trim()}`);
   } else {
     const response = await api(`/recordings/${encodeURIComponent(recording.id)}/audio`);
     if (!response.ok) fail(`recording audio: ${response.status}`);
@@ -171,6 +189,83 @@ async function sync() {
   console.log(`written: piece revision ${body.snapshot.piece.revision}; ${JSON.parse(stored.syncpoints).length} tuples; ${JSON.parse(stored.provenance).format}`);
 }
 
-const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync };
+/** Tab text → the score studio would store, checked every way a piece is checked, and a
+ *  picture of it to hold against the source. Writes nothing to the library. */
+function build() {
+  const source = option('text') ?? join(out, 'score.tab.txt');
+  let built: ReturnType<typeof buildTabText>;
+  try { built = buildTabText(readFileSync(source, 'utf8')); } catch (e) { fail(`${source}: ${e instanceof Error ? e.message : e}`); }
+  const { document, warnings } = built;
+  warnings.forEach(w => console.log(`  warning: ${w}`));
+  const errors = validateConversion(document) as string[];
+  if (errors.length) fail(`the document does not validate:\n  ${errors.join('\n  ')}`);
+  const passes = linearizePasses(document);
+  for (const d of passes.diagnostics) console.log(`  pass diagnostic: bar ${d.measureIndex + 1} — ${d.message}`);
+  // What studio will read is the stored .gp, so everything downstream reads that back.
+  const stored = checkStorage(document);
+  writeFileSync(join(out, 'score.gp'), stored.bytes);
+  writeJson('score.built.mnx.json', document);
+  const reread = upgradeTabExtension(importGuitarProCleanRoom(stored.bytes) as unknown as MnxStructure);
+  writeJson('score.mnx.json', reread);
+  writeJson('score.storage.json', { options: stored.options, check: stored.check, losses: stored.losses });
+  const order = linearizePasses(reread).entries.map(e => e.measureIndex + 1);
+  console.log(`${document.global.measures.length} bars written, ${order.length} performed: ${order.join(' ')}`);
+  console.log(`storage check: ${stored.check.verdict}${stored.losses.length ? ` — ${stored.losses.map(l => `${l.kind} ${l.path}`).join('; ')}` : ''}`);
+  stored.check.warnings.forEach(w => console.log(`  export warning: ${w}`));
+  initSmufl();
+  const widthSp = Number(option('width', '200'));
+  const system = computeBothSystem(document, widthSp) ?? fail('the score has no tab view to preview');
+  const svg = renderSvgToString({ ...system, pxPerSp: 10 });
+  const font = readFileSync(join(ROOT, 'public/smufl/Bravura.woff2')).toString('base64');
+  const html = join(out, 'preview.html');
+  writeFileSync(html, `<!doctype html><meta charset="utf-8"><style>@font-face { font-family: 'Bravura'; src: url(data:font/woff2;base64,${font}) format('woff2'); }
+html,body { margin:0; background:#fff; } :root { --font-family-sans: Georgia, serif; } svg { display:block; margin:12px; }</style>${svg}`);
+  const size = (attr: string) => Math.ceil(Number(new RegExp(`\\b${attr}="([\\d.]+)"`).exec(svg)?.[1] ?? 0)) + 24;
+  execFileSync('google-chrome', ['--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars', '--default-background-color=ffffff',
+    `--window-size=${size('width')},${size('height')}`, `--screenshot=${join(out, 'preview.png')}`, html], { stdio: 'ignore' });
+  unlinkSync(html);
+  console.log(`→ score.gp, score.mnx.json, preview.png (${size('width')}×${size('height')})`);
+}
+
+/** The piece, made from build's score.gp exactly as studio's New piece page makes one. */
+async function create() {
+  if (existsSync(join(out, 'piece.json'))) fail('piece.json exists: this run already has a piece');
+  const bytes = readFileSync(join(out, 'score.gp'));
+  const built = readJson('score.built.mnx.json') as MnxStructure;
+  const { options } = readJson('score.storage.json');
+  const title = built._x?.mnxLab?.work?.title ?? 'Untitled';
+  const filename = `${title.replace(/[\\/\u0000-\u001f]/g, ' ').trim().slice(0, 240) || 'Untitled'}.gp`;
+  console.log(`would create "${title}" from score.gp (${bytes.length} bytes) as ${filename}`);
+  if (!flag('write')) { console.log('dry run: nothing written (pass --write)'); return; }
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  const response = await api('/pieces', { method: 'POST', body: JSON.stringify({
+    rendition: { filename, sha256, content: bytes.toString('base64'), producer_version: 'recording-align', producer_options: options },
+    derived_tags: derivedLibraryTags(built) }) });
+  const body = await response.json();
+  if (!response.ok) fail(`create refused (${response.status}): ${JSON.stringify(body)}`);
+  const pieceId = body.snapshot.piece.id;
+  writeJson('piece.json', { pieceId, revision: body.snapshot.piece.revision, canonical: body.snapshot.piece.canonical_rendition_id, recording: null, origin });
+  console.log(`created piece ${pieceId} r${body.snapshot.piece.revision}: ${origin}/studio/#/piece/${pieceId}`);
+}
+
+/** A YouTube recording on this run's piece; piece.json then names it, as `fetch` would. */
+async function attach() {
+  const piece = readJson('piece.json');
+  const video = option('video') ?? fail('--video <YouTube url> is required');
+  if (piece.recording) fail(`piece.json already names recording ${piece.recording.id}`);
+  console.log(`would attach ${video} to piece ${piece.pieceId}`);
+  if (!flag('write')) { console.log('dry run: nothing written (pass --write)'); return; }
+  const live = await (await api(`/pieces/${encodeURIComponent(piece.pieceId)}`)).json();
+  const id = `studio-${randomUUID()}`;
+  const response = await api(`/pieces/${encodeURIComponent(piece.pieceId)}/recordings/${id}`, { method: 'PUT',
+    body: JSON.stringify({ expected_revision: live.snapshot.piece.revision, name: option('name', 'Recording'), video, selectedId: null }) });
+  const body = await response.json();
+  if (!response.ok) fail(`attach refused (${response.status}): ${JSON.stringify(body)}`);
+  const recording = body.snapshot.recordings.find((r: { id: string }) => r.id === id);
+  writeJson('piece.json', { ...piece, revision: body.snapshot.piece.revision, recording });
+  console.log(`attached recording ${id} (youtube ${recording.external_id}); piece revision ${body.snapshot.piece.revision}`);
+}
+
+const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, build, create, attach };
 if (!commands[command]) fail(`unknown command ${command ?? '(none)'}; one of ${Object.keys(commands).join(', ')}`);
 await commands[command]();

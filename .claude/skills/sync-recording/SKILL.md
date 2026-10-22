@@ -43,6 +43,7 @@ lessons of earlier runs, and the open questions this run might answer.
 OUT=<scratchpad>/runs/<slug>                      # one directory per run
 T="npx vite-node --config vitest.config.ts tools/recording-align/align.ts --"
 PY="$HOME/dev/guitar-nn/.venv-basic-pitch/bin/python -I tools/recording-align/align.py"
+SCREEN="$HOME/dev/guitar-nn/.venv-basic-pitch/bin/python -I tools/recording-align/screen.py"
 ```
 
 Every command reads and writes files in `$OUT`; each step can be rerun alone.
@@ -54,6 +55,37 @@ Every command reads and writes files in `$OUT`; each step can be rerun alone.
 - `$PY selftest` passes (no audio needed; seconds). A failure is a tool bug: stop and fix it.
 - `which yt-dlp ffmpeg` both exist; the Basic Pitch Python exists. If it is missing, say so —
   do not substitute another transcriber silently.
+
+## Step 0b — no piece yet: read it off the screen
+
+When the owner wants a piece made from a video that shows its notation (lesson and cover
+videos often scroll the arranger's score along the bottom), read that rather than
+transcribing the audio — tab names string and fret outright. Say first that an on-screen
+arrangement is usually the arranger's sold work, and that reading it into the private
+library is the owner's call.
+
+1. **Pages.** Download the best stream (`yt-dlp -f 'bv*[height<=2160]'`) to `$OUT/video/`,
+   then `$SCREEN pages --video <file> --out $OUT`. Note when the score is on screen: a panel
+   that disappears halfway usually means the rest is a repeat.
+2. **Read** into `$OUT/score.tab.txt` (format: `tools/recording-align/tabText.ts`). Habits
+   that kept run 5's 33 bars right: calibrate the six tab lines on every page against a bar
+   you can check in the notation, and zoom ×2 on a page half whenever a digit could sit on
+   either of two lines; the rhythm row above the tab is the upper voice's, the row below the
+   lower voice's — place each digit by its x against those; cross-check a bar's digits against
+   the treble staff (an octave above sounding); write `bar N = M` only after comparing digit
+   by digit.
+3. **Write what is played, not what is printed.** Run 5 played a first ending back to bar 5,
+   which had no repeat sign; written as segno + D.S. al Coda, since `passes.ts` does not nest
+   repeats. The bar search (step 4) finds such a departure if the text guesses wrong. Note any
+   departure in the file's header comment.
+4. **Build and judge**: `$T build --out $OUT`, then hold `preview.png` against the pages.
+   `build` writes `score.mnx.json`, so Steps 2–5 (`score`, `audio --video <url>`, `transcribe`,
+   `check`, `structure`) judge the transcription against the recording **before** the piece
+   exists. A weak bar here is a
+   misreading until shown otherwise.
+5. **Make the piece** once the numbers are good and the owner has asked for it: `$T create`,
+   then `$T attach --video <url>` (dry runs; `--write` to do it). `piece.json` then stands in
+   for Step 1; carry on from Step 6.
 
 ## Step 1 — the piece: `$T fetch --piece <id> --out $OUT [--recording <id>]`
 
