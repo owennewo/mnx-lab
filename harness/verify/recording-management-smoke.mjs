@@ -61,9 +61,14 @@ try {
     const sheet=()=>page.shadowRoot.querySelector('mnx-studio-recordings');
     // What plays is chosen in the Mix panel, opened from the tray's Mix field.
     const src=()=>page.shadowRoot.querySelector('mnx-studio-mix');
-    const sourceButton=()=>player.shadowRoot.querySelector('.field.mix');
+    const sourceButton=()=>player.shadowRoot.querySelector('[data-mix-open]');
     const openSource=async()=>{if(!src()){sourceButton().click();await page.updateComplete;await src()?.updateComplete;}};
-    const select=async id=>{await openSource();src().shadowRoot.querySelector(id==='add-recording'?'[aria-label="Add recording"]':'[data-source="'+id+'"]').click();await delay(150);await page.updateComplete;await sheet()?.updateComplete;for(let i=0;i<100&&player.playback.loading;i++)await delay(50);};
+    // The recording layer's toggle plays its chosen recording; with more than one, a radio chooses it.
+    const select=async id=>{await openSource();const mix=()=>src().shadowRoot,on=()=>mix().querySelector('[data-layer="recording"]').getAttribute('aria-pressed')==='true';
+      if(id==='add-recording')mix().querySelector('[aria-label="Add recording"]').click();
+      else if(id==='synth'){if(on())mix().querySelector('[data-layer="recording"]').click();}
+      else{mix().querySelector('[data-source="'+id+'"]')?.click();await page.updateComplete;await src().updateComplete;if(!on())mix().querySelector('[data-layer="recording"]').click();}
+      await delay(150);await page.updateComplete;await sheet()?.updateComplete;for(let i=0;i<100&&player.playback.loading;i++)await delay(50);};
     const edit=async id=>{await openSource();src().shadowRoot.querySelector('[data-edit="'+id+'"]').click();await delay(250);await page.updateComplete;await sheet()?.updateComplete;};
     const input=async(label,value,type='input')=>{const el=sheet().shadowRoot.querySelector('[aria-label="'+label+'"]');el.value=value;el.dispatchEvent(new Event(type,{bubbles:true}));await sheet().updateComplete;};
     const button=text=>[...sheet().shadowRoot.querySelectorAll('button')].find(b=>b.textContent.trim()===text);
@@ -126,7 +131,7 @@ try {
   const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===1)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
   assert.equal(reloaded[0]?.id,result.audioId);assert.equal(reloaded[0]?.name,'Renamed take');assert.equal(reloaded[0]?.syncpoints.length,3);assert.equal(uploads,1);assert.ok(canonicalReads>=3);
   await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});
-  await c.evaluate(`(async()=>{const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');await player.selectSource(player.recordings[0].id);await page.updateComplete;player.shadowRoot.querySelector('.field.mix').click();await page.updateComplete;const source=page.shadowRoot.querySelector('mnx-studio-mix');await source.updateComplete;if(source.getBoundingClientRect().width>360)throw Error('Mix panel overflows mobile');source.shadowRoot.querySelector('[data-edit]').click();await new Promise(r=>setTimeout(r,400));const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');if(sheet.getBoundingClientRect().width>360)throw Error('Panel overflows mobile');})()`);
+  await c.evaluate(`(async()=>{const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');await player.selectSource(player.recordings[0].id);await page.updateComplete;player.shadowRoot.querySelector('[data-mix-open]').click();await page.updateComplete;const source=page.shadowRoot.querySelector('mnx-studio-mix');await source.updateComplete;if(source.getBoundingClientRect().width>360)throw Error('Mix panel overflows mobile');source.shadowRoot.querySelector('[data-edit]').click();await new Promise(r=>setTimeout(r,400));const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');if(sheet.getBoundingClientRect().width>360)throw Error('Panel overflows mobile');})()`);
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-mobile.png',Buffer.from(shot.result.data,'base64'));
   assert.deepEqual(c.logs,[]);console.log('Recording management smoke OK',JSON.stringify({uploads,...result,reloaded:reloaded.length}));
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}

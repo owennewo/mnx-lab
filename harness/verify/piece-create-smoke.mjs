@@ -59,11 +59,11 @@ try {
   const read = await c.evaluate(`JSON.stringify((d => ({ bars: d.global.measures.length, time: d.global.measures[0].time, key: d.global.measures[0].key, capo: d.parts[0]._x.mnxLab.capo, low: d.parts[0]._x.mnxLab.strings.find(s => s.string === 6).pitch, high: d.parts[0]._x.mnxLab.strings.find(s => s.string === 1).pitch }))(${piece}.querySelector('mnx-player').document))`);
   assert.deepEqual(JSON.parse(read), { bars: 9, time: { count: 6, unit: 8 }, key: { fifths: 2 }, capo: 2, low: { step: 'D', octave: 2 }, high: { step: 'D', octave: 4 } });
   // Nothing to sync against yet, and the Mix panel says what to do about it.
-  const handle = `${piece}.querySelector('mnx-player').shadowRoot.querySelector('.field.mix')`;
+  const handle = `${piece}.querySelector('mnx-player').shadowRoot.querySelector('[data-mix-open]')`;
   await wait(`!!${handle}`);
   await c.evaluate(`${handle}.click()`);
   const source = `${piece}.querySelector('mnx-studio-mix[slot=side]')?.shadowRoot`;
-  await wait(`${source}?.querySelector('[data-source="synth"]')?.textContent.includes('add a recording')`);
+  await wait(`${source}?.querySelector('section[aria-label="Recordings"] .empty')?.textContent.includes('add a YouTube video')`);
   await wait(`!!${source}?.querySelector('[aria-label="Add recording"]') && !${source}.querySelector('[aria-label="Add recording"]').disabled`);
   const pieceShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-new-piece-opened.png',Buffer.from(pieceShot.result.data,'base64'));
   // It is a library piece like any other: listed under its title and artist, with the tags read off it.

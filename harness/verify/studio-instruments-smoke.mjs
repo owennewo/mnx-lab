@@ -56,7 +56,7 @@ try {
   const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
   const choose = value => c.evaluate(`{ const s = ${select}; s.value = ${JSON.stringify(value)}; s.dispatchEvent(new Event('change')); }`);
   // The Mix panel opens from the tray's Mix field; the synth's own settings hang behind the Synth row.
-  const openSheet = async () => { await c.evaluate(`${sheet} || ${player}.shadowRoot.querySelector('.field.mix').click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
+  const openSheet = async () => { await c.evaluate(`${sheet} || ${player}.shadowRoot.querySelector('[data-mix-open]').click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
   const openSettings = async () => { await c.evaluate(`${sheet}.querySelector('.pop') || ${sheet}.querySelector('[data-settings]').click()`); await wait(`!!${sheet}.querySelector('.pop .quality')`); };
   /** Play a moment and count the notes the host acknowledges as sounding. */
   const listen = () => c.evaluate(`(async () => {

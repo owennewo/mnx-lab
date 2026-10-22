@@ -148,19 +148,21 @@ try {
   assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback sound"]')`), false);
   assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback source"]')`), false);
   assert.equal(await c.evaluate(`[...${piece}.querySelectorAll('button[slot=actions]')].some(b => /Source|Parts/.test(b.getAttribute('aria-label') ?? ''))`), false, 'the header still carries a source or parts button');
-  const handle = `${player}.shadowRoot.querySelector('.field.mix')`;
+  const handle = `${player}.shadowRoot.querySelector('[data-mix-open]')`;
   await wait(`${handle}?.getAttribute('aria-label')?.startsWith('Mix: Synth')`);
   await c.evaluate(`${handle}.click()`);
   const mix = `${piece}.querySelector('mnx-studio-mix[slot=side]')?.shadowRoot`;
-  await wait(`${mix}?.querySelectorAll('.part').length === 1 && ${handle}.getAttribute('aria-expanded') === 'true'`);
-  await wait(`${mix}.querySelector('[data-source="synth"]')?.getAttribute('aria-checked') === 'true' && !!${mix}.querySelector('[aria-label="Add recording"]')`);
-  // A lone part cannot leave the score; a mute, a solo and a sound reach the player's
-  // mix and the per-piece preference.
-  await wait(`${mix}.querySelector('.part button[aria-label^="Hide"]').disabled`);
-  await c.evaluate(`${mix}.querySelector('.part button[aria-label^="Mute"]').click()`);
-  await wait(`${player}.partMix[0]?.muted === true && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].muted === true`);
-  await c.evaluate(`${mix}.querySelector('.part button[aria-label^="Solo"]').click()`);
-  await wait(`${player}.partMix[0]?.solo === true && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].solo === true`);
+  // Three layers (studio-mix-layers.md): no recording yet, the synth on, the click off.
+  const part = `${mix}?.querySelector('section[aria-label="Synth"] .ch')`;
+  await wait(`${mix}?.querySelectorAll('section[aria-label="Synth"] .ch').length === 1 && ${handle}.getAttribute('aria-expanded') === 'true'`);
+  await wait(`${mix}.querySelector('[data-layer="synth"]')?.getAttribute('aria-pressed') === 'true' && ${mix}.querySelector('[data-layer="recording"]').disabled && !!${mix}.querySelector('[aria-label="Add recording"]')`);
+  // A lone part cannot leave the score; a level and a sound reach the player's mix and the
+  // per-piece preference, and the click layer reaches the player and the tray.
+  await wait(`${part}.querySelector('button[aria-label^="Hide"]').disabled`);
+  await c.evaluate(`{ const r = ${part}.querySelector('input[type=range]'); r.value = '0.5'; r.dispatchEvent(new Event('input')); }`);
+  await wait(`${player}.partMix[0]?.volume === 0.5 && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].volume === 0.5`);
+  await c.evaluate(`${mix}.querySelector('[data-layer="click"]').click()`);
+  await wait(`${player}.layers.click === true && ${player}.shadowRoot.querySelector('[data-layer="click"]').getAttribute('aria-pressed') === 'true' && ${handle}.getAttribute('aria-label').startsWith('Mix: Synth + Click')`);
   // An instrument is a synth design (core-campaign-synth Phase 6).
   await c.evaluate(`{ const s = ${mix}.querySelector('select'); s.value = 'design:basic-piano'; s.dispatchEvent(new Event('change')); }`);
   await wait(`${player}.partMix[0]?.instrument?.design === 'basic-piano'`);
@@ -169,11 +171,11 @@ try {
   await wait(`${player}.masterVolume === 0.5 && ${handle}.getAttribute('aria-label').endsWith('master 50')`);
   const mixShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-mix.png',Buffer.from(mixShot.result.data,'base64'));
   // Put the mix back so the next run starts from the default.
-  await c.evaluate(`${mix}.querySelector('.part button[aria-label^="Unmute"]').click()`);
-  await c.evaluate(`${mix}.querySelector('.part button[aria-label^="Unsolo"]').click()`);
+  await c.evaluate(`{ const r = ${part}.querySelector('input[type=range]'); r.value = '1'; r.dispatchEvent(new Event('input')); }`);
+  await c.evaluate(`${player}.shadowRoot.querySelector('[data-layer="click"]').click()`);
   await c.evaluate(`{ const s = ${mix}.querySelector('select'); s.value = s.options[0].value; s.dispatchEvent(new Event('change')); }`);
   await c.evaluate(`{ const r = ${mix}.querySelector('input[aria-label="Master volume"]'); r.value = '0.7'; r.dispatchEvent(new Event('input')); }`);
-  await wait(`${player}.partMix[0]?.muted === false && ${player}.partMix[0]?.solo === false && ${player}.partMix[0]?.instrument?.kind === 'design'`);
+  await wait(`${player}.partMix[0]?.volume === 1 && ${player}.layers.click === false && ${mix}.querySelector('[data-layer="click"]').getAttribute('aria-pressed') === 'false' && ${player}.partMix[0]?.instrument?.kind === 'design'`);
   await c.evaluate(`${mix}.querySelector('button[aria-label="Close mix"]').click()`);
   await wait(`!${piece}.querySelector('mnx-studio-mix') && ${handle}.getAttribute('aria-expanded') === 'false'`);
   // Back to the library without a reload: the frame goes with the piece, the header returns.

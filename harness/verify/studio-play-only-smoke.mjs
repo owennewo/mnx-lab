@@ -95,7 +95,7 @@ try {
   const row = await c.evaluate(actions);
   assert.ok(!row.some(label => label.includes('Keys')), `the tools row offers a Keys sheet with nothing bound: ${row.join(' · ')}`);
   // What plays and the mix are the tray's on every device: its Mix field opens the panel.
-  assert.ok(await c.evaluate(`!!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.field.mix')`), 'the tray lost its Mix field, which touch keeps');
+  assert.ok(await c.evaluate(`!!${piece}.querySelector('mnx-player').shadowRoot.querySelector('[data-mix-open]')`), 'the tray lost its Mix field, which touch keeps');
 
   await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);

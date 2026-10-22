@@ -99,7 +99,7 @@ try {
   await key('KeyZ', { ctrl: true });
   await wait(`JSON.parse(${frets}).some(f => f.endsWith(':3')) && window.__auditions.length === 5`);
   // Switched off in the Mix panel's synth settings, the arrows are silent.
-  await c.evaluate(`${player}.shadowRoot.querySelector('.field.mix').click()`);
+  await c.evaluate(`${player}.shadowRoot.querySelector('[data-mix-open]').click()`);
   const mix = `${piece}.querySelector('mnx-studio-mix[slot=side]')?.shadowRoot`;
   await wait(`!!${mix}?.querySelector('[data-settings]')`);
   await c.evaluate(`${mix}.querySelector('[data-settings]').click()`);
