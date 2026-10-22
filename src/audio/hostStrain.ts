@@ -21,6 +21,10 @@ export interface LoadReport {
    *  the longest stretch and the stretches over 8 ms (playbackTrace.ts). */
   peakKind?: string;
   kinds?: Record<string, { ms: number; max: number; long: number }>;
+  /** The worklet's running count of clock skips — blocks where the browser's audio clock had moved
+   *  on past frames the host was never asked for — and the milliseconds skipped (host-processor.js). */
+  skipsTotal?: number;
+  skippedMsTotal?: number;
 }
 export const STRAIN = Object.freeze({ busy: 0.7, peakMs: 8, clearAfterMs: 3000 });
 export class StrainMonitor {

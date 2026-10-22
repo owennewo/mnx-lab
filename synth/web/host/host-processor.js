@@ -11,6 +11,9 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
   for(const type of ['diagnostic','meter'])this.host.on(type,data=>this.port.postMessage({type,data}));
   this.host.on('sounding',data=>this.port.postMessage({type:'sounding',data}));
   this.started=false;
+  // Blocks where the browser's frame had moved on from the host's, and the frames skipped:
+  // running totals since the processor started, sent with each load report.
+  this.skips={count:0,frames:0};
   // Load: the share of the audio thread's time the host takes — rendering, and the messages
   // that re-plan — reported twice a second, so a page can tell when a device is not keeping
   // up. The worklet may have no clock finer than Date.now; over half a second of calls its
@@ -39,14 +42,19 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
   const start=this.clock();work();const now=this.clock(),spent=now-start,load=this.load;
   load.busy+=spent;if(spent>load.peak){load.peak=spent;load.peakKind=kind;}
   const k=load.kinds[kind]??={ms:0,max:0,long:0};k.ms+=spent;k.max=Math.max(k.max,spent);if(spent>8)k.long++;
-  if(now-load.since>=500){this.port.postMessage({type:'load',data:{busy:load.busy/(now-load.since),peakMs:load.peak,peakKind:load.peakKind,kinds:load.kinds,windowMs:now-load.since}});this.load={since:now,busy:0,peak:0,peakKind:'',kinds:{}};}
+  if(now-load.since>=500){this.port.postMessage({type:'load',data:{busy:load.busy/(now-load.since),peakMs:load.peak,peakKind:load.peakKind,kinds:load.kinds,windowMs:now-load.since,
+   skipsTotal:this.skips.count,skippedMsTotal:this.skips.frames/sampleRate*1000}});this.load={since:now,busy:0,peak:0,peakKind:'',kinds:{}};}
  }
+ // The host renders at the browser's frame, every block. It used to take the frame once and
+ // count blocks from there; when the browser moved on without asking for some, every note
+ // after came out that much late until the page was reloaded (0.64 s, seen 2026-10-22).
  process(_,outputs){
-  const output=outputs[0],n=output[0].length;
-  if(!this.started){this.host.position=currentFrame;this.started=true;}
+  const output=outputs[0],n=output[0].length,host=this.host;
+  if(this.started&&currentFrame!==host.position){this.skips.count++;this.skips.frames+=currentFrame-host.position;}
+  this.started=true;
   this.timed('render',()=>{
    try{
-    const [l,r]=this.host.render(n);output[0].set(l.subarray(0,n));output[1]?.set(r.subarray(0,n));
+    const [l,r]=host.render(n,currentFrame);output[0].set(l.subarray(0,n));output[1]?.set(r.subarray(0,n));
    }catch(error){output.forEach(c=>c.fill(0));this.port.postMessage({type:'error',message:String(error.message||error)});}
   });
   return true;

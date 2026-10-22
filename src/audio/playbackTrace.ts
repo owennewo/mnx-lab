@@ -15,6 +15,10 @@
  * panel's Buffer buttons choose the AudioContext's latencyHint (roadmap step 2): the browser's
  * default, 'balanced' (the trace's own default) or 'playback', applied when the page reloads;
  * `?latency=` takes those or a number of seconds.
+ *
+ * Reports also carry the worklet's clock skips: blocks where the browser's audio clock had moved
+ * on past frames the host was never asked for (host-processor.js). The host follows the browser's
+ * clock, so a skip is a glitch, not a lasting lag; the trace says how many and how long.
  */
 import type { LoadReport } from './hostStrain.ts';
 
@@ -32,6 +36,8 @@ export interface TraceReport {
   latencyMs?: number;
   /** What the longest stretch was, and the kinds with stretches over 8 ms (count). */
   peak?: string; long?: Record<string, number>;
+  /** The clock skips since the page's audio started, and their milliseconds, once there are any. */
+  skipsTotal?: number; skippedMsTotal?: number;
 }
 export interface KindTotal { ms: number; max: number; long: number }
 export interface TraceProfile { realTimeFactor?: number; parts?: Record<string, { kind: string; msPerAudioSecond: number }> }
@@ -73,6 +79,14 @@ export function longByKind(reports: TraceReport[], first: number, last = Infinit
   for (const r of reports) if (r.t >= first && r.t < last) for (const [k, n] of Object.entries(r.long ?? {})) counts[k] = (counts[k] ?? 0) + n;
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(', ') || 'none';
 }
+/** The clock skips since the page's audio started and within the run, or '' when there were none. Pure. */
+export function skipsLine(reports: TraceReport[]): string {
+  const last = [...reports].reverse().find(r => r.skipsTotal), first = reports[0];
+  if (!last?.skipsTotal) return '';
+  const count = (n: number, ms: number) => n ? `${n} (${Math.round(ms)} ms)` : 'none';
+  return `  clock skips: ${count(last.skipsTotal, last.skippedMsTotal ?? 0)} since the audio started, `
+    + `${count(last.skipsTotal - (first?.skipsTotal ?? 0), (last.skippedMsTotal ?? 0) - (first?.skippedMsTotal ?? 0))} in this run`;
+}
 /** A run as a few lines of text. Pure. */
 export function describe(run: TraceRun, index: number): string {
   const parts = Object.entries(run.profile?.parts ?? {}).map(([id, p]) => `${id} (${p.kind}) ${p.msPerAudioSecond.toFixed(1)} ms/s`).join(', ');
@@ -87,6 +101,7 @@ export function describe(run: TraceRun, index: number): string {
     `  ${line('after', summarise(run.reports, WINDOW_SECONDS))}`,
     `  stretches over 8 ms: first ${WINDOW_SECONDS} s ${longByKind(run.reports, 0, WINDOW_SECONDS)}; after ${longByKind(run.reports, WINDOW_SECONDS)}`,
     ...(kinds ? [`  longest by kind: ${kinds}`] : []),
+    ...(skipsLine(run.reports) ? [skipsLine(run.reports)] : []),
     `  main-thread long tasks ${run.longTasks.count} (${Math.round(run.longTasks.ms)} ms)${parts ? ` · ${parts}` : ''}`,
   ].join('\n');
 }
@@ -169,7 +184,8 @@ class PlaybackTrace {
     const long = Object.fromEntries(Object.entries(report.kinds ?? {}).filter(([, k]) => k.long > 0).map(([name, k]) => [name, k.long]));
     run.reports.push({ t: Math.round(t * 100) / 100, busy: Math.round(report.busy * 1000) / 1000, peakMs: Math.round(report.peakMs * 100) / 100, underruns,
       ...(report.peakKind ? { peak: report.peakKind } : {}), ...(Object.keys(long).length ? { long } : {}),
-      ...(measured !== undefined && Number.isFinite(measured) ? { latencyMs: Math.round(measured * 1000) } : {}) });
+      ...(measured !== undefined && Number.isFinite(measured) ? { latencyMs: Math.round(measured * 1000) } : {}),
+      ...(report.skipsTotal ? { skipsTotal: report.skipsTotal, skippedMsTotal: Math.round(report.skippedMsTotal ?? 0) } : {}) });
     for (const [name, k] of Object.entries(report.kinds ?? {})) {
       const total = (run.kinds ??= {})[name] ??= { ms: 0, max: 0, long: 0 };
       total.ms = Math.round((total.ms + k.ms) * 10) / 10; total.max = Math.max(total.max, Math.round(k.max * 10) / 10); total.long += k.long;

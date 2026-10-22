@@ -156,11 +156,12 @@ export class NativeHostPort implements HostPort {
     this.output.connect(context.destination);
     host.connect(this.output);
     host.on('diagnostic', (d: Diagnostic) => this.options.onDiagnostic?.(d));
-    host.on('load', (load: { busy: number; peakMs: number; peakKind?: string; kinds?: LoadReport['kinds'] }) => {
+    host.on('load', (load: { busy: number; peakMs: number; peakKind?: string; kinds?: LoadReport['kinds']; skipsTotal?: number; skippedMsTotal?: number }) => {
       // Chrome counts output underruns where it can (AudioContext.playbackStats); elsewhere load alone.
       const counted = (context as AudioContext & { playbackStats?: { underrunEvents?: number } }).playbackStats?.underrunEvents;
       this.loadListener?.({ busy: load.busy, peakMs: load.peakMs, ...(typeof counted === 'number' ? { underrunsTotal: counted } : {}),
-        ...(load.peakKind ? { peakKind: load.peakKind } : {}), ...(load.kinds ? { kinds: load.kinds } : {}) });
+        ...(load.peakKind ? { peakKind: load.peakKind } : {}), ...(load.kinds ? { kinds: load.kinds } : {}),
+        ...(typeof load.skipsTotal === 'number' ? { skipsTotal: load.skipsTotal, skippedMsTotal: load.skippedMsTotal ?? 0 } : {}) });
     });
     host.on('error', (e: unknown) => this.options.onError?.(String((e as { message?: unknown })?.message ?? e)));
     let configured: Setup | undefined;

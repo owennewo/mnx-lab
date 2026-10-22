@@ -1,7 +1,7 @@
 // The playback trace's summaries (src/audio/playbackTrace.ts; roadmap core-synth-performance,
 // the baseline): reports split at ten seconds from the first note, hostStrain.ts's hot rule.
 import { it, expect } from 'vitest';
-import { summarise, longByKind, parseLatency, describe as describeRun, playbackTrace, type TraceRun } from '../../src/audio/playbackTrace.ts';
+import { summarise, longByKind, parseLatency, skipsLine, describe as describeRun, playbackTrace, type TraceRun } from '../../src/audio/playbackTrace.ts';
 
 const reports = [
   { t: -0.4, busy: 0.9, peakMs: 30, underruns: 0 },   // the start-up stall, before the first note
@@ -37,6 +37,13 @@ it('describes a run in a few lines, with the buffer, the long stretches and the 
     '  longest by kind: schedule 9 ms, render 4 ms',
     '  main-thread long tasks 3 (412 ms) · guitar (plucked) 44.5 ms/s',
   ].join('\n'));
+});
+it('says how often the audio clock skipped, since the audio started and in the run', () => {
+  expect(skipsLine(reports)).toBe('');
+  const skipped = [{ t: 0.1, busy: 0.2, peakMs: 2, underruns: 0, skipsTotal: 1, skippedMsTotal: 640 },
+    { t: 0.6, busy: 0.2, peakMs: 2, underruns: 0, skipsTotal: 3, skippedMsTotal: 646 }, { t: 1.1, busy: 0.2, peakMs: 2, underruns: 0 }];
+  expect(skipsLine(skipped)).toBe('  clock skips: 3 (646 ms) since the audio started, 2 (6 ms) in this run');
+  expect(skipsLine(skipped.slice(0, 1))).toBe('  clock skips: 1 (640 ms) since the audio started, none in this run');
 });
 it('takes a latencyHint category, the browser default or seconds', () => {
   expect(['default', 'interactive', 'balanced', 'playback'].map(parseLatency)).toEqual(['default', 'interactive', 'balanced', 'playback']);

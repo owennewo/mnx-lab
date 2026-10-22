@@ -173,6 +173,34 @@ test('parts created mid-session play at their scheduled frames, exactly as from 
  }
 });
 
+// The browser's audio clock can move on without asking for some frames. The worklet passes
+// its frame every block; the host and every instrument's clock move with it, so what follows
+// sounds at its scheduled frame, not that much late (a page played 0.64 s behind its cursor,
+// 2026-10-22). Compared block by block in loudness: the kit's noise and the strings' filters
+// carry what rendering the gap would have left, so the samples differ, but the timing must not.
+test('a host whose clock skips frames plays what follows at its scheduled frames',async()=>{
+ const {INSTRUMENTS}=await import('../web/host/instruments/index.js');
+ const fixture=name=>read(`web/contract/fixtures/${name}.json`),lead=2,skipAt=48000,skip=30720,frames=Math.round(4*48000);
+ const rms=x=>Math.sqrt(x.reduce((s,v)=>s+v*v,0)/x.length);
+ for(const name of ['ukulele-layout','keys-pedal','kit-chokes']){
+  const f=fixture(name),{notes,controls}=effectiveEvents(f);
+  const run=jump=>{
+   const host=new HostCore({rate:48000,block:128,instruments:INSTRUMENTS,assets}),out=new Map();
+   host.configure(f.setup);host.schedule({notes:notes.map(n=>({...n,at:n.at+lead})),controls:controls.map(c=>({...c,at:c.at+lead}))});
+   // `clock` is the browser's frame; the host is told it each block.
+   for(let clock=0;clock<lead*48000+frames;clock+=128){
+    if(jump&&clock===skipAt)clock+=skip;
+    out.set(clock,rms(host.render(128,clock)[0].subarray(0,128)));
+   }
+   return out;
+  };
+  const whole=run(false),skipped=run(true);let apart=0,total=0;
+  for(const [clock,x] of skipped)if(clock>=skipAt){const y=whole.get(clock);apart+=Math.abs(x-y);total+=y;}
+  assert.ok(total>1,`${name} sounds`);
+  assert.ok(apart/total<.05,`${name}: loudness ${(apart/total*100).toFixed(1)}% apart from the unskipped host`);
+ }
+});
+
 // --- Chains (chain campaign C7–C10) ------------------------------------------------
 const steady=[{id:'s',part:'a',at:.05,duration:3,velocity:.7,target:{pitch:57}}];
 const chainRun=(blocks,opts={})=>one({chain:blocks},{notes:steady,seconds:3,...opts});

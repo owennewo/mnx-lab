@@ -301,15 +301,24 @@ export class HostCore{
  }
 
  // A block is rendered in slices at tempo changes, so they land on their exact frame
- // whatever the block size.
- render(count=this.block){
+ // whatever the block size. `at` is the caller's clock: the worklet passes the browser's
+ // frame every block, so the host keeps no count of its own that could fall behind it.
+ render(count=this.block,at=this.position){
   if(count>this.block)throw Error('Audio block too large');
+  if(at!==this.position)this.moveTo(at);
   for(let done=0;done<count;){
    this.applyTempo();
    const next=this.tempoEvents[0]?.frame,m=next!==undefined&&next<this.position+count-done?next-this.position:count-done;
    this.renderSlice(m,done);done+=m;
   }
   return this.output;
+ }
+ // The clock moved on without these frames being asked for (the browser skipped them):
+ // every clock in the host moves with it. What fell due in the gap comes due at once;
+ // what was sounding rings on from where it was.
+ moveTo(frame){
+  this.position=frame;
+  for(const part of this.parts.values())if(part.begun)part.instrument.begin?.(frame);
  }
  renderSlice(count,offset){
   const n=count,start=this.position,[mL,mR]=this.mix,prof=this.profiling,blockStart=prof?.clock();

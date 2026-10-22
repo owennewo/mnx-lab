@@ -29,7 +29,8 @@ export interface Instrument {
   apply(changes: InstrumentChanges): void;
   /** Optional: fold these notes (ended, unreferenced) into planning state; what plays must not change. */
   forget?(ids: string[]): void;
-  /** Called once before the first render with the host frame the instrument's clock starts at. */
+  /** The host frame the instrument's clock is at: called before the first render, and again
+   *  whenever the host's clock moves on past frames it was never asked to render. */
   begin?(frame: number): void;
   /** Render the next `count` frames (≤ block); returns stereo views valid until the next call. */
   render(count: number): [Float32Array, Float32Array];
@@ -45,7 +46,9 @@ export class HostCore {
   configure(setup: Setup): Diagnostic[];
   schedule(batch: { notes?: Note[]; controls?: Control[]; through?: number }): Diagnostic[];
   cancel(cancel: { from?: number; ids?: string[]; silence?: boolean }): Diagnostic[];
-  render(count?: number): [Float32Array, Float32Array];
+  /** Render `count` frames from `at` (default: where the last render ended). A worklet passes the
+   *  browser's frame every block; a jump moves every instrument's clock with it. */
+  render(count?: number, at?: number): [Float32Array, Float32Array];
 }
 
 export interface Label { id: string; part: string; kind: string; onsetFrame: number; endFrame: number; pitch?: number; piece?: string; velocity: number; techniques: { type: string; native: boolean }[] }
@@ -63,8 +66,9 @@ export class InstrumentHost {
   cancel(cancel: { from?: number; ids?: string[]; silence?: boolean }): Promise<Diagnostic[]>;
   profile(action: 'start' | 'snapshot'): Promise<unknown>;
   now(): number;
-  /** 'load' (twice a second): `{busy, peakMs, peakKind, kinds, windowMs}` — the share of the audio thread the host took, its longest single stretch
-   *  and what that was ('render' or a message type), and per kind `{ms, max, long}` (long: stretches over 8 ms). */
+  /** 'load' (twice a second): `{busy, peakMs, peakKind, kinds, windowMs, skipsTotal, skippedMsTotal}` — the share of the audio thread the host took,
+   *  its longest single stretch and what that was ('render' or a message type), per kind `{ms, max, long}` (long: stretches over 8 ms), and
+   *  the running count of blocks where the browser's clock had skipped frames the host was never asked for, with the milliseconds skipped. */
   on(type: 'diagnostic' | 'meter' | 'sounding' | 'error' | 'load', fn: (data: any) => void): () => void;
   connect(destination?: AudioNode): this;
   dispose(): void;
