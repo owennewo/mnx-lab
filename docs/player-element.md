@@ -90,7 +90,8 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   `practiceOptions` (`audio/practice.ts`): count-in, repeats, then, gap, trainer, click. The
   player announces the loop as `loop-changed` `{documentId, loop: LoopMark | null}`, which
   `bindPlayback` (and the workbench) put on the playback state for the score's marker.
-  `setLoop(region?)` remains the raw transport seam.
+  With a loop set, `play()` starts at its first bar (the repeat count carries on), except in
+  the run-out after it. `setLoop(region?)` remains the raw transport seam.
 - `playback-state-changed` carries `{documentId, ordinal, highlight, playing}`;
   highlights are `{noteKey, ordinal}`. Most are written occurrences — one per visit to
   a note. RESTS are in the list too and are not: a rest sounds nothing, so it is absent

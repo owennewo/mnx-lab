@@ -59,6 +59,13 @@ try {
     check(viewer.shadowRoot.querySelector('svg .loop-chip text')?.textContent.startsWith('Count-in'),'The chip does not count the count-in');
     for(let i=0;i<120&&player.snapshot?.loop?.counting;i++)await delay(50);
     check(player.snapshot?.state==='playing'&&player.scorePosition?.ordinal===1,'After the count-in the loop does not play from bar 2');
+    // Paused in the loop's second bar, Play goes back to its first, on the same repeat.
+    for(let i=0;i<120&&player.scorePosition?.ordinal!==2;i++)await delay(50);
+    const k=player.snapshot?.loop?.k;
+    player.pause();await delay(100);
+    check(player.scorePosition?.ordinal===2,'The pause did not keep its place in bar 3');
+    await player.play();await delay(100);
+    check(player.scorePosition?.ordinal===1&&player.snapshot?.loop?.k===k,'Play after a pause did not start the loop again on its repeat: '+JSON.stringify({at:player.scorePosition?.ordinal,k:player.snapshot?.loop?.k,was:k}));
     player.pause();await delay(100);
     return 'counted';
   })()`));

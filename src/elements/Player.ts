@@ -645,32 +645,46 @@ export class Player extends LitElement {
     /* ── the loop ──
        The loop's lanes tinted, a bracket over its bars and a handle at each
        end (Loop practice canvas, 2026-10-22): a grip that rises above the
-       tray, drawn 20px wide, caught 48 × 96. */
+       tray, drawn 20px wide, caught 48 × 96. In playback's blue, as the
+       score's marker is; the playhead's lane keeps the tray's accent. Neither
+       sizes the rail's rows: a looping rail is as tall as a handle, its rows
+       packed at the foot, so the section names stay on the lanes and the
+       bracket runs between the two. A handle rises from the lanes' row, its
+       stem stopping at the foot of the lane it holds (--lift: the lanes below
+       it, as a fraction of the cell). */
+    .rail.looping {
+      min-height: 88px;
+      align-content: end;
+    }
     .lane.looped {
-      background: color-mix(in oklab, var(--accent), var(--player-ground) 62%);
+      background: color-mix(in oklab, var(--playback), var(--player-ground) 62%);
     }
     .lane.looped.played {
-      background: color-mix(in oklab, var(--accent), var(--player-ground) 40%);
+      background: color-mix(in oklab, var(--playback), var(--player-ground) 40%);
     }
     .lane.looped[aria-current='true'] {
       background: var(--accent);
     }
     .rail .loop-bracket {
-      grid-row: 1;
-      align-self: end;
+      grid-row: 2;
+      align-self: start;
       height: 2px;
-      margin-bottom: 4px;
-      background: var(--accent);
+      margin-top: -3px;
+      background: var(--playback);
       pointer-events: none;
     }
     .rail .loop-handle {
-      grid-row: 1 / 3;
+      grid-row: 2;
       align-self: end;
       position: relative;
       z-index: 4;
+      --drop: calc((var(--tray-line, 30px) + 2px) * var(--lift, 0));
       width: 24px;
-      height: 88px;
+      height: calc(88px - var(--drop));
+      margin-top: calc(var(--tray-line, 30px) - 88px);
+      margin-bottom: var(--drop);
       padding: 0;
+      gap: 0;
       border: 0;
       border-radius: 0;
       background: transparent;
@@ -699,12 +713,12 @@ export class Player extends LitElement {
       height: 20px;
       flex: none;
       border-radius: 3px;
-      background: var(--accent);
+      background: var(--playback);
     }
     .rail .loop-handle .stem {
-      width: 6px;
+      width: 2px;
       flex: 1 1 0;
-      background: var(--accent);
+      background: var(--playback);
     }
     .rail .loop-handle:focus-visible .grip {
       outline: 2px solid var(--ink);
@@ -733,11 +747,11 @@ export class Player extends LitElement {
       min-width: 104px;
     }
     .field.loop.on .box {
-      background: color-mix(in oklab, var(--accent), var(--player-ground) 88%);
-      box-shadow: inset 0 0 0 1.5px var(--accent);
+      background: color-mix(in oklab, var(--playback), var(--player-ground) 88%);
+      box-shadow: inset 0 0 0 1.5px var(--playback);
     }
     .field.loop.on .lab {
-      color: var(--accent-fg);
+      color: var(--playback);
     }
     .field.loop .box button {
       height: 100%;
@@ -753,7 +767,7 @@ export class Player extends LitElement {
       padding: 0 8px;
     }
     .field.loop.on .box button {
-      color: var(--accent-fg);
+      color: var(--playback);
     }
     .field.loop .box button.more {
       flex: none;
@@ -763,8 +777,8 @@ export class Player extends LitElement {
       border-left: 1px solid color-mix(in oklab, var(--ink), transparent 82%);
     }
     .field.loop .box button.more[aria-expanded='true'] {
-      background: var(--accent);
-      color: #fff;
+      background: var(--playback);
+      color: var(--player-ground);
     }
     .pop.loop {
       width: min(330px, calc(100vw - 32px));
@@ -1419,7 +1433,19 @@ export class Player extends LitElement {
     if (selected) this.reapplyLoop();
     return selected;
   }
-  async play() { this.localError = ''; if (this.status?.needsStart && this.status.alignmentIssue) await this.session?.start(); else await this.session?.play(); }
+  async play() {
+    this.localError = '';
+    if (this.status?.needsStart && this.status.alignmentIssue) { await this.session?.start(); return; }
+    await this.toLoopStart();
+    await this.session?.play();
+  }
+  /** A loop set, Play starts at its first bar — the bars it has got to, at the repeat it had
+   *  reached. The run-out after a loop (Carry on) plays on from where it paused. */
+  private async toLoopStart() {
+    const bars = this.shownBars, session = this.session, measure = bars && this.performance?.measures[bars.first];
+    if (!bars || !measure || !session || this.playback?.wantsPlayback || this.status?.transport?.loop?.visit.runOut) return;
+    await session.seek({ ordinal: bars.first, metricOffset: measure.from });
+  }
   pause() { this.session?.pause(); }
   /** Sound one written note on that visit with the synth (roadmap: core-note-audition) — the
    *  session's, or with a recording as the source one kept for this. Silent when switched off
@@ -1644,7 +1670,7 @@ export class Player extends LitElement {
     const current = this.scorePosition?.ordinal ?? this.lastOrdinal ?? -1;
     const looped = this.dragBars?.bars ?? this.shownBars;
     return html`<div
-      class="rail"
+      class=${looped && !this.syncMode ? 'rail looping' : 'rail'}
       role="group"
       aria-label="Position"
       tabindex="-1"
@@ -2090,11 +2116,17 @@ export class Player extends LitElement {
     const lo = Math.min(...columns), hi = Math.max(...columns);
     const startColumn = performance.measures[bars.first]!.measureIndex, endColumn = performance.measures[bars.last]!.measureIndex;
     const count = bars.last - bars.first + 1;
+    // Lanes are equal shares of the cell, so the lanes under the one held are that share of it.
+    const lift = (column: number, ordinal: number) => {
+      const lanes = this.railModel?.cells[column]?.lanes ?? [];
+      if (lanes.length < 2 || lanes.length > GAUGE_PASSES) return 0;
+      return (lanes.length - 1 - Math.max(0, lanes.findIndex(lane => lane.ordinal === ordinal))) / lanes.length;
+    };
     const handle = (edge: 'first' | 'last', column: number) => {
       const dragging = this.dragBars?.edge === edge;
       const ordinal = edge === 'first' ? bars.first : bars.last;
       return html`<button type="button" class=${`loop-handle ${edge}${dragging ? ' dragging' : ''}`}
-        style=${`grid-column: ${column + 1};`}
+        style=${`grid-column: ${column + 1}; --lift: ${lift(column, ordinal)};`}
         aria-label=${`Loop ${edge === 'first' ? 'start' : 'end'}, bar ${this.barLabel(ordinal)}. Drag, or use the arrow keys, to move it`}
         @pointerdown=${(e: PointerEvent) => this.onHandleDown(edge, e)}
         @pointermove=${(e: PointerEvent) => this.onHandleMove(edge, e)}

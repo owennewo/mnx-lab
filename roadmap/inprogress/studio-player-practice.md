@@ -28,6 +28,17 @@
   through a repeated section (the rail's lanes, "Loop · pass 2").
 - *"in the tray maybe the drag markers can be made considerably larger (twice as wide, twice
   as tall)"* — a 20px grip on a 6px stem, 88px tall, rising above the tray; caught 48 × 96.
+- After the first hands-on look (2026-10-22): *"I think a pause and play should jump cursor to
+  start of loop maintaining the same repeat number"*; the handles' stems *"should 1) be thinner
+  and 2 reach down to touch the bottom of the pad/bar it refers to"*; *"the horizontal line
+  between the start/end verticals should be lower it is obscuring some of the section text"*;
+  *"the loop colours should match, its blue in the score but red in the play tray"*; and the
+  score's chip *"is a little high it is obscuring the bar above"*. All five built the same day:
+  Play goes back to the loop's first bar on the repeat it had reached; a 2px stem ends at the foot
+  of the lane it holds; the bracket runs between the section names and the lanes, and a looping
+  rail keeps its rows at its foot rather than stretching them; the tray's loop is playback blue
+  (the playhead's lane keeps the accent); the score's bracket is 2 sp over the system with a
+  smaller chip that starts after the bar number.
 - This item's start gate (campaign clause 7: reviewer items 1–10 verified first) was lifted by
   the owner's *"Can you implement this please"*.
 
@@ -48,11 +59,12 @@ another pass) or moved with ←/→ when focused. **On the score** (`elements/lo
 marker A): a wash behind its bars and a bracket over them that runs off a system's end and picks
 up on the next, a chip at its start naming it (*Loop 2–5 · repeat 3 of 8*) and counting a
 count-in (*Count-in ●●○○*). The marker is in playback's colour, not the accent: on the score
-the accent is the selection. Drawn from the rendered SVG after the engine is done, so no golden
+the accent is the selection. The tray's loop takes the same blue. Drawn from the rendered SVG after the engine is done, so no golden
 moves.
 
-**Behaviour**: paused, the loop stays where the cursor wanders and Play starts at it; playing,
-a seek out of the loop leaves it. A pause keeps the repeat it was on; Play counts in again.
+**Behaviour**: paused, the loop stays where the cursor wanders and Play starts at its first bar
+— the bars Advance has reached, on the repeat it was on — counting in again; playing, a seek out
+of the loop leaves it. In the run-out after a loop (Carry on), Play carries on from the pause.
 
 **The options** (`audio/practice.ts`, pure): count-in (off / 1 / 2 bars, when playback starts and
 whenever the loop advances), repeats (∞ / 2 / 4 / 8), then (Stop — parked at the loop's start;
@@ -80,7 +92,8 @@ the synth.
   click on each beat.
 - `harness/verify/loop-smoke.mjs` (`npm run smoke -- loop`) — the workbench in Chrome: selection
   → Loop field, the score's marker and chip, a count-in on the chip, a mouse drag of the end
-  handle, a paused cursor keeping the loop, a seek out while playing leaving it, Clear.
+  handle, Play after a pause going back to the loop's first bar on the same repeat, a paused cursor
+  keeping the loop, a seek out while playing leaving it, Clear.
 
 ## Left for later (not filed)
 
