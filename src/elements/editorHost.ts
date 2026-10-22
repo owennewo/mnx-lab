@@ -289,6 +289,25 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     lastSounded = key;
     playback?.audition?.({ noteKey: slot!.noteKey, ordinal: ordinal! });
   };
+  /**
+   * The performed bars the selection covers (roadmap/inprogress/studio-player-practice.md): from
+   * where Play would start — the selection's first bar on the anchor's pass — to the first
+   * playing of its last bar after that. A selection across a repeat sign therefore covers
+   * what is played between them, in the order it is played. Null when there is none.
+   */
+  const selectionBars = (start: PerformedPlace | null): { first: number; last: number } | null => {
+    if (!start) return null;
+    const selection = session.selection, entries = session.passModel.entries;
+    let last: number;
+    if (selection.level === 'document') return entries.length ? { first: 0, last: entries.length - 1 } : null;
+    if (selection.extent.kind === 'cursor') last = Math.max(selection.anchor.measureIndex, selection.extent.cursor.measureIndex);
+    else {
+      const members = session.resolvedSelection.members;
+      last = Math.max(-1, ...members.map(m => ('measureIndex' in m ? m.measureIndex : -1)));
+    }
+    const end = entries.find(entry => entry.ordinal >= start.ordinal && entry.measureIndex === last);
+    return end ? { first: start.ordinal, last: end.ordinal } : null;
+  };
   /** Where the cursor stands, as one comparable value: an element stays selected while this holds. */
   const cursorPlace = () => JSON.stringify([session.cursor, session.selectionLevel, session.performedOrdinal]);
   /** The note under the cursor and what decides its sound — pitch, string, fret — or null. */
@@ -331,6 +350,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // The tray names the cursor's exact place while it is drawn and the music is not playing.
     const start = session.playStart;
     playback?.place?.(start && !playing && !cursorHidden && !suspended() ? toPosition(start) : null);
+    // The bars the selection covers, for the player's Loop button.
+    if (!playing) playback?.range?.(suspended() ? null : selectionBars(start));
     // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard.
     viewer.selectionInactive = !hasKeyboard();
     // The lyric panel outlines the cursor's word — following it while nobody is typing there.

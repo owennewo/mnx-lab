@@ -5,7 +5,7 @@ import { compilePerformance } from '../audio/performance.ts';
 import type { Performance } from '../audio/performanceTypes.ts';
 import { chooseScoreOrdinal } from '../model/playback.ts';
 import { ContextProvider } from '@lit/context';
-import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
+import { playbackStateContext, initialPlaybackState, type LoopMark, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
 import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
 import { resolveIteration, activeIteration, withPlaybackOrdinal, verseForPass } from '../model/playback.ts';
 import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
@@ -354,6 +354,12 @@ export class ScenarioPage extends LitElement {
     this.performanceError=compiled.ok?'':compiled.diagnostics.map(d=>d.message).join('; ');
     this.setPlayback(withPlaybackOrdinal(this.playback, this.passModel, this.playback.ordinal));
   }
+  /** The player's loop, for the score's marker. */
+  private onLoopChanged = (event: Event) => {
+    const detail = (event as CustomEvent<{ documentId: string; loop: LoopMark | null }>).detail;
+    if (detail.documentId !== this.scenarioId) return;
+    this.setPlayback({ ...this.playback, loop: detail.loop });
+  };
   private onPlaybackUpdate = (event: Event) => {
     const update = (event as CustomEvent<PlaybackUpdate>).detail;
     if (!this.passModel || update.documentId !== this.scenarioId) return;
@@ -381,6 +387,7 @@ export class ScenarioPage extends LitElement {
       seek: ({ ordinal, offset }) => { page.player?.seek(ordinal, offset); },
       audition: ({ noteKey, ordinal, edited }) => { page.player?.audition(noteKey, ordinal, { edited }); },
       place: position => { if (page.player) page.player.cursorPlace = position && { ordinal: position.ordinal, metricOffset: position.offset }; },
+      range: bars => { if (page.player) page.player.loopCandidate = bars; },
       subscribe(listener) {
         page.addEventListener('playback-state-changed', listener);
         return () => page.removeEventListener('playback-state-changed', listener);
@@ -1799,6 +1806,7 @@ export class ScenarioPage extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('playback-state-changed', this.onPlaybackUpdate);
+    this.addEventListener('loop-changed', this.onLoopChanged);
     window.addEventListener('assist-credentials-change', this.onCredentialsChange);
     void this.refreshFingerprint();
     const landing = takeLanding();
@@ -1820,6 +1828,7 @@ export class ScenarioPage extends LitElement {
     this.editor?.dispose();
     this.editor = null;
     this.removeEventListener('playback-state-changed', this.onPlaybackUpdate);
+    this.removeEventListener('loop-changed', this.onLoopChanged);
     window.removeEventListener('assist-credentials-change', this.onCredentialsChange);
     this.chatAbort?.abort();
     this.showClipboardNotice(null);

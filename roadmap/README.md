@@ -62,9 +62,6 @@ proposals that name their campaign.
 
 
 
-- **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
-  studio's first player feature in `elements/`: loop the selection with the **written-range
-  → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
 
 
 
@@ -151,6 +148,11 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-player-practice.md](inprogress/studio-player-practice.md)** — campaign item 13,
+  **built 2026-10-22**, awaiting the owner's hands-on check: the tray's Loop field loops whole
+  performed bars (the selection's, or the bar here), handles on the rail, the loop washed and
+  bracketed on the score; count-in, repeats, then Stop / Carry on / Advance, gap, speed trainer,
+  click.
 - **[core-editor-click-targets.md](inprogress/core-editor-click-targets.md)** — **built 2026-10-19**,
   awaiting the owner's hands-on check. What a press on the score means: every point is an **element** (selected), a **slot** (places the cursor) or **dead space**
   (nothing); hover promises what the press does. Narrows pointer placement's "anywhere in the bar"

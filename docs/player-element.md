@@ -82,7 +82,15 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   to the visit's own `from…until` so a mid-bar segno cannot be seeked outside of.
   Omitted, it selects the measure's start, which is what every seek did before presses
   began naming the moment they landed on. An absent ordinal returns false. Natural completion can
-  be restarted with Play. The loop API is the seam for item 13, with no practice UI yet.
+  be restarted with Play.
+- **The loop** ([studio-player-practice](../roadmap/inprogress/studio-player-practice.md)):
+  `setLoopBars(bars | null)` and `toggleLoop()` loop whole performed bars `{first, last}`;
+  `loop` reads them back. `loopCandidate` is what the Loop field takes while not playing — a
+  host's editor sets it from `CursorPlayback.range`. `setPracticeOptions(options)` /
+  `practiceOptions` (`audio/practice.ts`): count-in, repeats, then, gap, trainer, click. The
+  player announces the loop as `loop-changed` `{documentId, loop: LoopMark | null}`, which
+  `bindPlayback` (and the workbench) put on the playback state for the score's marker.
+  `setLoop(region?)` remains the raw transport seam.
 - `playback-state-changed` carries `{documentId, ordinal, highlight, playing}`;
   highlights are `{noteKey, ordinal}`. Most are written occurrences — one per visit to
   a note. RESTS are in the list too and are not: a rest sounds nothing, so it is absent
@@ -137,8 +145,8 @@ The backends:
 - `HostBackend.replacePerformance` rebuilds the transport (pure derivation) and derives the
   stream and setup again, keeping the synth and its context. The place carries over by score position,
   bar and offset, and the state with it: playing plays on, paused stays. A place the new
-  performance no longer has, or a stopped transport, starts at the beginning, stopped. A
-  loop is not carried.
+  performance no longer has, or a stopped transport, starts at the beginning, stopped. The
+  backend does not carry a loop; the player sets its loop again on the new transport.
 - The session's factory reads the player's performance when it is called, so a later
   source change sees the score as it is now. Source, rate, volume, sync mode and live
   segments are untouched.

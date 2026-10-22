@@ -50,6 +50,8 @@ const SMOKES = {
   'piece-create': one('piece-create-smoke.mjs', STUDIO_LIBRARY), // 11
   'embed': { build: 'build:embed', covers: ['embed'], jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] }, // 10 each
   'selection': one('selection-smoke.mjs', WORKBENCH), // 10
+  // The loop from the tray: selection, score marker, count-in, handle drag (studio-player-practice).
+  'loop': one('loop-smoke.mjs', WORKBENCH), // ~8
   'single-cursor': one('single-cursor-smoke.mjs', STUDIO), // 7
   'focus': one('focus-mode-smoke.mjs', WORKBENCH), // 6
   'youtube': one('youtube-smoke.mjs', ['embed'], { build: 'build:embed' }), // 6

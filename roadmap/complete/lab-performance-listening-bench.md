@@ -211,7 +211,7 @@ extension or new roadmap campaign is authorised by implementing this bench.
 
 - [Performance compiler](../../docs/player-performance.md) and
   [native playback](../../docs/player-transport.md): existing rendering and identities.
-- [Studio practice proposal](../proposed/studio-player-practice.md): related consumer work, explicitly
+- [Studio practice proposal](../inprogress/studio-player-practice.md): related consumer work, explicitly
   excluding recording/detection; neither proposal silently expands the other.
 - [Basic Pitch](https://github.com/spotify/basic-pitch): candidate polyphonic baseline,
   not a guarantee of causal low-latency behaviour.

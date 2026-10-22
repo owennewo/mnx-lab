@@ -12,6 +12,7 @@ import type { LoadReport } from '../../src/audio/hostStrain.ts';
 import { performanceToStream } from '../../src/audio/contractStream.ts';
 import { scorePositionAt } from '../../src/audio/scorePosition.ts';
 import { rational } from '../../src/audio/time.ts';
+import { PLAIN_LOOP, practiceRegion } from '../../src/audio/practice.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 // @ts-expect-error plain mjs
 import { loadCorpus } from '../verify/check-scenarios.mjs';
@@ -50,6 +51,8 @@ class CorePort implements HostPort {
   /** What the speaker is playing, measured: `heardLatency` behind the render (undefined: cannot say). */
   heardLatency: number | undefined = undefined;
   heard() { return this.heardLatency === undefined ? undefined : this.core.seconds - this.heardLatency; }
+  clicks: { at: number; accent: boolean }[] = [];
+  click(at: number, accent: boolean) { this.clicks.push({ at, accent }); }
 }
 /** Timers on the host's clock; each callback runs in its own turn, as in a browser. */
 function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) {
@@ -230,6 +233,32 @@ it('a loop repeats its notes as new notes, visit after visit, exactly a loop apa
   for (let i = 0; i < v0.length; i++) expect(v1[i]!.at - v0[i]!.at).toBeCloseTo(loopSeconds, 6);
   for (const n of notes) expect(n.at + n.duration - v0[0]!.at, 'cut at the loop end').toBeLessThanOrEqual(loopSeconds * (1 + Number(n.id.split('.').at(-1))) + 1e-6);
   expect(new Set(notes.map(n => n.id)).size).toBe(notes.length);
+  expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
+}, 60_000);
+
+it('a practice counts in with clicks a lead ahead, plays its repeats at the trainer\'s rates, and clicks through the passage', async () => {
+  const { backend, port, run, flush, performance, stream } = rig(scenario('lab/document/twelve-bar-blues'));
+  await run(0.1);
+  const trainer = { start: 0.5, step: 0.5, every: 1, ceiling: 1 };
+  backend.transport.setLoop(practiceRegion(performance, { first: 0, last: 0 }, { ...PLAIN_LOOP, countIn: 1, repeats: 2, trainer, click: true }, 1));
+  const start = port.now();
+  await backend.play(); await flush();
+  const m = performance.measures[0]!;
+  const bar = stream.secondsAt(rational(m.duration.num, m.duration.den)) - stream.secondsAt(m.position);
+  await run(bar / 0.5 * 2 + bar + 1);
+  const count = bar / 0.5, beat = count / 4;
+  const counted = port.clicks.slice(0, 4);
+  counted.forEach((c, i) => expect(c.at, `count-in beat ${i + 1}`).toBeCloseTo(start + 0.25 + i * beat, 3));
+  expect(counted.map(c => c.accent)).toEqual([true, false, false, false]);
+  const notes = port.batches.flatMap(b => b.notes).sort((a, b) => a.at - b.at);
+  expect(notes[0]!.at, 'the first note follows the count-in').toBeCloseTo(start + 0.25 + count, 3);
+  // Repeat 1 at half speed, repeat 2 at full: the same notes, the second set twice as fast.
+  const [r1, r2] = [notes.filter(n => n.id.endsWith('.0')), notes.filter(n => n.id.endsWith('.1'))];
+  expect(r2.length).toBe(r1.length);
+  expect(r2[0]!.at).toBeCloseTo(start + 0.25 + count + bar / 0.5, 3);
+  expect((r1.at(-1)!.at - r1[0]!.at) / (r2.at(-1)!.at - r2[0]!.at)).toBeCloseTo(2, 3);
+  expect(port.clicks.length, 'a click on each beat of each repeat as well').toBe(4 + 4 + 4);
+  expect(backend.snapshot.state).toBe('stopped');
   expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
 }, 60_000);
 

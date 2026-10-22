@@ -41,4 +41,7 @@ export interface CursorPlayback {
    *  exact place in the score, where the playhead read back from a recording's clock is only
    *  near it. Null when there is no cursor to name (playing, hidden, unbound). Optional. */
   place?(position: PerformedPosition | null): void;
+  /** The performed bars the selection covers, first and last — what the player's Loop button
+   *  loops (roadmap/inprogress/studio-player-practice.md). Null when there is none. Optional. */
+  range?(bars: { first: number; last: number } | null): void;
 }

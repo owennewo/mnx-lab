@@ -17,7 +17,8 @@ import { linearizePasses } from '../model/passes.ts';
 import { restSpansOf, restsAt, type RestSpan } from '../model/restSpans.ts';
 import type { PartMix } from '../audio/partMix.ts';
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
-import { ZERO, compare, type Rational } from '../audio/time.ts';
+import { ZERO, compare, rational, type Rational } from '../audio/time.ts';
+import { DEFAULT_TRAINER, PLAIN_LOOP, practiceRegion, type LoopBars, type MeterOf, type PracticeOptions, type PracticeThen } from '../audio/practice.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackOccurrence, PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
@@ -112,6 +113,18 @@ export class Player extends LitElement {
   /** A host that stores what the sync bar makes (`sync-edit`) opts in; the
    *  tray then offers the rail/sync toggle while a recording is the source. */
   @property({ type: Boolean }) syncEditable = false;
+  /** The bars a host's editor has selected (`CursorPlayback.range`): what the Loop button loops
+   *  while the music is not playing. Null: the bar the cursor or the playhead is on. */
+  @property({ attribute: false }) loopCandidate: LoopBars | null = null;
+  /** The loop, as performed bars; null when there is none. */
+  @state() private loopBars: LoopBars | null = null;
+  /** The bars the practice is playing — the loop's, or where Advance has moved it to. */
+  @state() private shownBars: LoopBars | null = null;
+  /** How the loop is practised: count-in, repeats, then, gap, trainer, click. */
+  @state() private practice: PracticeOptions = PLAIN_LOOP;
+  /** A loop handle being dragged, and the bars it would make. */
+  @state() private dragBars: { bars: LoopBars; edge: 'first' | 'last' } | null = null;
+  private lastLoopSignature = '';
   /** The tray's bar shows the recording's time and its cut lines, not the rail. */
   @state() private syncMode = false;
   @state() private clickOn = false;
@@ -629,6 +642,261 @@ export class Player extends LitElement {
       right: 0;
       transform: none;
     }
+    /* ── the loop ──
+       The loop's lanes tinted, a bracket over its bars and a handle at each
+       end (Loop practice canvas, 2026-10-22): a grip that rises above the
+       tray, drawn 20px wide, caught 48 × 96. */
+    .lane.looped {
+      background: color-mix(in oklab, var(--accent), var(--player-ground) 62%);
+    }
+    .lane.looped.played {
+      background: color-mix(in oklab, var(--accent), var(--player-ground) 40%);
+    }
+    .lane.looped[aria-current='true'] {
+      background: var(--accent);
+    }
+    .rail .loop-bracket {
+      grid-row: 1;
+      align-self: end;
+      height: 2px;
+      margin-bottom: 4px;
+      background: var(--accent);
+      pointer-events: none;
+    }
+    .rail .loop-handle {
+      grid-row: 1 / 3;
+      align-self: end;
+      position: relative;
+      z-index: 4;
+      width: 24px;
+      height: 88px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      touch-action: none;
+      cursor: ew-resize;
+    }
+    .rail .loop-handle.first {
+      justify-self: start;
+      margin-left: -12px;
+    }
+    .rail .loop-handle.last {
+      justify-self: end;
+      margin-right: -12px;
+    }
+    /* The catch is wider than the grip. */
+    .rail .loop-handle::before {
+      content: '';
+      position: absolute;
+      inset: -4px -12px;
+    }
+    .rail .loop-handle .grip {
+      width: 20px;
+      height: 20px;
+      flex: none;
+      border-radius: 3px;
+      background: var(--accent);
+    }
+    .rail .loop-handle .stem {
+      width: 6px;
+      flex: 1 1 0;
+      background: var(--accent);
+    }
+    .rail .loop-handle:focus-visible .grip {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+    .rail .loop-handle.dragging {
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+    }
+    .rail .loop-card {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 9px;
+      white-space: nowrap;
+      font: 600 12px/1 var(--sans);
+      color: #fff;
+      background: var(--ink);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .field.loop .box {
+      padding: 0;
+      gap: 0;
+      background: var(--tray-cell, var(--line));
+      min-width: 104px;
+    }
+    .field.loop.on .box {
+      background: color-mix(in oklab, var(--accent), var(--player-ground) 88%);
+      box-shadow: inset 0 0 0 1.5px var(--accent);
+    }
+    .field.loop.on .lab {
+      color: var(--accent-fg);
+    }
+    .field.loop .box button {
+      height: 100%;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      font: 600 13px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+    }
+    .field.loop .box button.toggle {
+      flex: 1 1 auto;
+      gap: 6px;
+      padding: 0 8px;
+    }
+    .field.loop.on .box button {
+      color: var(--accent-fg);
+    }
+    .field.loop .box button.more {
+      flex: none;
+      width: 26px;
+      padding: 0;
+      justify-content: center;
+      border-left: 1px solid color-mix(in oklab, var(--ink), transparent 82%);
+    }
+    .field.loop .box button.more[aria-expanded='true'] {
+      background: var(--accent);
+      color: #fff;
+    }
+    .pop.loop {
+      width: min(330px, calc(100vw - 32px));
+      font: 13px/1.3 var(--sans);
+    }
+    .pop.loop .head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .pop.loop .head b {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .pop.loop .head span {
+      flex: 1 1 auto;
+      color: var(--ink-3);
+    }
+    .pop.loop .head button {
+      height: auto;
+      padding: 0;
+      border: 0;
+      background: none;
+      text-decoration: underline;
+      font-size: 12px;
+      color: var(--ink-2);
+    }
+    .pop.loop .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 28px;
+    }
+    .pop.loop .row > span:first-child {
+      flex: 1 1 auto;
+      color: var(--ink-2);
+    }
+    .seg {
+      display: inline-flex;
+    }
+    .seg button {
+      height: 26px;
+      min-width: 34px;
+      padding: 0 9px;
+      margin-left: -1px;
+      border-radius: 0;
+      justify-content: center;
+      font: 600 12px/1 var(--sans);
+      color: var(--ink-2);
+    }
+    .seg button[aria-checked='true'] {
+      position: relative;
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--player-ground);
+    }
+    .pop.loop .note {
+      margin: 0;
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+    .pop.loop .progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 600 12px/1 var(--mono);
+    }
+    .pop.loop .progress .bars {
+      flex: 1 1 auto;
+      height: 6px;
+      display: flex;
+      gap: 2px;
+    }
+    .pop.loop .progress .bars span {
+      flex: 1 1 0;
+      background: var(--tray-cell, var(--line));
+    }
+    .pop.loop .progress .bars span.done {
+      background: var(--ink);
+    }
+    .pop.loop .progress .bars span.now {
+      background: var(--accent);
+    }
+    .pop.loop .rule {
+      height: 1px;
+      background: var(--line);
+    }
+    .pop.loop label.check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: auto;
+      padding: 0;
+      border: 0;
+    }
+    .steppers {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .stepper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stepper > span {
+      font: 600 10px/1 var(--sans);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .stepper > div {
+      display: flex;
+      align-items: center;
+      height: 28px;
+      background: var(--tray-cell, var(--line));
+    }
+    .stepper output {
+      flex: 1 1 auto;
+      text-align: center;
+      font: 600 12px/1 var(--mono);
+      white-space: nowrap;
+    }
+    .stepper button {
+      width: 22px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      justify-content: center;
+      background: transparent;
+    }
     /* ── rate and volume ──
        A value button on the tray — glyph and the number — and its control
        in an overlay above the tray: rate has preset chips and the fine
@@ -783,7 +1051,7 @@ export class Player extends LitElement {
   `
   ];
   /** Which overlay is open — rate or volume; it closes on click-away or Escape. */
-  @state() private openPop: 'rate' | 'volume' | null = null;
+  @state() private openPop: 'rate' | 'volume' | 'loop' | null = null;
   private readonly onClickAway = (event: PointerEvent) => {
     if (!this.openPop) return;
     const inside = event.composedPath().some((n) => n instanceof HTMLElement && n.classList.contains('anchor'));
@@ -818,6 +1086,7 @@ export class Player extends LitElement {
       this.rate = Number(localStorage.getItem('mnx-player-rate')) || 1;
       this.volume = Number(localStorage.getItem('mnx-player-volume') ?? 0.7);
       this.youtubeNoticeHidden = localStorage.getItem('mnx-player-youtube-terms-hidden') === 'true';
+      this.practice = Player.readPractice(localStorage.getItem('mnx-player-practice'));
     } catch {}
     this.rate = Player.snapRate(this.rate);
     this.volume = Number.isFinite(this.volume) ? Math.min(1, Math.max(0, this.volume)) : 0.7;
@@ -984,11 +1253,12 @@ export class Player extends LitElement {
   private teardown() {
     this.clickTrack?.dispose(); this.clickTrack = undefined; this.clickOn = false;
     this.syncMode = false; this.liveSegments = null; this.liveSegmentsFor = ''; this.appliedSync.clear(); this.derivedFor.clear();
+    this.loopBars = this.shownBars = null; this.dragBars = null;
     this.youtubeNotice = false;
     this.revision++;
     this.session?.dispose(); this.session = undefined;
     this.dropAuditioner(); this.pendingAudition = undefined;
-    this.status = undefined; this.lastOrdinal = null; this.publish();
+    this.status = undefined; this.lastOrdinal = null; this.publish(); this.announceLoop();
   }
   /** Held while the transport wants playback — a stand's screen must not
    *  sleep mid-song. Driven from publish(), the one place that knows. */
@@ -1043,7 +1313,7 @@ export class Player extends LitElement {
     };
     this.session = new PlaybackSession(factory('synth'), factory, () => {
       if (revision !== this.revision || !this.session) return;
-      this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.refreshDerivedSync(); this.publish();
+      this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.refreshDerivedSync(); this.followPractice(); this.publish();
       if (this.session.backend instanceof HostBackend) this.dropAuditioner();
       else this.auditioner?.setVolume(this.volume);
     });
@@ -1063,7 +1333,7 @@ export class Player extends LitElement {
     if (!session || !performance) return;
     const backend = session.backend;
     this.auditioner?.replacePerformance(performance, this.document);
-    if (backend instanceof HostBackend) backend.replacePerformance(performance, this.document);
+    if (backend instanceof HostBackend) { backend.replacePerformance(performance, this.document); this.reapplyLoop(); }
     else if (backend instanceof RecordingBackend) {
       const source = this.activeRecording, id = backend.id, duration = this.status?.mediaDuration;
       if (!source) return;
@@ -1144,7 +1414,10 @@ export class Player extends LitElement {
       }
     }
     if (source?.kind !== 'youtube') this.youtubeNotice = false;
-    return await this.session?.select(id, replace) ?? false;
+    const selected = await this.session?.select(id, replace) ?? false;
+    // A new source is a new backend: the loop is set on it afresh.
+    if (selected) this.reapplyLoop();
+    return selected;
   }
   async play() { this.localError = ''; if (this.status?.needsStart && this.status.alignmentIssue) await this.session?.start(); else await this.session?.play(); }
   pause() { this.session?.pause(); }
@@ -1198,6 +1471,9 @@ export class Player extends LitElement {
   seek(ordinal: number, metricOffset?: Rational) {
     const measure = this.performance?.measures.find(m => m.ordinal === ordinal);
     if (!measure || !this.session) return false;
+    // Playing, a seek out of the loop leaves it; paused, the loop stays and Play starts at it.
+    const shown = this.shownBars;
+    if (shown && this.playback?.wantsPlayback && (ordinal < shown.first || ordinal > shown.last)) this.setLoopBars(null);
     const within = metricOffset === undefined
       ? measure.from
       : compare(metricOffset, measure.from) < 0
@@ -1366,6 +1642,7 @@ export class Player extends LitElement {
     const model = this.railModel;
     if (!model) return nothing;
     const current = this.scorePosition?.ordinal ?? this.lastOrdinal ?? -1;
+    const looped = this.dragBars?.bars ?? this.shownBars;
     return html`<div
       class="rail"
       role="group"
@@ -1384,6 +1661,7 @@ export class Player extends LitElement {
                 lane.ordinal < current ? 'played' : '',
                 lane.jumped ? 'jumped' : '',
                 lane.x > 0 || lane.w < 1 ? 'partial' : '',
+                looped && lane.ordinal >= looped.first && lane.ordinal <= looped.last ? 'looped' : '',
               ].join(' ')}
               style=${lane.x > 0 || lane.w < 1 ? `--x: ${(lane.x * 100).toFixed(2)}%; --w: ${(lane.w * 100).toFixed(2)}%;` : nothing}
               aria-label=${lane.tip}
@@ -1394,6 +1672,7 @@ export class Player extends LitElement {
           )}
         </div>`,
       )}
+      ${this.loopOnRail()}
     </div>`;
   }
 
@@ -1527,10 +1806,312 @@ export class Player extends LitElement {
       && !source.syncSegments && !this.liveSegments?.cuts.length;
   }
 
+  // ── the loop (roadmap/inprogress/studio-player-practice.md) ────────────
+  // Whole performed bars, first to last. The Loop button takes the bar
+  // playing, else the editor's selection as the host reports it, else the
+  // bar the cursor or the playhead is on. The synth plays it as a practice
+  // (src/audio/practice.ts); a recording loops it plainly, by seeking.
+
+  /** The loop's bars, or null. */
+  get loop(): LoopBars | null { return this.loopBars; }
+  /** How the loop is practised. */
+  get practiceOptions(): PracticeOptions { return this.practice; }
+  /** Turn the loop on (on the bars the button takes) or off. */
+  toggleLoop() { this.setLoopBars(this.loopBars ? null : this.loopTarget()); }
+  /** Loop these performed bars; null clears the loop. */
+  setLoopBars(bars: LoopBars | null) {
+    const count = this.performance?.measures.length ?? 0;
+    const valid = bars && bars.first >= 0 && bars.first <= bars.last && bars.last < count ? { first: bars.first, last: bars.last } : null;
+    this.loopBars = this.shownBars = valid;
+    if (!valid && this.openPop === 'loop') this.openPop = null;
+    this.applyLoop();
+    this.announceLoop();
+  }
+  /** Change how the loop is practised; a loop playing starts its count of repeats again. */
+  setPracticeOptions(options: PracticeOptions) {
+    this.practice = options;
+    this.adoptShownBars();
+    this.savePractice();
+    this.reapplyLoop();
+  }
+  private loopTarget(): LoopBars | null {
+    const count = this.performance?.measures.length ?? 0;
+    const bar = (o: number | null | undefined) => o !== null && o !== undefined && o >= 0 && o < count ? { first: o, last: o } : null;
+    if (!count) return null;
+    if (this.playback?.wantsPlayback) return bar(this.scorePosition?.ordinal);
+    const c = this.loopCandidate;
+    if (c && c.first >= 0 && c.first <= c.last && c.last < count) return c;
+    return bar(this.cursorPlace?.ordinal) ?? bar(this.scorePosition?.ordinal) ?? bar(0);
+  }
+  /** Once Advance has moved the practice, the loop is where it got to: an edit starts from there. */
+  private adoptShownBars() {
+    if (this.shownBars && this.loopBars && (this.shownBars.first !== this.loopBars.first || this.shownBars.last !== this.loopBars.last))
+      this.loopBars = this.shownBars;
+  }
+  /** The loop again, after the backend or the performance changed under it. */
+  private reapplyLoop() {
+    const count = this.performance?.measures.length ?? 0;
+    if (this.loopBars && this.loopBars.last >= count) { this.setLoopBars(null); return; }
+    if (this.loopBars) this.shownBars = this.loopBars;
+    this.applyLoop();
+    this.announceLoop();
+  }
+  private applyLoop() {
+    const session = this.session, performance = this.performance, bars = this.loopBars;
+    if (!session || !performance) return;
+    const backend = session.backend;
+    try {
+      if (backend instanceof HostBackend) backend.transport.setLoop(bars ? practiceRegion(performance, bars, this.practice, this.rate, this.meterOf()) : undefined);
+      else session.setLoop(bars ? this.scoreLoop(bars) : undefined);
+    } catch (error) {
+      this.loopBars = this.shownBars = null;
+      this.localError = `the loop could not be set (${error instanceof Error ? error.message : String(error)})`;
+    }
+  }
+  /** Bars as a recording's loop: from the first bar's start to the next bar's. */
+  private scoreLoop(bars: LoopBars): ScoreLoop {
+    const measures = this.performance!.measures, first = measures[bars.first]!, next = measures[bars.last + 1];
+    return {
+      start: { ordinal: bars.first, metricOffset: first.from },
+      end: next ? { ordinal: bars.last + 1, metricOffset: next.from } : { ordinal: measures.length, metricOffset: ZERO },
+    };
+  }
+  /** Each bar's count: the beats of its time signature (compound time counted in dotted beats). */
+  private meterOf(): MeterOf {
+    const performance = this.performance!, globals = this.document?.global.measures ?? [];
+    return ordinal => {
+      const m = performance.measures[ordinal];
+      let time: { count: number; unit: number } | undefined;
+      for (let i = m?.measureIndex ?? 0; i >= 0 && !time; i--) time = globals[i]?.time ?? undefined;
+      const [n, d] = defaultBeatUnit(time);
+      const count = time ? Math.max(1, Math.round(time.count / time.unit / (n / d))) : 4;
+      return { count, beat: rational(BigInt(n), BigInt(d)) };
+    };
+  }
+  /** The practice moved on (Advance) or ended: the loop follows it. */
+  private followPractice() {
+    const loop = this.status?.transport?.loop, take = loop?.visit.take?.bars;
+    if (!this.loopBars || !take || this.dragBars) { this.announceLoop(); return; }
+    const same = (a: LoopBars | null, b: LoopBars) => a?.first === b.first && a.last === b.last;
+    if (!same(this.shownBars, take)) this.shownBars = take;
+    // Advanced to the end: the loop stays where it got to, and plays from there next time.
+    if (loop?.ended && !same(this.loopBars, take)) { this.loopBars = take; queueMicrotask(() => this.applyLoop()); }
+    this.announceLoop();
+  }
+  /** The written bar a performed one is, as the score numbers it. */
+  private barLabel(ordinal: number): string {
+    const m = this.performance?.measures[ordinal];
+    if (!m) return '';
+    return String(this.document?.global.measures[m.measureIndex]?.number ?? m.measureIndex + 1);
+  }
+  private barsLabel(bars: LoopBars) {
+    const a = this.barLabel(bars.first), b = this.barLabel(bars.last);
+    return a === b && bars.first === bars.last ? a : `${a}–${b}`;
+  }
+  /** Tell the host where the loop is, for the score's marker (`loop-changed`). */
+  private announceLoop() {
+    const bars = this.dragBars?.bars ?? this.shownBars, performance = this.performance;
+    const loop = this.status?.transport?.loop, playing = this.playback?.wantsPlayback ?? false;
+    const take = loop?.visit.take;
+    const counting = playing ? loop?.counting ?? null : null;
+    const detail = bars && performance ? {
+      first: bars.first,
+      last: bars.last,
+      measures: [...new Set(performance.measures.slice(bars.first, bars.last + 1).map(m => m.measureIndex))],
+      start: performance.measures[bars.first]!.measureIndex,
+      end: performance.measures[bars.last]!.measureIndex,
+      label: `Loop ${this.barsLabel(bars)}${playing && take && this.practice.repeats !== null ? ` · repeat ${take.repeat} of ${this.practice.repeats}` : ''}`,
+      counting,
+    } : null;
+    const signature = JSON.stringify([this.documentId, detail]);
+    if (signature === this.lastLoopSignature) return;
+    this.lastLoopSignature = signature;
+    this.dispatchEvent(new CustomEvent('loop-changed', { detail: { documentId: this.documentId, loop: detail }, bubbles: true, composed: true }));
+  }
+  private static readPractice(json: string | null): PracticeOptions {
+    try {
+      const o = JSON.parse(json ?? 'null') as Partial<PracticeOptions> | null;
+      if (!o || typeof o !== 'object') return PLAIN_LOOP;
+      const int = (v: unknown, lo: number, hi: number, d: number) => typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi ? v : d;
+      const t = o.trainer;
+      return {
+        countIn: int(o.countIn, 0, 2, 0),
+        repeats: o.repeats === null ? null : int(o.repeats, 1, 99, 4),
+        then: o.then === 'continue' || o.then === 'advance' ? o.then : 'stop',
+        gap: int(o.gap, 0, 1, 0),
+        trainer: t && typeof t === 'object' && [t.start, t.step, t.every, t.ceiling].every(v => typeof v === 'number' && Number.isFinite(v))
+          ? { start: Player.snapRate(t.start), step: Math.min(0.25, Math.max(0.05, t.step)), every: int(t.every, 1, 8, 2), ceiling: Player.snapRate(Math.max(t.start, t.ceiling)) } : null,
+        click: o.click === true,
+      };
+    } catch { return PLAIN_LOOP; }
+  }
+  private savePractice() {
+    try { localStorage.setItem('mnx-player-practice', JSON.stringify(this.practice)); } catch {}
+  }
+
+  /** The Loop field: its body turns the loop on and off, its chevron opens the options. */
+  private loopControl() {
+    if (!this.performance) return nothing;
+    const bars = this.dragBars?.bars ?? this.shownBars, on = this.loopBars !== null, open = this.openPop === 'loop' && on;
+    const icon = Player.stroke('M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4', 15);
+    const pass = (() => {
+      const m = bars && this.performance?.measures[bars.first];
+      return m && m.occurrence > 1 ? ` · pass ${m.occurrence}` : '';
+    })();
+    return html`<span class="anchor">
+      ${open ? this.loopOptions() : nothing}
+      <span class=${on ? 'field loop on' : 'field loop'}>
+        <span class="lab" aria-hidden="true">Loop${on ? pass : ''}</span>
+        <span class="box">
+          <button type="button" class="toggle" aria-pressed=${on}
+            aria-label=${on && bars ? `Loop bars ${this.barsLabel(bars)}: on. Press to clear it` : 'Loop: off. Press to loop the bars here'}
+            title=${on ? 'Clear the loop' : 'Loop the bars here'}
+            @click=${() => this.toggleLoop()}>${icon}<span>${on && bars ? this.barsLabel(bars) : 'Off'}</span></button>
+          <button type="button" class="more" aria-haspopup="dialog" aria-expanded=${open} aria-label="Loop options" title="Loop options"
+            ?disabled=${!on}
+            @click=${() => (this.openPop = open ? null : 'loop')}>${Player.stroke(open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6', 10)}</button>
+        </span>
+      </span>
+    </span>`;
+  }
+  private loopOptions() {
+    const o = this.practice, bars = this.shownBars, synth = this.session?.backend instanceof HostBackend;
+    const set = (patch: Partial<PracticeOptions>) => this.setPracticeOptions({ ...o, ...patch });
+    const seg = <T,>(label: string, value: T, choices: readonly [T, string][], pick: (v: T) => void) => html`<div class="row">
+      <span>${label}</span>
+      <span class="seg" role="radiogroup" aria-label=${label}>${choices.map(([v, text]) => html`<button type="button" role="radio"
+        aria-checked=${v === value} @click=${() => pick(v)}>${text}</button>`)}</span>
+    </div>`;
+    const take = this.status?.transport?.loop?.visit.take;
+    const playing = this.playback?.wantsPlayback ?? false;
+    const t = o.trainer;
+    const pct = (r: number) => `${Math.round(r * 100)}%`;
+    const stepper = (label: string, value: string, down: () => void, up: () => void) => html`<div class="stepper"><span>${label}</span><div>
+      <button type="button" aria-label=${`${label}: less`} @click=${down}>−</button><output aria-label=${label}>${value}</output>
+      <button type="button" aria-label=${`${label}: more`} @click=${up}>+</button></div></div>`;
+    const trainer = (patch: Partial<NonNullable<PracticeOptions['trainer']>>) => {
+      const next = { ...(t ?? DEFAULT_TRAINER), ...patch };
+      next.start = Player.snapRate(Math.min(1, Math.max(Player.RATE_MIN, next.start)));
+      next.ceiling = Player.snapRate(Math.min(Player.RATE_MAX, Math.max(next.start, next.ceiling)));
+      next.step = Math.round(Math.min(0.25, Math.max(0.05, next.step)) * 100) / 100;
+      next.every = Math.min(8, Math.max(1, Math.round(next.every)));
+      set({ trainer: next });
+    };
+    const count = bars ? bars.last - bars.first + 1 : 0;
+    return html`<div class="pop loop" role="dialog" aria-label="Loop options">
+      <div class="head"><b>Loop</b><span>${bars ? `bars ${this.barsLabel(bars)} · ${count} bar${count === 1 ? '' : 's'}` : ''}</span>
+        <button type="button" @click=${() => this.setLoopBars(null)}>Clear loop</button></div>
+      ${synth ? html`
+        ${playing && take && o.repeats !== null ? html`<div class="progress"><span>Repeat ${take.repeat} of ${o.repeats}</span>
+          <span class="bars" aria-hidden="true">${Array.from({ length: Math.min(o.repeats, 24) }, (_, i) => html`<span class=${i + 1 < take.repeat ? 'done' : i + 1 === take.repeat ? 'now' : ''}></span>`)}</span></div>` : nothing}
+        ${seg('Count-in', o.countIn, [[0, 'Off'], [1, '1 bar'], [2, '2 bars']], v => set({ countIn: v }))}
+        ${seg('Repeats', o.repeats, [[null, '∞'], [2, '2'], [4, '4'], [8, '8']], v => set({ repeats: v }))}
+        ${o.repeats !== null ? seg<PracticeThen>('Then', o.then, [['stop', 'Stop'], ['continue', 'Carry on'], ['advance', 'Advance']], v => set({ then: v })) : nothing}
+        ${o.repeats !== null && o.then === 'advance' ? html`<p class="note">After ${o.repeats} repeats the loop moves on a bar and counts in again${t ? ', back at the trainer’s starting speed' : ''}. It stops at the end of the piece.</p>` : nothing}
+        ${seg('Gap between', o.gap, [[0, 'None'], [1, '1 bar']], v => set({ gap: v }))}
+        <div class="rule"></div>
+        <label class="check"><input type="checkbox" .checked=${t !== null} @change=${(e: Event) => set({ trainer: (e.target as HTMLInputElement).checked ? (t ?? DEFAULT_TRAINER) : null })}>Speed trainer</label>
+        ${t ? html`<div class="steppers">
+            ${stepper('Start', pct(t.start), () => trainer({ start: t.start - 0.05 }), () => trainer({ start: t.start + 0.05 }))}
+            ${stepper('Step', `+${pct(t.step)}`, () => trainer({ step: t.step - 0.05 }), () => trainer({ step: t.step + 0.05 }))}
+            ${stepper('Every', `${t.every} rep.`, () => trainer({ every: t.every - 1 }), () => trainer({ every: t.every + 1 }))}
+            ${stepper('Up to', pct(t.ceiling), () => trainer({ ceiling: t.ceiling - 0.05 }), () => trainer({ ceiling: t.ceiling + 0.05 }))}
+          </div>
+          ${playing && take ? html`<p class="note">Now ${pct(take.rate)}</p>` : nothing}` : nothing}
+        <label class="check"><input type="checkbox" .checked=${o.click} @change=${(e: Event) => set({ click: (e.target as HTMLInputElement).checked })}>Click through the loop</label>`
+      : html`<p class="note">A recording loops these bars as they are. Count-in, repeats, the speed trainer and the click play with the synth.</p>`}
+    </div>`;
+  }
+
+  // ── the loop's handles on the rail ──
+  /** The performed bar under the pointer while a handle is dragged: the column under it, and the
+   *  lane by height while the pointer is over the cells (above them, the pass the handle is on). */
+  private ordinalUnder(event: PointerEvent, edge: 'first' | 'last'): number | null {
+    const model = this.railModel, rail = this.renderRoot.querySelector<HTMLElement>('.rail');
+    const base = this.loopBars;
+    if (!model || !rail || !base) return null;
+    const box = rail.getBoundingClientRect();
+    const column = Math.min(model.columns - 1, Math.max(0, Math.floor((event.clientX - box.left) / box.width * model.columns)));
+    const lanes = model.cells[column]?.lanes ?? [];
+    if (!lanes.length) return null;
+    const cellTop = box.bottom - (rail.querySelector<HTMLElement>('.cell')?.offsetHeight ?? 30);
+    const current = edge === 'first' ? base.first : base.last;
+    const currentLane = Math.max(0, model.cells.flatMap(c => [c.lanes.findIndex(l => l.ordinal === current)]).find(i => i >= 0) ?? 0);
+    const lane = event.clientY >= cellTop
+      ? Math.min(lanes.length - 1, Math.max(0, Math.floor((event.clientY - cellTop) / (box.bottom - cellTop) * lanes.length)))
+      : Math.min(lanes.length - 1, currentLane);
+    return lanes[lane]!.ordinal;
+  }
+  private dragTo(edge: 'first' | 'last', ordinal: number) {
+    const base = this.loopBars;
+    if (!base) return;
+    const bars = edge === 'first' ? { first: Math.min(ordinal, base.last), last: base.last } : { first: base.first, last: Math.max(ordinal, base.first) };
+    this.dragBars = { bars, edge };
+    this.announceLoop();
+  }
+  private onHandleDown(edge: 'first' | 'last', event: PointerEvent) {
+    if (!this.loopBars || event.button > 0) return;
+    event.preventDefault(); event.stopPropagation();
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    this.adoptShownBars();
+    this.dragBars = { bars: this.loopBars, edge };
+  }
+  private onHandleMove(edge: 'first' | 'last', event: PointerEvent) {
+    if (!this.dragBars || this.dragBars.edge !== edge) return;
+    const ordinal = this.ordinalUnder(event, edge);
+    if (ordinal !== null) this.dragTo(edge, ordinal);
+  }
+  private onHandleUp(event: PointerEvent) {
+    const drag = this.dragBars;
+    if (!drag) return;
+    (event.currentTarget as HTMLElement).releasePointerCapture?.(event.pointerId);
+    this.dragBars = null;
+    const base = this.loopBars;
+    if (base && (drag.bars.first !== base.first || drag.bars.last !== base.last)) this.setLoopBars(drag.bars);
+    else this.announceLoop();
+  }
+  /** ←/→ on a focused handle move it a performed bar. */
+  private onHandleKey(edge: 'first' | 'last', event: KeyboardEvent) {
+    const base = this.shownBars ?? this.loopBars, count = this.performance?.measures.length ?? 0;
+    if (!base || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+    this.adoptShownBars();
+    event.preventDefault(); event.stopPropagation();
+    const step = event.key === 'ArrowLeft' ? -1 : 1;
+    const bars = edge === 'first'
+      ? { first: Math.min(base.last, Math.max(0, base.first + step)), last: base.last }
+      : { first: base.first, last: Math.max(base.first, Math.min(count - 1, base.last + step)) };
+    this.setLoopBars(bars);
+  }
+  /** The bracket over the loop's written bars and a handle at each end. */
+  private loopOnRail() {
+    const bars = this.dragBars?.bars ?? this.shownBars, performance = this.performance;
+    if (!bars || !performance || this.syncMode) return nothing;
+    const columns = performance.measures.slice(bars.first, bars.last + 1).map(m => m.measureIndex);
+    const lo = Math.min(...columns), hi = Math.max(...columns);
+    const startColumn = performance.measures[bars.first]!.measureIndex, endColumn = performance.measures[bars.last]!.measureIndex;
+    const count = bars.last - bars.first + 1;
+    const handle = (edge: 'first' | 'last', column: number) => {
+      const dragging = this.dragBars?.edge === edge;
+      const ordinal = edge === 'first' ? bars.first : bars.last;
+      return html`<button type="button" class=${`loop-handle ${edge}${dragging ? ' dragging' : ''}`}
+        style=${`grid-column: ${column + 1};`}
+        aria-label=${`Loop ${edge === 'first' ? 'start' : 'end'}, bar ${this.barLabel(ordinal)}. Drag, or use the arrow keys, to move it`}
+        @pointerdown=${(e: PointerEvent) => this.onHandleDown(edge, e)}
+        @pointermove=${(e: PointerEvent) => this.onHandleMove(edge, e)}
+        @pointerup=${(e: PointerEvent) => this.onHandleUp(e)}
+        @pointercancel=${(e: PointerEvent) => this.onHandleUp(e)}
+        @keydown=${(e: KeyboardEvent) => this.onHandleKey(edge, e)}
+      ><span class="grip"></span><span class="stem"></span>${dragging ? html`<span class="loop-card">${edge === 'first' ? 'Start' : 'End'} · bar ${this.barLabel(ordinal)} · ${count} bar${count === 1 ? '' : 's'}</span>` : nothing}</button>`;
+    };
+    return html`<div class="loop-bracket" style=${`grid-column: ${lo + 1} / ${hi + 2};`}></div>${handle('first', startColumn)}${handle('last', endColumn)}`;
+  }
+
   // ── rate and volume: a value on the tray, the control in an overlay ─────
   static readonly RATE_PRESETS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
   private setRate(value: number) {
+    // A rate chosen by hand ends the speed trainer's say over it.
+    if (this.practice.trainer && this.loopBars) { this.practice = { ...this.practice, trainer: null }; this.savePractice(); this.adoptShownBars(); this.reapplyLoop(); }
     this.rate = this.status?.kind === 'youtube' ? value : Player.snapRate(value);
     this.rate = this.session?.setRate(this.rate) ?? this.rate;
     try {
@@ -1720,6 +2301,7 @@ export class Player extends LitElement {
         ${this.sourceControl ? html`<slot name="source-tools"></slot>` : nothing}
         <span class="settings">
         ${this.rateControl()}
+        ${this.loopControl()}
         ${this.volumeControl()}
         </span>
       </div>

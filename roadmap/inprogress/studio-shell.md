@@ -27,7 +27,7 @@ Not in scope, each its own later item: saving an edit (**decided 2026-09-17**, b
 [studio authoring campaign](studio-campaign-authoring.md): a new **`.gp`** rendition that
 takes the canonical pointer — not the MNX rendition this doc first assumed), sharing, sync,
 recordings and syncpoints in the player, practice tools
-([studio-player-practice.md](../proposed/studio-player-practice.md)), the BYOK assist flow
+([studio-player-practice.md](studio-player-practice.md)), the BYOK assist flow
 ([apps/studio/README.md](../../apps/studio/README.md) records the promotion it needs).
 
 ## Decisions this doc makes

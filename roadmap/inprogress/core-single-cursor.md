@@ -114,7 +114,7 @@ music stopped.
    → at bar 8's `:|` goes to bar 1, Shift+→ goes to bar 9. It is inherent, not a choice.
 4. **Play collapses a selection.** With any rung above the event selected, Play moves the
    cursor to the selection's first event on the anchor's pass, closes the selection, then
-   plays. (A loop over a selection is [studio-player-practice](../proposed/studio-player-practice.md)'s
+   plays. (A loop over a selection is [studio-player-practice](studio-player-practice.md)'s
    job and gets its own control.)
 5. **Pause parks the cursor.** On pause or stop, the cursor moves to the event sounding at
    the playhead (the last onset at or before it) on the cursor's own part, staff and voice,
@@ -222,9 +222,9 @@ by hand, not decisions.
 - **Keeping the reviewer's unclamped walk.** It could return as a workbench-only mode that
   detaches inspection from the cursor. Nobody has asked for it since it shipped; build it
   when someone misses it.
-- **Loop playback of a selection** — [studio-player-practice](../proposed/studio-player-practice.md).
-  Its selection-to-loop policy starts "on the inspection iteration"; after this item that
-  reads "on the selection anchor's pass", and whoever picks it up amends it.
+- **Loop playback of a selection** — [studio-player-practice](studio-player-practice.md).
+  Built 2026-10-22: the loop starts where Play would — the selection's first bar on the
+  anchor's pass — and rule 4 stands; the loop has its own control in the tray.
 - **Performance-ordered selection ranges.** Rule 3 is why they do not exist.
 - **The unrolled view.** It already draws one bar per performance entry, so this model fits
   it without change. Making it the default for editing is a separate question.

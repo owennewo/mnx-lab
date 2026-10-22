@@ -44,6 +44,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { SPACE_DEFAULT_SP, densityLadder, packedRowMeasures, spacePolicy, type PackingInput } from '../engine/layout/spacing.ts';
+import { drawLoopMarker } from './loopMarker.ts';
 import { ScoreGestures, type GestureTargets } from './gestures.ts';
 import { DEFAULT_SPACE_SP, DEFAULT_STAFF_SP } from './zoomDefaults.ts';
 import { createLayoutCache } from '../engine/render/layoutCache.ts';
@@ -728,6 +729,26 @@ export class DocumentViewer extends LitElement {
       }
 
       :host #projection-container svg .unperformed { opacity: 0.3; cursor: default; }
+      /* The loop (loopMarker.ts): in playback's colour, so it never reads as the selection. */
+      :host #projection-container svg .loop-wash {
+        fill: color-mix(in oklab, var(--playback) 9%, transparent);
+        pointer-events: none;
+      }
+      :host #projection-container svg .loop-marker {
+        pointer-events: none;
+      }
+      :host #projection-container svg .loop-bracket {
+        stroke: var(--playback);
+      }
+      :host #projection-container svg .loop-continues,
+      :host #projection-container svg .loop-chip rect {
+        fill: var(--playback);
+      }
+      :host #projection-container svg .loop-chip text {
+        fill: var(--paper);
+        font-family: var(--sans);
+        font-weight: 600;
+      }
       :host #projection-container svg .recording-bookend-block {
         fill: color-mix(in oklab, var(--paper-ink) 7%, var(--paper));
         stroke: color-mix(in oklab, var(--paper-ink) 22%, transparent);
@@ -1153,7 +1174,7 @@ export class DocumentViewer extends LitElement {
     this.bindScoreSurface();
     if(changed.has('playbackState')){
       if(this.bookendSignature()!==this.renderedBookends)this.renderProjection();
-      else {this.paintPlayback();this.paintBookends();}
+      else {this.paintPlayback();this.paintBookends();if(this.loopSignature()!==this.renderedLoop)this.paintLoop();}
       // Paused under a bound editor, the playhead IS the cursor
       // (core-single-cursor.md) and the selection's own reveal decides the
       // scroll; following the playhead too would fight it.
@@ -1412,6 +1433,7 @@ export class DocumentViewer extends LitElement {
       };
       this.selectionPage = svg && !quick ? page : null;
       if (svg) this.drawSelection(svg, page, previousEnclosure, quick);
+      if (svg && !quick) this.paintLoop(svg, page);
     };
 
     // No pane captions: the view is named by whichever surface hosts this
@@ -2070,6 +2092,30 @@ export class DocumentViewer extends LitElement {
     };
   }
   private bookendSignature(): string { return JSON.stringify(this.systemBookends() ?? null); }
+  /** The loop as last drawn, so a frame that did not move it draws nothing. */
+  private renderedLoop = 'null';
+  private loopSignature(): string { return JSON.stringify(this.playbackState?.loop ?? null); }
+  /**
+   * The player's loop on the drawn page (loopMarker.ts): its written bars washed and bracketed —
+   * unrolled, the performed bars it plays — with a chip at its start that counts a count-in.
+   */
+  private paintLoop(svg = this.container?.querySelector<SVGSVGElement>('svg') ?? null, page = this.selectionPage) {
+    this.renderedLoop = this.loopSignature();
+    if (!svg || !page) return;
+    const loop = this.playbackState?.loop ?? null;
+    const unrolled = page.entries !== undefined;
+    const label = loop?.counting
+      ? `Count-in ${'●'.repeat(loop.counting.beat)}${'○'.repeat(Math.max(0, loop.counting.of - loop.counting.beat))}`
+      : loop?.label ?? '';
+    const ordinals = loop ? Array.from({ length: loop.last - loop.first + 1 }, (_, i) => loop.first + i) : [];
+    drawLoopMarker(svg, loop ? {
+      measures: unrolled ? ordinals : loop.measures,
+      start: unrolled ? loop.first : loop.start,
+      end: unrolled ? loop.last : loop.end,
+      label,
+    } : null, packedRowMeasures(page.packings, page.densityH));
+  }
+
   private paintBookends() {
     const phase = this.playbackState?.mediaPhase;
     for (const node of this.container?.querySelectorAll<SVGElement>('.recording-bookend') ?? []) {

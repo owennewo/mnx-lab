@@ -9,7 +9,22 @@ export interface PlaybackOccurrence {
   ordinal: number;
 }
 
+/** The loop, as the player announces it (`loop-changed`) for the score's marker. */
+export interface LoopMark {
+  /** Performed bars, first and last. */
+  first: number;
+  last: number;
+  /** The written bars it plays, in order of first playing; the bar it starts in and the one it ends in. */
+  measures: number[];
+  start: number;
+  end: number;
+  label: string;
+  /** In a count-in: the beat, from 1, of how many. */
+  counting: { beat: number; of: number } | null;
+}
 export interface PlaybackState extends PlaybackPositionState {
+  /** The loop the player has set, or null. */
+  loop: LoopMark | null;
   /** Is the transport RUNNING — not merely parked somewhere. `followPlayback`
    *  says the view is tracking the playhead, which is true by default and says
    *  nothing about whether the playhead is moving; this says whether there is
@@ -35,7 +50,7 @@ export interface PlaybackUpdate {
   mediaPhase?: PlaybackState['mediaPhase'];
 }
 export function initialPlaybackState(): PlaybackState {
-  return { ...initialPlaybackPosition(), playing: false, highlight: [], recordingBookends: null, mediaPhase: null };
+  return { ...initialPlaybackPosition(), playing: false, highlight: [], recordingBookends: null, mediaPhase: null, loop: null };
 }
 
 export const mnxDocumentContext = createContext<MnxDocument | null>(Symbol('mnx-document'));

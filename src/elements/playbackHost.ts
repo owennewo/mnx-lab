@@ -15,6 +15,7 @@ import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { compilePerformance } from '../audio/performance.ts';
 import { beatOfKey } from './scoreSeek.ts';
 import type { MnxDocument } from '../model/mnx.ts';
+import type { LoopMark } from './mnxContext.ts';
 import type { Player } from './Player.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
 import type { CursorPlayback } from './cursorPlayback.ts';
@@ -99,7 +100,15 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   // the host decides what that means, exactly as `note-selected` becomes a seek
   // above. With no player bound the gesture is a no-op, never an error.
   const toggle = () => player.toggle();
+  /** The player's loop, for the score's marker. */
+  const loop = (event: Event) => {
+    const detail = (event as CustomEvent<{ documentId: string; loop: LoopMark | null }>).detail;
+    if (detail.documentId !== player.documentId) return;
+    state = { ...state, loop: detail.loop };
+    publish();
+  };
   player.addEventListener('playback-state-changed', update);
+  player.addEventListener('loop-changed', loop);
   const cursor: CursorPlayback = {
     get playing() { return player.playback?.wantsPlayback ?? false; },
     get playhead() {
@@ -113,6 +122,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     },
     audition: ({ noteKey, ordinal, edited }) => { player.audition(noteKey, ordinal, { edited }); },
     place: position => { player.cursorPlace = position && { ordinal: position.ordinal, metricOffset: position.offset }; },
+    range: bars => { player.loopCandidate = bars; },
     couple() {
       coupled++;
       let released = false;
@@ -178,6 +188,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       state = initialPlaybackState();
       publish();
       player.removeEventListener('playback-state-changed', update);
+      player.removeEventListener('loop-changed', loop);
       viewer.removeEventListener('note-selected', select);
       viewer.removeEventListener('position-selected', place);
       viewer.removeEventListener('transport-toggle', toggle);

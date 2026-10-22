@@ -172,7 +172,30 @@ export class NativeHostPort implements HostPort {
   profile(action: 'start' | 'snapshot') { return this.host ? this.host.profile(action) : Promise.resolve(undefined); }
   configure(setup: Setup) { this.setup = setup; void this.host?.configure(setup).catch(this.reject); }
   schedule(batch: { notes?: Note[]; controls?: Control[]; through?: number }) { clearTimeout(this.idleTimer); void this.host?.schedule(batch).catch(this.reject); }
-  cancel(cancel: { from?: number; silence?: boolean }) { void this.host?.cancel(cancel).catch(this.reject); }
+  cancel(cancel: { from?: number; silence?: boolean }) {
+    void this.host?.cancel(cancel).catch(this.reject);
+    const from = cancel.from ?? 0;
+    for (const c of this.clicks) if (c.at >= from) { try { c.osc.stop(); } catch { /* not started */ } }
+    this.clicks = this.clicks.filter(c => c.at < from);
+  }
+  /** Clicks sent and not yet heard, so a cancel can take them back. */
+  private clicks: { at: number; osc: OscillatorNode }[] = [];
+  /** A practice's click (hostBackend.ts): the sync bar's sound (native/click.ts), into the master
+   *  gain beside the host, so the volume carries it; late by the limiter's look-ahead, as the host is. */
+  click(at: number, accent: boolean) {
+    const context = this.context, output = this.output;
+    if (!context || !output) return;
+    const when = at + this.lookahead;
+    const osc = new OscillatorNode(context, { type: 'triangle', frequency: accent ? 1760 : 1175 });
+    const gain = new GainNode(context, { gain: 0 });
+    gain.gain.setValueAtTime(0, when);
+    gain.gain.linearRampToValueAtTime(accent ? 0.6 : 0.4, when + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.06);
+    osc.connect(gain).connect(output);
+    osc.start(when); osc.stop(when + 0.08);
+    this.clicks = this.clicks.filter(c => c.at > context.currentTime - 1);
+    this.clicks.push({ at, osc });
+  }
   setVolume(volume: number) {
     this.volume = volume;
     if (this.output && this.context) this.output.gain.setTargetAtTime(volume, this.context.currentTime, 0.01);

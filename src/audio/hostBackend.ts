@@ -61,6 +61,9 @@ export interface HostPort {
    *  platform reports: on a phone or tablet under a large buffer that was 40 ms against a
    *  measured second (roadmap core-synth-performance). */
   heard?(): number | undefined;
+  /** Optional: a metronome click at host time `at` (a count-in, or the click through a loop). A
+   *  cancel takes back those not yet heard, as it does notes. Without it a practice counts in silently. */
+  click?(at: number, accent: boolean): void;
   /** Optional: the host's per-part cost metering, started at play and read at stop (playbackTrace.ts). */
   profile?(action: 'start' | 'snapshot'): Promise<unknown>;
 }
@@ -77,11 +80,14 @@ export interface HostBackendOptions {
 
 /** The stream's controls are its tempo changes (contractStream.ts). */
 type Tempo = { id: string; at: number; type: 'tempo'; bpm: number };
-interface Visit { k: number; vs: number; ve: number; va: number; started: boolean; emitted: Set<string> }
+/** A visit as the host plays it: score seconds `vs`–`ve`, from transport time `va`, at `speed`; `cut`: a loop's, its notes cut at `ve`. */
+interface Visit { k: number; vs: number; ve: number; va: number; speed: number; cut: boolean; started: boolean; emitted: Set<string>;
+  /** Its clicks in transport time, and how many are sent. */
+  clicks: { at: number; accent: boolean }[]; clicked: number }
 interface Plan {
   gen: number;
-  speed: number;
-  loop: { start: number; end: number } | undefined;
+  /** The transport's visit (`Transport.planned`) being supplied. */
+  index: number;
   visit: Visit;
   cursor: number;
   controlCursor: number;
@@ -123,7 +129,6 @@ export class HostBackend implements PlaybackBackend {
   private routed!: HostSetup;
   private notes: Note[] = [];
   private tempos: Tempo[] = [];
-  private endSeconds = 0;
   private readonly lead: number;
   private readonly ahead: number;
   private readonly clock: Clock;
@@ -245,7 +250,6 @@ export class HostBackend implements PlaybackBackend {
       this.onEvent(event);
       if (event.kind === 'state') for (const listener of this.listeners) listener();
     } });
-    this.endSeconds = this.stream.secondsAt(transport.duration);
     return transport;
   }
 
@@ -257,7 +261,7 @@ export class HostBackend implements PlaybackBackend {
       // Paused and still paused (a seek, a rate), playback has nothing sounding — its pause
       // silenced it — so a clicked note (`audition`) is left to ring rather than cut by the seek it made.
       if (wasPlaying || snapshot.state === 'playing') this.port.cancel({ from: this.port.now(), silence: true });
-      this.plan = snapshot.state === 'playing' ? this.newPlan(snapshot.position, snapshot.rate) : undefined;
+      this.plan = snapshot.state === 'playing' ? this.newPlan(snapshot.position) : undefined;
     }
     // At the end of the piece the transport stops by itself: what is scheduled plays out.
     if (snapshot.state !== 'playing') {
@@ -266,24 +270,28 @@ export class HostBackend implements PlaybackBackend {
     }
     if (this.plan && !this.plan.done && this.plan.through - this.rendered() < this.ahead / 2) this.topUp(this.plan);
   }
-  private newPlan(position: Performance['sounding'][number]['position'], speed: number): Plan {
+  private newPlan(position: Performance['sounding'][number]['position']): Plan {
     // The frozen clock is the transport's anchor time: restart() read it, then pumped and emitted.
     const audio = this.clock.now(), score = this.stream.secondsAt(position);
-    this.audibleAt = audio + this.lead;
     this.underrunBase = undefined;
     if (playbackTrace.on) {
       if (playbackTrace.active) playbackTrace.end();
       playbackTrace.begin(documentTitle(this.document) || globalThis.document?.title || 'piece');
       void this.port.profile?.('start').catch(() => {});
     }
-    const region = this.live.loopRegion;
-    const loop = region ? { start: this.stream.secondsAt(region.start), end: this.stream.secondsAt(region.end) } : undefined;
-    return {
-      gen: ++this.generation, speed, loop,
-      visit: { k: 0, vs: score, ve: loop?.end ?? this.endSeconds, va: audio, started: false, emitted: new Set() },
-      cursor: firstAt(this.notes, score), controlCursor: firstAt(this.tempos, score),
-      through: audio, done: false,
-    };
+    const visit = this.visitFor(0)!;
+    // A count-in is silence to the host: what it plays starts after it.
+    this.audibleAt = visit.va + this.lead;
+    return { gen: ++this.generation, index: 0, visit, cursor: firstAt(this.notes, score), controlCursor: firstAt(this.tempos, score), through: audio, done: false };
+  }
+  /** The transport's visit `index` as the host plays it, or undefined past the last. */
+  private visitFor(index: number): Visit | undefined {
+    const v = this.live.planned(index);
+    if (!v) return undefined;
+    const vs = this.stream.secondsAt(v.from), ve = this.stream.secondsAt(v.until);
+    const clicks = [...v.countClicks.map(c => ({ at: c.audio, accent: c.accent })),
+      ...v.clicks.map(c => ({ at: v.audio + (this.stream.secondsAt(c.at) - vs) / v.rate, accent: c.accent }))];
+    return { k: v.k < 0 ? 0 : v.k, vs, ve, va: v.audio, speed: v.rate, cut: v.looped, started: false, emitted: new Set(), clicks, clicked: 0 };
   }
   private bpmAt(seconds: number) {
     let bpm = 120;
@@ -298,19 +306,23 @@ export class HostBackend implements PlaybackBackend {
   /** Supply the host from where the plan stands to `ahead` past now. */
   private topUp(p: Plan) {
     const to = this.rendered() + this.ahead, notes: Note[] = [], controls: Control[] = [];
-    const host = (v: Visit, seconds: number) => v.va + (seconds - v.vs) / p.speed + this.lead;
+    const host = (v: Visit, seconds: number) => v.va + (seconds - v.vs) / v.speed + this.lead;
     let wraps = 0;
     for (;;) {
       const v = p.visit;
       if (!v.started) {
         v.started = true;
         // Tempo-synced effects need the tempo in force where the visit starts.
-        controls.push({ id: `tempo:${p.gen}.${v.k}`, at: v.va + this.lead, type: 'tempo', bpm: this.bpmAt(v.vs) * p.speed });
-        if (v.k === 0)
+        controls.push({ id: `tempo:${p.gen}.${v.k}`, at: v.va + this.lead, type: 'tempo', bpm: this.bpmAt(v.vs) * v.speed });
+        if (p.index === 0)
           for (const n of this.notes) {
             if (n.at >= v.vs) break;
-            if (n.at + n.duration > v.vs) notes.push(this.sustained(n, p, v, host(v, v.vs)));
+            if (n.at + n.duration > v.vs) notes.push(this.sustained(n, v, p, host(v, v.vs)));
           }
+      }
+      for (; v.clicked < v.clicks.length && v.clicks[v.clicked]!.at < to; v.clicked++) {
+        const c = v.clicks[v.clicked]!;
+        this.port.click?.(c.at + this.lead, c.accent);
       }
       let full = false;
       for (; p.cursor < this.notes.length; p.cursor++) {
@@ -322,26 +334,28 @@ export class HostBackend implements PlaybackBackend {
       for (; p.controlCursor < this.tempos.length; p.controlCursor++) {
         const c = this.tempos[p.controlCursor]!;
         if (c.at >= v.ve || host(v, c.at) - this.lead >= to) break;
-        if (c.at > v.vs) controls.push({ ...c, id: `${c.id}:${p.gen}.${v.k}`, at: host(v, c.at), bpm: c.bpm * p.speed });
+        if (c.at > v.vs) controls.push({ ...c, id: `${c.id}:${p.gen}.${v.k}`, at: host(v, c.at), bpm: c.bpm * v.speed });
       }
-      const end = v.va + (v.ve - v.vs) / p.speed;
-      if (full || end >= to) break;
-      if (!p.loop) { p.done = true; break; }
+      const end = v.va + (v.ve - v.vs) / v.speed;
+      if (full || end >= to || v.clicked < v.clicks.length) break;
+      const next = this.visitFor(p.index + 1);
+      if (!next) { p.done = true; break; }
       if (++wraps > MAX_WRAPS) throw new RangeError('Too many loop wraps in one scheduling window.');
-      p.visit = { k: v.k + 1, vs: p.loop.start, ve: p.loop.end, va: end, started: false, emitted: new Set() };
-      p.cursor = firstAt(this.notes, p.loop.start);
-      p.controlCursor = firstAt(this.tempos, p.loop.start);
+      p.index++;
+      p.visit = next;
+      p.cursor = firstAt(this.notes, next.vs);
+      p.controlCursor = firstAt(this.tempos, next.vs);
     }
     p.through = to;
     this.port.schedule({ notes, controls, through: to + this.lead });
   }
   /** A note in a visit, retimed for the rate; cut at a loop's end. */
-  private placed(n: Note, p: Plan, v: Visit, at: number): Note {
-    const end = p.loop ? Math.min(n.at + n.duration, v.ve) : n.at + n.duration;
+  private placed(n: Note, p: Pick<Plan, 'gen'>, v: Visit, at: number): Note {
+    const end = v.cut ? Math.min(n.at + n.duration, v.ve) : n.at + n.duration;
     const kept = (end - n.at) / n.duration;
     const techniques = (n.techniques ?? []).flatMap((t): Technique[] => {
       if (t.type === 'legato') return v.emitted.has(t.from as string) ? [{ ...t, from: `${t.from}:${p.gen}.${v.k}` } as Technique] : [];
-      if (t.type === 'vibrato') return [{ ...t, rateHz: (t.rateHz as number) * p.speed, ...(typeof t.start === 'number' ? { start: Math.min(1, t.start / kept) } : {}),
+      if (t.type === 'vibrato') return [{ ...t, rateHz: (t.rateHz as number) * v.speed, ...(typeof t.start === 'number' ? { start: Math.min(1, t.start / kept) } : {}),
         ...(typeof t.phase === 'number' ? { phase: t.phase } : {}) } as Technique];
       if (t.type === 'bend') {
         const points = (t.points as { at: number; cents: number }[]).map(q => ({ at: q.at / kept, cents: q.cents }));
@@ -352,15 +366,15 @@ export class HostBackend implements PlaybackBackend {
     });
     v.emitted.add(n.id);
     const { techniques: _, ...rest } = n;
-    return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - n.at) / p.speed), ...(techniques.length ? { techniques } : {}) };
+    return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - n.at) / v.speed), ...(techniques.length ? { techniques } : {}) };
   }
   /** A note already sounding where play starts: struck again there, for what is left of it. */
-  private sustained(n: Note, p: Plan, v: Visit, at: number): Note {
+  private sustained(n: Note, v: Visit, p: Plan, at: number): Note {
     const end = Math.min(n.at + n.duration, v.ve);
     const techniques = (n.techniques ?? []).filter(t => t.type === 'mute' || t.type === 'harmonic');
     v.emitted.add(n.id);
     const { techniques: _, ...rest } = n;
-    return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - v.vs) / p.speed), ...(techniques.length ? { techniques } : {}) };
+    return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - v.vs) / v.speed), ...(techniques.length ? { techniques } : {}) };
   }
 
   /**
@@ -381,8 +395,8 @@ export class HostBackend implements PlaybackBackend {
       // Play, or a newer press, got there first.
       if (this.closed || gen !== this.generation || this.live.snapshot.state === 'playing') return;
       const first = Math.min(...notes.map(n => n.at)), at = this.port.now() + AUDITION_LEAD;
-      const plan = { gen, speed, loop: undefined } as Plan;
-      const visit: Visit = { k: 0, vs: first, ve: Infinity, va: at, started: true, emitted: new Set() };
+      const visit: Visit = { k: 0, vs: first, ve: Infinity, va: at, speed, cut: false, started: true, emitted: new Set(), clicks: [], clicked: 0 };
+      const plan = { gen };
       const placed = notes.map(n => this.placed(n, plan, visit, at + (n.at - first) / speed));
       const end = Math.max(...placed.map(n => n.at + n.duration));
       this.port.cancel({ from: this.port.now(), silence: true });
