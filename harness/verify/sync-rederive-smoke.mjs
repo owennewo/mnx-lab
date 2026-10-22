@@ -77,12 +77,12 @@ try {
    check(player.sourceId===rows[0].id,'the echo re-cued the source');
    // The Mix panel's list of what plays says which imported sync to distrust.
    player.shadowRoot.querySelector('[data-mix-open]').click();
-   await until(()=>page.shadowRoot.querySelector('mnx-studio-mix')?.shadowRoot?.querySelectorAll('[data-source]').length===4,'no Mix panel');
+   await until(()=>page.shadowRoot.querySelector('mnx-studio-mix')?.shadowRoot?.querySelectorAll('[data-source]').length===3,'no Mix panel');
    const sheet=page.shadowRoot.querySelector('mnx-studio-mix').shadowRoot;
    // The chosen recording's row says how it follows the score: each in turn.
    const sub=async name=>{[...sheet.querySelectorAll('[data-source]')].find(s=>s.textContent.includes(name)).click();
-     await until(()=>sheet.querySelector('[data-edit]')?.closest('.ch')?.textContent.includes(name),'did not choose '+name);
-     return sheet.querySelector('[data-edit]').textContent;};
+     await until(()=>sheet.querySelector('.ch [data-edit]')?.closest('.ch')?.textContent.includes(name),'did not choose '+name);
+     return sheet.querySelector('.ch [data-edit]').textContent;};
    for(const [name,says] of [['Studio take','follows the whole score'],['Imported, never opened','follows the whole score'],['Imported, other bars','may be out of date']]){
      const text=await sub(name);check(text.includes(says),name+': '+text);}
    await player.selectSource(rows[2].id);

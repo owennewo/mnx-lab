@@ -85,7 +85,7 @@ it('the listening workspace gates its code, disk-read evidence, and shared timin
 it('the synth runs its own functional suite, the build and its smoke; its prose runs nothing (core-campaign-synth S12)', () => {
   const code = planGate(['synth/web/host/host-core.js']);
   expect(code.synth).toBe(true);
-  expect(code.tests, 'the root tests that play through the synth').toEqual({ mode: 'files', files: ['harness/conformance/contract-stream.test.ts', 'harness/conformance/host-backend.test.ts', 'harness/conformance/host-instruments.test.ts'] });
+  expect(code.tests, 'the root tests that play through the synth').toEqual({ mode: 'files', files: ['harness/conformance/contract-stream.test.ts', 'harness/conformance/host-backend.test.ts', 'harness/conformance/host-instruments.test.ts', 'harness/conformance/mix-layers.test.ts'] });
   expect(code.build, 'its shell is in the site bundle').toBe(true);
   expect(code.smokes, 'its app flows, and the player on its host').toEqual(['synth', 'synth-host', 'studio-instruments']);
   expect(planGate(['synth/README.md']).smokes).toEqual([]);

@@ -142,7 +142,9 @@ export class MixSheet extends LitElement {
     .eye[aria-pressed='true'] { color: var(--ink-faint, var(--ink-3)); }
     .note { grid-column: 2 / -1; padding-bottom: 8px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
     .note.problem { color: light-dark(#a3341f, #f0907c); }
-    .pick { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 6px; border: 0; text-align: left; font-size: 13px; color: var(--ink-2); }
+    .choice { display: flex; align-items: center; }
+    .pick { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 6px; border: 0; text-align: left; font-size: 13px; color: var(--ink-2); }
+    .pick > span:last-child { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .pick[aria-checked='true'] { color: var(--ink); font-weight: 600; }
     .dot { width: 12px; height: 12px; flex: none; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--ink-3); }
     [aria-checked='true'] .dot { border: 3.5px solid var(--accent); }
@@ -261,8 +263,12 @@ export class MixSheet extends LitElement {
       ${!chosen
         ? html`<p class="empty">${this.canAdd ? 'None yet: add a YouTube video or an audio file to play along to.' : 'None.'}</p>`
         : html`<div class=${on ? 'rows' : 'rows off'}>
-            ${this.recordings.length > 1 ? html`<div role="radiogroup" aria-label="Which recording">${this.recordings.map(r => html`<button class="pick" type="button" role="radio"
-              aria-checked=${r.id === chosen.id} data-source=${r.id} @click=${() => this.emit('recording-choose', { id: r.id })}><span class="dot"></span>${r.name ?? 'Unnamed recording'}</button>`)}</div>` : nothing}
+            ${this.recordings.length > 1 ? html`<div role="radiogroup" aria-label="Which recording">${this.recordings.map(r => html`<div class="choice">
+              <button class="pick" type="button" role="radio" aria-checked=${r.id === chosen.id} data-source=${r.id}
+                @click=${() => this.emit('recording-choose', { id: r.id })}><span class="dot"></span><span>${r.name ?? 'Unnamed recording'}</span></button>
+              ${r.id === chosen.id ? nothing : html`<button class="plain" type="button" data-edit=${r.id} aria-label=${`Edit ${r.name ?? 'recording'}`}
+                title="Edit the recording and its sync" @click=${() => this.emit('recording-edit', { id: r.id })}>${pencil}</button>`}
+            </div>`)}</div>` : nothing}
             ${this.recordingRow(chosen, on)}
           </div>`}
     </section>`;

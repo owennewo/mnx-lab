@@ -3,8 +3,9 @@
 > **Status: in progress 2026-10-22.** Designed in conversation on 2026-10-22 on the
 > *Mix panel: recordings as channels* canvas
 > (https://claude.ai/artifact/Am8a3S1z8wpfvxQM6yp2h5); the chosen board is *Without M and S:
-> toggles and levels only*. Supersedes the Mix panel's "Play from" radio list
-> ([studio-chrome-sand](../complete/), 2026-10-16) and the loop options' *Click through the loop*
+> toggles and levels only*. Built 2026-10-22, awaiting the owner's hands-on check (by ear: does
+> the synth sit on the video's beat?). Supersedes the Mix panel's "Play from" radio list and its
+> parts' M and S (the Mix panel of 2026-10-16), and the loop options' *Click through the loop*
 > ([studio-player-practice.md](studio-player-practice.md)).
 
 ## The owner's directions (2026-10-22)
@@ -63,6 +64,34 @@ The rate follows whatever leads: while a YouTube video leads, Rate offers YouTub
 - `apps/studio/src/MixSheet.ts`, `PiecePage.ts` — the panel and the stored layers (piece
   preferences: `layers`).
 
+## Checked
+
+- `harness/conformance/mix-layers.test.ts`, on the real synth core: the beat grid; the click on
+  every beat on the synth's clock with no loop; levels switching the click; the warp (a recording
+  that waits 3 s then plays at half speed); the follower — every note once at the recording's
+  time and twice as long, a seek taking back what was sent and restarting at bar 7, a pause
+  silencing it.
+- In a browser on a real YouTube recording with 66 sync points: the synth's and the click's
+  outputs both sounding while the video plays (measured at their gains, not heard); the recording
+  toggled off mid-play hands over to the synth at the same bar, the video closing; the synth and
+  the click switching off and on instantly mid-play.
+- The studio smokes, adapted: the layer toggles, a part's level, the click reaching the tray.
+
+## Open
+
+- **By ear.** How tightly the synth sits on a YouTube recording is the sync's accuracy plus the
+  difference between the iframe's audio path and the synth's; neither has been heard. If the
+  synth runs consistently early or late, a fixed offset belongs in `MediaFollower` (it has none).
+- A recording with no usable sync plays alone: the panel says the synth and the click wait for a
+  sync. A recording's intro and outro (outside its anchors) have no synth either.
+- The sync bar's own click (while editing a sync) is separate from the click layer; both on, both
+  sound.
+
 ## Learnings
 
-(appended as it lands)
+- **Notify loops.** A backend that notifies when set, called from the session's notify handler,
+  re-enters it: what is applied must be noted *before* acting (`Player.applyLayers`), and a level
+  change that changes no snapshot field should not notify at all.
+- **The follower is the click track generalised.** `ClickTrack` already fitted a line through a
+  jittery media clock and scheduled each beat once; following with notes needed the same estimate
+  plus a restart rule (drift past 0.25 s, a rate change, a pause) and a sustained-note re-strike.

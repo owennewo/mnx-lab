@@ -2326,11 +2326,12 @@ export class Player extends LitElement {
   private get chosenRecording() {
     return this.recordings.find(r => r.id === this.sourceId) ?? this.recordings.find(r => r.id === this.recordingChoice) ?? this.recordings[0];
   }
-  /** What the layers sound, as the tray's label says it: "Video + Synth", or "silent". */
-  get layersLabel() {
+  /** What the layers sound, as the tray's label says it: "Video + Synth", or "silent" — with
+   *  `named`, the recording by its name (the field's accessible name). */
+  layersLabel(named = false) {
     const layers = this.layers, chosen = this.chosenRecording;
     if (!layers) return '';
-    const heard = [this.sourceId !== 'synth' && chosen ? (chosen.kind === 'youtube' ? 'Video' : 'Audio') : '',
+    const heard = [this.sourceId !== 'synth' && chosen ? (named ? chosen.name : chosen.kind === 'youtube' ? 'Video' : 'Audio') : '',
       layers.synth ? 'Synth' : '', layers.click ? 'Click' : ''].filter(Boolean);
     return heard.length ? heard.join(' + ') : 'silent';
   }
@@ -2356,12 +2357,12 @@ export class Player extends LitElement {
     const chosen = this.chosenRecording, recordingOn = this.sourceId !== 'synth', level = Math.round(this.volume * 100);
     const toggle = (layer: string, on: boolean, icon: string, name: string, act: () => void) => html`<button type="button" aria-pressed=${on}
       data-layer=${layer} aria-label=${`${name}: ${on ? 'on' : 'off'}`} title=${`${on ? 'Turn off' : 'Play'} ${name}`} @click=${act}>${Player.stroke(icon, 20)}</button>`;
-    return html`<span class="field layers"><span class="lab" aria-hidden="true">Mix · ${this.layersLabel}</span><span class="box" role="group" aria-label="Mix">
+    return html`<span class="field layers"><span class="lab" aria-hidden="true">Mix · ${this.layersLabel()}</span><span class="box" role="group" aria-label="Mix">
         ${chosen ? toggle('recording', recordingOn, chosen.kind === 'youtube' ? Player.LAYER_ICONS.video : Player.LAYER_ICONS.audio, chosen.name, () => this.toggleRecording()) : nothing}
         ${toggle('synth', layers.synth, Player.LAYER_ICONS.synth, 'the synth', () => this.setLayer('synth', !layers.synth))}
         ${toggle('click', layers.click, Player.LAYER_ICONS.click, 'the click', () => this.setLayer('click', !layers.click))}
         <button type="button" class="mix-open" data-mix-open aria-expanded=${mixer.open}
-          aria-label=${`Mix: ${this.layersLabel}, master ${level}`} title="The mix, and the master volume"
+          aria-label=${`Mix: ${this.layersLabel(true)}, master ${level}`} title="The mix, and the master volume"
           @click=${() => this.dispatchEvent(new CustomEvent('mixer-toggle', { bubbles: true, composed: true }))}
         ><span>${level}</span>${Player.stroke(mixer.open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6', 10)}</button>
       </span></span>`;

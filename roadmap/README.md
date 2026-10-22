@@ -148,6 +148,10 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-mix-layers.md](inprogress/studio-mix-layers.md)** — **built 2026-10-22**, awaiting the
+  owner's hands-on check: a recording, the synth and a click as three layers, toggled from the
+  tray's Mix field and headed the same in the Mix panel; the synth follows a recording through its
+  sync; the click sounds every beat; levels only, no mute or solo.
 - **[studio-player-practice.md](inprogress/studio-player-practice.md)** — campaign item 13,
   **built 2026-10-22**, awaiting the owner's hands-on check: the tray's Loop field loops whole
   performed bars (the selection's, or the bar here), handles on the rail, the loop washed and

@@ -70,8 +70,9 @@ of the loop leaves it. In the run-out after a loop (Carry on), Play carries on f
 whenever the loop advances), repeats (∞ / 2 / 4 / 8), then (Stop — parked at the loop's start;
 Carry on — on to the end of the piece; Advance — the loop moves on a bar, the trainer drops back
 to its start, it counts in again, and it stops where it cannot move), gap between repeats (none
-/ 1 bar of silence), speed trainer (start, step, every *n* repeats, up to), click through the
-loop. A rate chosen by hand switches the trainer off. Options are a per-browser preference
+/ 1 bar of silence), speed trainer (start, step, every *n* repeats, up to). The click through
+the loop moved to the mix on 2026-10-22 — a layer on every beat, wherever the time comes from
+([studio-mix-layers.md](studio-mix-layers.md)). A rate chosen by hand switches the trainer off. Options are a per-browser preference
 (`mnx-player-practice`); the loop itself is not persisted.
 
 **How it plays**: the transport's loop became a run of **visits** (`LoopRegion.visits`), each
