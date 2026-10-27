@@ -14,7 +14,10 @@
 //   · A volta (`ending`) with `numbers` is taken only on those iterations of
 //     its strain and skipped wholesale otherwise (its own `repeatEnd`
 //     included — that is what makes second endings continue). An ending
-//     without numbers is never skipped.
+//     without numbers is never skipped. A pass that skips the strain's last
+//     ending still repeats while the strain has passes left: a lone "2." over
+//     :|x3 plays A, A + ending, A (Soundslice's reading; decided 2026-10-27 on
+//     Sun Did Glide).
 //   · A `jump` fires once, at its metric location: both kinds go to the segno
 //     (the first bar carrying one, else the beginning). Only `dsalfine` stops
 //     at `fine`.
@@ -220,8 +223,26 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     const endingEnd = endingStart === undefined ? i : endingStart + Math.max(1, ending?.duration ?? 1) - 1;
     const numbers = ending?.numbers;
     if (numbers && numbers.length > 0 && !numbers.includes(iteration)) {
-      i = endingEnd + 1;
       from = undefined;
+      // Skipping the strain's last ending leaves the strain — unless that ending holds the repeat
+      // sign closing it and passes remain, when the pass repeats anyway: |: A |2. B :|x3 is
+      // A, A B, A (Soundslice reads it so; Sun Did Glide). An open "3." with no repeat sign of its
+      // own (the spec's alternate-endings examples) still just leaves.
+      if (strainEnd[i] !== undefined && endingEnd >= strainEnd[i]!) {
+        let closing: { times?: number } | undefined;
+        for (let k = endingEnd; k >= (endingStart ?? i) && !closing; k--) closing = globals[k]?.repeatEnd;
+        if (closing && iteration < (closing.times ?? 2)) {
+          i = repeatStartIndex;
+          iteration += 1;
+          viaLoop = true;
+          arrival = 'loop';
+          continue;
+        }
+        // The strain is spent; music after it starts over at pass 1.
+        iteration = 1;
+        endingExit = null;
+      }
+      i = endingEnd + 1;
       arrival = 'ending';
       continue;
     }

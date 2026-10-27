@@ -31,7 +31,7 @@
   },
   "converter/Sun-did-glide": {
     "owner": "input-conversion",
-    "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied.",
+    "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied. The repeats are also read differently, on purpose: the Interlude (bars 47-68) is a lone \"2.\" ending holding the :|x3 that closes the 9-68 strain. MuseScore skips it with its repeat sign on passes 1 and 3 (55 bars); MNX Lab follows Soundslice and the recorded performance (A, A + Interlude, A: 153 bars), decided by the owner 2026-10-27.",
     "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
   },
   "converter/Triplets-and-graces": {

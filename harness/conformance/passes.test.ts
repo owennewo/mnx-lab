@@ -53,6 +53,30 @@ describe('linearizePasses', () => {
     expect(model.soundingPasses).toEqual([[1, 2], [1, 2], [1], [2], [1]]);
   });
 
+  it('a lone later ending: passes it is not for still repeat while the strain has passes left', () => {
+    // m0 · |: m1 · m2 | m3 (2.) :|x3 · m4 — Sun Did Glide's Interlude: A, A + Interlude, A, then on
+    const model = linearizePasses(docOf([
+      {},
+      { repeatStart: {} },
+      {},
+      { ending: { numbers: [2], duration: 1 }, repeatEnd: { times: 3 } },
+      {}
+    ]));
+    expect(model.order).toEqual([0, 1, 2, 1, 2, 3, 1, 2, 4]);
+    expect(model.soundingPasses).toEqual([[1], [1, 2, 3], [1, 2, 3], [2], [1]]);
+    expect(model.entries.at(-1)!.iteration).toBe(1);
+    expect(model.diagnostics).toEqual([]);
+
+    // The same with a multi-bar ending and the default two passes: pass 1 skips it and repeats.
+    const twice = linearizePasses(docOf([
+      { repeatStart: {} },
+      { ending: { numbers: [2], duration: 2 } },
+      { repeatEnd: {} },
+      {}
+    ]));
+    expect(twice.order).toEqual([0, 0, 1, 2, 3]);
+  });
+
   it('chained voltas inside one strain: an inner exit does not reset the pass', () => {
     // |: m0 (1.4.) | m1 (1.3.4.) | m2 (1.–4.) :|x4 | m3 — Guitar Pro's shape
     const model = linearizePasses(docOf([

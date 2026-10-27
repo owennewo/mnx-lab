@@ -27,7 +27,7 @@
     "strictTimingChecked": 170,
     "strictTimingExcluded": 4,
     "matchedNotes": 193,
-    "totalOurNotes": 1584,
+    "totalOurNotes": 2213,
     "totalExternalNotes": 3122,
     "observableBarChecks": 48
   },
@@ -14249,7 +14249,7 @@
       "id": "converter/Sun-did-glide",
       "attribution": {
         "owner": "input-conversion",
-        "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied.",
+        "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied. The repeats are also read differently, on purpose: the Interlude (bars 47-68) is a lone \"2.\" ending holding the :|x3 that closes the 9-68 strain. MuseScore skips it with its repeat sign on passes 1 and 3 (55 bars); MNX Lab follows Soundslice and the recorded performance (A, A + Interlude, A: 153 bars), decided by the owner 2026-10-27.",
         "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
       },
       "inputEvidenceSha256": "f62e72f8a6a06be0bdec20de634ded59cba859a5f480be593cc8da280fdaab67",
@@ -15925,8 +15925,7 @@
             {
               "attack": 272,
               "pitches": [
-                52,
-                61
+                52
               ]
             },
             {
@@ -16102,6 +16101,7 @@
               "attack": 301,
               "pitches": [
                 45,
+                68,
                 68
               ]
             },
@@ -16138,69 +16138,68 @@
             {
               "attack": 307,
               "pitches": [
-                45,
-                49,
-                57
+                59
               ]
             },
             {
               "attack": 308,
               "pitches": [
-                59
+                52
               ]
             },
             {
               "attack": 309,
               "pitches": [
-                59
+                56
               ]
             },
             {
               "attack": 310,
               "pitches": [
-                57
+                52
               ]
             },
             {
               "attack": 311,
               "pitches": [
-                59
+                61
               ]
             },
             {
               "attack": 312,
               "pitches": [
-                57
+                56
               ]
             },
             {
               "attack": 313,
               "pitches": [
-                56
+                59
               ]
             },
             {
               "attack": 314,
               "pitches": [
-                54
+                47,
+                61
               ]
             },
             {
               "attack": 315,
               "pitches": [
-                52
+                54
               ]
             },
             {
               "attack": 316,
               "pitches": [
-                54
+                59
               ]
             },
             {
               "attack": 317,
               "pitches": [
-                52
+                49
               ]
             },
             {
@@ -16212,35 +16211,3585 @@
             {
               "attack": 319,
               "pitches": [
-                49
+                54
               ]
             },
             {
               "attack": 320,
               "pitches": [
-                47
+                52
               ]
             },
             {
               "attack": 321,
               "pitches": [
-                49
+                56
               ]
             },
             {
               "attack": 322,
               "pitches": [
-                51
+                59
               ]
             },
             {
               "attack": 323,
               "pitches": [
-                54
+                52
               ]
             },
             {
               "attack": 324,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 325,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 326,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 327,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 328,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 329,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 330,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 331,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 332,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 333,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 334,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 335,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 336,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 337,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 338,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 339,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 340,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 341,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 342,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 343,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 344,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 345,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 346,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 347,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 348,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 349,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 350,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 351,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 352,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 353,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 354,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 355,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 356,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 357,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 358,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 359,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 360,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 361,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 362,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 363,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 364,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 365,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 366,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 367,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 368,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 369,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 370,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 371,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 372,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 373,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 374,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 375,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 376,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 377,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 378,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 379,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 380,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 381,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 382,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 383,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 384,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 385,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 386,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 387,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 388,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 389,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 390,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 391,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 392,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 393,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 394,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 395,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 396,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 397,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 398,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 399,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 400,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 401,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 402,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 403,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 404,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 405,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 406,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 407,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 408,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 409,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 410,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 411,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 412,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 413,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 414,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 415,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 416,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 417,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 418,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 419,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 420,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 421,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 422,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 423,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 424,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 425,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 426,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 427,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 428,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 429,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 430,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 431,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 432,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 433,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 434,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 435,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 436,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 437,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 438,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 439,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 440,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 441,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 442,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 443,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 444,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 445,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 446,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 447,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 448,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 449,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 450,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 451,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 452,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 453,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 454,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 455,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 456,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 457,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 458,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 459,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 460,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 461,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 462,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 463,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 464,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 465,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 466,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 467,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 468,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 469,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 470,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 471,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 472,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 473,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 474,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 475,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 476,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 477,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 478,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 479,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 480,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 481,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 482,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 483,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 484,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 485,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 486,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 487,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 488,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 489,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 490,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 491,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 492,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 493,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 494,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 495,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 496,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 497,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 498,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 499,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 500,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 501,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 502,
+              "pitches": [
+                47,
+                71
+              ]
+            },
+            {
+              "attack": 503,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 504,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 505,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 506,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 507,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 508,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 509,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 510,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 511,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 512,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 513,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 514,
+              "pitches": [
+                47,
+                71
+              ]
+            },
+            {
+              "attack": 515,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 516,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 517,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 518,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 519,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 520,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 521,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 522,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 523,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 524,
+              "pitches": [
+                66
+              ]
+            },
+            {
+              "attack": 525,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 526,
+              "pitches": [
+                49,
+                73
+              ]
+            },
+            {
+              "attack": 527,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 528,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 529,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 530,
+              "pitches": [
+                66
+              ]
+            },
+            {
+              "attack": 531,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 532,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 533,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 534,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 535,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 536,
+              "pitches": [
+                66
+              ]
+            },
+            {
+              "attack": 537,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 538,
+              "pitches": [
+                49,
+                73
+              ]
+            },
+            {
+              "attack": 539,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 540,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 541,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 542,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 543,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 544,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 545,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 546,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 547,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 548,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 549,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 550,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 551,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 552,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 553,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 554,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 555,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 556,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 557,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 558,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 559,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 560,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 561,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 562,
+              "pitches": [
+                47,
+                63
+              ]
+            },
+            {
+              "attack": 563,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 564,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 565,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 566,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 567,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 568,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 569,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 570,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 571,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 572,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 573,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 574,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 575,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 576,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 577,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 578,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 579,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 580,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 581,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 582,
+              "pitches": [
+                44
+              ]
+            },
+            {
+              "attack": 583,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 584,
+              "pitches": [
+                60
+              ]
+            },
+            {
+              "attack": 585,
+              "pitches": [
+                44
+              ]
+            },
+            {
+              "attack": 586,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 587,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 588,
+              "pitches": [
+                44,
+                68
+              ]
+            },
+            {
+              "attack": 589,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 590,
+              "pitches": [
+                60
+              ]
+            },
+            {
+              "attack": 591,
+              "pitches": [
+                44
+              ]
+            },
+            {
+              "attack": 592,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 593,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 594,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 595,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 596,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 597,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 598,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 599,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 600,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 601,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 602,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 603,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 604,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 605,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 606,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 607,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 608,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 609,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 610,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 611,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 612,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 613,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 614,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 615,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 616,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 617,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 618,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 619,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 620,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 621,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 622,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 623,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 624,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 625,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 626,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 627,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 628,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 629,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 630,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 631,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 632,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 633,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 634,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 635,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 636,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 637,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 638,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 639,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 640,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 641,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 642,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 643,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 644,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 645,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 646,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 647,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 648,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 649,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 650,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 651,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 652,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 653,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 654,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 655,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 656,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 657,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 658,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 659,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 660,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 661,
+              "pitches": [
+                45,
+                68,
+                68
+              ]
+            },
+            {
+              "attack": 662,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 663,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 664,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 665,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 666,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 667,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 668,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 669,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 670,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 671,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 672,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 673,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 674,
+              "pitches": [
+                47,
+                61
+              ]
+            },
+            {
+              "attack": 675,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 676,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 677,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 678,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 679,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 680,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 681,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 682,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 683,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 684,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 685,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 686,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 687,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 688,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 689,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 690,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 691,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 692,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 693,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 694,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 695,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 696,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 697,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 698,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 699,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 700,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 701,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 702,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 703,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 704,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 705,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 706,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 707,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 708,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 709,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 710,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 711,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 712,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 713,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 714,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 715,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 716,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 717,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 718,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 719,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 720,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 721,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 722,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 723,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 724,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 725,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 726,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 727,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 728,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 729,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 730,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 731,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 732,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 733,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 734,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 735,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 736,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 737,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 738,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 739,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 740,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 741,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 742,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 743,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 744,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 745,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 746,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 747,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 748,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 749,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 750,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 751,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 752,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 753,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 754,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 755,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 756,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 757,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 758,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 759,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 760,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 761,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 762,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 763,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 764,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 765,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 766,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 767,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 768,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 769,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 770,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 771,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 772,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 773,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 774,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 775,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 776,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 777,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 778,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 779,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 780,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 781,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 782,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 783,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 784,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 785,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 786,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 787,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 788,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 789,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 790,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 791,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 792,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 793,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 794,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 795,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 796,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 797,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 798,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 799,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 800,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 801,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 802,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 803,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 804,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 805,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 806,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 807,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 808,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 809,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 810,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 811,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 812,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 813,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 814,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 815,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 816,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 817,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 818,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 819,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 820,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 821,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 822,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 823,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 824,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 825,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 826,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 827,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 828,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 829,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 830,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 831,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 832,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 833,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 834,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 835,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 836,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 837,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 838,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 839,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 840,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 841,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 842,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 843,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 844,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 845,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 846,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 847,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 848,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 849,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 850,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 851,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 852,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 853,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 854,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 855,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 856,
+              "pitches": [
+                52,
+                61
+              ]
+            },
+            {
+              "attack": 857,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 858,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 859,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 860,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 861,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 862,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 863,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 864,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 865,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 866,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 867,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 868,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 869,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 870,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 871,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 872,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 873,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 874,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 875,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 876,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 877,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 878,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 879,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 880,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 881,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 882,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 883,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 884,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 885,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 886,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 887,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 888,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 889,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 890,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 891,
+              "pitches": [
+                45,
+                49,
+                57
+              ]
+            },
+            {
+              "attack": 892,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 893,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 894,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 895,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 896,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 897,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 898,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 899,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 900,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 901,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 902,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 903,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 904,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 905,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 906,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 907,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 908,
               "pitches": [
                 47,
                 51,
@@ -16249,13 +19798,13 @@
               ]
             },
             {
-              "attack": 325,
+              "attack": 909,
               "pitches": [
                 52
               ]
             },
             {
-              "attack": 326,
+              "attack": 910,
               "pitches": [
                 56
               ]
@@ -21465,9 +25014,9 @@
         }
       },
       "coverage": {
-        "ourGroups": 327,
+        "ourGroups": 911,
         "externalGroups": 326,
-        "ourNotes": 357,
+        "ourNotes": 986,
         "externalNotes": 714,
         "matchedNotes": 0,
         "excludedWrittenSpans": [],
@@ -23148,8 +26697,7 @@
             {
               "attack": 272,
               "pitches": [
-                52,
-                61
+                52
               ]
             },
             {
@@ -23325,6 +26873,7 @@
               "attack": 301,
               "pitches": [
                 45,
+                68,
                 68
               ]
             },
@@ -23361,69 +26910,68 @@
             {
               "attack": 307,
               "pitches": [
-                45,
-                49,
-                57
+                59
               ]
             },
             {
               "attack": 308,
               "pitches": [
-                59
+                52
               ]
             },
             {
               "attack": 309,
               "pitches": [
-                59
+                56
               ]
             },
             {
               "attack": 310,
               "pitches": [
-                57
+                52
               ]
             },
             {
               "attack": 311,
               "pitches": [
-                59
+                61
               ]
             },
             {
               "attack": 312,
               "pitches": [
-                57
+                56
               ]
             },
             {
               "attack": 313,
               "pitches": [
-                56
+                59
               ]
             },
             {
               "attack": 314,
               "pitches": [
-                54
+                47,
+                61
               ]
             },
             {
               "attack": 315,
               "pitches": [
-                52
+                54
               ]
             },
             {
               "attack": 316,
               "pitches": [
-                54
+                59
               ]
             },
             {
               "attack": 317,
               "pitches": [
-                52
+                49
               ]
             },
             {
@@ -23435,35 +26983,3585 @@
             {
               "attack": 319,
               "pitches": [
-                49
+                54
               ]
             },
             {
               "attack": 320,
               "pitches": [
-                47
+                52
               ]
             },
             {
               "attack": 321,
               "pitches": [
-                49
+                56
               ]
             },
             {
               "attack": 322,
               "pitches": [
-                51
+                59
               ]
             },
             {
               "attack": 323,
               "pitches": [
-                54
+                52
               ]
             },
             {
               "attack": 324,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 325,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 326,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 327,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 328,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 329,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 330,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 331,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 332,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 333,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 334,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 335,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 336,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 337,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 338,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 339,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 340,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 341,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 342,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 343,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 344,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 345,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 346,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 347,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 348,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 349,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 350,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 351,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 352,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 353,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 354,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 355,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 356,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 357,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 358,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 359,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 360,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 361,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 362,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 363,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 364,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 365,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 366,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 367,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 368,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 369,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 370,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 371,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 372,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 373,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 374,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 375,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 376,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 377,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 378,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 379,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 380,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 381,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 382,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 383,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 384,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 385,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 386,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 387,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 388,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 389,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 390,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 391,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 392,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 393,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 394,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 395,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 396,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 397,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 398,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 399,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 400,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 401,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 402,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 403,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 404,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 405,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 406,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 407,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 408,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 409,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 410,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 411,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 412,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 413,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 414,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 415,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 416,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 417,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 418,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 419,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 420,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 421,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 422,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 423,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 424,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 425,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 426,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 427,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 428,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 429,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 430,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 431,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 432,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 433,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 434,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 435,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 436,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 437,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 438,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 439,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 440,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 441,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 442,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 443,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 444,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 445,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 446,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 447,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 448,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 449,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 450,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 451,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 452,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 453,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 454,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 455,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 456,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 457,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 458,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 459,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 460,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 461,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 462,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 463,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 464,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 465,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 466,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 467,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 468,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 469,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 470,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 471,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 472,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 473,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 474,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 475,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 476,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 477,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 478,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 479,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 480,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 481,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 482,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 483,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 484,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 485,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 486,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 487,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 488,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 489,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 490,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 491,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 492,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 493,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 494,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 495,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 496,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 497,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 498,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 499,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 500,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 501,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 502,
+              "pitches": [
+                47,
+                71
+              ]
+            },
+            {
+              "attack": 503,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 504,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 505,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 506,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 507,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 508,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 509,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 510,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 511,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 512,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 513,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 514,
+              "pitches": [
+                47,
+                71
+              ]
+            },
+            {
+              "attack": 515,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 516,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 517,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 518,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 519,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 520,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 521,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 522,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 523,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 524,
+              "pitches": [
+                66
+              ]
+            },
+            {
+              "attack": 525,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 526,
+              "pitches": [
+                49,
+                73
+              ]
+            },
+            {
+              "attack": 527,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 528,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 529,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 530,
+              "pitches": [
+                66
+              ]
+            },
+            {
+              "attack": 531,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 532,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 533,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 534,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 535,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 536,
+              "pitches": [
+                66
+              ]
+            },
+            {
+              "attack": 537,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 538,
+              "pitches": [
+                49,
+                73
+              ]
+            },
+            {
+              "attack": 539,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 540,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 541,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 542,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 543,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 544,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 545,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 546,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 547,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 548,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 549,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 550,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 551,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 552,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 553,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 554,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 555,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 556,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 557,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 558,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 559,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 560,
+              "pitches": [
+                64
+              ]
+            },
+            {
+              "attack": 561,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 562,
+              "pitches": [
+                47,
+                63
+              ]
+            },
+            {
+              "attack": 563,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 564,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 565,
+              "pitches": [
+                63
+              ]
+            },
+            {
+              "attack": 566,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 567,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 568,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 569,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 570,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 571,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 572,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 573,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 574,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 575,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 576,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 577,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 578,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 579,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 580,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 581,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 582,
+              "pitches": [
+                44
+              ]
+            },
+            {
+              "attack": 583,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 584,
+              "pitches": [
+                60
+              ]
+            },
+            {
+              "attack": 585,
+              "pitches": [
+                44
+              ]
+            },
+            {
+              "attack": 586,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 587,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 588,
+              "pitches": [
+                44,
+                68
+              ]
+            },
+            {
+              "attack": 589,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 590,
+              "pitches": [
+                60
+              ]
+            },
+            {
+              "attack": 591,
+              "pitches": [
+                44
+              ]
+            },
+            {
+              "attack": 592,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 593,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 594,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 595,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 596,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 597,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 598,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 599,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 600,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 601,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 602,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 603,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 604,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 605,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 606,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 607,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 608,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 609,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 610,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 611,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 612,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 613,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 614,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 615,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 616,
+              "pitches": [
+                46
+              ]
+            },
+            {
+              "attack": 617,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 618,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 619,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 620,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 621,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 622,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 623,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 624,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 625,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 626,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 627,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 628,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 629,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 630,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 631,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 632,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 633,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 634,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 635,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 636,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 637,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 638,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 639,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 640,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 641,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 642,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 643,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 644,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 645,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 646,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 647,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 648,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 649,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 650,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 651,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 652,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 653,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 654,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 655,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 656,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 657,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 658,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 659,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 660,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 661,
+              "pitches": [
+                45,
+                68,
+                68
+              ]
+            },
+            {
+              "attack": 662,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 663,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 664,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 665,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 666,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 667,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 668,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 669,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 670,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 671,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 672,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 673,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 674,
+              "pitches": [
+                47,
+                61
+              ]
+            },
+            {
+              "attack": 675,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 676,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 677,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 678,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 679,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 680,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 681,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 682,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 683,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 684,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 685,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 686,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 687,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 688,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 689,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 690,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 691,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 692,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 693,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 694,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 695,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 696,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 697,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 698,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 699,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 700,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 701,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 702,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 703,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 704,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 705,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 706,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 707,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 708,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 709,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 710,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 711,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 712,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 713,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 714,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 715,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 716,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 717,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 718,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 719,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 720,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 721,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 722,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 723,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 724,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 725,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 726,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 727,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 728,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 729,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 730,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 731,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 732,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 733,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 734,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 735,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 736,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 737,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 738,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 739,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 740,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 741,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 742,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 743,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 744,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 745,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 746,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 747,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 748,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 749,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 750,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 751,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 752,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 753,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 754,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 755,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 756,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 757,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 758,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 759,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 760,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 761,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 762,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 763,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 764,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 765,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 766,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 767,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 768,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 769,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 770,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 771,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 772,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 773,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 774,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 775,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 776,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 777,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 778,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 779,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 780,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 781,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 782,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 783,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 784,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 785,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 786,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 787,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 788,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 789,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 790,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 791,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 792,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 793,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 794,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 795,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 796,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 797,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 798,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 799,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 800,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 801,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 802,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 803,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 804,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 805,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 806,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 807,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 808,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 809,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 810,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 811,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 812,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 813,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 814,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 815,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 816,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 817,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 818,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 819,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 820,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 821,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 822,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 823,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 824,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 825,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 826,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 827,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 828,
+              "pitches": [
+                52,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 829,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 830,
+              "pitches": [
+                47,
+                59,
+                61
+              ]
+            },
+            {
+              "attack": 831,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 832,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 833,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 834,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 835,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 836,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 837,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 838,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 839,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 840,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 841,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 842,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 843,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 844,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 845,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 846,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 847,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 848,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 849,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 850,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 851,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 852,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 853,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 854,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 855,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 856,
+              "pitches": [
+                52,
+                61
+              ]
+            },
+            {
+              "attack": 857,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 858,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 859,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 860,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 861,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 862,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 863,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 864,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 865,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 866,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 867,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 868,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 869,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 870,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 871,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 872,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 873,
+              "pitches": [
+                47,
+                68
+              ]
+            },
+            {
+              "attack": 874,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 875,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 876,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 877,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 878,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 879,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 880,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 881,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 882,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 883,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 884,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 885,
+              "pitches": [
+                45,
+                68
+              ]
+            },
+            {
+              "attack": 886,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 887,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 888,
+              "pitches": [
+                45
+              ]
+            },
+            {
+              "attack": 889,
+              "pitches": [
+                61
+              ]
+            },
+            {
+              "attack": 890,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 891,
+              "pitches": [
+                45,
+                49,
+                57
+              ]
+            },
+            {
+              "attack": 892,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 893,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 894,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 895,
+              "pitches": [
+                59
+              ]
+            },
+            {
+              "attack": 896,
+              "pitches": [
+                57
+              ]
+            },
+            {
+              "attack": 897,
+              "pitches": [
+                56
+              ]
+            },
+            {
+              "attack": 898,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 899,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 900,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 901,
+              "pitches": [
+                52
+              ]
+            },
+            {
+              "attack": 902,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 903,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 904,
+              "pitches": [
+                47
+              ]
+            },
+            {
+              "attack": 905,
+              "pitches": [
+                49
+              ]
+            },
+            {
+              "attack": 906,
+              "pitches": [
+                51
+              ]
+            },
+            {
+              "attack": 907,
+              "pitches": [
+                54
+              ]
+            },
+            {
+              "attack": 908,
               "pitches": [
                 47,
                 51,
@@ -23472,13 +30570,13 @@
               ]
             },
             {
-              "attack": 325,
+              "attack": 909,
               "pitches": [
                 52
               ]
             },
             {
-              "attack": 326,
+              "attack": 910,
               "pitches": [
                 56
               ]
@@ -25855,12 +32953,40 @@
           },
           {
             "code": "omitted-voice-expression",
-            "soundingId": "s355",
+            "soundingId": "s342",
+            "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+          },
+          {
+            "code": "omitted-voice-expression",
+            "soundingId": "s613",
+            "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+          },
+          {
+            "code": "omitted-voice-expression",
+            "soundingId": "s677",
+            "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+          },
+          {
+            "code": "omitted-voice-expression",
+            "soundingId": "s728",
+            "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+          },
+          {
+            "code": "omitted-voice-expression",
+            "soundingId": "s984",
             "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
           }
         ]
       },
       "compilerDiagnostics": [
+        {
+          "code": "string-conflict",
+          "message": "Simultaneous attacks on one string use independent fallback voices."
+        },
+        {
+          "code": "string-conflict",
+          "message": "Simultaneous attacks on one string use independent fallback voices."
+        },
         {
           "code": "string-conflict",
           "message": "Simultaneous attacks on one string use independent fallback voices."
