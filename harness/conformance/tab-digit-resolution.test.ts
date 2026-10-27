@@ -206,6 +206,29 @@ describe('resolved enterFret session intents', () => {
     expect(session.appliedOps).toHaveLength(1);
   });
 
+  it('refuses, with a reason, a fret typed inside a rest it cannot split', () => {
+    // Cormorant bar 7's shape: voice 1 one long rest, voice 2 four thumb quarters on string 4.
+    // Reading voice 1 at beat 2, the cursor stands inside that rest. The fret used to report
+    // success and vanish (2026-10-27); it is refused now, and says why.
+    const initial = entryDoc();
+    const quarter = { duration: { base: 'quarter' }, notes: [{ pitch: { step: 'D', octave: 3 }, _x: { mnxLab: { string: 4, fret: 0 } } }] };
+    initial.parts[0].measures[0].sequences.push({ voice: 'v2', content: [quarter, quarter, quarter, quarter] } as never);
+    const session = new EditorSession(structuredClone(initial), 'tab-entry');
+    expect(session.handleIntent({ type: 'jumpUp' })).toBe(true);
+    expect(session.cursor.voiceIndex ?? 0).toBe(0);
+    expect(session.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(session.cursor.onset).toEqual({ num: 1, den: 4 });
+    expect(session.handleIntent({ type: 'enterFret', fret: 3 })).toBe(false);
+    expect(session.lastRefusal).toBe('inside-event');
+    expect(session.doc).toEqual(initial);
+    expect(session.appliedOps).toEqual([]);
+    // Where the rest begins, the same fret is taken — and the reason does not linger.
+    expect(session.handleIntent({ type: 'prevPosition' })).toBe(true);
+    expect(session.cursor.onset).toEqual({ num: 0, den: 1 });
+    expect(session.handleIntent({ type: 'enterFret', fret: 3 })).toBe(true);
+    expect(session.lastRefusal).toBeNull();
+  });
+
   it('refuses an empty cell without a fingerboard and out-of-range frets', () => {
     const noFingerboard = new EditorSession(entryDoc(false));
     expect(noFingerboard.handleIntent({ type: 'enterFret', fret: 5 })).toBe(false);

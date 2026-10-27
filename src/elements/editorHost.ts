@@ -547,7 +547,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
     const deleted = intent.type === 'delete' ? session.lastDelete : null;
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
-    if (!handled) options.onRefused?.(intent, 'unavailable');
+    if (!handled) options.onRefused?.(intent, session.lastRefusal ?? 'unavailable');
     settle(intent.type === 'goToPointer');
     if (handled && AUDITION_MOVES.has(intent.type)) audition(intent.type === 'goToPointer');
     else if (handled && !NAVIGATION.has(intent.type)) auditionEdit(before);

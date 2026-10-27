@@ -36,6 +36,13 @@ describe('refusalNotice', () => {
     expect(notice!.message).toMatch(/current/i);
   });
 
+  it('says why a note cannot go inside another note or rest', () => {
+    const notice = refusalNotice(FRET, 'inside-event');
+    expect(notice!.ok).toBe(false);
+    expect(notice!.message).toMatch(/inside another note or rest/i);
+    expect(notice!.message).toMatch(/where one begins/i);
+  });
+
   it('speaks for an edit the session itself declined', () => {
     expect(refusalNotice(FRET, 'unavailable')).not.toBeNull();
   });

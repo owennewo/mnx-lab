@@ -180,8 +180,10 @@ export function deleteSelectionNotice(outcome: DeleteOutcome): ClipboardNotice {
  *  - `unavailable` — the session declined: a rung this document does not
  *    present, an edit this position cannot take.
  *  - `playing` — nothing is edited while the music plays (core-single-cursor.md).
+ *  - `inside-event` — a note typed inside another note or rest, which the editor
+ *    cannot split yet; it may only go where one begins.
  */
-export type RefusalReason = 'read-only' | 'suspended' | 'unavailable' | 'playing';
+export type RefusalReason = 'read-only' | 'suspended' | 'unavailable' | 'playing' | 'inside-event';
 
 /**
  * One sentence for a refusal, or NOTHING where silence is the honest answer.
@@ -205,5 +207,7 @@ export function refusalNotice(intent: EditorIntent, reason: RefusalReason): Clip
     return { ok: false, message: 'This is an older version — go back to the current one to edit it, or make this one current.' };
   if (reason === 'read-only')
     return { ok: false, message: 'This piece is open in another tab, so it is read only here. Close the other tab and reload to edit.' };
+  if (reason === 'inside-event')
+    return { ok: false, message: 'A note can\u2019t start inside another note or rest yet \u2014 only where one begins.' };
   return { ok: false, message: 'That can\u2019t be done here.' };
 }

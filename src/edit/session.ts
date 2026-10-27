@@ -111,6 +111,10 @@ const DURATION_LADDER: MnxNoteValueBase[] = [
  * `cleared` is press 1 (`thenRemoves` says whether a press 2 is waiting),
  * `removed` is press 2, and `refused` is the case that used to be silence.
  */
+/** A refusal the session can explain: `inside-event` — a fret typed where no note or rest begins,
+ *  inside one the editor cannot split yet. */
+export type SessionRefusal = 'inside-event';
+
 export type DeleteOutcome =
   | { kind: 'cleared'; level: SelectionLevel; notes: number; thenRemoves: boolean }
   | { kind: 'removed'; level: SelectionLevel; members: number }
@@ -150,6 +154,7 @@ export class EditorSession {
    *  dotted quarter stepping to an eighth stays dotted — as it does in every
    *  editor a player has used. */
   private lastDeleteOutcome: DeleteOutcome | null = null;
+  private lastRefusalReason: SessionRefusal | null = null;
   /** The armed end of a spanner-in-progress (campaign item 10): a note key, or
    *  null. The keyboard names two places in two presses because the ladder
    *  cannot yet extend laterally; when it can, "slur the selected run" becomes
@@ -328,6 +333,12 @@ export class EditorSession {
    *  sentence can never be shown for a keystroke that was not a delete. */
   get lastDelete(): DeleteOutcome | null {
     return this.lastDeleteOutcome;
+  }
+
+  /** Why the last intent was declined, when the session can say more than "not here" — so a
+   *  fret typed into the middle of a note or rest names the reason instead of vanishing. */
+  get lastRefusal(): SessionRefusal | null {
+    return this.lastRefusalReason;
   }
 
   get resolvedSelection(): ResolvedSelection {
@@ -603,6 +614,7 @@ export class EditorSession {
     // Delete's outcome describes ONE keystroke, so anything else discards it.
     // A notice that outlived its keystroke would report the previous press.
     if (intent.type !== 'delete') this.lastDeleteOutcome = null;
+    this.lastRefusalReason = null;
     if (isNavigationIntent(intent)) return this.navigate(intent);
     // Provenance for the op queue: apply() stamps the intent being handled
     // into the history entry (forward-recorded, never inferred).
@@ -1747,6 +1759,9 @@ export class EditorSession {
       // Nothing on this string at this position: insert. Only meaningful on
       // the fingerboard — in ordinal mode (no tab part) digits need a note.
       if (!tab) return false;
+      // The insert cannot split a note or rest yet: an onset INSIDE one changes nothing. That used
+      // to report success and the typed fret simply vanished (Cormorant bar 7, 2026-10-27).
+      const before = JSON.stringify(this.doc);
       // A rest keeps its own duration when it takes a pitch; `duration` is
       // only for an onset with nothing at all, which padded bars do not have.
       this.applyEntry({
@@ -1758,6 +1773,12 @@ export class EditorSession {
         duration: { base: 'quarter' },
         ...this.entryTarget
       });
+      if (JSON.stringify(this.doc) === before) {
+        this.history.undo();
+        this.reindex();
+        this.lastRefusalReason = 'inside-event';
+        return false;
+      }
       this.standOnEntered();
     }
     return true;
