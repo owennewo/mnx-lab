@@ -5,6 +5,8 @@ dist/
 .dev.vars.*
 !.dev.vars.example
 .secrets/
+# Agents' durable scratch space (research code, logs): survives reboots, never committed
+.scratchpad/
 .wrangler/
 *.log
 .DS_Store
