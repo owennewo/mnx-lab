@@ -196,6 +196,9 @@ export function linearizePasses(doc: MnxStructure): PassModel {
   // without looping means the strain resolved through its final ending, and
   // the music after it starts over at pass 1.
   let endingExit: number | null = null;
+  // The strain (by its last bar) whose passes a repeat sign has just used up — "1.3." spends it on
+  // pass 3 — so skipping its "2." afterwards leaves rather than loops.
+  let spentStrain: number | undefined;
   let steps = 0;
 
   const segno = globals.findIndex(m => m.segno !== undefined);
@@ -214,6 +217,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     if (!viaLoop && measure.repeatStart !== undefined) {
       repeatStartIndex = i;
       iteration = 1;
+      spentStrain = undefined;
     }
     viaLoop = false;
     // A numbered volta not for this iteration: step over its whole span,
@@ -231,7 +235,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       if (strainEnd[i] !== undefined && endingEnd >= strainEnd[i]!) {
         let closing: { times?: number } | undefined;
         for (let k = endingEnd; k >= (endingStart ?? i) && !closing; k--) closing = globals[k]?.repeatEnd;
-        if (closing && iteration < (closing.times ?? 2)) {
+        if (closing && spentStrain !== strainEnd[i] && iteration < (closing.times ?? 2)) {
           i = repeatStartIndex;
           iteration += 1;
           viaLoop = true;
@@ -302,6 +306,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
         iteration = 1;
         repeatStartIndex = startAt[i]!;
         endingExit = null;
+        spentStrain = undefined;
         continue;
       }
     }
@@ -335,6 +340,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       iteration = 1;
       repeatStartIndex = startAt[i]!;
       endingExit = null;
+      spentStrain = undefined;
       continue;
     }
     if (measure.repeatEnd !== undefined) {
@@ -348,6 +354,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       // The strain is spent; music after it starts over at pass 1.
       iteration = 1;
       endingExit = null;
+      spentStrain = strainEnd[i];
     }
     if (endingExit !== null && i >= endingExit) {
       iteration = 1;

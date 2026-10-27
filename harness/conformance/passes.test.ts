@@ -77,6 +77,24 @@ describe('linearizePasses', () => {
     expect(twice.order).toEqual([0, 0, 1, 2, 3]);
   });
 
+  it('a strain spent through an earlier ending is left, not looped, when its later ending is skipped', () => {
+    // m0 · |: m1 · m2 (1.3.) :| · m3 m4 (2.) :|x3 · m5 — the same shape written with standard voltas.
+    // Pass 3 spends the strain at m2; skipping the "2." after it must leave (MuseScore agrees).
+    const expected = [0, 1, 2, 1, 3, 4, 1, 2, 5];
+    for (const first of [{}, { times: 3 }]) {
+      const model = linearizePasses(docOf([
+        {},
+        { repeatStart: {} },
+        { ending: { numbers: [1, 3], duration: 1 }, repeatEnd: first },
+        { ending: { numbers: [2], duration: 2 } },
+        { repeatEnd: { times: 3 } },
+        {}
+      ]));
+      expect(model.truncated).toBe(false);
+      expect(model.order).toEqual(expected);
+    }
+  });
+
   it('chained voltas inside one strain: an inner exit does not reset the pass', () => {
     // |: m0 (1.4.) | m1 (1.3.4.) | m2 (1.–4.) :|x4 | m3 — Guitar Pro's shape
     const model = linearizePasses(docOf([
