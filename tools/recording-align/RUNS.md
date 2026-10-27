@@ -22,6 +22,12 @@ to do — each is a gap to close.
   methods decide nothing; what matters is a bar or a beat in the wrong place — the order, the
   margin over chance, the weak bars. Run 3's ±11 ms between speeds was measured against
   full speed's own sync, so it says neither is more precise.
+- **Tuning readings of +33 cents were Basic Pitch's**, not the recordings': +33 is one of its
+  pitch-bend steps (a third of a semitone). Measured from the audio (run 7), Teen Spirit is +7
+  and the Quaker +0.
+- A transcriber that hears fewer stray notes is worth more than one that finds a few more of
+  the score's: it lowers chance, and the margin is what keeps a lookalike passage out (run 7:
+  Sun Did Glide's outro, which Basic Pitch took for bars 9–14).
 
 ## Open questions
 
@@ -29,8 +35,9 @@ to do — each is a gap to close.
   choose, and should the tool help edit the score's repeats? Run 4: the owner chose to
   restructure the score, once three recordings showed the score was the outlier; the edit
   needed a hand-written script (gap 6 below), so yes, the tool should help.
-- A singer: Basic Pitch transcribes the voice too. Is pitch-class matching enough, or is a
-  source-separation step needed?
+- A singer: answered in runs 6–7. MuScriptor told `--instruments acoustic_guitar,voice` keeps
+  the voice out of the guitar's notes, as well as separating it does; a band under the guitar
+  still wants separation (Step 3).
 - Recordings longer than ~4 minutes: the search drops to 20 ms frames there; is that enough?
 - **Half-speed transcription** (`transcribe --half-speed`): on a fast piece with triplets, does
   it beat full speed on found − chance, weak bars or bar placement? Run 3 is the control at
@@ -195,3 +202,61 @@ to do — each is a gap to close.
   oracle check: no errors in 33 bars.
 - **Owner**: "Wow - you did brilliantly" (2026-10-22, after the PDF check).
 - **Time**: one session; reading the 33 bars was most of it.
+
+## Run 6 — 2026-10-27 — Sun Did Glide (Chris Brain), the owner's own transcription
+
+- **Piece** `dcbc40c2dcd33f45` — the owner's transcription (the only one there is), EADGAE capo 4,
+  160 bpm marked; vocal + guitar. **Recording** YouTube `iol5eETQsqw`, 231 s, synced earlier in
+  Soundslice (154 points).
+- **The score's notation ≠ studio's reading**: the Interlude (bars 47–68) was a lone "2." ending
+  holding the `:|x3` of the 9–68 strain. Soundslice and the performer read A, A + Interlude, A
+  (153 bars); `passes.ts` took the skipped ending's repeat sign with it (55 bars), so in studio
+  the sync was right only through bar 46. Fixed in `passes.ts` at the owner's word (c4205727,
+  then 5721c252 for a loop it introduced on "1.3. / 2."). MuseScore reads the old way (55 bars);
+  tested on tiny scores, the notation all three agree on is "1.3." on bar 46 with `:|`, a copy of
+  bar 46 starting "2." through the Interlude — written so at the owner's choice (78 bars).
+- **Method**: vocals out (BS-RoFormer) then htdemucs_6s's guitar stem; the bar search on the
+  stem with the recording's 153-bar order (score.json's `order`, `edges` and the never-performed
+  bars 47–68 in `written` filled in by hand, before the `passes.ts` fix); bars 75–77, a
+  ritardando to ~107 bpm outside the search's tempo range, placed by hand on heard downbeats.
+- **Found** (Basic Pitch): 88% exact against 21% chance; downbeats median 7 ms; 154–175 bpm.
+- **The Soundslice sync was early**: MuScriptor's notes (not used in the fit) within ±70 ms of
+  it 51%, of the new sync 92% (±40 ms: 27% → 91%).
+- **Written**: `sync --write --replace` at the owner's word — 153 segments, 154 cuts (148
+  snapped); rewritten with the same cuts when bar 46 was split, to rename the segments.
+- **Checking the transcription**: written notes no listener hears in any pass, and notes ≥ 2
+  listeners hear in every pass but not written (`disagreements.py` in the session's research
+  code), each shown to the owner as score bar + pass with the video time and per-pass evidence.
+  The owner settled them by ear: 14 changes, 4 left as written (heard by eye, too quiet to
+  hear), one dead note marked (an attack with no pitch: a low thud plus a high click).
+- **Improvised** (each a gap to close):
+  1. A recording that plays more of the score than `passes.ts` performs: no way to give the
+     search another order → score.json edited by hand. Fixed at the root (`passes.ts`).
+  2. A ritardando ending beyond the search's tempo range → bars placed by hand. Run 5 had one
+     too; `close_ending` places one or two bars, not three slowing bars.
+  3. Editing the owner's score (add, remove, retune notes; split a bar; mark a dead note) →
+     hand-written scripts over the MNX document, each checked by a storage round trip and a
+     bar-by-bar diff before saving. The tool should help (run 4's gap 6 again).
+- **Owner**: settled every finding by ear; the sync itself not yet judged.
+
+## Run 7 — 2026-10-27 — MuScriptor in place of Basic Pitch, against the recorded runs
+
+- **Why**: on drafting tests MuScriptor (medium) found 92–95% of notes where Basic Pitch found
+  79–84%, held on Sun Did Glide, which no model can have trained on. The owner chose to replace
+  Basic Pitch outright.
+- **Regression**, the same audio through both (dry runs):
+
+  | run | order (Basic Pitch / MuScriptor) | found exact vs chance | margin | weak bars | vs stored sync |
+  |---|---|---|---|---|---|
+  | 1 Jansch | 44/56 both | 85/19 → 86/11 | 66 → 75 | 2 / 2 | 2/20 ms → mean 12, max 39 ms |
+  | 4 Quaker | 57/57 · 56/57 | 77/37 → 71/25 | 40 → 46 | 2 / 4 | last bar unplaced; one point 130 ms |
+  | 5 Teen Spirit | 65/65 both | 89/13 → 92/9 | 76 → 83 | 1 / 1 | last bar + end 250–270 ms |
+  | 6 Sun Did Glide | departs at the outro · follows | 88/21 → 92/13 | 67 → 79 | 2 / 0 | bar 76 200 ms |
+
+  Mid-piece the two place bar lines within ~40 ms of each other everywhere; every larger
+  difference is a final bar in a ritardando. MuScriptor is weaker on the Quaker's fast triplet
+  eighths (half as many notes heard) and leaves its last bar unplaced.
+- **Changed**: `align.py transcribe` runs MuScriptor (`--instruments`, `--keep`), `check` reads
+  tuning measured from the audio, the skill's environment is `~/.venvs/muscriptor`, and the Jansch
+  gate is re-baselined (Step 8). MuScriptor is deterministic: two runs, byte-identical notes.
+

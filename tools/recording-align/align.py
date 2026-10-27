@@ -1,18 +1,21 @@
 """The audio half of recording alignment (.claude/skills/sync-recording).
 
-Run with the Basic Pitch environment's Python, isolated (-I), passing paths — never from
-inside the directory holding downloaded audio:
+Run with the MuScriptor environment's Python (README: setting it up), isolated (-I), passing
+paths — never from inside the directory holding downloaded audio:
 
-    PY=~/dev/guitar-nn/.venv-basic-pitch/bin/python
+    PY=~/.venvs/muscriptor/bin/python
     $PY -I tools/recording-align/align.py <command> --out <dir>
 
-    transcribe   audio/mono.wav → notes.json + transcription.mid (Basic Pitch)
-                 [--half-speed [--audio <wav>]]: transcribe a pitch-preserving half-speed
-                 stretch (Rubber Band, crisp transients) and scale the times back — an
-                 experiment for fast passages; see RUNS.md before relying on it
+    transcribe   the recording → notes.json + transcription.mid (MuScriptor, medium)
+                 reads audio/source.wav (else audio/mono.wav), or --audio <wav>;
+                 --instruments g1,g2 tells MuScriptor what plays (default acoustic_guitar; add
+                 voice for a singer) and --keep which of them to keep (default: all but voice);
+                 [--half-speed]: transcribe a pitch-preserving half-speed stretch (Rubber Band,
+                 crisp transients) and scale the times back — a Basic Pitch-era experiment, not
+                 yet tried with MuScriptor; see RUNS.md before relying on it
     check        does the recording sound like the score at all: key/capo shift, tuning, density
     structure    which written bar is played when → structure.json + report.md
-    selftest     the bar search against synthetic performances (no audio, no Basic Pitch)
+    selftest     the bar search against synthetic performances (no audio, no transcriber)
 
 Reads score.json from align.ts. Every step writes what it found into --out.
 """
@@ -42,32 +45,52 @@ def save(out, name, value):
 HALF_SPEED_FILTER = 'rubberband=tempo=0.5:transients=crisp:detector=percussive'
 
 
-def transcribe(out, half_speed=False, audio=None):
+MODEL = 'medium'   # small drops half the notes of a separated stem (RUNS.md run 7); large needs > 6 GB
+
+
+def transcribe(out, half_speed=False, audio=None, instruments='acoustic_guitar', keep=None):
+    """MuScriptor (Kyutai/Mirelo, CC-BY-NC weights: non-commercial use) from this environment. It is
+    deterministic, gives no loudness (amp is 1) and ends every note at the next onset of any note, so
+    a note's end is not its length. Tuning comes from the audio itself (librosa)."""
     import subprocess
-    from basic_pitch.inference import predict
-    from basic_pitch import ICASSP_2022_MODEL_PATH
-    wav = audio or os.path.join(out, 'audio', 'mono.wav')
+    import librosa
+    import mido
+    wav = audio or next(p for p in (os.path.join(out, 'audio', 'source.wav'), os.path.join(out, 'audio', 'mono.wav')) if os.path.exists(p))
     scale = 1.0
     if half_speed:
-        # Same pitch, twice as long: Basic Pitch hears a fast passage as a slow one. Its
-        # frames and its 58 ms shortest note then cover half as much of the real music.
+        # Same pitch, twice as long: a fast passage heard as a slow one.
         os.makedirs(os.path.join(out, 'audio'), exist_ok=True)
-        slow = os.path.join(out, 'audio', 'mono-half.wav')
-        subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', wav, '-af', HALF_SPEED_FILTER, '-ar', '22050', slow], check=True)
+        slow = os.path.join(out, 'audio', 'half.wav')
+        subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', wav, '-af', HALF_SPEED_FILTER, slow], check=True)
         wav, scale = slow, 0.5
-    _, midi, notes = predict(wav, ICASSP_2022_MODEL_PATH, onset_threshold=0.5, frame_threshold=0.3, minimum_note_length=58)
-    for instrument in midi.instruments:
-        for note in instrument.notes:
-            note.start, note.end = note.start * scale, note.end * scale
-        for bend in instrument.pitch_bends:
-            bend.time *= scale
-    midi.write(os.path.join(out, 'transcription.mid'))
-    heard = [{'start': float(s) * scale, 'end': float(e) * scale, 'pitch': int(p), 'amp': float(a), 'bends': [int(b) for b in (bd or [])]}
-             for s, e, p, a, bd in sorted(notes, key=lambda n: (n[0], n[2]))]
+    groups = [g.strip() for g in instruments.split(',') if g.strip()]
+    kept = set(keep.split(',')) if keep else {g for g in groups if g != 'voice'}
+    events_path = os.path.join(out, 'transcription.events.json')
+    cli = os.path.join(os.path.dirname(sys.executable), 'muscriptor')
+    subprocess.run([cli, 'transcribe', wav, '-m', MODEL, '-f', 'json', '-o', events_path, '--instruments', ','.join(groups),
+                    '--detect-tempo', 'false'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    events = load(out, 'transcription.events.json')
+    starts = {e['index']: e for e in events if e['type'] == 'start'}
+    heard = sorted(({'start': starts[e['start_event_index']]['start_time'] * scale, 'end': e['end_time'] * scale,
+                     'pitch': int(starts[e['start_event_index']]['pitch']), 'amp': 1.0, 'bends': []}
+                    for e in events if e['type'] == 'end' and e['start_event_index'] in starts
+                    and starts[e['start_event_index']]['instrument'] in kept), key=lambda n: (n['start'], n['pitch']))
     save(out, 'notes.json', heard)
-    save(out, 'transcription.json', {'speed': scale, 'filter': HALF_SPEED_FILTER if half_speed else None, 'source': os.path.abspath(wav)})
+    midi = mido.MidiFile(ticks_per_beat=480)
+    track = mido.MidiTrack(); midi.tracks.append(track)
+    tick = lambda s: int(round(s * 960))   # 120 bpm: 960 ticks a second
+    messages = sorted([(tick(n['start']), 1, n['pitch']) for n in heard] + [(tick(n['end']), 0, n['pitch']) for n in heard])
+    now = 0
+    for at, on, pitch in messages:
+        track.append(mido.Message('note_on' if on else 'note_off', note=pitch, velocity=80 if on else 0, time=at - now)); now = at
+    midi.save(os.path.join(out, 'transcription.mid'))
+    y, sr = librosa.load(wav, sr=22050, mono=True)
+    cents = float(librosa.estimate_tuning(y=y, sr=sr)) * 100
+    save(out, 'transcription.json', {'listener': 'muscriptor', 'model': MODEL, 'instruments': groups, 'kept': sorted(kept),
+                                     'speed': scale, 'filter': HALF_SPEED_FILTER if half_speed else None,
+                                     'source': os.path.abspath(wav), 'tuningCents': round(cents, 1)})
     print(f'{len(heard)} notes over {heard[0]["start"]:.1f}–{max(n["end"] for n in heard):.1f} s'
-          f'{" (transcribed at half speed, times scaled back)" if half_speed else ""}' if heard else 'no notes heard')
+          f'{" (transcribed at half speed, times scaled back)" if half_speed else ""}; tuning {cents:+.0f} cents' if heard else 'no notes heard')
 
 
 # ---------------------------------------------------------------- check
@@ -86,8 +109,10 @@ def check(out):
     fits = {k: float(ha @ np.roll(hs, k)) for k in range(-6, 6)}
     best = max(fits, key=fits.get)
     runner = max(v for k, v in fits.items() if k != best)
+    # Tuning as transcribe measured it from the audio; a Basic Pitch-era run carries bends instead.
+    meta = load(out, 'transcription.json') if os.path.exists(os.path.join(out, 'transcription.json')) else {}
     bends = [b for n in heard for b in n['bends']]
-    cents = float(np.median(bends)) * 100 / 3 if bends else 0.0   # Basic Pitch bends: 1/3-semitone bins
+    cents = meta.get('tuningCents', float(np.median(bends)) * 100 / 3 if bends else 0.0)
     span = max(n['end'] for n in heard) - heard[0]['start']
     marked = score['tempo'][0]['bpm'] if score['tempo'] else None
     score_seconds = (score['measures'][-1]['position'] + score['measures'][-1]['duration']) * 4 * 60 / (marked or 120)
@@ -434,10 +459,13 @@ if __name__ == '__main__':
     parser.add_argument('command', choices=['transcribe', 'check', 'structure', 'selftest'])
     parser.add_argument('--out', default='.')
     parser.add_argument('--half-speed', action='store_true', help='transcribe: a half-speed stretch, times scaled back')
-    parser.add_argument('--audio', help='transcribe: the audio to read instead of <out>/audio/mono.wav')
+    parser.add_argument('--audio', help='transcribe: the audio to read instead of <out>/audio/source.wav (else mono.wav)')
+    parser.add_argument('--instruments', default='acoustic_guitar',
+                        help='transcribe: MuScriptor instrument groups playing (muscriptor list-instruments); add voice for a singer')
+    parser.add_argument('--keep', help='transcribe: groups whose notes to keep (default: all of --instruments but voice)')
     a = parser.parse_args()
     out = os.path.abspath(a.out)
     if a.command == 'transcribe':
-        transcribe(out, a.half_speed, a.audio and os.path.abspath(a.audio))
+        transcribe(out, a.half_speed, a.audio and os.path.abspath(a.audio), a.instruments, a.keep)
     else:
         {'check': check, 'structure': structure, 'selftest': selftest}[a.command](out)

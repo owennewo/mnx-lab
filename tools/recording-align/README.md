@@ -11,9 +11,9 @@ Two halves, split by what each needs:
   the library stores it (`fetch`), the score as the player performs it (`score`), the
   recording's audio (`audio`), and the sync as the sync bar edits it (`sync`, built with
   `segmentsFromBarStarts` in `src/model/syncSegments.ts` and checked by studio's decoders).
-- **`align.py`** (the Basic Pitch environment's Python, numpy only beyond Basic Pitch) does
-  the audio: `transcribe`, `check` (key/capo, tuning, density), `structure` (the free-order
-  bar search and its report) and `selftest` (the search on synthetic performances).
+- **`align.py`** (the MuScriptor environment's Python, below) does the audio: `transcribe`
+  (MuScriptor), `check` (key/capo, tuning, density), `structure` (the free-order bar search and
+  its report) and `selftest` (the search on synthetic performances).
 
 Each command reads and writes files in `--out`:
 
@@ -22,13 +22,34 @@ Each command reads and writes files in `--out`:
 | `piece.json`, `score.mnx.json` | `fetch` | the piece, its recording, its stored score |
 | `score.json` | `score` | performed order, bars, notes, the score's own jumps |
 | `audio/mono.wav` | `audio` | 22.05 kHz mono; downloaded data, kept apart |
-| `notes.json`, `transcription.mid`, `transcription.json` | `transcribe` | what Basic Pitch heard, and at which speed (`--half-speed`: a pitch-preserving stretch, times scaled back) |
+| `notes.json`, `transcription.mid`, `transcription.json`, `transcription.events.json` | `transcribe` | what MuScriptor heard (its raw events too), which instruments were asked for and kept, the tuning measured from the audio, and at which speed (`--half-speed`: a pitch-preserving stretch, times scaled back) |
 | `check.json` | `check` | key fit by shift, tuning, density, flags |
 | `structure.json`, `report.md` | `structure` | bar by bar: when, how fast, notes found |
 | `sync-payload.json` | `sync` | the segments and sync points that would be written |
 | `screen/pages.json`, `screen/page-NN*.png` | `screen.py pages` | the notation a video shows: when each page is on screen, each page and overlapping slices of it |
 | `score.gp`, `score.built.mnx.json`, `score.storage.json`, `score.mnx.json`, `preview.png` | `build` | from `score.tab.txt`: the `.gp` studio would store, the built document, its storage check, the document read back from the `.gp` (what `score` reads), a picture of it |
 | `piece.json` | `create`, `attach` | the piece made from `score.gp`, then the recording put on it |
+
+## The MuScriptor environment
+
+`transcribe` runs [MuScriptor](https://github.com/muscriptor/muscriptor) (Kyutai and Mirelo,
+2026) — it replaced Basic Pitch on 2026-10-27 (RUNS.md run 7: a wider margin over chance on all
+four recorded runs). Its code is MIT; **its weights are CC-BY-NC: non-commercial use only**, so
+it serves the owner's own library and research, never anything sold or commercially hosted. The
+weights are gated: log in to Hugging Face once and accept the licence on the
+[medium](https://huggingface.co/MuScriptor/muscriptor-medium) model's page.
+
+```bash
+git clone https://github.com/muscriptor/muscriptor ~/src/muscriptor && git -C ~/src/muscriptor checkout 8a1ef88   # 0.4.0
+uv venv --python 3.12 ~/.venvs/muscriptor
+VIRTUAL_ENV=~/.venvs/muscriptor uv pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu126   # cu126 still runs a GTX 10-series (sm_61)
+VIRTUAL_ENV=~/.venvs/muscriptor uv pip install ~/src/muscriptor librosa
+uvx --from huggingface_hub hf auth login
+```
+
+What to know about its output, all measured (RUNS.md runs 6–7): it is deterministic (two runs,
+byte-identical); it gives no loudness, so `amp` is 1; and **a note's end is the next onset of any
+note** (961 of 961 within 30 ms), so it says nothing about how long a note is written.
 
 ## A piece that does not exist yet
 

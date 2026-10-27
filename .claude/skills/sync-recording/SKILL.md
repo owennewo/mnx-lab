@@ -1,6 +1,6 @@
 ---
 name: sync-recording
-description: Sync a recording (a YouTube video or an uploaded audio file) to a studio piece automatically — transcribe the audio with Basic Pitch, find which written bar is played when, report how well it matches, and write the sync the sync bar edits once the owner has seen the analysis. Ends with a reflection that improves this skill. Use when the user asks to sync, align or line up a recording with a piece, find the bar lines in a video, or invokes /sync-recording.
+description: Sync a recording (a YouTube video or an uploaded audio file) to a studio piece automatically — transcribe the audio with MuScriptor, find which written bar is played when, report how well it matches, and write the sync the sync bar edits once the owner has seen the analysis. Ends with a reflection that improves this skill. Use when the user asks to sync, align or line up a recording with a piece, find the bar lines in a video, or invokes /sync-recording.
 ---
 
 # /sync-recording — align a recording to a piece, then learn from the run
@@ -42,8 +42,8 @@ lessons of earlier runs, and the open questions this run might answer.
 ```bash
 OUT=<scratchpad>/runs/<slug>                      # one directory per run
 T="npx vite-node --config vitest.config.ts tools/recording-align/align.ts --"
-PY="$HOME/dev/guitar-nn/.venv-basic-pitch/bin/python -I tools/recording-align/align.py"
-SCREEN="$HOME/dev/guitar-nn/.venv-basic-pitch/bin/python -I tools/recording-align/screen.py"
+PY="$HOME/.venvs/muscriptor/bin/python -I tools/recording-align/align.py"
+SCREEN="$HOME/.venvs/muscriptor/bin/python -I tools/recording-align/screen.py"
 ```
 
 Every command reads and writes files in `$OUT`; each step can be rerun alone.
@@ -53,8 +53,11 @@ Every command reads and writes files in `$OUT`; each step can be rerun alone.
 - `curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/studio/` answers (the owner's
   dev server; if not, ask them to start `npm run dev`).
 - `$PY selftest` passes (no audio needed; seconds). A failure is a tool bug: stop and fix it.
-- `which yt-dlp ffmpeg` both exist; the Basic Pitch Python exists. If it is missing, say so —
-  do not substitute another transcriber silently.
+- `which yt-dlp ffmpeg` both exist; the MuScriptor environment exists (`~/.venvs/muscriptor`,
+  set up as in the [README](../../../tools/recording-align/README.md#the-muscriptor-environment)),
+  and its weights download — they are gated on Hugging Face (`hf auth login`, licence accepted).
+  If it is missing, say so — do not substitute another transcriber silently. Its weights are
+  **CC-BY-NC**: the owner's own library and research only, never a commercial use.
 
 ## Step 0b — no piece yet: read it off the screen
 
@@ -104,12 +107,17 @@ performed order may not be what the transcriber meant.
 
 ## Step 3 — the audio and its notes
 
-`$T audio --out $OUT`, then `$PY transcribe --out $OUT`. Note the recording's length against
+`$T audio --out $OUT`, then `$PY transcribe --out $OUT` (MuScriptor, ~1 min per 3-minute
+recording on the GPU; deterministic). Tell it what plays: `--instruments acoustic_guitar` is the
+default; **a singer** → `--instruments acoustic_guitar,voice` (it keeps only the guitar's
+notes). **A band** (drums, keys) under the guitar → separate it first (RUNS.md run 6: vocals out
+with BS-RoFormer, then htdemucs_6s's guitar stem, `~/.venvs/separation`) and pass the stem as
+`--audio`; with a voice only, the full mix does as well. Note the recording's length against
 the score's length at its marked tempo: a much shorter recording usually stops early; a much
 longer one plays more than the score lays out (verses, an intro, talking).
 
-**Experiment — half speed (open question in RUNS.md).** When the piece is fast or full of
-triplets, also transcribe a half-speed stretch in a sibling directory and run Steps 4–5 there:
+**Experiment — half speed (open question in RUNS.md; measured with Basic Pitch, untried with
+MuScriptor).** When the piece is fast or full of triplets, also transcribe a half-speed stretch in a sibling directory and run Steps 4–5 there:
 
 ```bash
 mkdir -p $OUT-half && cp $OUT/piece.json $OUT/score.json $OUT-half/
@@ -184,8 +192,10 @@ After the owner has had a chance to listen, ask how it lines up (a sentence is e
    - a threshold → change only with evidence from at least two runs, and record why in RUNS.md;
    - a safety rule (analysis before writing, the overwrite guard, audio out of the repo) →
      never loosen it without the owner saying so.
-3. **Rerun the regression**: the Jansch run in RUNS.md must still reproduce (same order,
-   cuts within ~20 ms of the stored sync).
+3. **Rerun the regression**: the Jansch run in RUNS.md must still reproduce — the same order
+   (1–21, 1–20, 22–24), 86% / 86% found against 11% chance, and cuts within ~40 ms of the stored
+   sync (MuScriptor's baseline, run 7: mean 12 ms, max 39 ms; its notes are deterministic, so the
+   notes themselves must come out identical).
 4. **Land it** through a worktree (CLAUDE.md's landing sequence), and say in one line what the
    next run will do better.
 
