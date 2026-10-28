@@ -58,13 +58,19 @@ try {
   // The Mix panel opens from the tray's Mix field; the synth's own settings hang behind the Synth row.
   const openSheet = async () => { await c.evaluate(`${sheet} || ${player}.shadowRoot.querySelector('[data-mix-open]').click()`); await wait(`!!${select} && ${select}.options.length > 4`); };
   const openSettings = async () => { await c.evaluate(`${sheet}.querySelector('.pop') || ${sheet}.querySelector('[data-settings]').click()`); await wait(`!!${sheet}.querySelector('.pop .quality')`); };
-  /** Play a moment and count the notes the host acknowledges as sounding. */
+  /** Play until the host acknowledges a note as sounding (or 8 s pass), and count what it heard.
+   *  A fixed 2.5 s window missed the first note on a loaded gate: the rig is still starting. */
   const listen = () => c.evaluate(`(async () => {
     // From the top: the editor's cursor, past the notes typed, is where play would start.
     const p = ${player}; p.stop(); await p.play();
     const host = p.session.backend.port.host, heard = new Set();
-    const off = host.on('sounding', list => list.forEach(s => heard.add(s.id)));
-    await new Promise(r => setTimeout(r, 2500)); off(); p.stop();
+    await new Promise(resolve => {
+      let done = false;
+      const finish = () => { if (done) return; done = true; off(); resolve(); };
+      const off = host.on('sounding', list => { list.forEach(s => heard.add(s.id)); if (heard.size) finish(); });
+      setTimeout(finish, 8000);
+    });
+    p.stop();
     return heard.size;
   })()`);
 
