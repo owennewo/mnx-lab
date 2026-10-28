@@ -123,10 +123,26 @@ interface LineGroups {
   groups: Map<string, string[]>;
 }
 
+/** Every lyric row with words anywhere in the document — every part, voice and container. */
+function documentLyricRows(doc: MnxStructure): Set<string> {
+  const rows = new Set<string>();
+  const visit = (items: readonly MnxSequenceItem[]) => {
+    for (const item of items) {
+      for (const id of Object.keys((item as MnxEvent).lyrics?.lines ?? {})) rows.add(id);
+      const content = (item as { content?: MnxSequenceItem[] }).content;
+      if (Array.isArray(content)) visit(content);
+    }
+  };
+  for (const part of doc.parts ?? []) for (const measure of part.measures ?? []) for (const sequence of measure.sequences ?? []) visit(sequence.content ?? []);
+  return rows;
+}
+
 function lineGroups(doc: MnxStructure, walk: LyricEventEntry[]): LineGroups {
   const metadata = doc.global?.lyrics?.lineMetadata ?? {};
-  const order = doc.global?.lyrics?.lineOrder ?? [];
-  const present = new Set<string>(Object.keys(metadata));
+  // Rows are the document's, not one voice's: verse 2 is the same row whichever voice sings it,
+  // as the renderer stacks them — so a voice with no words yet reuses the rows another voice made.
+  const order = [...new Set(doc.global?.lyrics?.lineOrder ?? [])];
+  const present = new Set<string>([...Object.keys(metadata), ...documentLyricRows(doc)]);
   for (const entry of walk)
     for (const id of Object.keys(entry.event.lyrics?.lines ?? {})) present.add(id);
   const stacked = [
@@ -1051,9 +1067,9 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
   // needs is metadata a Guitar Pro save cannot keep.
   if (minted.size) {
     const existing = new Set([...groups.values()].flat().filter(id => !minted.has(id)));
-    const ordered = doc.global.lyrics?.lineOrder ?? [];
+    const ordered = [...new Set(doc.global.lyrics?.lineOrder ?? [])];
     const filled = new Set(result.lines.filter(line => line.syllables.size > 0).map(line => line.lineId));
-    const wanted = [...ordered, ...[...existing].filter(id => !ordered.includes(id)).sort(), ...minted];
+    const wanted = [...new Set([...ordered, ...[...existing].filter(id => !ordered.includes(id)).sort(), ...minted])];
     const present = new Set([...existing, ...[...minted].filter(id => filled.has(id))]);
     const inferred = [...ordered.filter(id => present.has(id)), ...[...present].filter(id => !ordered.includes(id)).sort()];
     const reordered = inferred.join() !== wanted.filter(id => present.has(id)).join();

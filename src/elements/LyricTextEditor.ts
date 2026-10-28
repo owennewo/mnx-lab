@@ -180,8 +180,8 @@ export class LyricTextEditor extends LitElement {
         font-size: 12px;
       }
       /* Which part and voice the words are sung to — a choice only where the score offers one. */
+      header .title, header select { flex: none; }
       header select {
-        min-width: 0;
         max-width: 12em;
         padding: 2px 2px;
         border: 1px solid transparent;
@@ -424,13 +424,19 @@ export class LyricTextEditor extends LitElement {
       .diagnostic:hover { background: var(--row-current); }
       .diagnostic.warning { color: var(--warning-ink); }
       .diagnostic .at { font-weight: 600; font-variant-numeric: tabular-nums; }
+      /* The tools give way before the part and voice do: a long problem count truncates. */
       .tools {
+        min-width: 0;
         margin-left: auto;
         display: flex;
         align-items: center;
         gap: 2px;
       }
+      .tools [role='status'] { min-width: 0; display: flex; }
       .issues {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         height: 28px;
         margin-right: 4px;
         padding: 0 10px;

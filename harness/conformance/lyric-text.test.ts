@@ -663,4 +663,26 @@ describe('a lyric sung to another voice', () => {
     expect(lyricVoiceOf(session.doc, 0)).toBe(1);
     expect(lyricPlaceOfSyllable(session.doc, 't2', '1')).toEqual({ partIndex: 0, voiceIndex: 1, place: { ordinal: 0, onset: [1, 4] } });
   });
+
+  it('reuses the rows another voice made: verse 3 of an empty voice is not written over verse 1', () => {
+    // A strain played three times, words on voice 1 for two verses (as a Guitar Pro import has them).
+    const session = new EditorSession(twoVoices());
+    session.doc.global.measures[0]!.repeatStart = {};
+    session.doc.global.measures[0]!.repeatEnd = { times: 3 };
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, 'a b | c d')) });
+    // The import declares the rows' order.
+    session.doc.global.lyrics = { ...session.doc.global.lyrics, lineOrder: ['1', '2'] };
+    // Three verses on the melody: rows 1 and 2 are the document's, row 3 is new.
+    const text = 'one two three | four five six | sev-en eight';
+    const parsed = parseLyricText(session.doc, 0, text, 1);
+    expect(parsed.diagnostics).toEqual([]);
+    expect(parsed.lines.map(line => [line.lineId, line.ordinal])).toEqual([['1', 1], ['2', 2], ['3', 3]]);
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parsed, 1) });
+    const order = session.doc.global.lyrics?.lineOrder;
+    if (order) expect(new Set(order).size).toBe(order.length);
+    // Read back, the same text plans nothing — no verse claims another's row.
+    const again = parseLyricText(session.doc, 0, serializeLyricText(session.doc, 0, 1), 1);
+    expect(again.diagnostics).toEqual([]);
+    expect(serializeLyricText(session.doc, 0, 1).replace(/\s+/g, ' ')).toBe(text);
+  });
 });

@@ -473,6 +473,27 @@ try {
       ly = JSON.parse(await cdp.evaluate(LYRIC));
       if (!/Sing low/.test(ly.text ?? '') || ly.changes !== 0) fail(`voice 2 reads “${ly.text}” (${ly.changes} change(s))`);
       else pass(`voice 2 kept the words typed for it (“${ly.text}”)`);
+
+      // A column as narrow as studio's, with a problem showing: the count gives way, the choices do not.
+      await type(' 1.1|');
+      const header = JSON.parse(await cdp.evaluate(`(() => {
+        const find = (root, depth) => {
+          if (!root || depth > 12) return null;
+          const hit = root.querySelector('mnx-lyric-text-editor');
+          if (hit) return hit;
+          for (const el of root.querySelectorAll('*')) { const deeper = el.shadowRoot && find(el.shadowRoot, depth + 1); if (deeper) return deeper; }
+          return null;
+        };
+        const el = find(document, 0);
+        el.style.width = '320px';
+        const sr = el.shadowRoot, card = sr.querySelector('.card').getBoundingClientRect();
+        const box = sel => sr.querySelector(sel)?.getBoundingClientRect();
+        const voice = box('select.voice-choice'), close = box('button.close'), issues = box('button.issues');
+        return JSON.stringify({ issues: !!issues, voice: voice?.width ?? 0, closeInside: !!close && close.right <= card.right + 0.5 && close.width > 0 });
+      })()`));
+      if (!header.issues) fail('typing an old bar number raised no problem to show');
+      else if (header.voice < 40 || !header.closeInside) fail(`a narrow header with a problem: voice picker ${header.voice}px wide, close ${header.closeInside ? 'inside' : 'pushed out'}`);
+      else pass(`a narrow header with a problem keeps the voice picker (${Math.round(header.voice)}px) and the close button`);
     }
     await press('Escape', 'Escape', 27);
   }
