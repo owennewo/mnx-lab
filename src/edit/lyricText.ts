@@ -298,6 +298,8 @@ export interface ParsedLyricText {
   starts?: LyricLineStart[];
   /** The text lines that open a block with a header (`2:`, `nl:`). */
   headers?: number[];
+  /** The main text's bar lines and runs, each with the bar played it leads into or starts on. */
+  bars?: { from: number; to: number; ordinal: number; run?: number }[];
   /** Explicit declarations retain empty preceding rows and stable row order. */
   newRows?: { id: string; lang?: string }[];
   lineOrder?: string[];
@@ -932,7 +934,7 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
   const { groups } = lineGroups(doc, written);
   const taken = new Set([...groups.values()].flat());
   const minted = new Set<string>();
-  const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [], starts: [], covers: [] };
+  const result: ParsedLyricText = { lines: [], diagnostics: [], tokens: [], starts: [], covers: [], bars: [] };
   const atLine = (offset: number) => text.slice(0, offset).split('\n').length - 1;
   const assigned = new Map<string, { text: string; type?: SyllableType; index: number }>();
   const visitLabel = (index: number) => {
@@ -994,6 +996,11 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     const starts: TokenStart[] = [];
     const parsed = parseWrittenLyricText(doc, partIndex, buffer, walk, true, visits.length, places, starts);
     const sourceAt = (from: number | undefined) => offsets.find(o => o.from === from)?.source;
+    if (b === 0) for (const { from, source } of offsets) {
+      const ordinal = places.get(from), run = EMPTY_RUN.exec(source.text);
+      if (ordinal !== undefined && (source.text === '|' || run))
+        result.bars!.push({ from: source.from, to: source.to, ordinal, ...(run ? { run: Number(run[1]) } : {}) });
+    }
     // The block's tokens over the performance: each from its start until the next one's. A token that
     // starts no later than the one before it takes up no time of its own (a bar line after a bar's
     // last word), and is no place's.
@@ -1099,6 +1106,75 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
     }
   }
   return result;
+}
+
+/**
+ * The text with its section lines where the score's sections begin. The main text's own section
+ * lines are taken out, and each section the text reaches is named again after the bar line that
+ * leads into it — a run of empty bars it starts inside is split around it — as the serializer
+ * writes them, so canonical text is unchanged. Words never move: a section line puts nothing on
+ * a note. `map` carries an offset in the old text to the new.
+ */
+export function placeLyricSections(doc: MnxStructure, partIndex: number, text: string, voiceIndex = 0):
+  { text: string; map: (offset: number) => number } {
+  const edit = (from: string, edits: { from: number; to: number; insert: string }[]) => {
+    let out = '', at = 0;
+    for (const e of edits) { out += from.slice(at, e.from) + e.insert; at = e.to; }
+    const map = (offset: number) => {
+      let shift = 0;
+      for (const e of edits) {
+        if (offset < e.from) break;
+        if (offset < e.to) return e.from + shift;
+        shift += e.insert.length - (e.to - e.from);
+      }
+      return offset + shift;
+    };
+    return { text: out + from.slice(at), map };
+  };
+  // Out: the main text's section lines (the blocks after a header line have none).
+  const lines = text.split('\n');
+  const main = lines.findIndex(line => !isLyricSectionLine(line) && takeHeader(tokenize(line, 0)) !== null);
+  const removals: { from: number; to: number; insert: string }[] = [];
+  let offset = 0;
+  lines.forEach((line, index) => {
+    if ((main < 0 || index < main) && isLyricSectionLine(line))
+      removals.push(index < lines.length - 1 ? { from: offset, to: offset + line.length + 1, insert: '' }
+        : { from: Math.max(0, offset - 1), to: offset + line.length, insert: '' });
+    offset += line.length + 1;
+  });
+  const stripped = edit(text, removals);
+  // In: each section the text reaches, where its first bar starts.
+  const bars = parseLyricText(doc, partIndex, stripped.text, voiceIndex).bars ?? [];
+  const mainEnd = main < 0 ? stripped.text.length : stripped.map(lines.slice(0, main).join('\n').length);
+  const body = stripped.text.slice(0, mainEnd);
+  const lastToken = body.trimEnd().length;
+  const inserts: { from: number; to: number; insert: string }[] = [];
+  const splits = new Map<(typeof bars)[number], { ordinal: number; line: string }[]>();
+  for (const section of lyricSections(doc)) {
+    let at: number | undefined;
+    if (section.ordinal === 0) at = body.length - body.trimStart().length;
+    const line = bars.find(bar => bar.run === undefined && bar.ordinal === section.ordinal);
+    if (line) at = line.to;
+    const run = bars.find(bar => bar.run !== undefined && bar.ordinal < section.ordinal && section.ordinal < bar.ordinal + bar.run);
+    if (at === undefined && run) splits.set(run, [...splits.get(run) ?? [], section]);
+    // Only between words, as the serializer names them: a section past the last token is not reached.
+    if (at === undefined || at >= lastToken) continue;
+    let from = at, to = at;
+    while (from > 0 && /[ \t]/.test(body[from - 1]!)) from--;
+    while (to < body.length && /[ \t]/.test(body[to]!)) to++;
+    if (body[to] === '\n') to++;
+    inserts.push({ from, to, insert: `${from === 0 || body[from - 1] === '\n' ? '' : '\n'}${section.line}\n` });
+  }
+  // A run a section starts inside is cut there: the bars before it close the line, the rest open the next.
+  for (const [run, sections] of splits) {
+    const sign = body[run.from]!;
+    let from = run.ordinal, insert = '';
+    for (const section of sections) { insert += `${sign}${section.ordinal - from} |\n${section.line}\n`; from = section.ordinal; }
+    inserts.push({ from: run.from, to: run.to, insert: `${insert}${sign}${run.ordinal + run.run! - from}` });
+  }
+  inserts.sort((a, b) => a.from - b.from);
+  const placed = edit(stripped.text, inserts);
+  return { text: placed.text, map: offset => placed.map(stripped.map(offset)) };
 }
 
 /** Is `a` later in the performance than `b`? */

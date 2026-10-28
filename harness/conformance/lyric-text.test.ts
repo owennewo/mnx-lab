@@ -14,6 +14,7 @@ import {
   lyricVoiceOf,
   lyricVoices,
   parseLyricText,
+  placeLyricSections,
   planLyricEdits,
   serializeLyricText
 } from '../../src/edit/lyricText.ts';
@@ -711,5 +712,46 @@ describe('text with problems', () => {
     const session = new EditorSession(doc);
     expect(session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, parsed, 0, { despiteProblems: true }) })).toBe(true);
     expect(serializeLyricText(session.doc, 0).replace(/\s+/g, ' ')).toBe('a b | d e | f g');
+  });
+});
+
+describe('section lines placed by the panel', () => {
+  // Verse from bar 1 (repeated), Bridge from bar 4: the Bridge begins on the 6th bar played.
+  function sectioned() {
+    const doc = bars(6);
+    doc.global.measures[0]!.section = { label: 'Verse' };
+    doc.global.measures[0]!.repeatStart = {};
+    doc.global.measures[1]!.repeatEnd = {};
+    doc.global.measures[3]!.section = { label: 'Bridge' };
+    return doc;
+  }
+
+  it('leaves canonical text as it is, and puts back the lines it is missing or has in the wrong place', () => {
+    const doc = sectioned();
+    put(doc, 1, '1', 'one'); put(doc, 1, '2', 'two'); put(doc, 6, '1', 'end');
+    const text = serializeLyricText(doc, 0);
+    expect(text).toBe('[V Verse]\none | ×1 |\ntwo | ×2 |\n[B Bridge]\n×2 |\nend');
+    expect(placeLyricSections(doc, 0, text).text).toBe(text);
+    expect(placeLyricSections(doc, 0, text.replace(/\[[^\]]*\]\n/g, '')).text).toBe(text);
+    expect(placeLyricSections(doc, 0, 'one | ×1 |\n[B Bridge]\ntwo | ×2 |\n×2 |\nend\n[V Verse]').text).toBe(text);
+  });
+
+  it('names a section where the words reach it, mid-line or inside a run of empty bars, and moves no word', () => {
+    const doc = sectioned();
+    const text = 'one | ×1 | two | ×4 | end';
+    const placed = placeLyricSections(doc, 0, text);
+    expect(placed.text).toBe('[V Verse]\none | ×1 | two | ×2 |\n[B Bridge]\n×2 | end');
+    expect(placed.text.slice(placed.map(text.indexOf('end')), placed.map(text.indexOf('end')) + 3)).toBe('end');
+    expect(placed.text.slice(placed.map(text.indexOf('two')), placed.map(text.indexOf('two')) + 3)).toBe('two');
+    const plan = (text: string) => planLyricEdits(doc, 0, parseLyricText(doc, 0, text));
+    expect(plan(placed.text)).toEqual(plan(text));
+    // After a bar line, the section opens the next line.
+    expect(placeLyricSections(doc, 0, 'one | ×1 | two | ×2 | x | ×1 | end').text)
+      .toBe('[V Verse]\none | ×1 | two | ×2 |\n[B Bridge]\nx | ×1 | end');
+  });
+
+  it('names no section the text does not reach', () => {
+    const doc = sectioned();
+    expect(placeLyricSections(doc, 0, 'one | ×1 | two').text).toBe('[V Verse]\none | ×1 | two');
   });
 });

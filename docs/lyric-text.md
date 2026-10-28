@@ -52,6 +52,14 @@ jumps, and wraps at four bars or before the next bar would pass 80 characters.
 A single long bar stays intact. A `|` added anywhere nudges every word after it
 along by a bar, and taking one out brings them back.
 
+A **section line** (`[V2 Verse]`) names where a section of the score begins:
+the generator writes one wherever a pass into a section starts, on a line of its
+own after the bar line that leads into it, splitting a run of empty bars that
+the section starts inside. Section lines are the panel's, not the typist's: at
+each commit (and when a draft is offered back) they are taken out and written
+again where the bar lines now put each section. A section line moves no
+word, so a pickup sung before the section's first bar stays on the line above.
+
 The text is painted beneath a transparent text box: words in ink, and the marks
 that place them — bar lines, skips, runs, the hyphens and underscores inside a
 word — faded back.
@@ -162,3 +170,11 @@ reload. The user's direction:
 and, on the proposed one-second pause, "1s pause seems quite small", so the
 pause is 3 seconds (`LYRIC_COMMIT_PAUSE_MS`). The save session already batches
 its local writes, so a commit costs one recovery write, not one per keystroke.
+
+Section lines became the panel's on 2026-10-28. They had been written only when
+the text was generated, so a draft typed bar by bar kept its section lines where
+they had been typed, and the panel showed `[V1 Verse]` above words that the tray
+placed in the third pass of the verse. The owner:
+
+> I was hoping that these sections would be inserted automatically based on if a
+> bar has a section name

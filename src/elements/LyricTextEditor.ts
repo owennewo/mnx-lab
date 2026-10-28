@@ -34,6 +34,7 @@ import {
   lyricVoices,
   parseLyricText,
   planLyricEdits,
+  placeLyricSections,
   serializeLyricText,
   type LyricPlace,
   type LyricPlanEdit,
@@ -524,7 +525,7 @@ export class LyricTextEditor extends LitElement {
     if (this.doc) {
       this.text = serializeLyricText(this.doc, this.partIndex, this.voiceIndex);
       if (this.draft !== null && this.draft !== this.text) {
-        this.text = this.draft;
+        this.text = placeLyricSections(this.doc, this.partIndex, this.draft, this.voiceIndex).text;
         this.touched = this.pending = true;
       }
       this.reparse();
@@ -885,6 +886,7 @@ export class LyricTextEditor extends LitElement {
       if (area) this.caretAt(area.selectionStart);
     }
     if (!this.pending || this.playing || this.readOnly || !this.doc) return;
+    this.placeSections();
     this.reparse();
     // What found its notes goes to the score now; text with problems is also kept whole as a
     // draft, since the document holds only the part of it that fits.
@@ -896,6 +898,24 @@ export class LyricTextEditor extends LitElement {
       return;
     }
     this.saveDraft(this.text);
+  }
+
+  /**
+   * The section lines are the panel's: at each commit they are taken out and named again where
+   * the words now reach each section. The caret stays on its word, and the line it is on where it was.
+   */
+  private placeSections() {
+    const placed = placeLyricSections(this.doc!, this.partIndex, this.text, this.voiceIndex);
+    const area = this.textarea();
+    if (placed.text === this.text || !area) return;
+    const caret = area.selectionStart, end = area.selectionEnd, row = this.rows()[atLine(this.text, caret)];
+    const above = row ? row.offsetTop - area.scrollTop : null;
+    this.text = area.value = placed.text;
+    area.setSelectionRange(placed.map(caret), placed.map(end));
+    void this.updateComplete.then(() => {
+      const moved = this.rows()[atLine(this.text, area.selectionStart)];
+      if (moved && above !== null) area.scrollTop = moved.offsetTop - above;
+    });
   }
 
   /** The document the plan is measured against moved under the visit: plan against the new one. */
