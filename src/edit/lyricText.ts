@@ -31,7 +31,7 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 // grace notes and tie continuations are skipped automatically by the walk, so
 // most pasted text needs no special tokens at all.
 
-import type { MnxEvent, MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
+import type { MnxEvent, MnxSequence, MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { noteKeyAt } from '../model/noteWalk.ts';
 import { hasRepeatStructure, linearizePasses } from '../model/passes.ts';
@@ -46,15 +46,34 @@ export interface LyricEventEntry {
   event: MnxEvent;
 }
 
+/** A measure's staff-1 sequences, in order: a voice is its index here, as the cursor counts it. */
+const staffOneVoices = (measure: { sequences?: MnxSequence[] }) => (measure.sequences ?? []).filter(s => (s.staff ?? 1) === 1);
+
+/** The voices of a part that can carry lyrics — those with a note the walk sings — in order. */
+export function lyricVoices(doc: MnxStructure, partIndex: number): number[] {
+  const count = Math.max(0, ...(doc.parts?.[partIndex]?.measures ?? []).map(measure => staffOneVoices(measure).length));
+  return Array.from({ length: count }, (_, voice) => voice).filter(voice => lyricEventWalk(doc, partIndex, voice).length > 0);
+}
+
+/** The voice of a part whose notes carry the most syllables — where its lyric already is — or null when none do. */
+export function lyricVoiceOf(doc: MnxStructure, partIndex: number): number | null {
+  let best: { voice: number; count: number } | null = null;
+  for (const voice of lyricVoices(doc, partIndex)) {
+    const count = lyricEventWalk(doc, partIndex, voice).filter(entry => Object.keys(entry.event.lyrics?.lines ?? {}).length).length;
+    if (count && (!best || count > best.count)) best = { voice, count };
+  }
+  return best?.voice ?? null;
+}
+
 /**
- * The lyric-eligible events of one part, in document order: staff-1 voice 1
- * (the convention the format reserves a header token to widen later), tuplet
+ * The lyric-eligible events of one voice of one part, in document order: staff-1
+ * voice `voiceIndex` (its index among the bar's staff-1 sequences), tuplet
  * and tremolo content included, grace content skipped (not sung), rests and
  * `space` items skipped (no notes), tie continuations skipped (one syllable
  * spans the tie). Events outside the walk keep whatever lyrics they carry —
  * the surface never touches what it cannot express.
  */
-export function lyricEventWalk(doc: MnxStructure, partIndex: number): LyricEventEntry[] {
+export function lyricEventWalk(doc: MnxStructure, partIndex: number, voiceIndex = 0): LyricEventEntry[] {
   const part = doc.parts?.[partIndex];
   if (!part) return [];
   // A tie continuation is an event whose every note is some tie's target.
@@ -63,9 +82,9 @@ export function lyricEventWalk(doc: MnxStructure, partIndex: number): LyricEvent
     for (const note of event.notes ?? [])
       for (const tie of note.ties ?? []) if (tie.target) tieTargets.add(tie.target);
   };
-  const forEachVoiceOneEvent = (fn: (event: MnxEvent, measureIndex: number, eventIndex: number, containerIndex?: ContainerIndex) => void) => {
+  const forEachVoiceEvent = (fn: (event: MnxEvent, measureIndex: number, eventIndex: number, containerIndex?: ContainerIndex) => void) => {
     (part.measures ?? []).forEach((measure, measureIndex) => {
-      const sequence = (measure.sequences ?? []).find(s => (s.staff ?? 1) === 1);
+      const sequence = staffOneVoices(measure)[voiceIndex];
       (sequence?.content ?? []).forEach((item: MnxSequenceItem, eventIndex) => {
         const record = item as { type?: string; content?: MnxSequenceItem[] };
         if (record.type === 'grace') return;
@@ -77,14 +96,14 @@ export function lyricEventWalk(doc: MnxStructure, partIndex: number): LyricEvent
       });
     });
   };
-  forEachVoiceOneEvent(collectTies);
+  forEachVoiceEvent(collectTies);
   const entries: LyricEventEntry[] = [];
-  forEachVoiceOneEvent((event, measureIndex, eventIndex, containerIndex) => {
+  forEachVoiceEvent((event, measureIndex, eventIndex, containerIndex) => {
     const notes = event.notes ?? [];
     if (notes.length === 0) return; // rests and authored silence are not sung
     if (notes.every(note => note.id !== undefined && tieTargets.has(note.id))) return;
     entries.push({
-      noteKey: noteKeyAt(notes[0]!, measureIndex, 0, eventIndex, 0, containerIndex, partIndex, 1),
+      noteKey: noteKeyAt(notes[0]!, measureIndex, voiceIndex, eventIndex, 0, containerIndex, partIndex, 1),
       measureIndex,
       event
     });
@@ -494,11 +513,12 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
 export function lyricPassWarnings(
   doc: MnxStructure,
   partIndex: number,
-  parsed: ParsedLyricText
+  parsed: ParsedLyricText,
+  voiceIndex = 0
 ): LyricTextDiagnostic[] {
   if (!hasRepeatStructure(doc)) return [];
   const model = linearizePasses(doc);
-  const walk = lyricEventWalk(doc, partIndex);
+  const walk = lyricEventWalk(doc, partIndex, voiceIndex);
   const warnings: LyricTextDiagnostic[] = [];
   for (const line of parsed.lines) {
     const flagged = new Set<number>();
@@ -567,15 +587,15 @@ export function lyricPlanOps(edits: LyricPlanEdit[]): import('./ops.ts').EditOp[
 const normalizeType = (type?: string) => (type === 'whole' ? undefined : type);
 
 /**
- * The buffer is the complete lyric state of the part's walk: a line absent
+ * The buffer is the complete lyric state of the voice's walk: a line absent
  * from it clears its syllables on reachable events; events outside navigation,
  * outside the walk (and
  * other parts, other voices) are untouched. Empty result = nothing to apply.
  */
-export function planLyricEdits(doc: MnxStructure, partIndex: number, parsed: ParsedLyricText): LyricPlanEdit[] {
+export function planLyricEdits(doc: MnxStructure, partIndex: number, parsed: ParsedLyricText, voiceIndex = 0): LyricPlanEdit[] {
   if (parsed.diagnostics.length) return [];
-  const walk = lyricEventWalk(doc, partIndex);
-  const reachable = new Set(lyricPerformance(doc, partIndex).sources);
+  const walk = lyricEventWalk(doc, partIndex, voiceIndex);
+  const reachable = new Set(lyricPerformance(doc, partIndex, voiceIndex).sources);
   const desired = new Map<string, Map<number, { text: string; type?: SyllableType }>>();
   for (const line of parsed.lines) {
     const merged = desired.get(line.lineId) ?? new Map();
@@ -630,8 +650,8 @@ export function lyricVisitLabels(doc: MnxStructure): string[] {
   return linearizePasses(doc).entries.map(visit => `${visit.measureIndex + 1}.${visit.occurrence}`);
 }
 
-function lyricPerformance(doc: MnxStructure, partIndex: number) {
-  const written = lyricEventWalk(doc, partIndex);
+function lyricPerformance(doc: MnxStructure, partIndex: number, voiceIndex = 0) {
+  const written = lyricEventWalk(doc, partIndex, voiceIndex);
   const visits = linearizePasses(doc).entries;
   const walk: LyricEventEntry[] = [];
   const sources: number[] = [];
@@ -657,7 +677,7 @@ function lyricPerformance(doc: MnxStructure, partIndex: number) {
     return cursor;
   };
   for (const measure of doc.parts[partIndex]?.measures ?? []) {
-    timeItems(measure.sequences?.find(s => (s.staff ?? 1) === 1)?.content ?? [], ZERO, ONE);
+    timeItems(staffOneVoices(measure)[voiceIndex]?.content ?? [], ZERO, ONE);
   }
   for (const [ordinal, visit] of visits.entries()) {
     starts.push(walk.length);
@@ -737,23 +757,23 @@ export function lyricSections(doc: MnxStructure): LyricSection[] {
 }
 
 /**
- * The place a syllable drawn in the score stands for: the part it is in, the bar played and the
+ * The place a syllable drawn in the score stands for: the part and voice it is in, the bar played and the
  * onset of its note. A drawn syllable names its note (`data-playback-id`, qualified by the bar
  * played in an unrolled view) and its verse row; of that note's visits, the one that sings that
  * row is the place — the first, when none does (a row no pass reaches).
  */
-export function lyricPlaceOfSyllable(doc: MnxStructure, noteKey: string, lineId: string): { partIndex: number; place: LyricPlace } | null {
+export function lyricPlaceOfSyllable(doc: MnxStructure, noteKey: string, lineId: string): { partIndex: number; voiceIndex: number; place: LyricPlace } | null {
   const qualified = /^w(0|[1-9][0-9]*):(.*)$/s.exec(noteKey);
   const key = qualified ? qualified[2]! : noteKey, ordinal = qualified ? Number(qualified[1]) : null;
-  for (let partIndex = 0; partIndex < doc.parts.length; partIndex++) {
-    const { written, visits, walk, onsets } = lyricPerformance(doc, partIndex);
+  for (let partIndex = 0; partIndex < doc.parts.length; partIndex++) for (const voiceIndex of lyricVoices(doc, partIndex)) {
+    const { written, visits, walk, onsets } = lyricPerformance(doc, partIndex, voiceIndex);
     const hits = walk.filter(entry => entry.noteKey === key || entry.event.notes?.[0]?.id === key);
     if (!hits.length) continue;
     const row = [...lineGroups(doc, written).groups.values()].map(ids => ids.indexOf(lineId) + 1).find(at => at > 0) ?? 0;
     const hit = (ordinal !== null ? hits.find(entry => entry.measureIndex === ordinal) : undefined)
       ?? hits.find(entry => visits[entry.measureIndex]?.verse === row) ?? hits[0]!;
     const onset = onsets.get(hit.event) ?? ZERO;
-    return { partIndex, place: { ordinal: hit.measureIndex, onset: [Number(onset.num), Number(onset.den)] } };
+    return { partIndex, voiceIndex, place: { ordinal: hit.measureIndex, onset: [Number(onset.num), Number(onset.den)] } };
   }
   return null;
 }
@@ -778,8 +798,8 @@ const OLD_BAR_NUMBER = /^\d+(?:\.\d+)?\|$/;
  * stands on a line of its own (`×16 |`), and trailing silence is left off.
  * Lines break at repeats and jumps, at four bars, and before 80 characters.
  */
-export function serializeLyricText(doc: MnxStructure, partIndex: number): string {
-  const { written, visits, walk, sources, starts } = lyricPerformance(doc, partIndex);
+export function serializeLyricText(doc: MnxStructure, partIndex: number, voiceIndex = 0): string {
+  const { written, visits, walk, sources, starts } = lyricPerformance(doc, partIndex, voiceIndex);
   const { groups } = lineGroups(doc, written);
   const sections = new Map(lyricSections(doc).map(section => [section.ordinal, section.line]));
   const result: string[] = [];
@@ -871,8 +891,8 @@ export interface LyricLineStart {
  * starts another block, from the first bar played again, writing that stored
  * row or language rather than each visit's own verse.
  */
-export function parseLyricText(doc: MnxStructure, partIndex: number, text: string): ParsedLyricText {
-  const { written, visits, walk, sources, onsets } = lyricPerformance(doc, partIndex);
+export function parseLyricText(doc: MnxStructure, partIndex: number, text: string, voiceIndex = 0): ParsedLyricText {
+  const { written, visits, walk, sources, onsets } = lyricPerformance(doc, partIndex, voiceIndex);
   const { groups } = lineGroups(doc, written);
   const taken = new Set([...groups.values()].flat());
   const minted = new Set<string>();

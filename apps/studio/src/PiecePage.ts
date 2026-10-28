@@ -39,7 +39,7 @@
 // editor binding's `onChange`; previews (an older version, the lyric editor's
 // scratch) set `this.doc` directly and are never told to the save session.
 import { LitElement, css, html, nothing } from 'lit';
-import type { LyricPlace } from '../../../src/elements/LyricTextEditor.ts';
+import type { LyricPlace, LyricTargetDetail } from '../../../src/elements/LyricTextEditor.ts';
 import { rational, type Rational } from '../../../src/model/time.ts';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -106,13 +106,14 @@ const LONG_PRESS_MS = 500;
 /** A playhead's offset into its bar as the lyric panel's place spells it, to 1/3840 of a whole. */
 const onsetOf = (offset: Rational): [number, number] => [Number((offset.num * 3840n) / offset.den), 3840];
 
-/** Lyric text this device could not commit yet (it does not parse), per piece and part — the panel offers it back. */
+/** Lyric text this device could not commit yet (it does not parse), per piece, part and voice — the panel offers it back.
+ *  The first voice keeps the key it had before there was a choice of voice. */
 const lyricDrafts = (pieceId: string) => {
-  const key = (part: number) => `mnx-studio-lyric-draft:${pieceId}:${part}`;
+  const key = (part: number, voice: number) => `mnx-studio-lyric-draft:${pieceId}:${part}${voice ? `.v${voice}` : ''}`;
   return {
-    read: (part: number) => { try { return localStorage.getItem(key(part)); } catch { return null; } },
-    write: (part: number, text: string | null) => {
-      try { text === null ? localStorage.removeItem(key(part)) : localStorage.setItem(key(part), text); } catch { /* the panel still holds it */ }
+    read: (part: number, voice: number) => { try { return localStorage.getItem(key(part, voice)); } catch { return null; } },
+    write: (part: number, voice: number, text: string | null) => {
+      try { text === null ? localStorage.removeItem(key(part, voice)) : localStorage.setItem(key(part, voice), text); } catch { /* the panel still holds it */ }
     }
   };
 };
@@ -148,7 +149,7 @@ export class PiecePage extends LitElement {
   @state() private keysOpen = false;
   /** The lyric panel, for reading, where this device plays and does not edit: opened by a long press on a word. */
   @state() private lyricsOpen = false;
-  @state() private lyricsAt: { partIndex: number; place: LyricPlace } | null = null;
+  @state() private lyricsAt: { partIndex: number; voiceIndex: number; place: LyricPlace } | null = null;
   /** The page's one transient line: what a copy, cut or paste did, why an edit was refused,
    *  or that the piece plays other than as written. It names the last outcome and leaves. */
   @state() private notice: { message: string; tone: 'info' | 'warning' } | null = null;
@@ -1108,6 +1109,18 @@ export class PiecePage extends LitElement {
     if (!this.binding?.cursor.playing) this.seekTo(at.place);
     this.unfollow ??= this.binding?.cursor.subscribe(this.followLyrics) ?? null;
   }
+  /** The header asked for another part or voice: the panel again, there, at the playhead. */
+  private async retargetLyrics({ partIndex, voiceIndex }: LyricTargetDetail) {
+    const doc = this.doc?.mnxJson, head = this.binding?.cursor.playhead;
+    if (!doc || !this.lyricsAt) return;
+    const { lyricVoiceOf, lyricVoices } = await import('../../../src/edit/lyricText.ts');
+    if (this.doc?.mnxJson !== doc || !this.lyricsAt) return;
+    this.lyricsAt = {
+      partIndex,
+      voiceIndex: voiceIndex ?? lyricVoiceOf(doc, partIndex) ?? lyricVoices(doc, partIndex)[0] ?? 0,
+      place: head ? { ordinal: head.ordinal, onset: onsetOf(head.offset) } : this.lyricsAt.place
+    };
+  }
   private seekTo(place: LyricPlace) {
     this.binding?.cursor.seek({ ordinal: place.ordinal, offset: rational(BigInt(place.onset[0]), BigInt(place.onset[1])) });
   }
@@ -1437,14 +1450,16 @@ export class PiecePage extends LitElement {
             </button>`
           : nothing}
         ${this.lyricsOpen && this.lyricsAt && this.doc
-          ? html`<mnx-lyric-text-editor slot="lyrics"
+          ? keyed(`${this.lyricsAt.partIndex}.${this.lyricsAt.voiceIndex}`, html`<mnx-lyric-text-editor slot="lyrics"
               .doc=${this.doc.mnxJson}
               .partIndex=${this.lyricsAt.partIndex}
+              .voiceIndex=${this.lyricsAt.voiceIndex}
               .partLabel=${this.doc.mnxJson.parts[this.lyricsAt.partIndex]?.name ?? ''}
               .focusPlace=${this.lyricsAt.place}
               .readOnly=${true}
               @lyric-editor-caret=${(e: CustomEvent<LyricPlace>) => { if (!this.binding?.cursor.playing) this.seekTo(e.detail); }}
-              @lyric-editor-close=${() => (this.lyricsOpen = false)}></mnx-lyric-text-editor>`
+              @lyric-editor-target=${(e: CustomEvent<LyricTargetDetail>) => void this.retargetLyrics(e.detail)}
+              @lyric-editor-close=${() => (this.lyricsOpen = false)}></mnx-lyric-text-editor>`)
           : nothing}
         ${this.keysOpen && this.editor
           ? html`<mnx-studio-keys slot="side"

@@ -11,6 +11,8 @@ import {
   lyricPlaceOfSyllable,
   lyricSections,
   lyricPassWarnings,
+  lyricVoiceOf,
+  lyricVoices,
   parseLyricText,
   planLyricEdits,
   serializeLyricText
@@ -494,7 +496,7 @@ describe('performance order and canonical wrapping', () => {
     doc.global.measures[0]!.repeatEnd = {};
     put(doc, 1, '1', 'first', 1); put(doc, 1, '2', 'second', 1);
     // Bar 1's second note, sung by verse 2 on the second time through: the bar played second.
-    expect(lyricPlaceOfSyllable(doc, 'b0n1', '2')).toEqual({ partIndex: 0, place: { ordinal: 1, onset: [1, 4] } });
+    expect(lyricPlaceOfSyllable(doc, 'b0n1', '2')).toEqual({ partIndex: 0, voiceIndex: 0, place: { ordinal: 1, onset: [1, 4] } });
     expect(lyricPlaceOfSyllable(doc, 'b0n1', '1')?.place.ordinal).toBe(0);
     // In an unrolled view the drawn key names the bar played itself.
     expect(lyricPlaceOfSyllable(doc, 'w1:b0n1', '1')?.place.ordinal).toBe(1);
@@ -609,4 +611,56 @@ it('gives every performed place one token: a word, a skip, a run or the bar line
   ]);
   const at = (ordinal: number, onset: [number, number]) => { const c = coverAt(parsed, { ordinal, onset }); return c && text.slice(c.from, c.to); };
   expect([at(0, [1, 4]), at(1, [0, 1]), at(3, [1, 4]), at(4, [1, 2]), at(5, [1, 4])]).toEqual(['one_', '_', '×2', '|', undefined]);
+});
+
+describe('a lyric sung to another voice', () => {
+  /** One bar, two voices on staff 1: a bass of two halves under a melody of four quarters
+   *  (the melody second, as a Guitar Pro file often has it); the melody's third quarter rests. */
+  const twoVoices = (): MnxStructure => {
+    const q = { base: 'quarter' as const }, h = { base: 'half' as const };
+    const note = (id: string) => ({ id, pitch: { step: 'C', octave: 4 } });
+    return {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [{ measures: [{ sequences: [
+        { voice: 'bass', content: [{ duration: h, notes: [note('b1')] }, { duration: h, notes: [note('b2')] }] },
+        { voice: 'tune', content: [
+          { duration: q, notes: [note('t1')] }, { duration: q, notes: [note('t2')] },
+          { duration: q, rest: {} }, { duration: q, notes: [note('t3')] }
+        ] }
+      ] }] }]
+    } as MnxStructure;
+  };
+
+  it('walks the voice asked for, and lists the voices with notes to sing', () => {
+    const doc = twoVoices();
+    expect(lyricEventWalk(doc, 0, 1).map(e => e.noteKey)).toEqual(['t1', 't2', 't3']);
+    expect(lyricEventWalk(doc, 0).map(e => e.noteKey)).toEqual(['b1', 'b2']);
+    expect(lyricVoices(doc, 0)).toEqual([0, 1]);
+    doc.parts[0]!.measures[0]!.sequences[1]!.content = [{ duration: { base: 'whole' }, rest: {} }];
+    expect(lyricVoices(doc, 0)).toEqual([0]);
+  });
+
+  it('writes the second voice and leaves the first as it was', () => {
+    const session = new EditorSession(twoVoices());
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, 'low low')) });
+    expect(lyricVoiceOf(session.doc, 0)).toBe(0);
+    const parsed = parseLyricText(session.doc, 0, 'Black-bird sing', 1);
+    expect(parsed.diagnostics).toEqual([]);
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parsed, 1) })).toBe(true);
+    expect(serializeLyricText(session.doc, 0, 1)).toBe('Black-bird sing');
+    expect(serializeLyricText(session.doc, 0)).toBe('low low');
+    // Its own text plans nothing; clearing it clears only it.
+    expect(planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, 'Black-bird sing', 1), 1)).toEqual([]);
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, '', 1), 1) });
+    expect(serializeLyricText(session.doc, 0, 1)).toBe('');
+    expect(serializeLyricText(session.doc, 0)).toBe('low low');
+  });
+
+  it('opens on the voice a syllable is sung by, and finds where the words already are', () => {
+    const session = new EditorSession(twoVoices());
+    session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(session.doc, 0, parseLyricText(session.doc, 0, 'a b c', 1), 1) });
+    expect(lyricVoiceOf(session.doc, 0)).toBe(1);
+    expect(lyricPlaceOfSyllable(session.doc, 't2', '1')).toEqual({ partIndex: 0, voiceIndex: 1, place: { ordinal: 0, onset: [1, 4] } });
+  });
 });

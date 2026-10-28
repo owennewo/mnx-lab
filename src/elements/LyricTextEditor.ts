@@ -30,6 +30,7 @@ import {
   lyricSections,
   lyricVisitLabels,
   lyricPassWarnings,
+  lyricVoices,
   parseLyricText,
   planLyricEdits,
   serializeLyricText,
@@ -65,11 +66,15 @@ export type { LyricPlace };
 
 /** What the host is told: `edits` to commit; `accepted` is set by the host when they landed. */
 export interface LyricCommitDetail { edits: LyricPlanEdit[]; accepted: boolean }
+/** Asked for from the header: the panel again, sung to this part and voice (null: the host's usual pick). */
+export interface LyricTargetDetail { partIndex: number; voiceIndex: number | null }
 
 @customElement('mnx-lyric-text-editor')
 export class LyricTextEditor extends LitElement {
   @property({ attribute: false }) doc: MnxStructure | null = null;
   @property({ type: Number }) partIndex = 0;
+  /** Which of the part's staff-1 voices the text is sung to (0 = the first), as the cursor counts them. */
+  @property({ type: Number }) voiceIndex = 0;
   /** The part's display name, for the header. */
   @property({ type: String }) partLabel = '';
   /** Opens with the caret on the token that holds this performed place — the cursor's. */
@@ -174,6 +179,20 @@ export class LyricTextEditor extends LitElement {
         color: var(--ink-3);
         font-size: 12px;
       }
+      /* Which part and voice the words are sung to — a choice only where the score offers one. */
+      header select {
+        min-width: 0;
+        max-width: 12em;
+        padding: 2px 2px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: transparent;
+        color: var(--ink-3);
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      header select:hover, header select:focus-visible { border-color: var(--line); color: var(--ink); }
       /* The text names no bars: the margin beside it does, live, as a rail — each line a
          dot labelled with the bar played it starts in and that bar's score bar and pass. */
       .editor {
@@ -496,7 +515,7 @@ export class LyricTextEditor extends LitElement {
 
   firstUpdated() {
     if (this.doc) {
-      this.text = serializeLyricText(this.doc, this.partIndex);
+      this.text = serializeLyricText(this.doc, this.partIndex, this.voiceIndex);
       if (this.draft !== null && this.draft !== this.text) {
         this.text = this.draft;
         this.touched = this.pending = true;
@@ -568,6 +587,8 @@ export class LyricTextEditor extends LitElement {
   private labels: string[] = [];
   private sections: LyricSection[] = [];
   private labelsFor: MnxStructure | null = null;
+  /** The parts with notes to sing, and the voices of this one: the header's choices. */
+  private singable: { parts: number[]; voices: number[] } = { parts: [], voices: [] };
   private resizeObserver: ResizeObserver | null = null;
   /** The word outlined: the caret's, or the one the host last showed. */
   private marked: { from: number; to: number } | null = null;
@@ -776,11 +797,18 @@ export class LyricTextEditor extends LitElement {
 
   private reparse() {
     if (!this.doc) return;
-    if (this.labelsFor !== this.doc) { this.labels = lyricVisitLabels(this.doc); this.sections = lyricSections(this.doc); this.labelsFor = this.doc; }
-    this.parsed = parseLyricText(this.doc, this.partIndex, this.text);
-    this.warnings = lyricPassWarnings(this.doc, this.partIndex, this.parsed);
+    if (this.labelsFor !== this.doc) {
+      this.labels = lyricVisitLabels(this.doc); this.sections = lyricSections(this.doc); this.labelsFor = this.doc;
+      const doc = this.doc;
+      this.singable = {
+        parts: doc.parts.flatMap((_, part) => lyricVoices(doc, part).length ? [part] : []),
+        voices: lyricVoices(doc, this.partIndex)
+      };
+    }
+    this.parsed = parseLyricText(this.doc, this.partIndex, this.text, this.voiceIndex);
+    this.warnings = lyricPassWarnings(this.doc, this.partIndex, this.parsed, this.voiceIndex);
     this.edits = this.parsed.diagnostics.length === 0
-      ? planLyricEdits(this.doc, this.partIndex, this.parsed)
+      ? planLyricEdits(this.doc, this.partIndex, this.parsed, this.voiceIndex)
       : [];
   }
 
@@ -919,6 +947,40 @@ export class LyricTextEditor extends LitElement {
     setTimeout(() => { this.copied = false; }, 1500);
   }
 
+  /** The part and voice the text is sung to: plain words, or a choice where the score has more than one. */
+  private renderTarget() {
+    const { parts, voices } = this.singable;
+    const doc = this.doc;
+    const partName = (part: number) => doc?.parts[part]?.name || `Part ${part + 1}`;
+    return html`
+      ${doc && parts.length > 1
+        ? html`<select class="part-choice" aria-label="Part" title="The part the words are sung to"
+            @change=${(e: Event) => this.choose(Number((e.target as HTMLSelectElement).value), null)}>
+            ${parts.map(part => html`<option value=${part} ?selected=${part === this.partIndex}>${partName(part)}</option>`)}
+          </select>`
+        : this.partLabel ? html`<span class="part">${this.partLabel}</span>` : nothing}
+      ${voices.length > 1
+        ? html`<select class="voice-choice" aria-label="Voice" title="The voice the words are sung to"
+            @change=${(e: Event) => this.choose(this.partIndex, Number((e.target as HTMLSelectElement).value))}>
+            ${voices.map(voice => html`<option value=${voice} ?selected=${voice === this.voiceIndex}>Voice ${voice + 1}</option>`)}
+          </select>`
+        : nothing}`;
+  }
+
+  /**
+   * Sing the text to another part or voice. What this visit typed is committed (or kept as a
+   * draft) for the one it was typed for, and the host opens the panel again on the other —
+   * `voiceIndex` null leaves it to the host, as opening does.
+   */
+  private choose(partIndex: number, voiceIndex: number | null) {
+    this.commit();
+    this.dispatchEvent(new CustomEvent<LyricTargetDetail>('lyric-editor-target', {
+      detail: { partIndex, voiceIndex },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
   private close() {
     this.commit();
     this.dispatchEvent(new CustomEvent('lyric-editor-close', { bubbles: true, composed: true }));
@@ -946,7 +1008,7 @@ export class LyricTextEditor extends LitElement {
       <div class="card" role="complementary" aria-label="Lyrics" tabindex="-1" @keydown=${this.onKey}>
         <header>
           <span class="title">Lyrics</span>
-          ${this.partLabel ? html`<span class="part">${this.partLabel}</span>` : nothing}
+          ${this.renderTarget()}
           <div class="tools">
             <span role="status">${errors.length ? html`
               <button class="issues" title="Go to the first" @mousedown=${keepFocus} @click=${() => this.goTo(errors[0]!)}>

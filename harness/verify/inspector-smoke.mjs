@@ -405,9 +405,25 @@ try {
       text: sr.querySelector('textarea')?.value ?? null,
       diagnostics: [...sr.querySelectorAll('.diagnostic')].map(d => d.textContent.trim()),
       changes: el.plan?.length ?? null,
-      apply: !!sr.querySelector('button.apply')
+      apply: !!sr.querySelector('button.apply'),
+      voice: el.voiceIndex,
+      voices: [...sr.querySelectorAll('select.voice-choice option')].map(o => Number(o.value)),
+      parts: [...sr.querySelectorAll('select.part-choice option')].map(o => o.textContent.trim())
     });
   })()`;
+  /** Pick a voice from the panel's header, as a reader does. */
+  const chooseVoice = voice => cdp.evaluate(`(() => {
+    const find = (root, depth) => {
+      if (!root || depth > 12) return null;
+      const hit = root.querySelector('mnx-lyric-text-editor');
+      if (hit) return hit;
+      for (const el of root.querySelectorAll('*')) { const deeper = el.shadowRoot && find(el.shadowRoot, depth + 1); if (deeper) return deeper; }
+      return null;
+    };
+    const select = find(document, 0).shadowRoot.querySelector('select.voice-choice');
+    select.value = '${voice}';
+    select.dispatchEvent(new Event('change'));
+  })()`);
   await press('L', 'KeyL', 76, 8);
   let ly = JSON.parse(await cdp.evaluate(LYRIC));
   if (!ly.open) fail('no lyric editor after Shift+L');
@@ -432,6 +448,32 @@ try {
     if (!/^\[H Head\]\nHush/.test(ly.text ?? '')) fail(`reopening reads “${ly.text}” — closing did not commit the verse`);
     else if (ly.changes !== 0) fail('the reopened buffer diffs against its own document — the round trip is broken');
     else pass(`closing committed the verse; reopened on the document’s own serialization (“${ly.text}”)`);
+
+    // Another voice: the header offers the voices with notes, and the words go where it says.
+    console.log('\nthe panel sings to the voice its header names');
+    if (ly.voices.length < 2) fail(`a two-voice part offers voices ${JSON.stringify(ly.voices)}`);
+    else if (ly.parts.length < 2) fail(`a two-part score offers parts ${JSON.stringify(ly.parts)}`);
+    else {
+      pass(`offers voices ${ly.voices.map(v => v + 1).join(', ')} and parts ${ly.parts.join(', ')}; open on voice ${ly.voice + 1}`);
+      await chooseVoice(1);
+      await settle(cdp);
+      ly = JSON.parse(await cdp.evaluate(LYRIC));
+      if (ly.voice !== 1 || /Hush/.test(ly.text ?? '')) fail(`after choosing voice 2 the panel is on voice ${ly.voice + 1}, reading “${ly.text}”`);
+      else pass(`switched to voice 2 (“${ly.text}”)`);
+      await type('Sing low');
+      await press('Escape', 'Escape', 27);
+      await settle(cdp);
+      await press('L', 'KeyL', 76, 8);
+      ly = JSON.parse(await cdp.evaluate(LYRIC));
+      // Voice 1 still has more words, so the panel opens there — untouched by voice 2's.
+      if (ly.voice !== 0 || !/Hush lit-tle/.test(ly.text ?? '') || /Sing/.test(ly.text ?? '')) fail(`voice 1 reads “${ly.text}” on voice ${ly.voice + 1}`);
+      else pass('voice 1 kept its own words');
+      await chooseVoice(1);
+      await settle(cdp);
+      ly = JSON.parse(await cdp.evaluate(LYRIC));
+      if (!/Sing low/.test(ly.text ?? '') || ly.changes !== 0) fail(`voice 2 reads “${ly.text}” (${ly.changes} change(s))`);
+      else pass(`voice 2 kept the words typed for it (“${ly.text}”)`);
+    }
     await press('Escape', 'Escape', 27);
   }
 } catch (error) {

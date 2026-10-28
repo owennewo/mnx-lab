@@ -47,7 +47,7 @@ import {
 } from '../edit/keymap.ts';
 import { KEY_DOCS, KEY_GROUP_LABELS, type CheatGroup } from '../edit/keymapDocs.ts';
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
-import { lyricPlanOps } from '../edit/lyricText.ts';
+import { lyricPlanOps, lyricVoiceOf, lyricVoices } from '../edit/lyricText.ts';
 import { applyOp } from '../edit/ops.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import { copySelectionToStore, cutSelectionToStore, pasteSelectionFromStore } from '../edit/selectionClipboardActions.ts';
@@ -61,7 +61,7 @@ import { buildInspectorView, type InspectorView } from './inspectorRows.ts';
 import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from './inspectorMount.ts';
 import type { OverlayAnchor } from './overlayPlacement.ts';
 import type { RungInspector } from './RungInspector.ts';
-import type { LyricCommitDetail, LyricPlace, LyricTextEditor } from './LyricTextEditor.ts';
+import type { LyricCommitDetail, LyricPlace, LyricTargetDetail, LyricTextEditor } from './LyricTextEditor.ts';
 import './RungInspector.ts';
 import './LyricTextEditor.ts';
 import './EditorSurfaces.ts';
@@ -137,10 +137,13 @@ export interface EditorBindingOptions {
   onPreview?(document: MnxStructure | null): void;
   /**
    * Where the lyric panel keeps text it could not commit (it does not parse, or
-   * the edit was refused), per part, so a reload or a closed panel does not lose
-   * it. Without one, such text lives as long as the panel does.
+   * the edit was refused), per part and voice, so a reload or a closed panel does not
+   * lose it. Without one, such text lives as long as the panel does.
    */
-  lyricDrafts?: { read(partIndex: number): string | null; write(partIndex: number, text: string | null): void };
+  lyricDrafts?: {
+    read(partIndex: number, voiceIndex: number): string | null;
+    write(partIndex: number, voiceIndex: number, text: string | null): void;
+  };
   /** Where cut and copied selections go. Without one the clipboard keys are unbound. */
   clipboard?: SelectionClipboardStore;
   /** What a copy, cut or paste did, or the precise sentence for why it did not. */
@@ -612,7 +615,15 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   }
   /** The panel is a place beside the score, not a popover: the inspector over the score and the
    *  lyric panel are open together, each until it is put away. */
-  const openLyrics = (focus = true): boolean => {
+  /** The voice the panel opens on: the one the part's words are on, else the cursor's, else the first that has notes. */
+  const lyricVoiceFor = (partIndex: number): number => {
+    const voices = lyricVoices(session.doc, partIndex);
+    const cursorVoice = session.cursor.voiceIndex ?? 0;
+    return lyricVoiceOf(session.doc, partIndex)
+      ?? ((session.cursor.partIndex ?? 0) === partIndex && voices.includes(cursorVoice) ? cursorVoice : voices[0] ?? 0);
+  };
+  /** Open on the cursor's part — or on `target`, the part and voice asked for. */
+  const openLyrics = (focus = true, target?: { partIndex: number; voiceIndex: number | null }): boolean => {
     if (!surfaces || lyrics || suspended() || readOnly()) return false;
     tabDigits.flush();
     options.onOpenLyrics?.();
@@ -621,8 +632,12 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.takeFocus = focus;
     el.addEventListener('focusin', onFocusChange);
     el.addEventListener('focusout', onFocusChange);
-    const partIndex = session.cursor.partIndex ?? 0;
-    Object.assign(el, { playing, doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusPlace: lyricPlace(), draft: options.lyricDrafts?.read(partIndex) ?? null });
+    const partIndex = target?.partIndex ?? session.cursor.partIndex ?? 0;
+    const voiceIndex = target?.voiceIndex ?? lyricVoiceFor(partIndex);
+    Object.assign(el, {
+      playing, doc: session.doc, partIndex, voiceIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '',
+      focusPlace: lyricPlace(), draft: options.lyricDrafts?.read(partIndex, voiceIndex) ?? null
+    });
     lyricStep = null;
     /** The panel plans against the document its visit opened on. If something else moved the
      *  document since (an edit on the score, an undo), it plans against that instead — and
@@ -669,7 +684,13 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       detail.accepted = true;
       options.onPreview?.(null);
     });
-    el.addEventListener('lyric-editor-draft', e => options.lyricDrafts?.write(partIndex, (e as CustomEvent<{ text: string | null }>).detail.text));
+    el.addEventListener('lyric-editor-draft', e => options.lyricDrafts?.write(partIndex, voiceIndex, (e as CustomEvent<{ text: string | null }>).detail.text));
+    // Another part or voice: a visit of its own — its commits are a step of their own, its draft its own.
+    el.addEventListener('lyric-editor-target', e => {
+      const { partIndex: part, voiceIndex: voice } = (e as CustomEvent<LyricTargetDetail>).detail;
+      closeLyrics(false);
+      openLyrics(true, { partIndex: part, voiceIndex: voice });
+    });
     el.addEventListener('lyric-editor-close', () => { closeLyrics(); options.onLyricsChoice?.(false); });
     lyrics = el;
     (options.lyricPanel ?? surfaces).append(el);
@@ -861,9 +882,10 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (!moved) { draw(); return false; }
     focused = { press, place: cursorPlace() };
     if (press.kind === 'lyric' && lyrics) {
-      // The panel shows one part: a word of another reopens it there.
-      if (lyrics.partIndex === (session.cursor.partIndex ?? 0)) showLyricWord();
-      else { closeLyrics(false); openLyrics(); }
+      // The panel shows one voice of one part: a word of another reopens it there.
+      const partIndex = session.cursor.partIndex ?? 0, voiceIndex = session.cursor.voiceIndex ?? 0;
+      if (lyrics.partIndex === partIndex && lyrics.voiceIndex === voiceIndex) showLyricWord();
+      else { closeLyrics(false); openLyrics(true, { partIndex, voiceIndex }); }
     }
     draw();
     return true;
@@ -877,7 +899,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (focused?.press.key !== press.key && !selectElement(press)) return;
     if (press.kind === 'lyric') {
       if (lyrics) { showLyricWord(); lyrics.focus(); }
-      else if (openLyrics()) options.onLyricsChoice?.(true);
+      // On the word's own voice, which the press moved the cursor to.
+      else if (openLyrics(true, { partIndex: session.cursor.partIndex ?? 0, voiceIndex: session.cursor.voiceIndex ?? 0 })) options.onLyricsChoice?.(true);
     } else {
       closeInspector(false);
       openInspector(PILL_OF[press.kind]);
