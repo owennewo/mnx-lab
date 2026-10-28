@@ -10,6 +10,7 @@ import { squareLayout, type LayoutCache } from './layoutCache.ts';
 import type { NoteClickHandler, RenderPlan } from './plan.ts';
 import { clampStaffSp, renderOutcome, staffPxPerSp } from './scale.ts';
 import { fitPxPerSp } from './svg.ts';
+import { pageGeometry } from './pageGeometry.ts';
 
 const DEFAULT_PX_PER_SP = 10;
 
@@ -134,6 +135,6 @@ export function planLayout<A extends ReturnType<typeof commonLayoutArgs>>(
     projection,
     // The INK scale is what a zoom readout means by "how big is this", so that
     // is the one reported — `pxPerSp` is now the horizontal axis's business.
-    outcome: renderOutcome(pxPerSpY, fitted, layout.packings)
+    outcome: renderOutcome(pxPerSpY, fitted, layout.packings, pageGeometry(layout, pxPerSp, pxPerSpY))
   };
 }

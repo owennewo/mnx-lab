@@ -24,12 +24,7 @@ import {
   documentArtist,
   documentTitle
 } from '../model/mnx.ts';
-import {
-  resolveTabSetup,
-  tabPositionContext,
-  type PartTabSetups,
-  type TabSetup
-} from '../engine/tab/guitarPositions.ts';
+import type { PartTabSetups, TabSetup } from '../engine/tab/guitarPositions.ts';
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
@@ -65,6 +60,7 @@ import { SELECT_EVENTS_HOOK, SELECT_NOTES_HOOK } from '../engine/layout/selectio
 interface SelectionPage {
   entries: ReturnType<DocumentViewer['entriesFor']>;
   packings: RenderOutcome['packings'];
+  geometry: RenderOutcome['geometry'];
   densityH: number;
   staffOrdinals: (unit: NonNullable<SelectionContext['span']>['units'][number]) => number[];
 }
@@ -79,7 +75,8 @@ import {
 } from './pointerHitTest.ts';
 import { pressOf, PressCounter, targetAt, type ElementPress } from '../engine/render/clickTargets.ts';
 import { collectClickTargets, drawTargetOutline } from './clickTargetPaint.ts';
-import { systemReaches, unitsPerSp } from './scoreGeometry.ts';
+import { unitsPerSp } from './scoreGeometry.ts';
+import type { PageGeometry } from '../engine/render/pageGeometry.ts';
 import type { RenderedProjection } from '../engine/render/projection.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -410,6 +407,12 @@ export class DocumentViewer extends LitElement {
    *  derived from it — keyed on the packing's identity, so a new paint
    *  invalidates it and repeated `densitySteps()` calls do not re-pack. */
   private lastPackings: PackingInput[] | null = null;
+  /** Where the last paint's systems, staves and bars are (`RenderOutcome.geometry`). */
+  private lastGeometry: PageGeometry | null = null;
+  /** Where the drawn page's systems, staves and bars are, in its SVG's units; null before the first paint. */
+  get pageGeometry(): PageGeometry | null {
+    return this.lastGeometry;
+  }
   private ladder: { of: PackingInput[]; steps: number[] } | null = null;
   /** The density that packing was laid out at — `systemRows()`'s input. */
   private lastDensityH = 1;
@@ -1259,6 +1262,7 @@ export class DocumentViewer extends LitElement {
     const preview = this.selection?.preview;
     if (preview && svg && !quick) {
       drawEnclosure(svg, preview.enclosure, {
+        geometry: page.geometry,
         preview: true,
         entries: page.entries,
         noteIds: preview.noteIds,
@@ -1269,6 +1273,7 @@ export class DocumentViewer extends LitElement {
     }
     if (kind && svg && !quick) {
       drawEnclosure(svg, kind, {
+        geometry: page.geometry,
         entries: page.entries,
         noteIds: this.selection?.selectedNoteIds,
         eventIds: this.selection?.selectedEventIds,
@@ -1290,6 +1295,7 @@ export class DocumentViewer extends LitElement {
       const ghost = this.selection?.cursor;
       if ((kind === 'cell' || ghost?.structuralEmpty || ghost?.pendingFret != null) && ghost) {
         drawCursorGhost(svg, ghost, {
+          geometry: page.geometry,
           systemRows: packedRowMeasures(page.packings, page.densityH),
           staffOrdinals: page.staffOrdinals
         });
@@ -1378,56 +1384,37 @@ export class DocumentViewer extends LitElement {
       }
     };
 
-    // The selection-ladder enclosure: drawn from the finished SVG's own
-    // geometry, after the engine is done — the renderer never learns about
-    // editor state, the overlay reads what it drew.
+    // The selection-ladder enclosure: drawn over the finished SVG, after the
+    // engine is done — the renderer never learns about editor state.
     //
-    // The walk is done ONCE, into a table of the staves this paint draws, in
-    // the order they go down a system — so the ordinal the enclosure speaks in
-    // is just an index into it. The enclosure reads it forwards (address →
-    // ordinal) and pointer placement reads it backwards (ordinal → address);
-    // two separate walks would be two chances to disagree about a `both`-view
-    // part whose tab staff is conditional.
-    const resolved = this.resolvedView();
-    const tabOnly = resolved === 'tab';
-    const parts = visible.mnx.parts ?? [];
-    const anyDeclaredKind = parts.some(part => {
-      const kind = part._x?.mnxLab?.tab?.staffKind;
-      return kind === 'both' || kind === 'tab';
-    });
-    const table: RenderedStaff[] = [];
-    if (tabOnly) {
-      // The tab-only view draws exactly one staff, for the first part.
-      if (parts.length > 0)
-        table.push({ partIndex: 0, staffIndex: 1, projection: 'tab', staffCount: 1 });
-    } else {
-      parts.forEach((part, at) => {
-        const partIndex = visible.originalIndex[at];
-        let staffCount = Math.max(1, part.staves ?? 1);
-        for (const measure of part.measures) {
-          for (const sequence of measure.sequences ?? []) {
-            staffCount = Math.max(staffCount, sequence.staff ?? 1);
-          }
-        }
-        for (let staffIndex = 1; staffIndex <= staffCount; staffIndex++)
-          table.push({ partIndex, staffIndex, projection: 'notation', staffCount });
-        if (resolved === 'both') {
-          const kind = resolveTabSetup(tabSetup, part)?.staffKind ?? part._x?.mnxLab?.tab?.staffKind;
-          const opted = kind === 'both' || kind === 'tab';
-          const hasTab = (opted || !anyDeclaredKind) && tabPositionContext(part, tabSetup) !== null;
-          if (hasTab) table.push({ partIndex, staffIndex: 1, projection: 'tab', staffCount });
-        }
-      });
-    }
-    this.staffTable = table;
+    // The staves this paint draws are a table, in the order they go down a
+    // system — so the ordinal the enclosure speaks in is just an index into
+    // it. The enclosure reads it forwards (address → ordinal) and pointer
+    // placement reads it backwards (ordinal → address). It is the layout's own
+    // list (`RenderOutcome.geometry`), with each part named in the document as
+    // it stands rather than the visible parts it was laid out from.
+    const tabOnly = this.resolvedView() === 'tab';
+    const staffCountOf = (part: MnxPart) => {
+      let staffCount = Math.max(1, part.staves ?? 1);
+      for (const measure of part.measures)
+        for (const sequence of measure.sequences ?? []) staffCount = Math.max(staffCount, sequence.staff ?? 1);
+      return staffCount;
+    };
     const renderedStaffOrdinals = (unit: NonNullable<SelectionContext['span']>['units'][number]) =>
-      ordinalsOf(table, unit.partIndex, unit.staffIndex, tabOnly);
+      ordinalsOf(this.staffTable, unit.partIndex, unit.staffIndex, tabOnly);
 
     const enclosed = (pane: HTMLElement, paint: RenderOutcome) => {
       const svg = pane.querySelector('svg');
+      this.staffTable = (paint.geometry.rows[0]?.staves ?? []).map(staff => ({
+        partIndex: visible.originalIndex[staff.partIndex] ?? staff.partIndex,
+        staffIndex: staff.staffIndex,
+        projection: staff.projection,
+        staffCount: staffCountOf(visible.mnx.parts[staff.partIndex]!)
+      }));
       const page: SelectionPage = {
         entries: commonOpts.entries,
         packings: paint.packings,
+        geometry: paint.geometry,
         densityH,
         staffOrdinals: renderedStaffOrdinals
       };
@@ -1507,9 +1494,9 @@ export class DocumentViewer extends LitElement {
   private measuredPage(): { svg: SVGSVGElement; map: ScorePointerMap } | null {
     const svg = this.container?.querySelector<SVGSVGElement>('svg');
     const rows = this.systemRows();
-    if (!svg || !rows) return null;
+    if (!svg || !rows || !this.lastGeometry) return null;
     if (!this.pointerMap)
-      this.pointerMap = buildPointerMap(svg, rows, this.staffTable, unitsPerSp(svg));
+      this.pointerMap = buildPointerMap(svg, rows, this.staffTable, unitsPerSp(svg), this.lastGeometry);
     return { svg, map: this.pointerMap };
   }
 
@@ -1776,6 +1763,7 @@ export class DocumentViewer extends LitElement {
     // NOT in the event: the detail stays exactly `RenderScale`, because a
     // host wants the answer ("which values do something?"), not the input.
     this.lastPackings = drawn.packings;
+    this.lastGeometry = drawn.geometry;
     this.lastDensityH = densityH;
     this.lastStaffSp = used;
     // The page was rebuilt, so every measurement taken off it is stale —
@@ -2113,7 +2101,7 @@ export class DocumentViewer extends LitElement {
       start: unrolled ? loop.first : loop.start,
       end: unrolled ? loop.last : loop.end,
       label,
-    } : null, packedRowMeasures(page.packings, page.densityH));
+    } : null, page.geometry);
   }
 
   private paintBookends() {
@@ -2147,8 +2135,6 @@ export class DocumentViewer extends LitElement {
     if(!ink)return false;
     this.revealBox(ink.getBoundingClientRect(),'auto');return true;
   }
-  /** Each drawn page's system reaches (`systemReaches`), measured once per SVG. */
-  private reaches = new WeakMap<SVGSVGElement, { top: number; bottom: number }[]>();
   /**
    * What a reveal brings into view: the box, grown to the whole system it is on —
    * its staves and its verses, which may stand over the staff or under it — so a
@@ -2160,8 +2146,7 @@ export class DocumentViewer extends LitElement {
     const svg = this.container?.querySelector<SVGSVGElement>('svg');
     const vb = svg?.viewBox.baseVal;
     if (!svg || !vb || vb.height <= 0) return own;
-    let reaches = this.reaches.get(svg);
-    if (!reaches) { reaches = systemReaches(svg, unitsPerSp(svg)); this.reaches.set(svg, reaches); }
+    const reaches = this.lastGeometry?.rows.map(row => row.reach) ?? [];
     const page = svg.getBoundingClientRect();
     const scale = page.height / vb.height;
     const y = vb.y + ((box.top + box.bottom) / 2 - page.top) / scale;

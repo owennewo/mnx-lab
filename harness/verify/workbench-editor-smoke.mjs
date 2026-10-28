@@ -372,7 +372,7 @@ try {
     const v = viewer(); const { svg, map } = v.measuredPage();
     const ctm = svg.getScreenCTM();
     const toClient = (x, y) => { const p = svg.createSVGPoint(); p.x = x; p.y = y; return p.matrixTransform(ctm); };
-    const reachOf = (band, i) => (map.markers.some(y => y >= band.top - map.sp && y <= band.bottom + map.sp) ? 0.5 : 3.25) * (map.gaps[i] || map.sp);
+    const reachOf = (band, i) => (map.tab[i] ? 0.5 : 3.25) * (map.gaps[i] || map.sp);
     const staves = map.staves.map((band, i) => ({ top: band.top - reachOf(band, i), bottom: band.bottom + reachOf(band, i), x: (band.x1 + band.x2) / 2 }))
       .sort((a, b) => a.top - b.top);
     const holes = [[svg.viewBox.baseVal.y, staves[0].top]];

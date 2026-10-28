@@ -70,6 +70,8 @@ export interface LyricSyllable {
   verse: number;
   /** The system row this syllable's staff belongs to — the row fit's owner. */
   row: number;
+  /** The display staff it hangs from, in that row (`InkOrigin.display`). */
+  display?: number;
   /** The staff this syllable hangs from, in THIS system: its lines, and how
    *  far below them its own ink can reach — halfway to the next staff of its
    *  system; the last staff's reaches as far as its system's ink goes. */
@@ -173,6 +175,8 @@ function hangY(p: Primitive): number {
  * stamped with its syllable's row, so the row fit carries it with the system
  * it belongs to however deep it hangs.
  */
+const lyricOrigin = (syl: LyricSyllable) => (syl.display === undefined ? { row: syl.row } : { row: syl.row, display: syl.display });
+
 export function emitLyricRuns(
   runs: Iterable<LyricSyllable[]>,
   primitives: Primitive[],
@@ -207,7 +211,7 @@ export function emitLyricRuns(
     const h = (LYRIC_ASCENT_SP + LYRIC_DESCENT_SP) * (1 + 2 * GAP_PAD_Y), w = h * GAP_ASPECT;
     const gap: Primitive = {
       kind: 'rect', x: syl.x - w / 2, y: y - LYRIC_ASCENT_SP - h * GAP_PAD_Y, w, h, radius: h * 0.2,
-      fill: 'none', className: 'lyric-gap', origin: { row: syl.row },
+      fill: 'none', className: 'lyric-gap', origin: lyricOrigin(syl),
       ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
       ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
     };
@@ -225,7 +229,7 @@ export function emitLyricRuns(
         size: LYRIC_SIZE_SP,
         anchor: 'middle',
         className: 'lyric',
-        origin: { row: syl.row },
+        origin: lyricOrigin(syl),
         ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
         ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
       };
@@ -241,7 +245,7 @@ export function emitLyricRuns(
           size: LYRIC_SIZE_SP,
           anchor: 'middle',
           className: 'lyric-hyphen',
-          origin: { row: syl.row }
+          origin: lyricOrigin(syl)
         };
         primitives.push(hyphen);
       }

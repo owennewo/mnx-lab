@@ -5,7 +5,7 @@ import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
 import type { HorizontalPlan, PlanOptions } from './spacing.ts';
 import { buildScoreJobs, layoutNotation } from './notation.ts';
-import { offsetRows, stampRow, tagElement, translatePrimitiveY } from '../primitives.ts';
+import { stamp, tagElement, translatePrimitiveY, type BarSp, type DisplayStaff } from '../primitives.ts';
 import { rowOf } from './verticalDensity.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, tieOrigins } from './spacing.ts';
@@ -26,7 +26,8 @@ import {
   SETUP_LABEL_TUPLET_CLEAR_SP,
   emitTabTimeSig,
   emitTabVoices,
-  innerColumns
+  innerColumns,
+  TAB_STAFF_LINES
 } from './tabStaff.ts';
 import {
   emitLyricRuns,
@@ -297,6 +298,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // primitives are exactly the slice from its first measure onward.
   const rowStart: number[] = [];
   let openingScoreText: Primitive[] = [];
+  const bars: BarSp[] = [];
   // Which bars declare a feel, and which of those are a change worth printing.
   const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
   for (let i = 0; i < numMeasures; i++) {
@@ -581,7 +583,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     }
     qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, selectedNoteIds);
     // Everything this bar drew — its voltas, labels and directions too — is its row's.
-    stampRow(primitives, measurePrimitiveStart, m.row);
+    stamp(primitives, measurePrimitiveStart, { row: m.row, measure: writtenIndex(plan, i) });
+    bars.push({ row: m.row, index: i, measure: writtenIndex(plan, i), x: m.x, width: m.width });
   }
 
   // Before the frame is fitted: the marks are ink like any other, and both
@@ -638,11 +641,14 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const finalRows = tightened?.rows ?? rows;
   const finalDisplays = finalRows.map(row => [row]);
   if (!context) appendSystemBookends(primitives, finalDisplays, opts.systemBookends);
+  // One staff: everything here is drawn on it.
+  for (const p of primitives) if (p.origin && p.origin.display === undefined) p.origin.display = 0;
+  const staff: DisplayStaff = { partIndex: Math.max(0, mnx.parts.indexOf(part)), staffIndex: context?.staffIndex ?? 1, projection: 'tab', lines: TAB_STAFF_LINES };
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp,
     usedWidthSp: plan.usedWidthSp, naturalWidthSp,
     index, diagnostics, rows: finalRows, displays: finalDisplays,
-    packings: [plan.packing]
+    packings: [plan.packing], bars, staves: finalRows.map(() => [staff])
   };
 }
 
@@ -657,6 +663,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
   const diagnostics: LayoutDiagnostic[] = [];
   const rows: RowBandSp[] = [];
   const displays: RowBandSp[][] = [];
+  const bars: BarSp[] = [];
+  const staves: DisplayStaff[][] = [];
   const packings: NonNullable<LayoutResult['packings']> = [];
   const clearance = clearanceSpacing(display.clearance, opts.densityPad);
   let cursorY = clearance.tabOuterMargin(MARGIN_SP);
@@ -716,11 +724,14 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         const bands = result.rows;
         const bins: Primitive[][] = bands.map(() => []);
         for (const primitive of result.primitives) bins[rowOf(primitive, bands)]!.push(primitive);
-        return { bands, bins };
+        return { bands, bins, result };
       });
       for (let row = 0; row < plan.rowCount; row++) {
         const system: RowBandSp[] = [];
-        for (const staff of staffs) {
+        // One plan, so every staff draws the same bars: the first staff's stand for the system.
+        for (const bar of staffs[0]?.result.bars ?? []) if (bar.row === row) bars.push({ ...bar, row: rows.length });
+        staves.push(staffs.map(staff => staff.result.staves?.[row]?.[0]).filter((s): s is DisplayStaff => s !== undefined));
+        for (const [k, staff] of staffs.entries()) {
           const band = staff.bands[row];
           const ink = computeBoundsSp(staff.bins[row]);
           const top = Math.min(band.staffTop, ink?.y ?? band.staffTop);
@@ -729,7 +740,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
           // single-staff fit gives a versed system.
           if ((rows.length > 0 || system.length > 0) && staff.bins[row].some(p => /lyric/.test(p.className ?? ''))) cursorY += clearance.versesAbove;
           const dy = cursorY - top;
-          offsetRows(staff.bins[row], rows.length - row);
+          // Drawn alone, each staff was row `row`, staff 0; here it is this system's staff k.
+          for (const primitive of staff.bins[row]) primitive.origin = { ...primitive.origin!, row: rows.length, display: k };
           for (const primitive of staff.bins[row]) {
             translatePrimitiveY(primitive, dy);
             primitives.push(primitive);
@@ -744,6 +756,6 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
     });
   }
   appendSystemBookends(primitives, displays, opts.systemBookends);
-  return { primitives, index, diagnostics, rows, displays, packings,
+  return { primitives, index, diagnostics, rows, displays, packings, bars, staves,
     widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + (opts.densityPad !== undefined || (display.clearance ?? 2) === 2 ? MARGIN_SP : clearance.tabOuterMargin(MARGIN_SP + 3) - clearance.systemInk) };
 }

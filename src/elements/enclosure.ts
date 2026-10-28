@@ -42,19 +42,15 @@ import { SCORE_LABEL_CAP_RATIO } from '../engine/layout/scoreText.ts';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 import {
-  measureBoundaries,
-  collectBarlines,
-  collectStaves,
-  collectSystemBands,
-  assignSystems,
   inkBox,
-  snapToBarlines,
+  pageBands,
+  snapToBars,
   staffIndexOf,
   union,
   unitsPerSp,
-  type Box,
-  type StaffBand
+  type Box
 } from './scoreGeometry.ts';
+import type { PageGeometry } from '../engine/render/pageGeometry.ts';
 
 /**
  * Options for a SECOND enclosure drawn beside the real one: the selection
@@ -95,9 +91,12 @@ export interface EnclosureOptions {
    * is the host's call; this module only knows the rendered ink's own class
    * vocabulary, the same way it knows `.notehead` and `.fret-number`. */
   litLabels?: boolean;
+  /** Where the page's systems, staves and bars are — the layout's answer
+   *  (`RenderOutcome.geometry`), which the enclosure draws against. */
+  geometry: PageGeometry;
 }
 
-export type CursorGhostOptions = Pick<EnclosureOptions, 'systemRows' | 'staffOrdinals'>;
+export type CursorGhostOptions = Pick<EnclosureOptions, 'systemRows' | 'staffOrdinals' | 'geometry'>;
 
 export interface EnclosureSnapshot {
   kind: EnclosureKind;
@@ -237,7 +236,7 @@ export function markProjectionEchoes(
 export function drawEnclosure(
   svg: SVGSVGElement,
   kind: EnclosureKind,
-  options: EnclosureOptions = {}
+  options: EnclosureOptions
 ): void {
   const preview = options.preview === true;
   const layer = preview ? 'enclosure-preview' : 'enclosure';
@@ -315,8 +314,7 @@ export function drawEnclosure(
   const hasStructuralSpan = Boolean(options.span?.units.length && options.systemRows?.length);
   if (boxes.length === 0 && kind !== 'frame' && !hasStructuralSpan) return;
 
-  const barlines = collectBarlines(svg);
-  const staves = assignSystems(collectStaves(svg, sp), barlines);
+  const { staves, systems, tab, boundaries: rowBoundaries } = pageBands(options.geometry);
 
   const g = document.createElementNS(SVG_NS, 'g');
   g.setAttribute('class', `${layer} enc-${kind}`);
@@ -347,25 +345,19 @@ export function drawEnclosure(
   };
 
   /**
-   * Boxes per staff index — two-pass, by glyph KIND before proximity: fret
-   * numbers sit ON their staff, so they assign first and mark those staves as
-   * tab; noteheads then prefer the remaining staves. Pure y-proximity would
-   * hand a deep-ledger notehead to the tab staff below it — projection
-   * semantics (frets = tab, noteheads = notation) is the honest tiebreak.
+   * Boxes per staff index, by glyph KIND before proximity: the layout says which
+   * staves are tab, so a fret number goes to the nearest tab staff and a notehead
+   * to the nearest notation staff. Pure y-proximity would hand a deep-ledger
+   * notehead to the tab staff below it.
    */
   const byStaff = new Map<number, Box[]>();
-  const tabStaves = new Set<number>();
+  const tabStaves = new Set(staves.flatMap((_, i) => (tab[i] ? [i] : [])));
   if (staves.length > 0) {
-    for (const marker of svg.querySelectorAll<SVGGraphicsElement>('.tab-clef, .fret-number')) {
-      tabStaves.add(staffIndexOf(staves, inkBox(marker, sp)));
-    }
-    glyphs.forEach((el, i) => {
-      if (el.classList.contains('fret-number')) tabStaves.add(staffIndexOf(staves, boxes[i]));
-    });
+    const tabPool = [...tabStaves];
     const notationPool = staves.map((_, i) => i).filter(i => !tabStaves.has(i));
     glyphs.forEach((el, i) => {
       const staff = el.classList.contains('fret-number')
-        ? staffIndexOf(staves, boxes[i])
+        ? staffIndexOf(staves, boxes[i], tabPool)
         : staffIndexOf(staves, boxes[i], notationPool);
       byStaff.set(staff, [...(byStaff.get(staff) ?? []), boxes[i]]);
     });
@@ -379,7 +371,6 @@ export function drawEnclosure(
   if (hasStructuralSpan && kind !== 'frame') {
     const span = options.span!;
     const rows = options.systemRows!;
-    const systems = collectSystemBands(staves);
     const isRange = span.units.length > 1;
 
     systems.forEach((system, rowIndex) => {
@@ -387,7 +378,7 @@ export function drawEnclosure(
       if (!rowMeasures?.length) return;
       const units = span.units.filter(unit => rowMeasures.includes(unit.measureIndex));
       if (units.length === 0) return;
-      const boundaries = measureBoundaries(system, barlines, rowMeasures.length, sp);
+      const boundaries = rowBoundaries[rowIndex] ?? [];
       const rowRect = (
         x: number,
         y: number,
@@ -685,18 +676,7 @@ export function drawEnclosure(
       // bar's own tempo/rehearsal marks sit), clamped just inside the
       // viewBox so no side is ever clipped away.
       const vb = svg.viewBox.baseVal;
-      const systemBands = [...new Set(staves.map(s => s.system))]
-        .map(id => {
-          const ss = staves.filter(s => s.system === id);
-          return {
-            id,
-            top: Math.min(...ss.map(s => s.top)),
-            bottom: Math.max(...ss.map(s => s.bottom)),
-            x1: Math.min(...ss.map(s => s.x1)),
-            x2: Math.max(...ss.map(s => s.x2))
-          };
-        })
-        .sort((a, b) => a.top - b.top);
+      const systemBands = systems;
       const slotOf = (band: (typeof systemBands)[number]) => {
         const i = systemBands.indexOf(band);
         const prev = systemBands[i - 1];
@@ -719,7 +699,7 @@ export function drawEnclosure(
           const bottom = Math.max(band.bottom, u.y + u.h + 0.5 * sp) + 0.4 * sp;
           rect(u.x - 0.4 * sp, top, u.w + 0.8 * sp, bottom - top, 0.4 * sp, 0.07 * sp);
         } else {
-          const { left, right } = snapToBarlines(band, barlines, u.x, u.x + u.w);
+          const { left, right } = snapToBars(rowBoundaries[sys] ?? [], band, u.x, u.x + u.w);
           const slot = slotOf(band);
           const x0 = Math.max(left - 0.35 * sp, vb.x + 0.3 * sp);
           const x1 = Math.min(right + 0.35 * sp, vb.x + vb.width - 0.3 * sp);
@@ -830,7 +810,7 @@ function previewGlyphs(
 export function drawCursorGhost(
   svg: SVGSVGElement,
   ghost: CursorGhost,
-  options: CursorGhostOptions = {}
+  options: CursorGhostOptions
 ): void {
   svg.querySelector(':scope > g.cursor-ghost')?.remove();
   const sp = unitsPerSp(svg);
@@ -861,17 +841,9 @@ export function drawCursorGhost(
     (ghost.pendingFret === null || ghost.pendingFret === undefined)
   ) return;
 
-  const barlines = collectBarlines(svg);
-  const staves = assignSystems(collectStaves(svg, sp), barlines);
+  const { staves, systems, tab, gaps, boundaries: rowBoundaries } = pageBands(options.geometry);
   if (staves.length === 0) return;
 
-  const markerYs = [
-    ...svg.querySelectorAll<SVGTextElement>('text.tab-clef, text.fret-number')
-  ].map(el => (el.y.baseVal.numberOfItems > 0 ? el.y.baseVal.getItem(0).value : NaN));
-  const isTabBand = (band: StaffBand) =>
-    markerYs.some(y => y >= band.top - sp && y <= band.bottom + sp);
-
-  const systems = collectSystemBands(staves);
   const rows = options.systemRows ?? [];
   const measureIndex = ghost.measureIndex ?? -1;
   // The bar past the end belongs to no packed row — it is not in the document
@@ -890,7 +862,7 @@ export function drawCursorGhost(
     .map(ordinal => system.staffIndices[ordinal])
     .filter((index): index is number => index !== undefined);
   const pool = (mapped.length > 0 ? mapped : system.staffIndices).filter(index =>
-    ghost.string !== null ? isTabBand(staves[index]) : !isTabBand(staves[index])
+    ghost.string !== null ? tab[index] : !tab[index]
   );
   const bandIndex = pool[0] ?? mapped[0] ?? system.staffIndices[0];
   const band = staves[bandIndex];
@@ -920,19 +892,8 @@ export function drawCursorGhost(
     return;
   }
 
-  // Line spacing within the band (tab and notation staves may differ).
-  const lineYs = [...svg.querySelectorAll<SVGLineElement>('line.staff-line')]
-    .map(l => l.y1.baseVal.value)
-    .filter(y => y >= band.top - 0.01 && y <= band.bottom + 0.01)
-    .sort((a, b) => a - b);
-  let gap = sp;
-  for (let i = 1; i < lineYs.length; i++) {
-    const g = lineYs[i] - lineYs[i - 1];
-    if (g > 0.01) {
-      gap = g;
-      break;
-    }
-  }
+  // Line spacing within the band (tab and notation staves differ).
+  const gap = gaps[bandIndex] || sp;
 
   const y =
     ghost.string !== null
@@ -964,7 +925,7 @@ export function drawCursorGhost(
     const rowMeasures = rows[rowIndex];
     const measureOffset = rowMeasures.indexOf(measureIndex);
     if (measureOffset >= 0) {
-      const boundaries = measureBoundaries(system, barlines, rowMeasures.length, sp);
+      const boundaries = rowBoundaries[rowIndex] ?? [];
       x = measurePositionX(
         boundaries[measureOffset],
         boundaries[measureOffset + 1],

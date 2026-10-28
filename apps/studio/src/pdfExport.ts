@@ -91,12 +91,12 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
       }
     });
     const box = source.viewBox.baseVal;
-    // Break in whitespace, never through ink. A tall indivisible band gets its
-    // own fitted page, rather than clipping a staff at the paper edge.
-    const bands = Array.from(source.querySelectorAll<SVGGraphicsElement>('path,line,rect,text,circle,ellipse,polygon,polyline'))
-      .filter(node => getComputedStyle(node).visibility !== 'hidden' && getComputedStyle(node).display !== 'none')
-      .map(node => { const b = node.getBBox(); return [b.y - 2, b.y + b.height + 2]; })
-      .sort((a, b) => a[0] - b[0]);
+    // Break between systems, never through one: a band is a system with all the ink
+    // it carries — verses, headings, directions — as the layout drew it for that
+    // system. A tall indivisible band gets its own fitted page, rather than
+    // clipping a staff at the paper edge.
+    const bands = (viewer.pageGeometry?.rows ?? []).map(row => [row.reach.top - 2, row.reach.bottom + 2])
+      .sort((a, b) => a[0]! - b[0]!);
     const merged: number[][] = [];
     for (const band of bands) {
       const last = merged.at(-1);

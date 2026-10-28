@@ -2,10 +2,12 @@
  * The loop on the score (roadmap/inprogress/studio-player-practice.md; marker A on the Loop
  * practice canvas, 2026-10-22): a wash behind the loop's bars, a bracket over them that runs off
  * a system's end and picks up on the next, and a chip at its start naming it — or, during a
- * count-in, counting it. Drawn from the rendered SVG's own geometry after the engine is done, as
- * the selection's enclosure is (enclosure.ts), so the renderer never learns about playback.
+ * count-in, counting it. Drawn over the rendered SVG after the engine is done, against the
+ * layout's own systems and bars (`RenderOutcome.geometry`), as the selection's enclosure is
+ * (enclosure.ts), so the renderer never learns about playback.
  */
-import { assignSystems, collectBarlines, collectStaves, collectSystemBands, measureBoundaries, unitsPerSp } from './scoreGeometry.ts';
+import type { PageGeometry } from '../engine/render/pageGeometry.ts';
+import { unitsPerSp } from './scoreGeometry.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 /** The bracket's height over a system's top line: just clear of the bar numbers (their tops
@@ -14,7 +16,7 @@ const BRACKET_RISE_SP = 2;
 const CHIP_HEIGHT_SP = 1.6;
 
 export interface LoopMarker {
-  /** The bars the wash covers, as the rows of the drawn page number them. */
+  /** The bars the wash covers, as the drawn page's bars number them (`PageBar.index`). */
   measures: readonly number[];
   /** The bar the loop starts in (its chip and start tick) and ends in (its end tick). */
   start: number;
@@ -28,21 +30,19 @@ const element = <K extends keyof SVGElementTagNameMap>(name: K, attributes: Reco
   return node;
 };
 
-/** Draw `loop` on `svg`, whose systems hold `rows` (measure numbers per system, top to bottom); null clears it. */
-export function drawLoopMarker(svg: SVGSVGElement, loop: LoopMarker | null, rows: readonly (readonly number[])[] | null): void {
+/** Draw `loop` on `svg`, whose systems and bars `geometry` says; null clears it. */
+export function drawLoopMarker(svg: SVGSVGElement, loop: LoopMarker | null, geometry: PageGeometry | null): void {
   for (const layer of svg.querySelectorAll(':scope > g.loop-wash-layer, :scope > g.loop-marker')) layer.remove();
-  if (!loop || !rows?.length || !loop.measures.length) return;
+  if (!loop || !geometry?.rows.length || !loop.measures.length) return;
   const sp = unitsPerSp(svg);
-  const barlines = collectBarlines(svg);
-  const systems = collectSystemBands(assignSystems(collectStaves(svg, sp), barlines));
   const wanted = new Set(loop.measures);
   const numbers = [...svg.querySelectorAll<SVGTextElement>('text.measure-number')].map(text => text.getBBox?.()).filter(box => box && box.width > 0);
   const wash = element('g', { class: 'loop-wash-layer', 'aria-hidden': 'true' });
   const marks = element('g', { class: 'loop-marker', 'aria-hidden': 'true' });
-  systems.forEach((system, row) => {
-    const measures = rows[row];
-    if (!measures?.length) return;
-    const xs = measureBoundaries(system, barlines, measures.length, sp);
+  for (const system of geometry.rows) {
+    const measures = system.bars.map(bar => bar.index);
+    if (!measures.length) continue;
+    const xs = [system.bars[0]!.x1, ...system.bars.map(bar => bar.x2)];
     for (let i = 0; i < measures.length; i++) {
       if (!wanted.has(measures[i]!)) continue;
       let j = i;
@@ -67,7 +67,7 @@ export function drawLoopMarker(svg: SVGSVGElement, loop: LoopMarker | null, rows
         marks.appendChild(element('path', { class: 'loop-continues', d: `M${x1 - 0.2 * sp} ${y - 0.7 * sp}L${x1 + 0.8 * sp} ${y}L${x1 - 0.2 * sp} ${y + 0.7 * sp}Z` }));
       i = j;
     }
-  });
+  }
   if (wash.childElementCount) svg.insertBefore(wash, svg.firstChild);
   if (marks.childElementCount) svg.appendChild(marks);
   // The chip fits its words, measured once they are drawn.

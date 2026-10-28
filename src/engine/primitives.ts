@@ -93,18 +93,41 @@ export interface PrimitiveBase {
 export interface InkOrigin {
   /** The system row it was drawn for: an index into the layout's `rows`. */
   row: number;
+  /** The staff it was drawn on: an index into its row's `displays` (and `staves`).
+   *  Absent on ink that belongs to the system rather than one staff — a barline
+   *  through several staves, a brace, a heading over the system. */
+  display?: number;
+  /** The written measure (an index into `global.measures`) it was drawn for.
+   *  Absent on ink that spans bars — a slur, a volta, a verse. */
+  measure?: number;
 }
 
 /**
- * Stamp everything pushed since `from` that has no row yet as drawn for `row`. Emitters
- * stamp the range they pushed; an inner emitter that drew across rows has already stamped
- * each piece, and keeps its own.
+ * Stamp everything pushed since `from` as drawn for `origin`, filling only what a
+ * primitive does not say yet. Emitters stamp the range they pushed; an inner emitter
+ * that knew more — the staff, or the row of each half of a split curve — has stamped
+ * its own pieces first, and they keep it.
  */
-export function stampRow(primitives: readonly Primitive[], from: number, row: number): void {
+export function stamp(primitives: readonly Primitive[], from: number, origin: InkOrigin): void {
   for (let k = from; k < primitives.length; k++) {
     const p = primitives[k]!;
-    if (p.origin === undefined) p.origin = { row };
+    p.origin = p.origin ? { ...origin, ...p.origin } : { ...origin };
   }
+}
+
+/** Name the staff of everything pushed since `from` that was stamped with its row but
+ *  no staff — a post-pass that knows the staff it walked, around emitters that knew
+ *  only the row of each piece. */
+export function stampDisplay(primitives: readonly Primitive[], from: number, display: number): void {
+  for (let k = from; k < primitives.length; k++) {
+    const p = primitives[k]!;
+    if (p.origin && p.origin.display === undefined) p.origin = { ...p.origin, display };
+  }
+}
+
+/** `stamp` with the row alone. */
+export function stampRow(primitives: readonly Primitive[], from: number, row: number): void {
+  stamp(primitives, from, { row });
 }
 
 /** Offset the rows of primitives laid out on their own (a segment, a score block, a staff
@@ -361,4 +384,32 @@ export interface LayoutResult {
    * (roadmap/complete/core-render-density-zoom.md).
    */
   packings?: PackingInput[];
+  /** Every bar drawn, in the order drawn: the row it is on and its extent, from its
+   *  left barline (the system's left edge for a system's first bar) to its right.
+   *  What the overlays read instead of finding bars among barline strokes. */
+  bars?: BarSp[];
+  /** Per row, per display staff (parallel to `displays`): which staff it draws. */
+  staves?: DisplayStaff[][];
+}
+
+/** One drawn bar — see `LayoutResult.bars`. */
+export interface BarSp {
+  row: number;
+  /** Its index in the layout's plan: the ordinal `packedRowMeasures` lists. */
+  index: number;
+  /** The written measure it draws. */
+  measure: number;
+  x: number;
+  width: number;
+}
+
+/** Which staff a display band draws — see `LayoutResult.staves`. */
+export interface DisplayStaff {
+  /** Index into the laid-out document's `parts`. */
+  partIndex: number;
+  /** 1-based, as everywhere in the cursor's address. */
+  staffIndex: number;
+  projection: 'notation' | 'tab';
+  /** Its line count: five for notation, the string count for tab. */
+  lines: number;
 }

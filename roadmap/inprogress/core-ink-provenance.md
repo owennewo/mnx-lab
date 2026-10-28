@@ -116,3 +116,32 @@ Evidence: **every golden byte-identical** — the midpoint guessed right on ever
 corpus pins. The bug it guessed wrong on is pinned instead by
 `lyric-placement.test.ts` → *verses over a stacked heading*: on the old code the second
 system's verse sat 1.1 sp into its "Bridge" label; on the new it clears it.
+
+**Phase 2 — staff, bar and the page's geometry (2026-10-28).** `origin.display` on
+staff-bound ink (staff lines, clefs, key and time signatures, every event a staff draws,
+injected tab staves, full-bar rests, measure repeats, beams, slurs and ties, ottavas,
+hairpins, tab technique, verses) and `origin.measure` on everything a bar's loop iteration
+draws. `LayoutResult` gains `bars` (each drawn bar: row, plan index, written measure, x
+extent) and `staves` (per row, per display: part, staff, projection, line count), and
+`planLayout` puts them through the emitter's scale as `RenderOutcome.geometry`
+(`src/engine/render/pageGeometry.ts`), with each row's ink `reach` measured over the ink
+stamped as that row's. The overlays read it through `pageBands` (`scoreGeometry.ts`).
+Deleted: `collectStaves`, `assignSystems`, `collectSystemBands`, `collectBarlines`,
+`measureBoundaries`, `snapToBarlines` (now `snapToBars` over the layout's bar edges),
+`tabBandMarkers`, `isTabBand`, `bandLineGap` and `systemReaches`; the viewer's own copy of
+the staff table (now the layout's, which also fixes the tab-only view of several parts,
+where the copy assumed one staff); the PDF export's band merge over every element's
+`getBBox` (a text box is its whole em square, so two systems could merge). Within a row,
+`measureDisplayGaps` files staff-bound ink by `origin.display`; only ink drawn for the
+system as a whole (directions between staves) still goes by its anchor.
+
+Still read off the SVG, deliberately: ink — where a selected glyph or a drawn column
+actually is — and `staffIndexOf` for a selected glyph's box, now within the staves of its
+projection as the layout names them.
+
+Evidence: every golden byte-identical again (the display stamps feed `measureDisplayGaps`,
+which shapes every `both` view); the census now also checks that every staff-bound
+primitive names a staff of its row, that staff lines lie in the band they name, and that
+the bars, row by row, are exactly `packedRowMeasures`' rows. The selection, loop, unrolled,
+single-cursor, focus, inspector, studio-editor, studio-export and workbench-editor smokes
+pass against the new geometry.

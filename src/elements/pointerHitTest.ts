@@ -21,16 +21,9 @@
  * cursor grid knows which stop that neighbourhood belongs to.
  */
 import {
-  assignSystems,
   collectInkColumns,
   bandDistance,
-  bandLineGap,
-  collectBarlines,
-  collectStaves,
-  collectSystemBands,
-  isTabBand,
-  measureBoundaries,
-  tabBandMarkers,
+  pageBands,
   type InkColumn,
   type StaffBand,
   type SystemBand
@@ -38,6 +31,7 @@ import {
 import { measurePositionAt, measurePositionX } from '../engine/render/selectionGeometry.ts';
 import { slotAt, type ClickTarget, type SlotStaff } from '../engine/render/clickTargets.ts';
 import { collectClickTargets } from './clickTargetPaint.ts';
+import type { PageGeometry } from '../engine/render/pageGeometry.ts';
 
 /**
  * One rendered staff, in model terms. The viewer builds this list in the order
@@ -94,7 +88,8 @@ export interface ScorePointerMap {
   sp: number;
   staves: StaffBand[];
   systems: SystemBand[];
-  markers: number[];
+  /** Per band: whether it is a tab staff — the layout says, not the ink. */
+  tab: boolean[];
   /** Measure indices per rendered system row, top row first. */
   rows: number[][];
   /** Rendered staves in system order — the ordinal table. */
@@ -119,24 +114,19 @@ export function buildPointerMap(
   svg: SVGSVGElement,
   rows: number[][],
   table: RenderedStaff[],
-  unitsPerSp: number
+  unitsPerSp: number,
+  geometry: PageGeometry
 ): ScorePointerMap {
-  const barlines = collectBarlines(svg);
-  const staves = assignSystems(collectStaves(svg, unitsPerSp), barlines);
-  const systems = collectSystemBands(staves);
-  const markers = tabBandMarkers(svg);
-  const gaps = staves.map(band => bandLineGap(svg, band, unitsPerSp));
-  const boundaries = systems.map((system, rowIndex) => {
-    const count = rows[rowIndex]?.length ?? 0;
-    return count > 0 ? measureBoundaries(system, barlines, count, unitsPerSp) : [];
-  });
+  // Where the staves, systems and bars are is the layout's answer; the ink is read for
+  // what a press can land on.
+  const { staves, systems, tab, gaps, boundaries } = pageBands(geometry);
   return {
-    sp: unitsPerSp, staves, systems, markers, rows, table, gaps, boundaries,
+    sp: unitsPerSp, staves, systems, tab, rows, table, gaps, boundaries,
     columns: collectInkColumns(svg, unitsPerSp),
     targets: collectClickTargets(svg, unitsPerSp),
     slots: staves.map((band, index) => ({
       top: band.top, bottom: band.bottom, x1: band.x1, x2: band.x2,
-      gap: gaps[index] || unitsPerSp, tab: isTabBand(markers, band, unitsPerSp)
+      gap: gaps[index] || unitsPerSp, tab: tab[index] === true
     }))
   };
 }
@@ -227,7 +217,7 @@ export function hitTest(
   // the authority, not the table: in the `both` view the reader can point at
   // either of a part's two staves, and which one they pointed at is the whole
   // question. The table supplies the part and staff; the ink supplies the space.
-  const tab = isTabBand(map.markers, band, map.sp);
+  const tab = map.tab[bandIndex] === true;
   const gap = map.gaps[bandIndex] || map.sp;
   const line = tab
     ? Math.round((point.y - band.top) / Math.max(gap, 1e-6)) + 1
@@ -298,7 +288,8 @@ export function ordinalsOf(
   tabOnlyView: boolean
 ): number[] {
   if (partIndex === undefined || staffIndex === undefined) return [];
-  if (tabOnlyView) return partIndex === 0 ? [0] : [];
+  // A tab view draws a part's notes on its tab staff, whichever staff they are written on.
+  if (tabOnlyView) return table.flatMap((staff, ordinal) => (staff.partIndex === partIndex ? [ordinal] : []));
   const found: number[] = [];
   table.forEach((staff, ordinal) => {
     if (staff.partIndex !== partIndex) return;

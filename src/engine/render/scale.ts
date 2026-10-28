@@ -11,6 +11,7 @@
  * fire-and-forget for every caller that doesn't care, and the corpus harness
  * ignores it entirely.
  */
+import type { PageGeometry } from './pageGeometry.ts';
 import type { PackingInput } from '../layout/spacing.ts';
 
 export interface RenderScale {
@@ -43,6 +44,9 @@ export interface RenderScale {
 export interface RenderOutcome extends RenderScale {
   /** One per laid-out segment; empty when the layout packed nothing. */
   packings: PackingInput[];
+  /** Where the drawn systems, staves and bars are, in the SVG's units — for an
+   *  overlay to read rather than find in the drawing. */
+  geometry: PageGeometry;
 }
 
 /** The baseline at Staff 1sp. One definition, so the three renderers cannot
@@ -119,9 +123,10 @@ export function renderScale(pxPerSp: number, fitted: boolean): RenderScale {
 export function renderOutcome(
   pxPerSp: number,
   fitted: boolean,
-  packings: PackingInput[] | undefined
+  packings: PackingInput[] | undefined,
+  geometry: PageGeometry
 ): RenderOutcome {
-  return { ...renderScale(pxPerSp, fitted), packings: packings ?? [] };
+  return { ...renderScale(pxPerSp, fitted), packings: packings ?? [], geometry };
 }
 
 /** @deprecated Use `MIN_STAFF_SP`. */

@@ -73,7 +73,7 @@ import {
   BeamHookSpec
 } from './beams.ts';
 import {
-  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, offsetRows, stampRow, tagElement, translatePrimitiveY
+  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, offsetRows, stamp, stampDisplay, tagElement, translatePrimitiveY, type BarSp, type DisplayStaff
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import {
@@ -107,6 +107,7 @@ import { noteKeyAt } from '../../model/noteWalk.ts';
 import { syntheticEventKey } from '../../model/noteKeys.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
+  TAB_STAFF_LINES,
   emitTabClef,
   emitTabStaffLines,
   emitTabSystemHeader,
@@ -907,6 +908,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   let usedWidthSp = 0;
   let naturalWidthSp: number | undefined;
   const rows: RowBandSp[] = [];
+  const bars: BarSp[] = [];
+  const staves: DisplayStaff[][] = [];
   const displays: RowBandSp[][] = [];
   // One per laid-out segment: a score with per-system layouts packs each range
   // separately, and a density value is only degenerate when it changes NONE of
@@ -977,6 +980,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       }
       offsetRows(r.primitives, rows.length);
       primitives.push(...r.primitives);
+      for (const bar of r.bars) bars.push({ ...bar, row: bar.row + rows.length });
+      staves.push(...r.staves);
       for (const band of r.rows) {
         rows.push({ staffTop: band.staffTop + cursorY, staffBottom: band.staffBottom + cursorY });
       }
@@ -1014,7 +1019,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     rows: tightened?.rows ?? rows,
     // Display bands ride with their rows when the density pass moves them.
     displays: finalDisplays,
-    packings
+    packings, bars, staves
   };
 }
 
@@ -1064,6 +1069,9 @@ interface SegmentResult {
   packing: PackingInput;
   /** This segment's width at density 1 — see `LayoutResult.naturalWidthSp`. */
   naturalWidthSp?: number;
+  /** Rows are this segment's own, from 0. */
+  bars: BarSp[];
+  staves: DisplayStaff[][];
 }
 
 /**
@@ -1118,8 +1126,11 @@ function measureDisplayGaps(seg: SegmentResult, clearance: ClearanceSpacing): (n
       gapContent[r][d].push(p);
       continue;
     }
-    let d = 0;
-    while (d + 1 < bands.length && y >= (bands[d].staffBottom + bands[d + 1].staffTop) / 2) d++;
+    // Drawn on a staff, it is that staff's; ink drawn for the system as a whole goes by
+    // where its anchor falls among the row's bands.
+    let d = p.origin?.display ?? 0;
+    if (p.origin?.display === undefined)
+      while (d + 1 < bands.length && y >= (bands[d].staffBottom + bands[d + 1].staffTop) / 2) d++;
     buckets[r][d].push(p);
   }
 
@@ -1533,8 +1544,13 @@ function assembleSegment(
     const staffTop = staffTops[0];
     const sysBottom = displayTopOf(m.row, displayCount - 1) + displayHeights[displayCount - 1];
 
+    // What plan staff `s` drew since `from` is that staff's ink, in this bar.
+    const onStaff = (from: number, s: number) =>
+      stamp(primitives, from, { row: m.row, display: displayOfPlan[s]!, measure: writtenIndex(plan, i) });
+
     // Staff lines, per staff
-    for (const top of staffTops) {
+    for (const [staff, top] of staffTops.entries()) {
+      const from = primitives.length;
       for (let s = 0; s < STAFF_LINES; s++) {
         const lineY = top + s;
         primitives.push({
@@ -1544,6 +1560,7 @@ function assembleSegment(
           className: 'staff-line'
         });
       }
+      onStaff(from, staff);
     }
 
     if (m.firstInSystem) {
@@ -1662,10 +1679,12 @@ function assembleSegment(
     if (m.showClef) {
       for (let s = 0; s < numStaves; s++) {
         const staffClef = m.clefTimelines[s][0].clef;
+        const from = primitives.length;
         if (staffClef.unsupportedSign) {
           primitives.push({ kind: 'text', text: '?', x: m.clefX, y: staffTops[s] + 2,
             font: 'body', size: 2, baseline: 'central', className: 'unsupported-clef',
             title: `unsupported clef ${staffClef.unsupportedSign}` });
+          onStaff(from, s);
           continue;
         }
         primitives.push({
@@ -1676,6 +1695,7 @@ function assembleSegment(
           ...(staffClef.color ? { fill: staffClef.color } : {}),
           className: 'clef'
         });
+        onStaff(from, s);
       }
     }
 
@@ -1721,10 +1741,12 @@ function assembleSegment(
 
     // Mid-measure clef changes, at the column the plan reserved for them.
     for (const cc of m.clefChanges) {
+      const from = primitives.length;
       if (cc.clef.unsupportedSign) {
         primitives.push({ kind: 'text', text: '?', x: cc.x, y: (staffTops[cc.staff - 1] ?? staffTop) + 2,
           font: 'body', size: 1.4, baseline: 'central', className: 'unsupported-clef clef-change',
           title: `unsupported clef ${cc.clef.unsupportedSign}` });
+        onStaff(from, cc.staff - 1);
         continue;
       }
       primitives.push({
@@ -1736,6 +1758,7 @@ function assembleSegment(
         ...(cc.clef.color ? { fill: cc.clef.color } : {}),
         className: 'clef clef-change'
       });
+      onStaff(from, cc.staff - 1);
     }
 
     if (m.showKeySig) {
@@ -1744,6 +1767,7 @@ function assembleSegment(
       for (let s = 0; s < numStaves; s++) {
         if (m.clefTimelines[s][0].clef.unsupportedSign) continue;
         const clefShift = KEY_SIG_CLEF_OFFSET[m.clefTimelines[s][0].clef.sign];
+        const from = primitives.length;
         keySignatureGlyphs(m.keyFifths, m.cancelledKeyFifths).forEach((g, idx) => {
           primitives.push({
             kind: 'glyph',
@@ -1757,11 +1781,13 @@ function assembleSegment(
             className: 'key-sig'
           });
         });
+        onStaff(from, s);
       }
     }
 
     if (m.showTimeSig) {
-      for (const top of staffTops) {
+      for (const [staff, top] of staffTops.entries()) {
+        const from = primitives.length;
         // `display: common/cut` → a single symbol glyph centred on the middle
         // line, instead of the count/unit numerals.
         if (m.timeSig.display === 'common' || m.timeSig.display === 'cut') {
@@ -1773,6 +1799,7 @@ function assembleSegment(
             anchor: 'middle',
             className: 'time-sig'
           });
+          onStaff(from, staff);
           continue;
         }
         const numY = top + 1; // visual centre of upper half (line 2 from top)
@@ -1801,6 +1828,7 @@ function assembleSegment(
             className: 'time-sig-den'
           });
         }
+        onStaff(from, staff);
       }
     }
 
@@ -1842,6 +1870,7 @@ function assembleSegment(
       ...m.issues.map(message => ({ kind: 'render' as const, message }))
     ];
     resolvedByStaff.forEach((staffVoices, s) => {
+      const staffFrom = primitives.length;
       // Forced stems (layout sources) win; multiple stem-less voices rank by
       // pitch (upper voice up, rest down); lone voices auto-stem per event.
       const defaultStems = rankVoiceStems(staffVoices, m.clefTimelines[s][0].clef);
@@ -2015,7 +2044,7 @@ function assembleSegment(
                 if (lyricLines?.[lineId]?.text?.trim()) return;
                 const key = `${s}:${lineId}`;
                 lyricRuns.set(key, [...(lyricRuns.get(key) ?? []), {
-                  x: slot.x, verse, row: m.row, staffTop: staffTops[s], staffBottom: staffBottoms[s],
+                  x: slot.x, verse, row: m.row, display: displayOfPlan[s], staffTop: staffTops[s], staffBottom: staffBottoms[s],
                   bandBottom: lyricBandBottom(m.row, s), text: '', continues: false,
                   playbackId, lyricLine: lineId, gap: true
                 }]);
@@ -2031,6 +2060,7 @@ function assembleSegment(
                   x: slot.x,
                   verse,
                   row: m.row,
+                  display: displayOfPlan[s],
                   staffTop: staffTops[s],
                   staffBottom: staffBottoms[s],
                   bandBottom: lyricBandBottom(m.row, s),
@@ -2046,6 +2076,7 @@ function assembleSegment(
           }
         });
       });
+      onStaff(staffFrom, s);
     });
 
     // Native tab staves (the `both` view): six lines, TAB clef, tab-style
@@ -2053,6 +2084,7 @@ function assembleSegment(
     // standalone tab layout (tabStaff.ts), driven by the SAME plan slots as
     // the part's notation staff, so columns align by construction.
     for (const td of tabDisplays) {
+      const tabFrom = primitives.length;
       const tabTop = displayTopOf(m.row, td.displayIndex);
       emitTabStaffLines(m.x, m.width, tabTop, primitives);
       // Setup instructions (capo, non-standard tuning label) on the FIRST
@@ -2108,6 +2140,7 @@ function assembleSegment(
           spanMarks
         });
       }
+      stamp(primitives, tabFrom, { row: m.row, display: td.displayIndex, measure: writtenIndex(plan, i) });
     }
 
     // End barline — drawn per part group: internal barlines don't bridge the
@@ -2152,6 +2185,7 @@ function assembleSegment(
     // Full-measure rests (sequence.fullMeasure with empty content): one rest
     // centred in the bar's content span, on the sequence's staff.
     resolvedByStaff.forEach((staffVoices, s) => {
+      const from = primitives.length;
       for (const { seq: sequence } of staffVoices) {
         const fm = sequence.fullMeasure;
         if (!fm || sequence.content.length > 0) continue;
@@ -2169,6 +2203,7 @@ function assembleSegment(
           className: 'rest rest-full-measure'
         });
       }
+      onStaff(from, s);
     });
 
     // Measure repeats: the ％ sign on every staff of the part that declares
@@ -2177,6 +2212,7 @@ function assembleSegment(
       const part = planStaff.sources[planStaff.sources.length - 1]?.part;
       const mark = (part?.measures?.[writtenIndex(plan, i)] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
       if (!mark) return;
+      const from = primitives.length;
       const first = segment.staves.findIndex(st => st.sources.some(src => src.part === part));
       const spanEnd = plan.measures[i + Math.max(1, mark.number) - 1];
       emitMeasureRepeat({
@@ -2187,6 +2223,7 @@ function assembleSegment(
         labels: s === first,
         primitives
       });
+      onStaff(from, s);
     });
 
     if (ottavaOnsets) {
@@ -2263,7 +2300,7 @@ function assembleSegment(
     }
     qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, [...selectedNoteIds, ...selectedEventIds]);
     // Everything this bar drew is its row's.
-    stampRow(primitives, measurePrimitiveStart, m.row);
+    stamp(primitives, measurePrimitiveStart, { row: m.row, measure: writtenIndex(plan, i) });
   }
 
   const loopEnd = primitives.length;
@@ -2273,10 +2310,12 @@ function assembleSegment(
     const key = run.memberIds.find(id => run.stems.has(id));
     const from = primitives.length;
     emitBeamRun(run, primitives, beamSlantSp);
-    if (key !== undefined) stampRow(primitives, from, plan.measures[Number(key.split(':')[0])]!.row);
+    if (key === undefined) continue;
+    const [bar, staff] = key.split(':').map(Number);
+    stamp(primitives, from, { row: plan.measures[bar!]!.row, display: displayOfPlan[staff!]! });
   }
 
-  emitSlursAndTies(segment, plan, curveAnchors, primitives);
+  emitSlursAndTies(segment, plan, curveAnchors, primitives, s => displayOfPlan[s]!);
 
   // Playing technique, on BOTH staves (core-guitar-technique.md). Like slurs
   // and ties this waits for the whole segment: a hammer-on names its
@@ -2295,6 +2334,7 @@ function assembleSegment(
       ink: plan.inkRatio,
       primitives
     });
+    stampDisplay(primitives, techniqueStart, td.displayIndex);
     clearTabCapoTechniques(primitives, primitives.slice(techniqueStart), plan.inkRatio);
   }
   const notationTechnique = collectNotationTechnique(segment, plan, curveAnchors, staffTopOf);
@@ -2310,8 +2350,8 @@ function assembleSegment(
   }
 
   if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives, undefined, elementTargets);
-  if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
-  if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
+  if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives, s => displayOfPlan[s]!);
+  if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives, s => displayOfPlan[s]!);
 
   // The score-wide text row, last of all (core-ink-measured-gaps.md, stage A):
   // a tempo mark and then the labels sit one cohesion clearance above
@@ -2362,7 +2402,7 @@ function assembleSegment(
       clearAbove: tempoTop, primitives
     });
     emitOccurrenceLabel(m, staffTop, primitives);
-    stampRow(primitives, textFrom, m.row);
+    stamp(primitives, textFrom, { row: m.row, measure: writtenIndex(plan, i) });
   }
 
   // Lyrics last of all (lyricRuns.ts): a verse sits under everything its staff
@@ -2378,9 +2418,21 @@ function assembleSegment(
     }))
   );
 
+  // Which staff each display draws, and every bar's extent — the layout's own answers,
+  // for readers that would otherwise find them in the drawing.
+  const staves: DisplayStaff[] = [];
+  segment.staves.forEach((planStaff, s) => {
+    const source = planStaff.sources[0];
+    if (source) staves[displayOfPlan[s]!] = { partIndex: Math.max(0, (mnx.parts ?? []).indexOf(source.part)), staffIndex: source.staff, projection: 'notation', lines: STAFF_LINES };
+  });
+  for (const td of tabDisplays)
+    staves[td.displayIndex] = { partIndex: Math.max(0, (mnx.parts ?? []).indexOf(td.part)), staffIndex: 1, projection: 'tab', lines: TAB_STAFF_LINES };
+  const bars: BarSp[] = plan.measures.flatMap((m, i) => m.hidden ? [] : [{ row: m.row, index: i, measure: writtenIndex(plan, i), x: m.x, width: m.width }]);
+
   return {
     primitives, heightSp, usedWidthSp: plan.usedWidthSp, naturalWidthSp,
-    rows, displays, tabDisplayIndexes, packing: plan.packing
+    rows, displays, tabDisplayIndexes, packing: plan.packing, bars,
+    staves: rows.map(() => [...staves])
   };
 }
 
@@ -2854,7 +2906,9 @@ function emitSlursAndTies(
   segment: JobSegment,
   plan: HorizontalPlan,
   anchors: CurveAnchors,
-  primitives: Primitive[]
+  primitives: Primitive[],
+  /** The display staff a plan staff draws on. */
+  displayOf: (planStaff: number) => number
 ): void {
   // Row edges, for curves split at system breaks.
   const rowRight = new Map<number, number>();
@@ -2909,6 +2963,7 @@ function emitSlursAndTies(
   };
 
   segment.staves.forEach((spec, si) => {
+    const staffFrom = primitives.length;
     for (let mi = 0; mi < plan.measures.length; mi++) {
       const pm = plan.measures[mi];
       if (!pm || pm.hidden || pm.multiRest) continue;
@@ -2987,6 +3042,7 @@ function emitSlursAndTies(
         });
       });
     }
+    stampDisplay(primitives, staffFrom, displayOf(si));
   });
 }
 
@@ -3221,7 +3277,8 @@ function emitOttavas(
   plan: HorizontalPlan,
   staffTopOf: (row: number, s: number) => number,
   onsets: Map<number, OnsetX[][]>,
-  primitives: Primitive[]
+  primitives: Primitive[],
+  displayOf: (planStaff: number) => number
 ): void {
   for (const sp of spans) {
     const s = sp.staff;
@@ -3281,7 +3338,7 @@ function emitOttavas(
           className: 'ottava'
         });
       }
-      stampRow(primitives, drawnFrom, row);
+      stamp(primitives, drawnFrom, { row, display: displayOf(s) });
       first = false;
       a = b + 1;
     }
@@ -3459,7 +3516,8 @@ function emitHairpins(
   plan: HorizontalPlan,
   staffTopOf: (row: number, s: number) => number,
   onsets: Map<number, OnsetX[][]>,
-  primitives: Primitive[]
+  primitives: Primitive[],
+  displayOf: (planStaff: number) => number
 ): void {
   for (const sp of spans) {
     const s = sp.staff;
@@ -3498,7 +3556,7 @@ function emitHairpins(
           className: `hairpin hairpin-${sp.wedge}`
         });
       }
-      stampRow(primitives, drawnFrom, row);
+      stamp(primitives, drawnFrom, { row, display: displayOf(s) });
       first = false;
       a = b + 1;
     }
