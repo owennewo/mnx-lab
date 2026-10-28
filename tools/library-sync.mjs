@@ -103,6 +103,17 @@ function emptyChanges() {
 }
 
 /**
+ * A snapshot cut down to some pieces: their rows in every per-piece table, and no
+ * aliases (they belong to the library, not a piece, so a run limited to pieces
+ * leaves them alone). Planned on both sides, it syncs only those pieces.
+ */
+export function onlyPieces(snapshot, ids) {
+  const keep = new Set(ids), mine = rows => rows.filter(r => keep.has(r.piece_id));
+  return { ...snapshot, pieces: snapshot.pieces.filter(p => keep.has(p.id)), renditions: mine(snapshot.renditions), recordings: mine(snapshot.recordings),
+    tags: mine(snapshot.tags), piece_views: mine(snapshot.piece_views), tag_aliases: [] };
+}
+
+/**
  * Plan a two-way sync between snapshots `a` and `b` (rows of TABLES). Returns
  * what each side must receive, the conflicts left alone, and per-piece lines
  * a person can read. Pure: the caller decides whether to write it.
@@ -370,7 +381,7 @@ function report(plan, names) {
 }
 const empty = plan => ['a', 'b'].every(s => !plan.into[s].summary.length && !plan.into[s].blobs.size && !plan.into[s].views.length);
 
-const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--local-state <dir>] [--remote-state <dir>] [--backup <dir>]
+const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--piece <id>]... [--local-state <dir>] [--remote-state <dir>] [--backup <dir>]
 
   Plans a two-way sync between the local dev library and the deployed one and
   prints it. --apply writes it, after backing both databases up to --backup
@@ -380,12 +391,15 @@ const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--loc
   ${BACKUP_BUCKET} under library-sync/<time>/ and read back before anything is
   written; what was applied follows them there. --local-state defaults to the
   primary checkout's .wrangler/state; --remote-state replaces the deployed
-  library with a local one (a rehearsal).`;
+  library with a local one (a rehearsal). --piece (repeatable) syncs only those
+  pieces and leaves every other row, and the aliases, as they are; the backups
+  and the check that nothing moved while planning still cover both libraries.`;
 
 async function main(argv) {
-  const flags = new Set(), values = {};
+  const flags = new Set(), values = {}, pieces = [];
   for (let i = 0; i < argv.length; i++) {
     if (['--local-state', '--remote-state', '--backup'].includes(argv[i])) { if (!argv[i + 1]) throw new Error(USAGE); values[argv[i]] = resolve(argv[++i]); }
+    else if (argv[i] === '--piece') { if (!argv[i + 1]) throw new Error(USAGE); pieces.push(argv[++i]); }
     else if (['--apply', '--writers-stopped', '--help'].includes(argv[i])) flags.add(argv[i]);
     else throw new Error(USAGE);
   }
@@ -393,15 +407,17 @@ async function main(argv) {
   if (flags.has('--apply') && !flags.has('--writers-stopped')) throw new Error('Stop every writer to BOTH libraries (dev servers on the local state, studio tabs on the deployed site), then pass --writers-stopped.');
   const local = side('local', values['--local-state'] ?? await primaryState());
   const remote = side('remote', values['--remote-state'] ?? null);
-  try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state']); }
+  try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state'], pieces.length ? pieces : null); }
   finally { await Promise.all([local.close(), remote.close()]); }
 }
 
-async function sync(local, remote, apply, backup, deployed) {
+async function sync(local, remote, apply, backup, deployed, pieces) {
   const names = { a: 'local', b: 'remote' };
-  console.error(`local:  ${local.describe}\nremote: ${remote.describe}`);
+  console.error(`local:  ${local.describe}\nremote: ${remote.describe}${pieces ? `\npieces: ${pieces.join(', ')}` : ''}`);
   const [a, b] = await Promise.all([local.snapshot(), remote.snapshot()]);
-  const plan = planSync(a, b, names);
+  const cut = s => pieces ? onlyPieces(s, pieces) : s;
+  if (pieces) for (const id of pieces) if (![a, b].some(s => s.pieces.some(p => p.id === id))) throw new Error(`No piece ${id} in either library`);
+  const plan = planSync(cut(a), cut(b), names);
   console.log(report(plan, names));
   if (!apply || empty(plan)) return;
 
@@ -432,7 +448,7 @@ async function sync(local, remote, apply, backup, deployed) {
   // The record of what changed joins the backups; the writes are done whether or not it arrives.
   if (deployed && applied.length) await offsite(backup, prefix, applied).catch(e => console.error(`off-site copy of ${applied} failed (${e.message}); it is in ${backup}`));
 
-  const after = planSync(...await Promise.all([local.snapshot(), remote.snapshot()]), names);
+  const after = planSync(...(await Promise.all([local.snapshot(), remote.snapshot()])).map(cut), names);
   if (!empty(after)) { console.log(`\nNOT converged — run again to finish, or read what remains:${report(after, names)}`); process.exitCode = 1; }
   else console.log(`\nconverged${after.conflicts.length ? `, with ${after.conflicts.length} conflict(s) left for a person` : ''}.`);
 }

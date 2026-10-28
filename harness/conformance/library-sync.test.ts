@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error Node-only operator tool has no declaration file.
-import { planSync, statements, renderSql } from '../../tools/library-sync.mjs';
+import { planSync, statements, renderSql, onlyPieces } from '../../tools/library-sync.mjs';
 
 // Two real libraries: the migrations (revision trigger included), the planned
 // SQL executed as wrangler would run it, and a second plan that must be empty.
@@ -117,6 +117,19 @@ describe('library sync', () => {
     expect(quiet(planSync(snapshot(a), snapshot(b)))).toBe(true);
   });
 
+  it('limited to some pieces, moves only theirs and leaves every other row and the aliases alone', () => {
+    const [a, b] = [library(), library()];
+    for (const id of ['p1', 'p2']) { piece(a, id, { revision: 1, updated: 2 }); rendition(a, id, `${id}o`, { role: 'original' }); canonical(a, id, `${id}o`); }
+    insert(a, 'tag_aliases', { owner: 'operator', dimension: 'artist', raw_value: 'Beatles', canonical_value: 'The Beatles' });
+    const cut = (db: DatabaseSync) => onlyPieces(snapshot(db), ['p2']);
+    const plan = planSync(cut(a), cut(b));
+    b.exec(renderSql(statements(plan.into.b)));
+    expect(b.prepare('SELECT id FROM pieces').all().map(r => r.id)).toEqual(['p2']);
+    expect([...plan.into.b.blobs.keys()]).toEqual(['renditions/p2o'.padEnd(11 + 64, '0')]);
+    expect(b.prepare('SELECT count(*) n FROM tag_aliases').get()).toEqual({ n: 0 });
+    expect(quiet(planSync(cut(a), cut(b)))).toBe(true);
+    expect(quiet(planSync(snapshot(a), snapshot(b)))).toBe(false);
+  });
   it('refuses libraries on different migrations', () => {
     const [a, b] = [library(), library()];
     b.exec("DELETE FROM d1_migrations WHERE name LIKE '0006%'");
