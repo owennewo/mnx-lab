@@ -51,6 +51,41 @@ What to know about its output, all measured (RUNS.md runs 6–7): it is determin
 byte-identical); it gives no loudness, so `amp` is 1; and **a note's end is the next onset of any
 note** (961 of 961 within 30 ms), so it says nothing about how long a note is written.
 
+## Separating the guitar
+
+What to separate depends on what plays with the guitar. Measured 2026-10-28 on benches with a
+known answer, as MuScriptor medium's fretless note accuracy (the owner's priority; RUNS.md run 8):
+
+| recording | separate with | accuracy | time here (GTX 1060 Max-Q) |
+|---|---|---|---|
+| guitar alone | nothing — separators pass solo guitar through unchanged | same with or without | — |
+| guitar + voice | **Gabox Mel-Band INSTV7N** (the default) | 94.25% (unseparated 92.8%) | ~0.7–1.3× the recording |
+| guitar + voice, a hard piece | **HyperACE v2** (the quality choice, opt-in) | 95.3% | **~16×** (~48 min a 3-minute song) |
+| a band under the guitar | **BS-RoFormer SW**, its guitar stem | 93.4% | ~5× |
+
+Every separator reads 44.1 kHz stereo (`ffmpeg -i audio/source.wav -ar 44100 -ac 2 …`);
+`bs-roformer-infer` does not resample. None of these weights states a licence (community
+RoFormer weights); like MuScriptor's, they serve the owner's own library and research.
+
+- **INSTV7N** is in [audio-separator](https://github.com/nomadkaraoke/python-audio-separator)'s
+  registry: `audio-separator <wav> -m mel_band_roformer_instrumental_instv7n_gabox.ckpt`; use the
+  `(Instrumental)` file. Gabox's other Mel-Band instrumentals (v5n, FV8, FV8b, Bleedless V3) are
+  the same architecture and scored 93.6–94.1%: one tier, not worth choosing between.
+- **HyperACE v2** ([pcunwa/BS-Roformer-HyperACE](https://huggingface.co/pcunwa/BS-Roformer-HyperACE),
+  `v2_inst/`: `bs_roformer.py`, `config.yaml`, `bs_roformer_inst_hyperacev2.ckpt`, kept in
+  `~/.cache/sepnext/hyperace/`) ships its own model code, read before it was allowed to run;
+  [separate_hyperace.py](separate_hyperace.py) refuses any other version of it. Use its
+  `_instrument.wav` — the `_instrumental.wav` beside it is the voice.
+- **SW** (`enerjazzer/BS-ROFO-SW-Fixed`, `bs-roformer-infer`'s default model) — use its
+  `_guitar.wav`. Not htdemucs_6s, which files guitar as "piano" or "other" (half of one voice +
+  guitar recording). Never use `bs-roformer-infer`'s `_instrumental.wav`: it is the mix minus the
+  model's *first* stem, which for SW is the bass — in effect the unseparated mix.
+- Both instrumental models leave a ghost of the voice where only the voice sounds, and MuScriptor
+  hears it as guitar (~250 notes in 14 s of unaccompanied singing). Expect strays there.
+
+The environments here: `~/.venvs/separation` (Python 3.11, audio-separator 0.47.1, torch
+2.14.1+cu126) and `~/.venvs/sepnext` (Python 3.12, bs-roformer-infer 0.1.5, torch 2.14.1+cu126).
+
 ## A piece that does not exist yet
 
 Some videos show the arranger's notation on screen. `screen.py pages --video <file>` finds

@@ -108,13 +108,40 @@ performed order may not be what the transcriber meant.
 ## Step 3 — the audio and its notes
 
 `$T audio --out $OUT`, then `$PY transcribe --out $OUT` (MuScriptor, ~1 min per 3-minute
-recording on the GPU; deterministic). Tell it what plays: `--instruments acoustic_guitar` is the
-default; **a singer** → `--instruments acoustic_guitar,voice` (it keeps only the guitar's
-notes). **A band** (drums, keys) under the guitar → separate it first (RUNS.md run 6: vocals out
-with BS-RoFormer, then htdemucs_6s's guitar stem, `~/.venvs/separation`) and pass the stem as
-`--audio`; with a voice only, the full mix does as well. Note the recording's length against
-the score's length at its marked tempo: a much shorter recording usually stops early; a much
-longer one plays more than the score lays out (verses, an intro, talking).
+recording on the GPU; deterministic; `--instruments acoustic_guitar` is the default). What plays
+with the guitar decides whether to separate it first — the table, the models and their traps are
+in the [README](../../../tools/recording-align/README.md#separating-the-guitar):
+
+- **Guitar alone** → transcribe as it is. Separating changes nothing.
+- **A singer** → separate with Gabox INSTV7N, the default, and transcribe its instrumental
+  (`--audio`, guitar only). It beats the unseparated mix by about 1.5 points, at about a minute
+  per minute of recording:
+  ```bash
+  mkdir -p $OUT/sep/in && ffmpeg -loglevel error -y -i $OUT/audio/source.wav -ar 44100 -ac 2 $OUT/sep/in/mix.wav
+  ~/.venvs/separation/bin/audio-separator $OUT/sep/in/mix.wav -m mel_band_roformer_instrumental_instv7n_gabox.ckpt \
+    --model_file_dir <scratchpad>/models --output_dir $OUT/sep/instv7n --output_format WAV
+  $PY transcribe --out $OUT --audio "$OUT/sep/instv7n/mix_(Instrumental)_mel_band_roformer_instrumental_instv7n_gabox.wav"
+  ```
+  **HyperACE v2** is the quality choice, offered only for a more challenging piece: dense or
+  fast playing, a voice that buries the guitar, or an INSTV7N draft with many weak bars. It is
+  about 1 point better and about 16× the recording's length to run (~48 min for 3 minutes), so
+  offer it with the time and run it only when the owner says to:
+  ```bash
+  ~/.venvs/sepnext/bin/python -I tools/recording-align/separate_hyperace.py ~/.cache/sepnext/hyperace $OUT/sep/in $OUT/sep/hyperace
+  $PY transcribe --out $OUT --audio $OUT/sep/hyperace/mix_instrument.wav   # _instrument, not _instrumental (the voice)
+  ```
+- **A band** (drums, keys) under the guitar → SW's guitar stem (`bs-roformer-infer`, its default
+  model; ~5× the recording's length). Not htdemucs_6s, which files guitar as piano or other:
+  ```bash
+  mkdir -p $OUT/sep/in && ffmpeg -loglevel error -y -i $OUT/audio/source.wav -ar 44100 -ac 2 $OUT/sep/in/mix.wav
+  ~/.venvs/sepnext/bin/bs-roformer-infer --input_folder $OUT/sep/in --store_dir $OUT/sep/sw
+  $PY transcribe --out $OUT --audio $OUT/sep/sw/mix_guitar.wav
+  ```
+
+Both instrumental models leave a ghost of the voice where only the voice sounds, and MuScriptor
+hears it as stray guitar notes. Note the recording's length against the score's length at its
+marked tempo: a much shorter recording usually stops early; a much longer one plays more than
+the score lays out (verses, an intro, talking).
 
 **Experiment — half speed (open question in RUNS.md; measured with Basic Pitch, untried with
 MuScriptor).** When the piece is fast or full of triplets, also transcribe a half-speed stretch in a sibling directory and run Steps 4–5 there:

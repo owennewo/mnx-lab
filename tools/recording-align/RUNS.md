@@ -35,9 +35,10 @@ to do — each is a gap to close.
   choose, and should the tool help edit the score's repeats? Run 4: the owner chose to
   restructure the score, once three recordings showed the score was the outlier; the edit
   needed a hand-written script (gap 6 below), so yes, the tool should help.
-- A singer: answered in runs 6–7. MuScriptor told `--instruments acoustic_guitar,voice` keeps
-  the voice out of the guitar's notes, as well as separating it does; a band under the guitar
-  still wants separation (Step 3).
+- A singer: answered in run 8, revising runs 6–7. Those found the unseparated mix as good as
+  separating, but the stem they compared against had been damaged by htdemucs_6s. Against a
+  vocal model's instrumental, the mix loses about 1.5 points of notes; Step 3 now separates a
+  singer with Gabox INSTV7N (HyperACE v2 on request), and a band with SW.
 - Recordings longer than ~4 minutes: the search drops to 20 ms frames there; is that enough?
 - **Half-speed transcription** (`transcribe --half-speed`): on a fast piece with triplets, does
   it beat full speed on found − chance, weak bars or bar placement? Run 3 is the control at
@@ -260,3 +261,33 @@ to do — each is a gap to close.
   tuning measured from the audio, the skill's environment is `~/.venvs/muscriptor`, and the Jansch
   gate is re-baselined (Step 8). MuScriptor is deterministic: two runs, byte-identical notes.
 
+
+## Run 8 — 2026-10-28 — which separator, per kind of recording (a drafting experiment, no sync written)
+
+- **Why**: separation was chosen by hand and inconsistently: an htdemucs_6s guitar stem for a band,
+  none for a singer. The question was asked three times, once per kind of recording, with the
+  decision rule set before anything ran: the best fretless note F1 (MuScriptor medium, with the
+  repeat vote), and a 0.5-point tie margin.
+- **Benches**: guitar alone (Teen Spirit, Jansch); guitar + voice (Teen Spirit with Cormorant's
+  vocal laid over it; Sun Did Glide, live); a band (Teen Spirit with Cormorant's vocal, drums
+  and keys). The truth for each is its studio piece. Bar lines were fixed and identical for every
+  candidate.
+
+  | recording | candidates (F1 averaged over the benches) | time for a 3-minute song |
+  |---|---|---|
+  | guitar alone | unseparated 88.6% = Gabox 88.6% = HyperACE 88.6% (identical) | — |
+  | guitar + voice | unseparated 92.8 · ep_317 instrumental 94.0 · Gabox Mel-Band v5n 94.05 · **INSTV7N 94.25** · FV8 93.8 · FV8b 93.7 · Bleedless V3 93.6 · SW 94.6 · **HyperACE v2 95.3** | 0 · 9 · 2–3 (every Gabox) · 15 · 48 min |
+  | a band | **SW guitar 93.4** · ep_317 then SW 93.8 (a tie) | 15 · 25 min |
+
+  On Sun Did Glide, HyperACE got 62% of bars right ignoring string; INSTV7N got 44%, SW 50%.
+- **Owner's choice** (2026-10-28): "lets make the INSTV7N the default choice with HyperACE v2 as
+  the quality choice offered only for more challenging pieces". INSTV7N won among four siblings
+  of one architecture, by an amount inside the tie margin. It is unconfirmed until it holds on a
+  voice + guitar recording it was not chosen on.
+- **Traps found**: `bs-roformer-infer`'s `_instrumental.wav` is the mix minus the model's
+  first stem, so for SW it is in effect the unseparated mix, and for HyperACE it is the voice. Both
+  instrumental models leave a ghost of the voice where only the voice sounds, which MuScriptor
+  hears as guitar notes.
+- **Changed**: Step 3 separates by kind of recording; README "Separating the guitar" has the table,
+  the models and the environments; `separate_hyperace.py` runs HyperACE and refuses any model
+  code other than the version that was audited.
