@@ -27,6 +27,7 @@ The text is in the order the words are sung, and **names no bars**. It runs
 from the first bar played: `|` is the next bar played, and `×4` (or `x4`, as
 typed) is four bars nobody sings, standing where a bar starts. Newlines are
 whitespace, so a line can be re-wrapped or pasted without moving anything.
+A `|` after the last bar closes the piece; only one beyond that is an error.
 
 The margin beside the text says where each line starts, worked out live from
 the bar lines as you type: the **bar played** (counting every pass and jump

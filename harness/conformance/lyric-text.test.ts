@@ -109,8 +109,11 @@ describe('parse', () => {
     // …named on the bar line it spills over, so the panel can mark that token.
     expect(spilled.diagnostics).toMatchObject([{ textLine: 0, bar: 2, played: 2, from: 8, to: 9, message: expect.stringContaining('too many syllables') }]);
 
-    const beyond = parseLyricText(doc, 0, '| | | x');
+    // A bar line after the last bar closes the piece; one more leads nowhere, and so does a word after it.
+    expect(parseLyricText(doc, 0, '| | |').diagnostics).toEqual([]);
+    const beyond = parseLyricText(doc, 0, '| | | |');
     expect(beyond.diagnostics[0]).toMatchObject({ message: expect.stringContaining('past the end of the music') });
+    expect(parseLyricText(doc, 0, '| | | x').diagnostics.length).toBeGreaterThan(0);
 
     const overflow = parseLyricText(doc, 0, 'a b c d e f g h i j');
     expect(overflow.diagnostics).toMatchObject([{ message: expect.stringContaining('more syllables than sung notes') }]);

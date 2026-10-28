@@ -421,7 +421,8 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
         const resolved = check[1] !== ''
           ? Number(check[1]) - 1
           : (barPointer >= 0 ? barPointer : next > 0 ? walk[next - 1]!.measureIndex : -1) + 1;
-        if (resolved >= barCount && barCount > 0)
+        // The bar line after the last bar closes the music; only one beyond it leads nowhere.
+        if (resolved > barCount && barCount > 0)
           diagnostics.push({ textLine, at: token.from, message: `a bar line past the end of the music (${barCount} bars)` });
         else if (lastSyllableBar >= resolved) {
           if (firstSpill) laterSpills++;
