@@ -3,10 +3,11 @@
 // WORKBENCH STATE, not the document: it opens on the canonical projection
 // (serializeLyricText) and parses live into diagnostics named by bar. There is
 // no apply: a pause in typing, leaving the box, closing the panel or hiding the
-// page COMMITS a clean parse — the host is handed the plan (planLyricEdits)
+// page COMMITS the parse — the host is handed the plan (planLyricEdits)
 // against `doc`, the document the visit opened on, and keeps one undo step per
-// visit. Text that does not parse cannot be committed, so it goes to the host's
-// draft store instead and is offered back the next time the panel opens.
+// visit. Text with problems commits the words that found their notes (a bar's
+// spill and words past the music are left out), and is also kept whole in the
+// host's draft store, offered back the next time the panel opens.
 //
 // A right-hand panel: the score frame makes room beside the score and
 // the host renders the buffer's parse onto it live (lyric-editor-edits →
@@ -813,26 +814,23 @@ export class LyricTextEditor extends LitElement {
     }
     this.parsed = parseLyricText(this.doc, this.partIndex, this.text, this.voiceIndex);
     this.warnings = lyricPassWarnings(this.doc, this.partIndex, this.parsed, this.voiceIndex);
-    this.edits = this.parsed.diagnostics.length === 0
-      ? planLyricEdits(this.doc, this.partIndex, this.parsed, this.voiceIndex)
-      : [];
+    // Problems do not hold the score back: the words that found their notes are planned all the same.
+    this.edits = planLyricEdits(this.doc, this.partIndex, this.parsed, this.voiceIndex, { despiteProblems: true });
   }
 
   /**
-   * The live preview: a clean parse hands the host the current diff so the
-   * score beside it redraws as if applied. While errors stand, the last clean
-   * preview holds — flickering back to the committed text mid-word would
-   * punish typing the very hyphen the parser is complaining about.
+   * The live preview: the parse hands the host the current diff so the score
+   * beside it redraws as if applied — problems and all: a bar with too many
+   * words shows none of its spill, and words past the music show nowhere,
+   * while the rest of the text draws where it lands.
    */
   private preview() {
     clearTimeout(this.previewTimer); this.previewTimer = undefined;
-    if (this.parsed.diagnostics.length === 0) {
-      this.dispatchEvent(new CustomEvent('lyric-editor-edits', {
-        detail: { edits: this.edits },
-        bubbles: true,
-        composed: true
-      }));
-    }
+    this.dispatchEvent(new CustomEvent('lyric-editor-edits', {
+      detail: { edits: this.edits },
+      bubbles: true,
+      composed: true
+    }));
   }
 
   /** The token the caret is in that takes up performed time, if any — where the cursor goes, and what is outlined. */
@@ -888,14 +886,14 @@ export class LyricTextEditor extends LitElement {
     }
     if (!this.pending || this.playing || this.readOnly || !this.doc) return;
     this.reparse();
-    if (this.parsed.diagnostics.length === 0) {
-      const detail: LyricCommitDetail = { edits: this.edits, accepted: false };
-      this.dispatchEvent(new CustomEvent('lyric-editor-commit', { detail, bubbles: true, composed: true }));
-      if (detail.accepted) {
-        this.pending = false;
-        this.saveDraft(null);
-        return;
-      }
+    // What found its notes goes to the score now; text with problems is also kept whole as a
+    // draft, since the document holds only the part of it that fits.
+    const detail: LyricCommitDetail = { edits: this.edits, accepted: false };
+    this.dispatchEvent(new CustomEvent('lyric-editor-commit', { detail, bubbles: true, composed: true }));
+    if (detail.accepted && this.parsed.diagnostics.length === 0) {
+      this.pending = false;
+      this.saveDraft(null);
+      return;
     }
     this.saveDraft(this.text);
   }
@@ -906,9 +904,9 @@ export class LyricTextEditor extends LitElement {
     this.reparse();
   }
 
-  /** The plan against `doc`, or null while the text does not parse. */
-  get plan(): LyricPlanEdit[] | null {
-    return this.parsed.diagnostics.length === 0 ? this.edits : null;
+  /** The plan against `doc`: the words that found their notes, problems or not. */
+  get plan(): LyricPlanEdit[] {
+    return this.edits;
   }
 
   private saveDraft(text: string | null) {
@@ -1018,7 +1016,7 @@ export class LyricTextEditor extends LitElement {
           <div class="tools">
             <span role="status">${errors.length ? html`
               <button class="issues" title="Go to the first" @mousedown=${keepFocus} @click=${() => this.goTo(errors[0]!)}>
-                ${errors.length} to fix${this.pending ? ' · not in the score yet' : ''}
+                ${errors.length} to fix
               </button>` : nothing}</span>
             <button class="icon copy" aria-label=${this.copied ? 'Copied' : 'Copy lyrics'} title=${this.copied ? 'Copied' : 'Copy lyrics'}
               @mousedown=${keepFocus} @click=${() => void this.copy()}>

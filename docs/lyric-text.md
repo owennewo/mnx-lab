@@ -7,10 +7,14 @@ when typing pauses for 3 seconds, when the box loses focus, when the panel close
 (another panel opening closes it), when Play starts and when the page is hidden.
 All the commits of one visit to the panel are a single undoable edit.
 
-Text that does not parse cannot be committed. The panel says so beside the
-diagnostics, and studio keeps it as a draft on the device (per piece and part)
-that the panel offers back the next time it opens. Play leaves the panel open,
-read-only, until the music pauses.
+Text with problems still draws and commits the words that found their notes.
+The words that spill past a bar line are left out (the bar line holds, so the
+next word starts in the bar it names), and so are words past the end of the
+music. One slip puts every later bar out of step, so the first spill is the one
+problem reported, and it counts the later bars the slip reaches. While problems
+stand, studio also keeps the whole text as a draft on the device (per piece,
+part and voice), and the panel offers it back the next time it opens. Play
+leaves the panel open, read-only, until the music pauses.
 
 The caret is the editor's cursor. Clicking or arrowing onto a word moves the one
 cursor to that word's note on that visit, and the playback cursor with it; while

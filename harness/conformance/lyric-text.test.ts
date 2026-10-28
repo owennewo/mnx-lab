@@ -686,3 +686,30 @@ describe('a lyric sung to another voice', () => {
     expect(serializeLyricText(session.doc, 0, 1).replace(/\s+/g, ' ')).toBe(text);
   });
 });
+
+describe('text with problems', () => {
+  it('a bar line holds after a spill: the spill is dropped and the next word starts in the bar it names', () => {
+    const doc = bars(3);
+    const parsed = parseLyricText(doc, 0, 'a b c | d e | f g');
+    expect(parsed.diagnostics).toMatchObject([{ bar: 2, message: 'too many syllables before this bar — they spill into it' }]);
+    const sung = new Map([...parsed.lines[0]!.syllables].map(([index, s]) => [lyricEventWalk(doc, 0)[index]!.noteKey, s.text]));
+    // "c" spilled into bar 2 and is left out; bar 2 is still "d e", bar 3 still "f g".
+    expect(Object.fromEntries(sung)).toEqual({ b0n0: 'a', b0n1: 'b', b1n0: 'd', b1n1: 'e', b2n0: 'f', b2n1: 'g' });
+  });
+
+  it('one slip that puts every later bar out of step is one problem, counting the bars it reaches', () => {
+    // A bar of three where each bar holds two: every bar line after it spills too.
+    const parsed = parseLyricText(bars(4), 0, 'a b c | d e f | g h i | j');
+    expect(parsed.diagnostics).toHaveLength(1);
+    expect(parsed.diagnostics[0]).toMatchObject({ bar: 2, message: expect.stringContaining('and before 2 later bars, likely the same slip') });
+  });
+
+  it('plans the words that found their notes, when asked to despite the problems', () => {
+    const doc = bars(3);
+    const parsed = parseLyricText(doc, 0, 'a b c | d e | f g');
+    expect(planLyricEdits(doc, 0, parsed)).toEqual([]);
+    const session = new EditorSession(doc);
+    expect(session.handleIntent({ type: 'applyLyricPlan', edits: planLyricEdits(doc, 0, parsed, 0, { despiteProblems: true }) })).toBe(true);
+    expect(serializeLyricText(session.doc, 0).replace(/\s+/g, ' ')).toBe('a b | d e | f g');
+  });
+});

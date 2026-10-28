@@ -237,11 +237,12 @@ try {
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'a second commit in the same visit made a second undo step');
   await c.evaluate(`${page}.editor.handleIntent({ type: 'redo' })`);
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["sung","song"]');
-  // Text that does not parse — here, a bar number from the old format — cannot be committed: it is kept as a draft and offered back.
+  // Text with a problem — here, a bar number from the old format — commits the words that found their
+  // notes, and is kept whole as a draft and offered back.
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = '1.1| half'; t.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.close').click()`);
   await wait(`!${lyrics}`);
-  assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["sung","song"]', 'text that does not parse reached the document');
+  assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '["half"]', 'the words of text with a problem did not reach the document');
   await c.evaluate(`${viewer}.focus()`); await key('KeyL', { shift: true });
   await wait(`${lyrics}?.shadowRoot?.querySelector('textarea')?.value === '1.1| half'`);
   // Fixed, it commits like any other text — and the draft goes.
@@ -337,6 +338,6 @@ try {
   await c.send('Page.reload');
   await wait(`!!${page}?.editor && !!${lyrics}?.shadowRoot?.querySelector('textarea')`);
   assert.equal(await c.evaluate(`${lyrics}.matches(':focus-within')`), false, 'lyrics put back on load took the keyboard');
-  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then committed by a pause, a blur and a close (one step per visit, unparsed text kept as a draft), the lyrics beside a side panel, put away and brought back by Shift+L and kept so across reloads, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
+  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then committed by a pause, a blur and a close (one step per visit, text with a problem committed in part and kept whole as a draft), the lyrics beside a side panel, put away and brought back by Shift+L and kept so across reloads, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

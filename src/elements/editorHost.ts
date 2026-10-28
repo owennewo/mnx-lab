@@ -653,7 +653,6 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       rebaseLyrics();
       // Read after any rebase: the plan against the document the visit now stands on.
       const edits = el.plan;
-      if (edits === null) return;
       options.onPreview?.(edits.length === 0 || !el.doc ? null : applyOp(el.doc, { type: 'batch', ops: lyricPlanOps(edits) }));
     });
     // The caret is the cursor: a word's visit and onset move the one cursor — and so the playhead — there.
@@ -672,8 +671,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('lyric-editor-commit', e => {
       const detail = (e as CustomEvent<LyricCommitDetail>).detail;
       if (rebaseLyrics()) {
-        // Replanned against the moved document; text that no longer fits it stays a draft.
-        if (el.plan === null) return;
+        // Replanned against the moved document.
         detail.edits = el.plan;
       }
       const amend = lyricStep !== null;

@@ -361,6 +361,9 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
   const minted = new Set<string>();
   const takenIds = new Set<string>([...groups.values()].flat());
   const barCount = measureCount ?? walk.reduce((max, entry) => Math.max(max, entry.measureIndex + 1), 0);
+  // One slip — a bar too many or too few — puts every later bar out of step, and each would
+  // spill on its own: the first spill names the problem, and counts the ones after it.
+  let firstSpill: (LyricTextDiagnostic & { at?: number }) | null = null, laterSpills = 0;
 
   let offset = 0;
   const textLines = text.split('\n');
@@ -418,8 +421,18 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
           : (barPointer >= 0 ? barPointer : next > 0 ? walk[next - 1]!.measureIndex : -1) + 1;
         if (resolved >= barCount && barCount > 0)
           diagnostics.push({ textLine, at: token.from, message: `a bar line past the end of the music (${barCount} bars)` });
-        else if (lastSyllableBar >= resolved)
-          diagnostics.push({ textLine, at: token.from, bar: resolved + 1, message: 'too many syllables before this bar — they spill into it' });
+        else if (lastSyllableBar >= resolved) {
+          if (firstSpill) laterSpills++;
+          else diagnostics.push(firstSpill = { textLine, at: token.from, bar: resolved + 1, message: '' });
+          // The bar line holds: the words that spilled are dropped, and the next word starts in the bar it names.
+          const start = walk.findIndex(entry => entry.measureIndex >= resolved);
+          next = start < 0 ? walk.length : start;
+          for (const index of [...syllables.keys()]) if (index >= next) syllables.delete(index);
+          const dropped = (start: TokenStart) => start.entry !== undefined ? start.entry >= next : start.bar >= resolved;
+          for (let t = tokens.length - 1; t >= 0 && tokens[t]!.entryIndex >= next; t--) tokens.pop();
+          if (covers) for (let c = covers.length - 1; c >= 0 && covers[c]!.at >= 0 && dropped(covers[c]!); c--) covers.pop();
+          lastSyllableBar = next > 0 ? walk[next - 1]!.measureIndex : -1;
+        }
         while (next < walk.length && walk[next]!.measureIndex < resolved) next++;
         barPointer = resolved;
         places?.set(token.from, resolved);
@@ -511,6 +524,9 @@ function parseWrittenLyricText(doc: MnxStructure, partIndex: number, text: strin
       diagnostics.push({ textLine, message: 'the line ends mid-word (a trailing hyphen with nothing after)' });
     lines.push({ lineId, minted: wasMinted, ...(header?.lang ? { lang: header.lang } : {}), ordinal, textLine, syllables });
   }
+  if (firstSpill) firstSpill.message = 'too many syllables before this bar — they spill into it' + (laterSpills
+    ? ` (and before ${laterSpills} later bar${laterSpills === 1 ? '' : 's'}, likely the same slip: the words after it are out of step with the bars)`
+    : '');
   return { lines, diagnostics, tokens };
 }
 
@@ -607,9 +623,13 @@ const normalizeType = (type?: string) => (type === 'whole' ? undefined : type);
  * from it clears its syllables on reachable events; events outside navigation,
  * outside the walk (and
  * other parts, other voices) are untouched. Empty result = nothing to apply.
+ * Text with problems plans nothing — unless `despiteProblems`: then it plans the words that
+ * found their notes (a spill's words are already dropped by the parse), so the score can show
+ * what is right while the rest is being fixed.
  */
-export function planLyricEdits(doc: MnxStructure, partIndex: number, parsed: ParsedLyricText, voiceIndex = 0): LyricPlanEdit[] {
-  if (parsed.diagnostics.length) return [];
+export function planLyricEdits(doc: MnxStructure, partIndex: number, parsed: ParsedLyricText, voiceIndex = 0,
+  { despiteProblems = false } = {}): LyricPlanEdit[] {
+  if (parsed.diagnostics.length && !despiteProblems) return [];
   const walk = lyricEventWalk(doc, partIndex, voiceIndex);
   const reachable = new Set(lyricPerformance(doc, partIndex, voiceIndex).sources);
   const desired = new Map<string, Map<number, { text: string; type?: SyllableType }>>();
