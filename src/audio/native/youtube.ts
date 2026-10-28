@@ -50,6 +50,7 @@ export function youtubeVisible(frame: HTMLIFrameElement): boolean {
 /** Owns the visible iframe, visibility hooks and actual-API clock polling. */
 export class NativeYouTubePort extends YouTubePort {
   private timer?: ReturnType<typeof setInterval>;
+  private carrier?: ReturnType<typeof setInterval>;
   private frame?: HTMLIFrameElement;
   private destroyed=false;
   private readonly visibility=()=>this.sample();
@@ -68,6 +69,7 @@ export class NativeYouTubePort extends YouTubePort {
       for(const [key,value] of Object.entries({enablejsapi:'1',origin:location.origin,playsinline:'1',controls:'1',autoplay:'0',disablekb:'0'}))url.searchParams.set(key,value);
       frame.src=url.href;owner.frame=frame;container.append(frame);
       owner.timer=setInterval(()=>owner.sample(),100);
+      owner.carrier=setInterval(()=>owner.carry(),40);
       document.addEventListener('visibilitychange',owner.visibility);document.addEventListener('fullscreenchange',owner.visibility);
       window.addEventListener('pagehide',owner.visibility);
       return new api.Player(frame,{events});
@@ -76,7 +78,7 @@ export class NativeYouTubePort extends YouTubePort {
   }
   override dispose(){
     if(this.destroyed)return;this.destroyed=true;
-    clearInterval(this.timer);document.removeEventListener('visibilitychange',this.visibility);document.removeEventListener('fullscreenchange',this.visibility);window.removeEventListener('pagehide',this.visibility);
+    clearInterval(this.timer);clearInterval(this.carrier);document.removeEventListener('visibilitychange',this.visibility);document.removeEventListener('fullscreenchange',this.visibility);window.removeEventListener('pagehide',this.visibility);
     super.dispose();this.frame?.remove();
   }
 }

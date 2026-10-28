@@ -21,6 +21,8 @@ const errors: Record<number, string> = {
   101: 'The owner does not allow this video to be embedded.', 150: 'The owner does not allow this video to be embedded.',
   153: 'YouTube could not identify this embed. Check the host origin and HTTP Referer policy.',
 };
+/** The furthest the clock is carried past its last sample. */
+const CARRY_SECONDS = 0.25;
 export class YouTubePort implements MediaPort {
   readonly kind = 'youtube';
   private api?: YouTubePlayerApi;
@@ -51,17 +53,27 @@ export class YouTubePort implements MediaPort {
   private priming = false;
   private primed?: Promise<boolean>;
   private primeFinish?: (started: boolean) => void;
+  /** When `clock` was read from the player, on `monotonic`. */
+  private sampledAt = 0;
   /** `pageHidden` reports a page no one can see — a background tab, where the browser holds back
-   *  the frames a load waits on. Time spent hidden is not counted against readiness. */
+   *  the frames a load waits on. Time spent hidden is not counted against readiness. `monotonic`
+   *  (seconds) carries the clock forward between the samples the adapter takes. */
   constructor(private readonly videoId: string, private readonly factory: YouTubeFactory,
-    private readonly visible: () => boolean, private readonly pageHidden: () => boolean = () => false) {}
+    private readonly visible: () => boolean, private readonly pageHidden: () => boolean = () => false,
+    private readonly monotonic: () => number = () => performance.now() / 1000) {}
   get capabilities(): PlaybackCapabilities {
     const reported = this.apiReady ? this.api!.getAvailablePlaybackRates() : [1];
     const values = [...new Set((Array.isArray(reported) ? reported : [1]).filter(r => Number.isFinite(r) && r > 0))].sort((a,b)=>a-b);
     if (!values.length) values.push(1);
     return { rate: { min: values[0], max: values.at(-1)!, step: 1, values }, volume: true, loop: 'seek', parts: false };
   }
-  get currentTime() { return this.clock; }
+  /** The player's time as last sampled, carried forward while it plays: the adapter samples every
+   *  100 ms, and a held reading was on average 50 ms behind what was heard (and up to 100) for
+   *  the cursor and for a synth following along. Never carried past a missed sample or two. */
+  get currentTime() {
+    if (this.state !== 1 || this.seekingNow || this.seekTarget !== undefined) return this.clock;
+    return this.clock + Math.min(Math.max(0, this.monotonic() - this.sampledAt), CARRY_SECONDS) * this.acceptedRate;
+  }
   get duration() { const value=this.apiReady ? this.api!.getDuration() : 0; return Number.isFinite(value) && value>=0 ? value : 0; }
   get paused() { return this.state !== 1; }
   get ended() { return this.state === 0; }
@@ -131,12 +143,15 @@ export class YouTubePort implements MediaPort {
     const actual=this.api.getCurrentTime();
     if (Number.isFinite(actual) && actual>=0 && this.state!==3) {
       if (this.seekTarget === undefined || Math.abs(actual-this.seekTarget)<.75) {
-        this.clock=actual; this.seekTarget=undefined;
+        this.clock=actual; this.sampledAt=this.monotonic(); this.seekTarget=undefined;
         if (this.seekingNow) { this.seekingNow=false; clearTimeout(this.seekTimer); this.seekRequest?.resolve(); this.seekRequest=undefined; this.emit('seeked'); }
       }
     }
     this.emit('time');
   }
+  /** Between samples: say the time has moved, so the cursor follows the carried clock (40 ms, as
+   *  the audio port does) rather than stepping with the samples. Reads nothing from the player. */
+  carry() { if (!this.closed && this.apiReady && this.state===1 && !this.priming && !this.seekingNow && this.seekTarget===undefined) this.emit('time'); }
   async play() {
     const generation=++this.generation;
     await this.prepare();

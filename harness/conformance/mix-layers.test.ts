@@ -181,3 +181,27 @@ it('the synth follows a recording: every note once, at the recording\'s time, tw
   r.backend.followMedia(null);
   r.backend.dispose();
 }, 60_000);
+
+it('following a recording, each note and beat is sent the output\'s latency early, so it is heard at the recording\'s time', async () => {
+  const r = rig(), sync = slowRecording(r, 3), LATENCY = 0.2;
+  Object.assign(r.port, { latency: () => LATENCY });
+  const media = { time: 2, rate: 1, playing: false, at: 0 };
+  const read = () => ({ mediaTime: media.playing ? media.time + (r.port.now() - media.at) * media.rate : media.time, rate: media.rate, playing: media.playing });
+  r.backend.setLayers({ synth: true, click: true, clickLevel: 1 });
+  r.backend.followMedia({ read, sync });
+  await r.run(0.2);
+  Object.assign(media, { playing: true, at: r.port.now(), time: 2 });
+  const t0 = r.port.now();
+  // Heard at the recording's time: rendered LATENCY before it.
+  const renderedAt = (synthSeconds: number) => t0 + (3 + 2 * synthSeconds - 2) - LATENCY;
+  await r.run(6);
+  const notes = r.port.batches.flatMap(b => b.notes);
+  expect(notes.length).toBeGreaterThan(0);
+  for (const n of notes) expect(n.at, n.id).toBeCloseTo(renderedAt(r.stream.notes.find(m => m.id === base(n.id))!.at), 2);
+  for (const b of r.port.batches) for (const n of b.notes) expect(n.at - b.now, 'past the commit horizon').toBeGreaterThan(0.1);
+  const beats = beatGrid(r.performance, documentMeter(r.performance, document));
+  expect(r.port.clicks[0]!.at).toBeCloseTo(renderedAt(r.stream.secondsAt(beats[0]!.position)), 2);
+  expect(warnings(r.port), JSON.stringify(warnings(r.port))).toEqual([]);
+  r.backend.followMedia(null);
+  r.backend.dispose();
+}, 60_000);

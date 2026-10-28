@@ -95,6 +95,10 @@ export interface FollowTarget {
   idle?(): void;
   /** Wake the host's audio, if it slept while nothing played. */
   unlock?(): Promise<void>;
+  /** Seconds from the host rendering a note to it being heard: the browser's buffer, the
+   *  system's, a Bluetooth link. A recording's clock already says what is heard (the media
+   *  pipeline delays itself to match), so each note is sent this much earlier. 0 where unknown. */
+  latency?(): number;
 }
 export interface MediaReading { readonly mediaTime: number; readonly rate: number; readonly playing: boolean }
 export interface FollowEvents {
@@ -157,6 +161,7 @@ export class MediaFollower {
     this.expected = { now, media, rate };
     this.supply(media, rate);
   }
+  private latency() { const l = this.target.latency?.() ?? 0; return Number.isFinite(l) && l > 0 ? l : 0; }
   /** Stop supplying, and silence what was sent. */
   stop() { if (this.running) this.halt(true); this.clock.reset(); this.last = NaN; }
 
@@ -174,15 +179,16 @@ export class MediaFollower {
     this.noteCursor = firstAt(notes, media);
     this.clickCursor = firstAt(clicks, media);
     this.through = media;
-    const host = this.target.now() + this.lead, sustained: Note[] = [];
+    // The soonest a note can be sent, and when that is heard.
+    const host = this.target.now() + this.lead, wait = this.lead + this.latency(), sustained: Note[] = [];
     // A note sounding where the media is: struck again for what is left of it.
     for (let i = 0; i < this.noteCursor; i++) {
       const n = notes[i]!;
-      if (n.at + n.duration > media + this.lead * rate) {
+      if (n.at + n.duration > media + wait * rate) {
         this.emitted.add(n.id);
         const { techniques, ...rest } = n;
         const kept = (techniques ?? []).filter(t => t.type === 'mute' || t.type === 'harmonic');
-        sustained.push({ ...rest, id: `${n.id}:f${this.gen}`, at: host, duration: Math.max(1e-4, (n.at + n.duration - media) / rate - this.lead),
+        sustained.push({ ...rest, id: `${n.id}:f${this.gen}`, at: host, duration: Math.max(1e-4, (n.at + n.duration - media) / rate - wait),
           ...(kept.length ? { techniques: kept } : {}) });
       }
     }
@@ -193,8 +199,9 @@ export class MediaFollower {
   private supply(media: number, rate: number) {
     const to = media + this.ahead * rate;
     if (to <= this.through) return;
-    const now = this.target.now(), soonest = now + this.lead;
-    const hostAt = (seconds: number) => Math.max(soonest, now + (seconds - media) / rate);
+    // Host time is when a note is rendered; the media's clock is what is heard.
+    const now = this.target.now(), soonest = now + this.lead, heardNow = now - this.latency();
+    const hostAt = (seconds: number) => Math.max(soonest, heardNow + (seconds - media) / rate);
     const { notes, clicks } = this.events, out: Note[] = [];
     for (; this.noteCursor < notes.length && notes[this.noteCursor]!.at < to; this.noteCursor++) {
       const n = notes[this.noteCursor]!;
@@ -205,7 +212,7 @@ export class MediaFollower {
       this.target.click?.(hostAt(c.at), c.accent);
     }
     this.through = to;
-    this.target.schedule({ notes: out, through: now + (to - media) / rate });
+    this.target.schedule({ notes: out, through: heardNow + (to - media) / rate });
   }
   /** A note at host time `at`, its length and techniques retimed for the rate. */
   private placed(n: Note, at: number, rate: number): Note {

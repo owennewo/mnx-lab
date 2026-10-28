@@ -473,6 +473,9 @@ export class HostBackend implements PlaybackBackend {
     const follower = new MediaFollower({
       now: () => port.now(), schedule: batch => port.schedule(batch), cancel: c => port.cancel(c), idle: () => port.idle?.(),
       unlock: () => port.unlock(), click: (at, accent) => port.click?.(at, accent),
+      // What lies between rendering and the speaker, measured where the browser can say, as the
+      // synth's own clock reads it (heard(), else the reported latency).
+      latency: () => { const heard = port.heard?.(); return heard !== undefined ? port.now() - heard : port.latency?.() ?? 0; },
     }, events);
     const tick = () => {
       const following = this.following;

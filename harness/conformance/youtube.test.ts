@@ -22,8 +22,9 @@ function fixture() {
     playVideo(){this.plays++;if(this.onPlay==='start'){this.state=1;queueMicrotask(()=>events.onStateChange({data:1}));}else if(this.onPlay==='block')queueMicrotask(()=>events.onAutoplayBlocked());},pauseVideo(){this.state=2;},seekTo(time:number){this.time=time;},cueVideoById({startSeconds}:{startSeconds:number}){this.cues.push(startSeconds);this.time=startSeconds;this.state=5;events.onStateChange({data:5});},
     getCurrentTime(){return this.time;},getDuration(){return this.duration;},getPlayerState(){return this.state;},getPlaybackRate(){return this.rate;},getAvailablePlaybackRates(){return this.rates;},setPlaybackRate(rate:number){this.requestedRate=rate;},getVolume(){return this.volume;},setVolume(volume:number){this.volume=volume;},mute(){this.muted=true;},unMute(){this.muted=false;},isMuted(){return this.muted;},destroy(){this.destroyed=true;},
   };
-  const port=new YouTubePort(id,async next=>{events=next;queueMicrotask(()=>events.onReady());return api;},()=>visible);
-  return {api,port,get events(){return events;},hide(){visible=false;},show(){visible=true;},state(data:number){api.state=data;events.onStateChange({data});}};
+  const clock={now:0};
+  const port=new YouTubePort(id,async next=>{events=next;queueMicrotask(()=>events.onReady());return api;},()=>visible,()=>false,()=>clock.now);
+  return {api,port,clock,get events(){return events;},hide(){visible=false;},show(){visible=true;},state(data:number){api.state=data;events.onStateChange({data});}};
 }
 const flush=async()=>{for(let i=0;i<10;i++)await Promise.resolve();};
 describe('official IFrame API adapter',()=>{
@@ -64,6 +65,22 @@ describe('official IFrame API adapter',()=>{
     f.api.time=4;f.port.sample();expect(f.port.currentTime).toBe(4);
     f.state(3);f.api.time=9;f.port.sample();expect(f.port.currentTime).toBe(4);expect(f.port.clockReliable).toBe(true);
     f.state(1);expect(f.port.currentTime).toBe(9);await f.port.seek(12);expect(f.port.currentTime).toBe(12);expect(f.port.seeking).toBe(false);f.port.dispose();
+  });
+  it('carries the clock forward between samples while playing, at the accepted rate, but not far and not paused',async()=>{
+    const f=fixture();await f.port.prepare();const play=f.port.play();await flush();f.state(1);await play;
+    f.clock.now=10;f.api.time=4;f.port.sample();expect(f.port.currentTime).toBe(4);
+    f.clock.now=10.05;expect(f.port.currentTime).toBeCloseTo(4.05,9);
+    f.api.rate=.5;f.events.onPlaybackRateChange();f.clock.now=10.08;expect(f.port.currentTime).toBeCloseTo(4.04,9);
+    f.clock.now=12;expect(f.port.currentTime).toBeCloseTo(4.125,9);
+    f.clock.now=12.01;f.api.time=5;f.port.sample();expect(f.port.currentTime).toBe(5);
+    f.port.pause();f.clock.now=12.2;expect(f.port.currentTime).toBe(5);f.port.dispose();
+  });
+  it('announces the carried time between samples only while playing',async()=>{
+    const f=fixture();await f.port.prepare();const seen:string[]=[];f.port.subscribe(e=>seen.push(e));
+    f.port.carry();expect(seen).toEqual([]);
+    const play=f.port.play();await flush();f.state(1);await play;seen.length=0;
+    f.port.carry();expect(seen).toEqual(['time']);
+    f.port.pause();seen.length=0;f.port.carry();expect(seen).toEqual([]);f.port.dispose();
   });
   it('keeps a seek\u2019s target as a reliable clock while YouTube is still getting there',async()=>{
     // A press on the score seeks, and YouTube takes a few hundred ms to report
