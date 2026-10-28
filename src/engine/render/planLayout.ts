@@ -135,6 +135,6 @@ export function planLayout<A extends ReturnType<typeof commonLayoutArgs>>(
     projection,
     // The INK scale is what a zoom readout means by "how big is this", so that
     // is the one reported — `pxPerSp` is now the horizontal axis's business.
-    outcome: renderOutcome(pxPerSpY, fitted, layout.packings, pageGeometry(layout, pxPerSp, pxPerSpY))
+    outcome: renderOutcome(pxPerSpY, fitted, layout.packings, pageGeometry(layout, pxPerSp, pxPerSpY), layout.occurrences)
   };
 }

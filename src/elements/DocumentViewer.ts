@@ -1,6 +1,6 @@
 import { noteTargetAt } from '../engine/render/noteTarget.ts';
 import { engravingEntries } from '../engine/layout/unrolled.ts';
-import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
+import { occurrenceKey } from '../model/noteKeys.ts';
 import { forEachNoteAddress } from '../model/noteWalk.ts';
 import { restSpansOf } from '../model/restSpans.ts';
 import type { MnxStructure } from '../model/mnx.ts';
@@ -412,6 +412,16 @@ export class DocumentViewer extends LitElement {
   /** Where the drawn page's systems, staves and bars are, in its SVG's units; null before the first paint. */
   get pageGeometry(): PageGeometry | null {
     return this.lastGeometry;
+  }
+  /** The ids the last paint drew for one visit of a bar (`RenderOutcome.occurrences`). */
+  private lastOccurrences: RenderOutcome['occurrences'] = undefined;
+  /**
+   * The written key and the visit behind an id the page drew — a note's, a rest's, a
+   * syllable's playback key. In the unrolled view an id names one visit (`w2:…`); the
+   * layout says which, so nothing here decodes it. Elsewhere the key is the id itself.
+   */
+  locate(id: string): { key: string; visit?: number } {
+    return this.lastOccurrences?.get(id) ?? { key: id };
   }
   private ladder: { of: PackingInput[]; steps: number[] } | null = null;
   /** The density that packing was laid out at — `systemRows()`'s input. */
@@ -1529,8 +1539,7 @@ export class DocumentViewer extends LitElement {
     const hit = target.closest<Element>('.notehead[data-source-id], .fret-number[data-source-id]');
     const raw = hit?.getAttribute('data-source-id');
     if (!raw) return undefined;
-    const occurrence = this.unrolled ? parseOccurrenceKey(raw) : null;
-    return occurrence ? occurrence.noteKey : raw;
+    return this.locate(raw).key;
   }
 
   /**
@@ -1579,10 +1588,9 @@ export class DocumentViewer extends LitElement {
     // Otherwise a SLOT places the cursor — and dead space is null: nothing.
     const hit = hitTest(page.map, point, noteKey);
     if (!hit) return;
-    // Unrolled, the ink names its visit (`w2:…`): the press means THAT visit.
-    const visit = this.unrolled
-      ? parseOccurrenceKey(ink?.getAttribute('data-source-id') ?? '')?.ordinal
-      : undefined;
+    // Unrolled, the ink is one visit's: the press means THAT visit.
+    const id = ink?.getAttribute('data-source-id');
+    const visit = id ? this.locate(id).visit : undefined;
     const placement: PointerPlacement = visit === undefined ? hit : { ...hit, ordinal: visit };
     this.clearHover(page.svg);
     this.dispatchEvent(
@@ -1664,11 +1672,10 @@ export class DocumentViewer extends LitElement {
     noteIdx: number,
     projection: RenderedProjection
   ) => {
-    const occurrence = this.unrolled ? parseOccurrenceKey(noteId) : null;
-    if (occurrence) noteId = occurrence.noteKey;
+    const { key, visit } = this.locate(noteId);
     this.dispatchEvent(
       new CustomEvent('note-selected', {
-        detail: { noteId, measureIdx, noteIdx, projection, ...(occurrence ? { ordinal: occurrence.ordinal } : {}) },
+        detail: { noteId: key, measureIdx, noteIdx, projection, ...(visit === undefined ? {} : { ordinal: visit }) },
         bubbles: true,
         composed: true
       })
@@ -1764,6 +1771,7 @@ export class DocumentViewer extends LitElement {
     // host wants the answer ("which values do something?"), not the input.
     this.lastPackings = drawn.packings;
     this.lastGeometry = drawn.geometry;
+    this.lastOccurrences = drawn.occurrences;
     this.lastDensityH = densityH;
     this.lastStaffSp = used;
     // The page was rebuilt, so every measurement taken off it is stale —

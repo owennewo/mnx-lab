@@ -356,7 +356,7 @@ export function emitTabStaffLines(
       kind: 'line',
       x1: x, y1: lineY, x2: x + width, y2: lineY,
       thickness: TAB_STAFF_LINE_THICKNESS_SP,
-      className: 'staff-line'
+      className: 'staff-line', role: 'frame'
     });
   }
 }
@@ -701,7 +701,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
             w: REST_TARGET_WIDTH_SP,
             h: FRET_BG_HEIGHT_SP,
             fill: 'transparent',
-            className: 'rest tab-rest',
+            className: 'rest tab-rest', role: 'event',
             sourceId: restKey
           });
           primitives.push({
@@ -830,6 +830,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         baseline: 'central',
         weight: FRET_FONT_WEIGHT,
         fill: fretFill,
+        role: 'event',
         className: 'fret-number' +
           (isActive ? ' active' : '') +
           (isSelected ? ' selected' : fretFill !== undefined && !isActive ? SELECTED_CLASS_MARK : ''),

@@ -5,7 +5,7 @@ import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
 import type { HorizontalPlan, PlanOptions } from './spacing.ts';
 import { buildScoreJobs, layoutNotation } from './notation.ts';
-import { stamp, tagElement, translatePrimitiveY, type BarSp, type DisplayStaff } from '../primitives.ts';
+import { stamp, tagElement, translatePrimitiveY, type BarSp, type DisplayStaff, type Occurrence } from '../primitives.ts';
 import { rowOf } from './verticalDensity.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, tieOrigins } from './spacing.ts';
@@ -299,6 +299,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const rowStart: number[] = [];
   let openingScoreText: Primitive[] = [];
   const bars: BarSp[] = [];
+  const occurrences = new Map<string, Occurrence>();
   // Which bars declare a feel, and which of those are a change worth printing.
   const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
   for (let i = 0; i < numMeasures; i++) {
@@ -340,7 +341,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         kind: 'line',
         x1: m.x, y1: staffTop, x2: m.x, y2: staffBottom,
         thickness: BARLINE_THICKNESS_SP,
-        className: 'barline barline-start'
+        className: 'barline barline-start', role: 'frame'
       });
     }
 
@@ -581,9 +582,9 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       emitMeasureDiagnostics(m.x, staffBottom, measureIssues, primitives);
       for (const issue of measureIssues) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
-    qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, selectedNoteIds);
+    qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, selectedNoteIds, occurrences);
     // Everything this bar drew — its voltas, labels and directions too — is its row's.
-    stamp(primitives, measurePrimitiveStart, { row: m.row, measure: writtenIndex(plan, i) });
+    stamp(primitives, measurePrimitiveStart, { row: m.row, measure: writtenIndex(plan, i), ...(m.entry ? { visit: m.entry.ordinal } : {}) });
     bars.push({ row: m.row, index: i, measure: writtenIndex(plan, i), x: m.x, width: m.width });
   }
 
@@ -640,7 +641,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
 
   const finalRows = tightened?.rows ?? rows;
   const finalDisplays = finalRows.map(row => [row]);
-  if (!context) appendSystemBookends(primitives, finalDisplays, opts.systemBookends);
+  if (!context) appendSystemBookends(primitives, finalDisplays, opts.systemBookends, bars);
   // One staff: everything here is drawn on it.
   for (const p of primitives) if (p.origin && p.origin.display === undefined) p.origin.display = 0;
   const staff: DisplayStaff = { partIndex: Math.max(0, mnx.parts.indexOf(part)), staffIndex: context?.staffIndex ?? 1, projection: 'tab', lines: TAB_STAFF_LINES };
@@ -648,7 +649,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp,
     usedWidthSp: plan.usedWidthSp, naturalWidthSp,
     index, diagnostics, rows: finalRows, displays: finalDisplays,
-    packings: [plan.packing], bars, staves: finalRows.map(() => [staff])
+    packings: [plan.packing], bars, staves: finalRows.map(() => [staff]),
+    ...(occurrences.size ? { occurrences } : {})
   };
 }
 
@@ -665,6 +667,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
   const displays: RowBandSp[][] = [];
   const bars: BarSp[] = [];
   const staves: DisplayStaff[][] = [];
+  const occurrences = new Map<string, Occurrence>();
   const packings: NonNullable<LayoutResult['packings']> = [];
   const clearance = clearanceSpacing(display.clearance, opts.densityPad);
   let cursorY = clearance.tabOuterMargin(MARGIN_SP);
@@ -718,6 +721,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
           plan: { ...plan, measures: plan.measures.map(measure => ({ ...measure, voices: measure.staves[staff] ?? [] })) }
         });
         for (const [key, location] of result.index) index.set(key, location);
+        for (const [id, occurrence] of result.occurrences ?? []) occurrences.set(id, occurrence);
         for (const diagnostic of result.diagnostics) {
           if (!diagnostics.some(existing => existing.measureIndex === diagnostic.measureIndex && existing.message === diagnostic.message)) diagnostics.push(diagnostic);
         }
@@ -738,7 +742,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
           const bottom = Math.max(band.staffBottom, ink ? ink.y + ink.h : band.staffBottom);
           // A staff whose verses stand over it gets the same extra air the
           // single-staff fit gives a versed system.
-          if ((rows.length > 0 || system.length > 0) && staff.bins[row].some(p => /lyric/.test(p.className ?? ''))) cursorY += clearance.versesAbove;
+          if ((rows.length > 0 || system.length > 0) && staff.bins[row].some(p => p.role === 'lyric')) cursorY += clearance.versesAbove;
           const dy = cursorY - top;
           // Drawn alone, each staff was row `row`, staff 0; here it is this system's staff k.
           for (const primitive of staff.bins[row]) primitive.origin = { ...primitive.origin!, row: rows.length, display: k };
@@ -755,7 +759,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
       }
     });
   }
-  appendSystemBookends(primitives, displays, opts.systemBookends);
+  appendSystemBookends(primitives, displays, opts.systemBookends, bars);
   return { primitives, index, diagnostics, rows, displays, packings, bars, staves,
+    ...(occurrences.size ? { occurrences } : {}),
     widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + (opts.densityPad !== undefined || (display.clearance ?? 2) === 2 ? MARGIN_SP : clearance.tabOuterMargin(MARGIN_SP + 3) - clearance.systemInk) };
 }

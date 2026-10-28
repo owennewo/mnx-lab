@@ -502,8 +502,8 @@ describe('performance order and canonical wrapping', () => {
     // Bar 1's second note, sung by verse 2 on the second time through: the bar played second.
     expect(lyricPlaceOfSyllable(doc, 'b0n1', '2')).toEqual({ partIndex: 0, voiceIndex: 0, place: { ordinal: 1, onset: [1, 4] } });
     expect(lyricPlaceOfSyllable(doc, 'b0n1', '1')?.place.ordinal).toBe(0);
-    // In an unrolled view the drawn key names the bar played itself.
-    expect(lyricPlaceOfSyllable(doc, 'w1:b0n1', '1')?.place.ordinal).toBe(1);
+    // In an unrolled view the page says which bar played the syllable was drawn for.
+    expect(lyricPlaceOfSyllable(doc, 'b0n1', '1', 1)?.place.ordinal).toBe(1);
     expect(lyricPlaceOfSyllable(doc, 'nowhere', '1')).toBeNull();
   });
 

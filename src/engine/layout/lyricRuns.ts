@@ -143,7 +143,6 @@ const GAP_ASPECT = 1.2;
 // A staff's frame — lines, barlines, a group's brace or bracket — and the
 // verses themselves never push a verse down. Whole class tokens only: a
 // tuplet-bracket under the notes is ink like any other.
-const NOT_HANGING_INK = /staff-line|barline|lyric|(^|\s)(brace|bracket)(\s|$)/;
 
 /** Where a primitive hangs from: a line or curve by its TOP (a down-stem starts
  *  at its notehead, a slur under the notes at its ends), anything else by its
@@ -198,7 +197,7 @@ export function emitLyricRuns(
       if (firstBaseline.has(syl.staffBottom)) continue;
       let deepest = syl.staffBottom;
       for (const p of primitives) {
-        if (p.origin?.row !== syl.row || NOT_HANGING_INK.test(p.className ?? '')) continue;
+        if (p.origin?.row !== syl.row || p.role === 'frame' || p.role === 'lyric') continue;
         const y = hangY(p);
         if (y < syl.staffTop || y >= syl.bandBottom) continue;
         deepest = Math.max(deepest, inkEdgesSp(p).bottom);
@@ -211,7 +210,7 @@ export function emitLyricRuns(
     const h = (LYRIC_ASCENT_SP + LYRIC_DESCENT_SP) * (1 + 2 * GAP_PAD_Y), w = h * GAP_ASPECT;
     const gap: Primitive = {
       kind: 'rect', x: syl.x - w / 2, y: y - LYRIC_ASCENT_SP - h * GAP_PAD_Y, w, h, radius: h * 0.2,
-      fill: 'none', className: 'lyric-gap', origin: lyricOrigin(syl),
+      fill: 'none', className: 'lyric-gap', role: 'lyric', origin: lyricOrigin(syl),
       ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
       ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
     };
@@ -228,7 +227,7 @@ export function emitLyricRuns(
         font: 'lyric',
         size: LYRIC_SIZE_SP,
         anchor: 'middle',
-        className: 'lyric',
+        className: 'lyric', role: 'lyric',
         origin: lyricOrigin(syl),
         ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
         ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
@@ -244,7 +243,7 @@ export function emitLyricRuns(
           font: 'lyric',
           size: LYRIC_SIZE_SP,
           anchor: 'middle',
-          className: 'lyric-hyphen',
+          className: 'lyric-hyphen', role: 'lyric',
           origin: lyricOrigin(syl)
         };
         primitives.push(hyphen);
@@ -285,7 +284,7 @@ function baselinesAbove(
     let ceiling = syl.staffTop;
     for (const p of primitives) {
       // Its own system's ink only: whatever the system above hangs is the row fit's to clear.
-      if (p.origin?.row !== syl.row || NOT_HANGING_INK.test(p.className ?? '')) continue;
+      if (p.origin?.row !== syl.row || p.role === 'frame' || p.role === 'lyric') continue;
       const e = inkEdgesSp(p);
       if (e.right < x0 || e.left > x1) continue;
       if (e.top >= syl.staffTop || e.bottom > staffBottom) continue;

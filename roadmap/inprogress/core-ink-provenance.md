@@ -89,10 +89,10 @@ layout instead of the drawing. Within-row staff attribution in `measureDisplayGa
 
 `origin.visit` (the performed ordinal, in a view that draws passes) so nothing parses
 `w{n}:` back out of an id — ids stay unique, the prefix stays as identity, but no reader
-decodes it. `origin.role` replaces className parsing inside the engine
+decodes it. A `role` replaces className parsing inside the engine
 (`STRUCTURAL_CLASSES`, `NOT_HANGING_INK`, `/lyric/`, the selectable-ink regex), leaving
-`className` to styling. The `SpatialIndex` gains part and staff, so a note's address is a
-lookup rather than a document walk.
+`className` to styling. ~~The `SpatialIndex` gains part and staff, so a note's address is a
+lookup rather than a document walk.~~ Dropped — see Progress.
 
 ## Progress
 
@@ -145,3 +145,39 @@ primitive names a staff of its row, that staff lines lie in the band they name, 
 the bars, row by row, are exactly `packedRowMeasures`' rows. The selection, loop, unrolled,
 single-cursor, focus, inspector, studio-editor, studio-export and workbench-editor smokes
 pass against the new geometry.
+
+**Phase 3 — visit and role (2026-10-28).** `origin.visit` on everything a visit's copy of
+a bar draws in the unrolled view, and `LayoutResult.occurrences` (through
+`RenderOutcome.occurrences`): every id drawn for one visit, performed or not, with the
+written key and the visit behind it. The viewer's `locate(id)` answers from it, so the
+note click, the pointer press, the cursor's pressed visit, the editor's lyric press and
+studio's long-press on a syllable no longer decode `w{n}:`; `lyricPlaceOfSyllable` takes
+the visit as an argument rather than parsing it; a slur's pinned end reads the visit its
+anchor was drawn for (`EventCurveAnchor.visit`). `parseOccurrenceKey` stays as public
+library API and nothing in the app calls it. `role` (a field beside `origin`, because the
+inner emitters that set it — `barlines.ts`, `repeats.ts` — do not know their row) is
+`frame`, `lyric`, `event`, `direction` or `between`, set where the ink is drawn; it
+replaces `STRUCTURAL_CLASSES` and the `direction-between` token in `measureDisplayGaps`,
+`NOT_HANGING_INK` in the verse baselines, `/lyric/` in the tab composer, the selectable-ink
+regex in the unrolled pass (which also matched `multirest-…` and `tab-rest-pill` by
+substring) and the `direction` token in the above-direction stacking. The census checks
+every role against the class it is drawn with, both ways. `systemBookends` takes the
+music's edge from the layout's bars instead of its staff lines.
+
+Left reading class names, deliberately: a module recognising a specific mark it drew
+itself by its exact name (`tuplet-number`, `tab-capo`, a repeat count's text) — that is
+identity, not classification — and `projectionForSourceClass`, which reads the clicked
+DOM element's own class in the `both` view, where one id is drawn on both projections and
+only the element pressed can say which.
+
+Dropped: part and staff in the `SpatialIndex`. The part index the layout keys notes with
+is exact only where a staff draws one part (a merged staff falls back to part 0), and the
+viewer lays out the visible parts only, so a layout part index would need mapping back
+before it could stand in for `findNoteAddress` — a cheap exact query on the model. An
+index that answered "part 0" for a merged staff would be the kind of confident wrong
+answer this item exists to remove.
+
+Evidence: goldens byte-identical (including the unrolled SVGs); the census (27 checks over
+nine projections) now covers rows, staves, bars and roles; the unrolled, workbench-editor,
+studio-editor, single-cursor, selection, player, sync-bar, youtube and recording-studio
+smokes pass.

@@ -128,7 +128,8 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
       x2: at, dx2: dx, y2: bottom,
       thickness: thinSp,
       ...(dash === undefined ? {} : { dash }),
-      className
+      className,
+      role: 'frame'
     });
 
   /** A heavy band whose ink ENDS `dx` of ink from `right` — a rect, since it
@@ -141,7 +142,8 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
       x: right, dx: dx - thickSp, y: top,
       w: thickSp, h: bottom - top,
       fill: 'currentColor',
-      className
+      className,
+      role: 'frame'
     });
 
   switch (type) {
@@ -195,7 +197,7 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
         kind: 'line',
         x1: x, y1: top - TICK_REACH_SP, x2: x, y2: top + TICK_REACH_SP,
         thickness: thinSp,
-        className: 'barline barline-tick'
+        className: 'barline barline-tick', role: 'frame'
       });
       return;
 
@@ -207,7 +209,7 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
         kind: 'line',
         x1: x, y1: top + inset, x2: x, y2: bottom - inset,
         thickness: thinSp,
-        className: 'barline barline-short'
+        className: 'barline barline-short', role: 'frame'
       });
       return;
     }

@@ -73,7 +73,6 @@ import type { PassNotice, PerformedPlace } from '../edit/session.ts';
 import { entryStart } from '../edit/performedCursor.ts';
 import { slotAt } from '../edit/cursor.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
-import { parseOccurrenceKey } from '../model/noteKeys.ts';
 import { PILL_OF, lyricVisit, type ElementPress } from '../engine/render/clickTargets.ts';
 import { barSeekTarget } from '../model/playback.ts';
 import { hasRepeatStructure } from '../model/passes.ts';
@@ -861,11 +860,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     let moved: boolean;
     if (press.kind === 'lyric') {
       if (press.noteKey === undefined || press.lyricLine === undefined) return false;
-      const occurrence = parseOccurrenceKey(press.noteKey);
-      const noteKey = occurrence?.noteKey ?? press.noteKey;
+      // The page says which note, and (unrolled) which visit, the syllable was drawn for.
+      const { key: noteKey, visit } = viewer.locate(press.noteKey);
       const address = findNoteAddress(session.doc, noteKey);
       if (!address) return false;
-      const ordinal = occurrence?.ordinal ?? lyricVisit(session.doc, session.passModel, address.measureIndex, press.lyricLine);
+      const ordinal = visit ?? lyricVisit(session.doc, session.passModel, address.measureIndex, press.lyricLine);
       moved = dispatch({
         type: 'goToPointer', measureIndex: address.measureIndex, partIndex: address.partIndex,
         staffIndex: address.staffIndex, line: 0, projection: session.projection, fraction: 0, noteKey,

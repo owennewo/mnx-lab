@@ -193,6 +193,23 @@ scale rhythmic springs. Every relationship has its own anchors so paired
 staves remain paired and independent systems remain distinct. An explicitly
 supplied legacy `densityPad` overrides the clearance policy wholesale.
 
+## Ink provenance: say what you drew it for
+
+Every primitive carries what it was drawn for (`origin` in `src/engine/primitives.ts`):
+its **row** always, its display **staff** when it is one staff's, its written **measure**
+when it is one bar's, and its **visit** in the unrolled view; and what it **is**
+(`role`: `frame`, `lyric`, `event`, `direction`, `between`) where a decision depends on
+it. Emitters stamp the range they pushed (`stamp`, `stampRow`, `stampDisplay`) — a new
+emitter inside a bar's loop iteration is stamped by the loop, one that draws across rows
+stamps each piece. **Readers take provenance from the ink, never from where it landed or
+from `className`**: the row fit moves ink by `origin.row`, verses clear their own row's
+ink, and the overlays read `RenderOutcome.geometry` (systems, staves with what each
+draws, bar edges, each row's ink reach) and `RenderOutcome.occurrences` (the visit behind
+an unrolled id) instead of measuring the SVG. Provenance never reaches a golden —
+`rounded()` strips it — so a change that only moves provenance moves no golden.
+`harness/conformance/ink-origin.test.ts` fails on unstamped ink. Why:
+[roadmap/inprogress/core-ink-provenance.md](../roadmap/inprogress/core-ink-provenance.md).
+
 ## The swing marking
 
 `emitSwingMark` in `src/engine/layout/scoreText.ts` draws `_x.mnxLab.swing` in

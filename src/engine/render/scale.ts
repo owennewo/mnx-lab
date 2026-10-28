@@ -12,6 +12,7 @@
  * ignores it entirely.
  */
 import type { PageGeometry } from './pageGeometry.ts';
+import type { Occurrence } from '../primitives.ts';
 import type { PackingInput } from '../layout/spacing.ts';
 
 export interface RenderScale {
@@ -47,6 +48,9 @@ export interface RenderOutcome extends RenderScale {
   /** Where the drawn systems, staves and bars are, in the SVG's units — for an
    *  overlay to read rather than find in the drawing. */
   geometry: PageGeometry;
+  /** In the unrolled view, the written key and the visit behind every id drawn for
+   *  one visit (`LayoutResult.occurrences`), so no reader decodes the id. */
+  occurrences?: Map<string, Occurrence>;
 }
 
 /** The baseline at Staff 1sp. One definition, so the three renderers cannot
@@ -124,9 +128,10 @@ export function renderOutcome(
   pxPerSp: number,
   fitted: boolean,
   packings: PackingInput[] | undefined,
-  geometry: PageGeometry
+  geometry: PageGeometry,
+  occurrences?: Map<string, Occurrence>
 ): RenderOutcome {
-  return { ...renderScale(pxPerSp, fitted), packings: packings ?? [], geometry };
+  return { ...renderScale(pxPerSp, fitted), packings: packings ?? [], geometry, ...(occurrences ? { occurrences } : {}) };
 }
 
 /** @deprecated Use `MIN_STAFF_SP`. */

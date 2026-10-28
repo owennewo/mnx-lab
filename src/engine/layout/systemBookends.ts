@@ -1,4 +1,4 @@
-import type { Primitive, RowBandSp } from '../primitives.ts';
+import type { BarSp, Primitive, RowBandSp } from '../primitives.ts';
 
 export interface SystemBookend {
   label: string;
@@ -24,16 +24,14 @@ export function systemBookendInsetSp(bookend: SystemBookend | undefined, inkRati
 export function appendSystemBookends(
   primitives: Primitive[],
   displays: readonly (readonly RowBandSp[])[],
-  bookends: SystemBookends | undefined
+  bookends: SystemBookends | undefined,
+  /** The layout's bars (`LayoutResult.bars`): where the music on each row begins and ends. */
+  bars: readonly BarSp[]
 ): void {
   if (!bookends || displays.length === 0) return;
 
   const edge = (row: number, side: 'leading' | 'trailing'): number | null => {
-    const xs: number[] = [];
-    for (const primitive of primitives) {
-      if (primitive.kind !== 'line' || primitive.className !== 'staff-line' || primitive.origin?.row !== row) continue;
-      xs.push(primitive.x1, primitive.x2);
-    }
+    const xs = bars.filter(bar => bar.row === row).flatMap(bar => [bar.x, bar.x + bar.width]);
     return xs.length ? (side === 'leading' ? Math.min(...xs) : Math.max(...xs)) : null;
   };
 

@@ -797,19 +797,17 @@ export function lyricSections(doc: MnxStructure): LyricSection[] {
 
 /**
  * The place a syllable drawn in the score stands for: the part and voice it is in, the bar played and the
- * onset of its note. A drawn syllable names its note (`data-playback-id`, qualified by the bar
- * played in an unrolled view) and its verse row; of that note's visits, the one that sings that
- * row is the place — the first, when none does (a row no pass reaches).
+ * onset of its note. A drawn syllable names its note and its verse row, and in a view that draws
+ * each visit, the visit it was drawn for (the page's `locate`); of that note's visits, that one
+ * is the place, else the one that sings that row — the first, when none does (a row no pass reaches).
  */
-export function lyricPlaceOfSyllable(doc: MnxStructure, noteKey: string, lineId: string): { partIndex: number; voiceIndex: number; place: LyricPlace } | null {
-  const qualified = /^w(0|[1-9][0-9]*):(.*)$/s.exec(noteKey);
-  const key = qualified ? qualified[2]! : noteKey, ordinal = qualified ? Number(qualified[1]) : null;
+export function lyricPlaceOfSyllable(doc: MnxStructure, key: string, lineId: string, visit?: number): { partIndex: number; voiceIndex: number; place: LyricPlace } | null {
   for (let partIndex = 0; partIndex < doc.parts.length; partIndex++) for (const voiceIndex of lyricVoices(doc, partIndex)) {
     const { written, visits, walk, onsets } = lyricPerformance(doc, partIndex, voiceIndex);
     const hits = walk.filter(entry => entry.noteKey === key || entry.event.notes?.[0]?.id === key);
     if (!hits.length) continue;
     const row = [...lineGroups(doc, written).groups.values()].map(ids => ids.indexOf(lineId) + 1).find(at => at > 0) ?? 0;
-    const hit = (ordinal !== null ? hits.find(entry => entry.measureIndex === ordinal) : undefined)
+    const hit = (visit !== undefined ? hits.find(entry => entry.measureIndex === visit) : undefined)
       ?? hits.find(entry => visits[entry.measureIndex]?.verse === row) ?? hits[0]!;
     const onset = onsets.get(hit.event) ?? ZERO;
     return { partIndex, voiceIndex, place: { ordinal: hit.measureIndex, onset: [Number(onset.num), Number(onset.den)] } };

@@ -102,3 +102,22 @@ describe('every primitive carries the row it was drawn for', () => {
     });
   }
 });
+
+/** What each role is, by the classes the stylesheet knows it as. */
+const ROLE_OF: Record<string, 'frame' | 'lyric' | 'event' | 'direction'> = {
+  'staff-line': 'frame', barline: 'frame', brace: 'frame', bracket: 'frame', 'group-label': 'frame',
+  lyric: 'lyric', 'lyric-hyphen': 'lyric', 'lyric-gap': 'lyric',
+  notehead: 'event', 'fret-number': 'event', rest: 'event', direction: 'direction'
+};
+
+describe('every primitive says what it is, and only those do', () => {
+  for (const [name, layout, applies] of projections) {
+    it(name, () => {
+      expect(census(layout, applies, result => result.primitives.flatMap(p => {
+        const c = cls(p.className);
+        const role = (p.className ?? '').split(' ').includes('direction-between') ? 'between' : ROLE_OF[c];
+        return role === p.role ? [] : [`${c} has role ${p.role}, not ${role}`];
+      }))).toEqual([]);
+    });
+  }
+});

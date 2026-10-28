@@ -37,14 +37,14 @@ export function emitRepeatStartStrokes(
     x, y: top,
     w: metrics.thick, h: bottom - top,
     fill: 'currentColor',
-    className: 'barline repeat-start'
+    className: 'barline repeat-start', role: 'frame'
   });
   primitives.push({
     kind: 'line',
     x1: x, dx1: thinDx, y1: top,
     x2: x, dx2: thinDx, y2: bottom,
     thickness: metrics.thin,
-    className: 'barline repeat-start'
+    className: 'barline repeat-start', role: 'frame'
   });
 }
 
@@ -67,7 +67,7 @@ export function emitRepeatEndStrokes(
     x, dx: -metrics.thick, y: top,
     w: metrics.thick, h: bottom - top,
     fill: 'currentColor',
-    className: 'barline repeat-end'
+    className: 'barline repeat-end', role: 'frame'
   });
   primitives.push({
     kind: 'line',
@@ -76,7 +76,7 @@ export function emitRepeatEndStrokes(
     x2: x, dx2: -metrics.thick - metrics.gap,
     y2: bottom,
     thickness: metrics.thin,
-    className: 'barline repeat-end'
+    className: 'barline repeat-end', role: 'frame'
   });
 }
 

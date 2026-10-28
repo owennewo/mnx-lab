@@ -73,7 +73,7 @@ import {
   BeamHookSpec
 } from './beams.ts';
 import {
-  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, offsetRows, stamp, stampDisplay, tagElement, translatePrimitiveY, type BarSp, type DisplayStaff
+  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, offsetRows, stamp, stampDisplay, tagElement, translatePrimitiveY, type BarSp, type DisplayStaff, type Occurrence
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import {
@@ -185,7 +185,6 @@ export const MIN_NOTATION_TAB_GAP_SP = 3;
 export { SEPARATION_CLEAR_SP };
 /** Primitives that span staves by construction (barlines, braces) or ARE the
  *  staff (its lines) — not content, and never measured as ink in a gap. */
-const STRUCTURAL_CLASSES = new Set(['barline', 'staff-line', 'brace', 'bracket', 'group-label']);
 /**
  * The PROBE gap the first pass opens between staves whose gap will be
  * measured. Ink is attributed to the band its anchor is nearest, and at the
@@ -888,6 +887,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
 
   const primitives: Primitive[] = [];
   const index: SpatialIndex = new Map();
+  const occurrences = new Map<string, Occurrence>();
   const diagnostics: LayoutDiagnostic[] = [];
 
   const jobs = buildScoreJobs(mnx);
@@ -933,6 +933,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         durationSpans: opts.durationSpans,
         elementTargets: opts.elementTargets,
         index,
+        occurrences,
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (opts.display !== undefined || (mnx.scores ?? []).length === 0),
         tabSetup: opts.tabSetup,
@@ -1011,7 +1012,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         return bands.map(b => ({ staffTop: b.staffTop + dy, staffBottom: b.staffBottom + dy }));
       })
     : displays;
-  appendSystemBookends(primitives, finalDisplays, opts.systemBookends);
+  appendSystemBookends(primitives, finalDisplays, opts.systemBookends, bars);
 
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, naturalWidthSp,
@@ -1019,7 +1020,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     rows: tightened?.rows ?? rows,
     // Display bands ride with their rows when the density pass moves them.
     displays: finalDisplays,
-    packings, bars, staves
+    packings, bars, staves,
+    ...(occurrences.size ? { occurrences } : {})
   };
 }
 
@@ -1036,6 +1038,7 @@ interface RenderSegmentArgs {
   durationSpans?: boolean;
   elementTargets?: boolean;
   index: SpatialIndex;
+  occurrences: Map<string, Occurrence>;
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
   tabSetup?: PartTabSetups;
@@ -1115,12 +1118,11 @@ function measureDisplayGaps(seg: SegmentResult, clearance: ClearanceSpacing): (n
   // something the gap must be wide enough to hold, collected per gap.
   const gapContent: Primitive[][][] = displays.map(bands => bands.map(() => []));
   for (const p of primitives) {
-    const tokens = (p.className ?? '').split(' ');
-    if (STRUCTURAL_CLASSES.has(tokens[0])) continue;
+    if (p.role === 'frame') continue;
     const y = anchorY(p);
     const r = rowOf(p, rows);
     const bands = displays[r];
-    if (tokens.includes('direction-between')) {
+    if (p.role === 'between') {
       let d = 1;
       while (d + 1 < bands.length && y >= bands[d].staffTop) d++;
       gapContent[r][d].push(p);
@@ -1221,7 +1223,7 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, durationSpans, elementTargets, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
+  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, durationSpans, elementTargets, index, occurrences, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
   const labelParts = originalSegment.staves.map((staff, s) => staff.sources.map(source => source.part).filter((part, index, parts) =>
     parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part))));
   // Beams slant with the outer heads by default; the flat house style is a
@@ -1545,8 +1547,8 @@ function assembleSegment(
     const sysBottom = displayTopOf(m.row, displayCount - 1) + displayHeights[displayCount - 1];
 
     // What plan staff `s` drew since `from` is that staff's ink, in this bar.
-    const onStaff = (from: number, s: number) =>
-      stamp(primitives, from, { row: m.row, display: displayOfPlan[s]!, measure: writtenIndex(plan, i) });
+    const drawnFor = { row: m.row, measure: writtenIndex(plan, i), ...(m.entry ? { visit: m.entry.ordinal } : {}) };
+    const onStaff = (from: number, s: number) => stamp(primitives, from, { ...drawnFor, display: displayOfPlan[s]! });
 
     // Staff lines, per staff
     for (const [staff, top] of staffTops.entries()) {
@@ -1557,7 +1559,7 @@ function assembleSegment(
           kind: 'line',
           x1: m.x, y1: lineY, x2: m.x + m.width, y2: lineY,
           thickness: STAFF_LINE_THICKNESS_SP,
-          className: 'staff-line'
+          className: 'staff-line', role: 'frame'
         });
       }
       onStaff(from, staff);
@@ -1572,7 +1574,7 @@ function assembleSegment(
           kind: 'line',
           x1: m.x, y1: staffTop, x2: m.x, y2: sysBottom,
           thickness: BARLINE_THICKNESS_SP,
-          className: 'barline barline-start'
+          className: 'barline barline-start', role: 'frame'
         });
       }
       // Group decorations (brace / bracket) left of the start barline; nested
@@ -1597,7 +1599,7 @@ function assembleSegment(
             x: m.x - g.depth * DECOR_STEP_SP - BRACE_STAFF_GAP_SP - braceRightInk,
             y: bottom,
             scale: braceScale,
-            className: 'brace'
+            className: 'brace', role: 'frame'
           });
         } else {
           const bx = gx - 0.2;
@@ -1605,10 +1607,10 @@ function assembleSegment(
             kind: 'rect',
             x: bx, y: top - 0.1, w: 0.5, h: bottom - top + 0.2,
             fill: 'currentColor',
-            className: 'bracket'
+            className: 'bracket', role: 'frame'
           });
-          primitives.push({ kind: 'glyph', glyph: 'bracketTop', x: bx, y: top - 0.1, className: 'bracket' });
-          primitives.push({ kind: 'glyph', glyph: 'bracketBottom', x: bx, y: bottom + 0.1, className: 'bracket' });
+          primitives.push({ kind: 'glyph', glyph: 'bracketTop', x: bx, y: top - 0.1, className: 'bracket', role: 'frame' });
+          primitives.push({ kind: 'glyph', glyph: 'bracketBottom', x: bx, y: bottom + 0.1, className: 'bracket', role: 'frame' });
         }
       }
 
@@ -1671,7 +1673,7 @@ function assembleSegment(
           font: 'body',
           size: 1.6,
           anchor: 'end',
-          className: 'group-label'
+          className: 'group-label', role: 'frame'
         });
       }
     }
@@ -2140,7 +2142,7 @@ function assembleSegment(
           spanMarks
         });
       }
-      stamp(primitives, tabFrom, { row: m.row, display: td.displayIndex, measure: writtenIndex(plan, i) });
+      stamp(primitives, tabFrom, { ...drawnFor, display: td.displayIndex });
     }
 
     // End barline — drawn per part group: internal barlines don't bridge the
@@ -2200,7 +2202,7 @@ function assembleSegment(
           x: (m.contentStartX + m.x + m.width) / 2,
           y: staffTops[s] + y,
           anchor: 'middle',
-          className: 'rest rest-full-measure'
+          className: 'rest rest-full-measure', role: 'event'
         });
       }
       onStaff(from, s);
@@ -2298,9 +2300,9 @@ function assembleSegment(
       emitMeasureDiagnostics(m.x, sysBottom, measureIssues, primitives);
       for (const issue of measureIssues) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
-    qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, [...selectedNoteIds, ...selectedEventIds]);
+    qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, [...selectedNoteIds, ...selectedEventIds], occurrences);
     // Everything this bar drew is its row's.
-    stamp(primitives, measurePrimitiveStart, { row: m.row, measure: writtenIndex(plan, i) });
+    stamp(primitives, measurePrimitiveStart, drawnFor);
   }
 
   const loopEnd = primitives.length;
@@ -2402,7 +2404,7 @@ function assembleSegment(
       clearAbove: tempoTop, primitives
     });
     emitOccurrenceLabel(m, staffTop, primitives);
-    stamp(primitives, textFrom, { row: m.row, measure: writtenIndex(plan, i) });
+    stamp(primitives, textFrom, { row: m.row, measure: writtenIndex(plan, i), ...(m.entry ? { visit: m.entry.ordinal } : {}) });
   }
 
   // Lyrics last of all (lyricRuns.ts): a verse sits under everything its staff
@@ -2881,6 +2883,8 @@ interface EventCurveAnchor {
   performedNotes?: boolean[];
   x: number;
   row: number;
+  /** The visit it was drawn for, in a view that draws each visit. */
+  visit?: number;
   stemDir: 1 | -1;
   /** Absolute notehead-centre y per chord member, in document order. */
   headYs: number[];
@@ -2984,7 +2988,7 @@ function emitSlursAndTies(
             // A pinned endpoint (startNote/endNote) anchors at that chord
             // member; otherwise at the outermost notehead on the curve side.
             const headY = (a: EventCurveAnchor, noteId?: string) => {
-              const pinKey = noteId ? (pm.entry ? occurrenceKey(noteId, a === start ? pm.entry.ordinal : Number(endKey!.match(/^w(\d+):/)?.[1])) : noteId) : undefined;
+              const pinKey = noteId ? occurrenceKey(noteId, a.visit) : undefined;
               const pinned = pinKey ? anchors.byNoteId.get(pinKey) : undefined;
               if (pinned) return pinned.anchor.headYs[pinned.noteIndex];
               return side === 'up' ? Math.min(...a.headYs) : Math.max(...a.headYs);
@@ -3668,7 +3672,8 @@ export function emitDirections(args: EmitDirectionsArgs): void {
             ...(dir.color ? { fill: dir.color } : {}),
             // `between` is placed relative to the GAP, not to a staff — the
             // gap measurement has to know (see measureDisplayGaps).
-            className: between ? 'direction direction-between' : 'direction'
+            className: between ? 'direction direction-between' : 'direction',
+            role: between ? 'between' : 'direction'
           }
         : {
             kind: 'text',
@@ -3681,7 +3686,8 @@ export function emitDirections(args: EmitDirectionsArgs): void {
             ...(dir.color ? { fill: dir.color } : {}),
             // `between` is placed relative to the GAP, not to a staff — the
             // gap measurement has to know (see measureDisplayGaps).
-            className: between ? 'direction direction-between' : 'direction'
+            className: between ? 'direction direction-between' : 'direction',
+            role: between ? 'between' : 'direction'
           }
     );
     if (placed) {
@@ -3689,7 +3695,7 @@ export function emitDirections(args: EmitDirectionsArgs): void {
       if (box) {
         const earlierThisCall = primitives.slice(callStart, firstNew);
         const isAboveDirection = (p: Primitive): boolean => {
-          if (!(p.className ?? '').split(/\s+/).includes('direction')) return false;
+          if (p.role !== 'direction' && p.role !== 'between') return false;
           const bounds = computeBoundsSp([p]);
           return bounds !== null && bounds.y + bounds.h < staffTops[s];
         };
@@ -3835,7 +3841,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
         x: x - (headW / 2) * ink,
         y: staffTop + staffYs[idx],
         scale: GRACE_SCALE,
-        className: 'notehead grace',
+        className: 'notehead grace', role: 'event',
         ...(graceKey ? { sourceId: graceKey } : {})
       });
     });
@@ -4034,7 +4040,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
         glyph: headGlyph,
         x: x - (NOTEHEAD_WIDTH_SP / 2) * ink,
         y: staffTop + staffYs[idx],
-        className: 'notehead',
+        className: 'notehead', role: 'event',
         ...(tremoloKey ? { sourceId: tremoloKey } : {})
       });
     });
@@ -4174,7 +4180,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         x,
         y: staffTop + restY,
         anchor: 'middle',
-        className: 'rest'
+        className: 'rest', role: 'event'
       });
       return;
     }
@@ -4213,7 +4219,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         glyph: headGlyph,
         x: x - (NOTEHEAD_WIDTH_SP / 2) * ink,
         y: staffTop + staffYs[idx],
-        className: 'notehead',
+        className: 'notehead', role: 'event',
         ...(keyFor?.(j, idx) ? { sourceId: keyFor(j, idx)! } : {})
       });
       for (let d = 0; d < (event.duration.dots ?? 0); d++) {
@@ -4441,6 +4447,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       x: eventX,
       y: staffTop + yOffset,
       anchor: 'middle',
+      role: 'event',
       className: `rest${restSelected ? ' selected' : restMark ? SELECTED_CLASS_MARK : ''}`,
       ...(restKey === undefined ? {} : { sourceId: restKey }),
       ...(restSelected ? { fill: SELECTED_COLOR } : restMark ? { fill: restMark } : {})
@@ -4532,6 +4539,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const curveAnchor: EventCurveAnchor = {
     x: eventX,
     row,
+    ...(args.occurrenceOrdinal === undefined ? {} : { visit: args.occurrenceOrdinal }),
     stemDir,
     headYs: staffYs.map(y => staffTop + y),
     ...(args.performedNoteKeys ? { performedNotes: noteIds.map(id => id !== undefined && args.performedNoteKeys!.has(id)) } : {})
@@ -4591,6 +4599,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       x: eventX - (w / 2) * ink,
       y,
       fill: noteFill(idx),
+      role: 'event',
       className: 'notehead' + noteColorClass(idx),
       sourceId: noteIds[idx]
     });

@@ -87,7 +87,24 @@ export interface PrimitiveBase {
    * `rounded()` strips it and the SVG emitter does not write it.
    */
   origin?: InkOrigin;
+  /**
+   * What the ink IS, for the engine's own decisions — set where it is drawn, so no
+   * layout reads it back out of `className`, which is the stylesheet's
+   * (roadmap/inprogress/core-ink-provenance.md, phase 3). Never part of a golden.
+   */
+  role?: InkRole;
 }
+
+/**
+ * - `frame`: the staff's furniture — staff lines, barlines, braces, brackets, a
+ *   group's label. Not ink anything clears or hangs under.
+ * - `lyric`: a verse's words, hyphens and gaps.
+ * - `event`: the ink a note or rest IS — a notehead, a fret digit, a rest — as
+ *   opposed to what decorates it.
+ * - `direction`: a performance direction set on a staff's side; `between`, one
+ *   set in the gap between two staves, which that gap must hold.
+ */
+export type InkRole = 'frame' | 'lyric' | 'event' | 'direction' | 'between';
 
 /** Where a primitive came from — see `PrimitiveBase.origin`. */
 export interface InkOrigin {
@@ -100,6 +117,10 @@ export interface InkOrigin {
   /** The written measure (an index into `global.measures`) it was drawn for.
    *  Absent on ink that spans bars — a slur, a volta, a verse. */
   measure?: number;
+  /** The performed visit (the bar played, from 0) it was drawn for, in a view that
+   *  draws each visit of a bar — the unrolled view. Absent where one drawn bar
+   *  stands for all its visits. */
+  visit?: number;
 }
 
 /**
@@ -111,7 +132,13 @@ export interface InkOrigin {
 export function stamp(primitives: readonly Primitive[], from: number, origin: InkOrigin): void {
   for (let k = from; k < primitives.length; k++) {
     const p = primitives[k]!;
-    p.origin = p.origin ? { ...origin, ...p.origin } : { ...origin };
+    const own = p.origin;
+    if (!own) { p.origin = { ...origin }; continue; }
+    // Each primitive's origin is its own object (a copy that moves rows gets a new one —
+    // `offsetRows`), so what it does not say yet is filled in place.
+    if (own.display === undefined && origin.display !== undefined) own.display = origin.display;
+    if (own.measure === undefined && origin.measure !== undefined) own.measure = origin.measure;
+    if (own.visit === undefined && origin.visit !== undefined) own.visit = origin.visit;
   }
 }
 
@@ -121,7 +148,7 @@ export function stamp(primitives: readonly Primitive[], from: number, origin: In
 export function stampDisplay(primitives: readonly Primitive[], from: number, display: number): void {
   for (let k = from; k < primitives.length; k++) {
     const p = primitives[k]!;
-    if (p.origin && p.origin.display === undefined) p.origin = { ...p.origin, display };
+    if (p.origin && p.origin.display === undefined) p.origin.display = display;
   }
 }
 
@@ -308,6 +335,12 @@ export interface SourceLocation {
   eventIndex: number;
 }
 
+/** The written key and the visit behind an id drawn for one visit of a bar (`w2:…`). */
+export interface Occurrence {
+  key: string;
+  visit: number;
+}
+
 /** Output of every layout module. */
 /**
  * `validation` — the document is musically wrong in a way the user can and
@@ -390,6 +423,10 @@ export interface LayoutResult {
   bars?: BarSp[];
   /** Per row, per display staff (parallel to `displays`): which staff it draws. */
   staves?: DisplayStaff[][];
+  /** In a view that draws each visit of a bar (the unrolled view), every id it drew
+   *  for one visit — performed or not — with the written key and the visit behind it,
+   *  so a reader looks them up rather than decoding the id. */
+  occurrences?: Map<string, Occurrence>;
 }
 
 /** One drawn bar — see `LayoutResult.bars`. */

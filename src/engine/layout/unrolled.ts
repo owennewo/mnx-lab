@@ -23,7 +23,7 @@ import {
   type Rational,
 } from '../../model/time.ts';
 import type { HorizontalPlan, MeasurePlan } from './spacing.ts';
-import type { Primitive, SpatialIndex } from '../primitives.ts';
+import type { Occurrence, Primitive, SpatialIndex } from '../primitives.ts';
 export { occurrenceKey } from '../../model/noteKeys.ts';
 
 /** The one presentation switch shared by notation, tab and combined layouts. */
@@ -212,6 +212,8 @@ export function qualifyMeasure(
   start: number,
   index: SpatialIndex,
   selectedIds: readonly string[] = [],
+  /** Filled with every id this visit's copy of the bar draws, and what it stands for. */
+  occurrences?: Map<string, Occurrence>,
 ): void {
   const entry = measure.entry;
   if (!entry) return;
@@ -229,13 +231,16 @@ export function qualifyMeasure(
     // speaks occurrence keys in this layout like everything else — so its
     // name is stamped here too, beside the ids it sits among.
     if (primitive.kind === 'rect' && primitive.playbackId !== undefined) {
-      primitive.playbackId = occurrenceKey(primitive.playbackId, entry.ordinal);
+      const written = primitive.playbackId;
+      primitive.playbackId = occurrenceKey(written, entry.ordinal);
+      occurrences?.set(primitive.playbackId, { key: written, visit: entry.ordinal });
     }
     if (!primitive.sourceId) continue;
     const key = primitive.sourceId;
     primitive.sourceId = occurrenceKey(key, entry.ordinal);
     primitive.writtenSourceId = key;
-    if (hooks.length > 0 && /notehead|fret-number|rest/.test(primitive.className ?? '')) {
+    occurrences?.set(primitive.sourceId, { key, visit: entry.ordinal });
+    if (hooks.length > 0 && primitive.role === 'event') {
       // Painted by the host: the written key lights every visit's copy, as below —
       // in the colour slot where the rule below colours, as a class alone where it does not.
       const keys = hooks.map(ns => `${ns}:${key}`);
@@ -245,7 +250,7 @@ export function qualifyMeasure(
       else primitive.selects = extendSelectionMark(primitive.selects, keys);
     } else if (
       selectedIds.includes(key) &&
-      /notehead|fret-number|rest/.test(primitive.className ?? '') &&
+      primitive.role === 'event' &&
       !primitive.className?.split(' ').includes('selected')
     ) {
       primitive.className = `${primitive.className ?? ''} selected`;

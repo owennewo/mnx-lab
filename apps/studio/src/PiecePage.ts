@@ -1101,7 +1101,8 @@ export class PiecePage extends LitElement {
     const [{ lyricPlaceOfSyllable }] = await Promise.all([
       import('../../../src/edit/lyricText.ts'), import('../../../src/elements/LyricTextEditor.ts')
     ]);
-    const at = lyricPlaceOfSyllable(doc, noteKey, lineId);
+    const { key, visit } = this.viewer.locate(noteKey);
+    const at = lyricPlaceOfSyllable(doc, key, lineId, visit);
     if (!at || this.doc?.mnxJson !== doc) return;
     this.lyricsOpen = true;
     this.lyricsAt = at;
