@@ -1,6 +1,7 @@
 # Ink provenance — every primitive says what it was drawn for
 
-> **Status: in progress, opened 2026-10-28.** Serves the **implementation loop**.
+> **Status: complete 2026-10-28** (opened and closed the same day). Serves the
+> **implementation loop**.
 > Three phases, each landed on its own: **(1) row**, **(2) display staff + bar + bar
 > geometry**, **(3) visit + role**. The goldens are the proof: a phase that only replaces
 > a correct guess with the fact moves no golden, and any golden that does move is a place

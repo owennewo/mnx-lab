@@ -2,7 +2,7 @@
  * Where the page's systems, staves and bars are, in the drawn SVG's own units —
  * the layout's answers (`LayoutResult.rows`, `displays`, `staves`, `bars`) put
  * through the emitter's scale, so an overlay reads them instead of finding them
- * in the drawing (roadmap/inprogress/core-ink-provenance.md, phase 2).
+ * in the drawing (roadmap/complete/core-ink-provenance.md, phase 2).
  *
  * The emitter draws a staff-space position at `x · pxPerSp` and a height at
  * `y · pxPerSpY`; the viewBox crops but does not move user units. So the

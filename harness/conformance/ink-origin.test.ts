@@ -1,4 +1,4 @@
-// Every primitive says what it was drawn for (roadmap/inprogress/core-ink-provenance.md).
+// Every primitive says what it was drawn for (roadmap/complete/core-ink-provenance.md).
 // The engine and the overlays read `origin` instead of working it back out from where
 // the ink landed, so a primitive without it is a mark something will file with the
 // wrong system. This lays the corpus out in every projection it pins — and the ones

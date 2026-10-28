@@ -208,7 +208,7 @@ draws, bar edges, each row's ink reach) and `RenderOutcome.occurrences` (the vis
 an unrolled id) instead of measuring the SVG. Provenance never reaches a golden —
 `rounded()` strips it — so a change that only moves provenance moves no golden.
 `harness/conformance/ink-origin.test.ts` fails on unstamped ink. Why:
-[roadmap/inprogress/core-ink-provenance.md](../roadmap/inprogress/core-ink-provenance.md).
+[roadmap/complete/core-ink-provenance.md](../roadmap/complete/core-ink-provenance.md).
 
 ## The swing marking
 

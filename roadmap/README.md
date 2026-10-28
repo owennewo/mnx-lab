@@ -148,10 +148,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-ink-provenance.md](inprogress/core-ink-provenance.md)** — **in progress 2026-10-28**:
-  every primitive carries what it was drawn for (`origin`: row, display staff, bar, visit, role),
-  and the engine and overlays read it instead of reconstructing it from geometry and class names.
-  Three phases: row (fixes verses over a stacked section label), staff + bar + bar geometry, visit + role.
 - **[studio-mix-layers.md](inprogress/studio-mix-layers.md)** — **built 2026-10-22**, awaiting the
   owner's hands-on check: a recording, the synth and a click as three layers, toggled from the
   tray's Mix field and headed the same in the Mix panel; the synth follows a recording through its
@@ -533,6 +529,13 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-ink-provenance.md](complete/core-ink-provenance.md)** — **complete 2026-10-28**:
+  every primitive carries what it was drawn for — `origin` (row, display staff, written
+  measure, visit) and a `role` — and the engine and overlays read it instead of reconstructing
+  it from where ink landed or from class names. Row fit, verse baselines, multi-staff tab
+  composition, display gaps, enclosure, hit-test, loop marker, reveal and PDF page breaks
+  all read the layout's answers (`RenderOutcome.geometry`, `occurrences`); goldens
+  byte-identical throughout; fixed verses over a section label stacked on a segno.
 - **[studio-recording-align.md](complete/studio-recording-align.md)** — **complete 2026-10-15**:
   the `sync-recording` skill and `tools/recording-align/` — Basic Pitch, studio's performed
   score, a free-order bar search reported against chance, the sync written in the sync bar's

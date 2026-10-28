@@ -82,7 +82,7 @@ export interface PrimitiveBase {
   element?: ElementTag;
   /**
    * What this ink was drawn for, stamped where it is drawn
-   * (roadmap/inprogress/core-ink-provenance.md). Readers take it from here rather
+   * (roadmap/complete/core-ink-provenance.md). Readers take it from here rather
    * than working it back out from where the ink landed. Never part of a golden:
    * `rounded()` strips it and the SVG emitter does not write it.
    */
@@ -90,7 +90,7 @@ export interface PrimitiveBase {
   /**
    * What the ink IS, for the engine's own decisions — set where it is drawn, so no
    * layout reads it back out of `className`, which is the stylesheet's
-   * (roadmap/inprogress/core-ink-provenance.md, phase 3). Never part of a golden.
+   * (roadmap/complete/core-ink-provenance.md, phase 3). Never part of a golden.
    */
   role?: InkRole;
 }

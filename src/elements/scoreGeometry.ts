@@ -7,7 +7,7 @@
  * `pageBands`). It used to be measured off the drawing: staves by clustering
  * staff lines, systems by which barlines touched them, bars by clustering
  * barline strokes, tab by a fret digit in the band
- * (roadmap/inprogress/core-ink-provenance.md, phase 2). What is still read
+ * (roadmap/complete/core-ink-provenance.md, phase 2). What is still read
  * off the SVG is ink: where a selected glyph or a drawn column actually is.
  *
  * DOM reads and plain numbers only. The arithmetic that needs no DOM lives in
