@@ -64,7 +64,8 @@ function foldInkOffsets<T>(value: T): T {
 export function rounded<T>(value: T): T {
   value = foldInkOffsets(value);
   return JSON.parse(
-    JSON.stringify(value, (_k, v) => (typeof v === 'number' ? Math.round(v * 10000) / 10000 : v))
+    // Provenance is never part of a golden: the goldens are a verdict about the ink.
+    JSON.stringify(value, (k, v) => (k === 'origin' ? undefined : typeof v === 'number' ? Math.round(v * 10000) / 10000 : v))
   );
 }
 

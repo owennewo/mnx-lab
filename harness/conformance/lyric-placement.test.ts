@@ -186,3 +186,34 @@ describe('a volta under a verse row holds together', () => {
     }
   }
 });
+
+describe('verses over a stacked heading', () => {
+  // The owner's Blackbird, 2026-10-28: in any system after the first, a section label
+  // stacked over a segno sat high enough to read as the system above's ink, and the verse
+  // over it was set straight through the label. A verse clears its OWN system's ink, all
+  // of it, however high it stacks.
+  it('a verse clears a section label stacked over a segno, in a later system too', () => {
+    initSmufl();
+    const doc = read(DOCS['tab-verses']!);
+    doc.global.lyrics = { lineOrder: ['1'] };
+    for (const measure of doc.parts[0]!.measures)
+      for (const sequence of measure.sequences)
+        for (const event of sequence.content as { lyrics?: { lines: Record<string, unknown> } }[])
+          if (event.lyrics) delete event.lyrics.lines['2'];
+    for (const bar of [0, 2]) {
+      doc.global.measures[bar]!.section = { label: bar ? 'Bridge' : 'Verse' };
+      doc.global.measures[bar]!.segno = { location: { fraction: [0, 1] } };
+    }
+    const layout = layoutTab({ mnx: doc, widthSp: 30 });
+    const labels = layout.primitives.filter(p => p.className === 'section-label');
+    expect(labels.map(p => p.origin?.row ?? -1)).toEqual([0, expect.any(Number)]);
+    expect(labels[1]!.origin!.row).toBeGreaterThan(0);
+    for (const label of labels) {
+      const box = inkEdgesSp(label);
+      const over = layout.primitives.filter(p => isLyric(p) && p.origin?.row === label.origin?.row)
+        .map(p => inkEdgesSp(p)).filter(ink => ink.right > box.left && ink.left < box.right);
+      expect(over.length, (label as TextPrim).text).toBeGreaterThan(0);
+      for (const ink of over) expect(ink.bottom, (label as TextPrim).text).toBeLessThanOrEqual(box.top);
+    }
+  });
+});

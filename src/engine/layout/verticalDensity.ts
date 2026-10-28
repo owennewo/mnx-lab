@@ -59,16 +59,6 @@ export const SEPARATION_CLEAR_SP = 3;
 export const MIN_PAD_DENSITY = 0;
 export const MAX_PAD_DENSITY = 2;
 
-/** Global marks emitted above a staff belong to the first system below their
- * anchor, even when a tall navigation stack reaches past the geometric
- * midpoint of the inter-system gap. Treating them like ordinary primitives
- * can file a section heading with the system above, which then carries the
- * heading away from the staff it names during tightening. */
-const ABOVE_STAFF_CLASSES = new Set([
-  'rehearsal-label', 'rehearsal-box', 'section-label', 'tempo', 'swing',
-  'segno', 'coda', 'fine', 'jump'
-]);
-
 /**
  * Bounded like `clampDensity`, and for the same reason: a bad value should
  * degrade to something drawable rather than throw. The floor can be 0 because
@@ -95,25 +85,8 @@ export interface TightenRowsArgs {
   heightSp: number;
   padDensity?: number;
   clearance?: number;
-  /** Internal fixed-point pass: retain the outer margins chosen on pass one
-   *  while re-measuring content ownership inside the page. */
+  /** Internal fixed-point pass: retain the outer margins chosen on pass one. */
   preserveOuterMargins?: boolean;
-  /** Below-staff space each row RESERVES for content that belongs to it — a
-   *  lyric verse block. Row attribution is by the gap's midpoint, which
-   *  mis-files a deep verse row with the system BELOW (it then translates
-   *  with the wrong row). The reservation pushes the boundary past the
-   *  block. Uniform per layout; thread per-row data if a layout ever needs
-   *  to mix reserved and unreserved rows. */
-  reservedBelowSp?: number;
-  /** Ownership decided by an earlier pass, reused instead of re-derived.
-   *
-   *  Attribution is geometric, so it is only trustworthy against the geometry
-   *  it was measured on. Once a pass has moved the rows, asking again where a
-   *  primitive falls asks about a page that no longer exists — and a flag
-   *  sitting high above its staff is exactly the ink that changes side when rows
-   *  close up. Which row emitted a primitive is a fact, not a measurement, so
-   *  the fixed-point loop settles it once and carries it. */
-  owners?: ReadonlyMap<Primitive, number>;
   /** Extra air above each row, on top of the system clearance — the tab view
    *  gives it to a system whose verses stand over its staff, so the words
    *  read as heading the staff below them rather than trailing the one above. */
@@ -126,12 +99,7 @@ export interface TranslatedRows {
   rows: RowBandSp[];
 }
 
-export interface TightenedRows extends TranslatedRows {
-  /** The attribution this pass used, for the next pass to reuse. */
-  owners: ReadonlyMap<Primitive, number>;
-  /** Ink extent per row after the move, measured against that attribution. */
-  ink: { top: number; bottom: number }[];
-}
+export type TightenedRows = TranslatedRows;
 
 /**
  * Re-places a finished layout's systems at the resolved clearance, translating each
@@ -152,25 +120,9 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   const clearance = clearanceSpacing(args.clearance, args.padDensity);
   if (rows.length === 0) return null;
 
-  // Which row each primitive belongs to: the bands are ordered and disjoint,
-  // so the midpoint between one row's bottom line and the next's top line is
-  // an unambiguous boundary. Derived from `rows` rather than from a row pitch,
-  // because a notation layout stacks several segments (per-system layouts,
-  // titled score blocks) whose rows are NOT uniformly spaced.
-  const boundaries = rowBoundariesSp(rows, args.reservedBelowSp ?? 0);
-  const rowOf = (y: number): number => {
-    let r = 0;
-    while (r < boundaries.length && y >= boundaries[r]) r++;
-    return r;
-  };
-  const rowOfPrimitive = (p: Primitive): number => {
-    const y = anchorY(p);
-    const className = (p.className ?? '').split(' ')[0];
-    if (!ABOVE_STAFF_CLASSES.has(className)) return rowOf(y);
-    const below = rows.findIndex(row => row.staffTop > y);
-    return below < 0 ? rows.length - 1 : below;
-  };
-
+  // Each primitive moves with the row it was drawn for (`origin.row`) — a fact the
+  // layout stamped, not a guess from where the ink landed, so a heading stacked
+  // high over a segno or a verse hanging deep stays with its own system.
   // Ink extents per row, through the same measurement the snug-crop viewport
   // already uses (`computeBoundsSp`) — glyph extents from the font's own SMuFL
   // bounding boxes, not from the baseline. That distinction is the whole
@@ -178,16 +130,7 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   // ink reaches 2.5sp above the staff, so measuring anchors would tighten a
   // system straight through the clef of the one below.
   const buckets: Primitive[][] = rows.map(() => []);
-  const owner = new Map<Primitive, number>();
-  for (const p of primitives) {
-    // A caller mid-fixed-point already knows the answer from the geometry the
-    // attribution was actually valid for; re-deriving it here would re-file
-    // ink against rows this loop has since moved.
-    const prior = args.owners?.get(p);
-    const r = prior !== undefined && prior < rows.length ? prior : rowOfPrimitive(p);
-    owner.set(p, r);
-    buckets[r].push(p);
-  }
+  for (const p of primitives) buckets[rowOf(p, rows)].push(p);
   const inkTop = rows.map((b, r) => Math.min(b.staffTop, computeBoundsSp(buckets[r])?.y ?? b.staffTop));
   const inkBottom = rows.map((b, r) => {
     const bb = computeBoundsSp(buckets[r]);
@@ -231,14 +174,11 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   if (offsets.every(o => o === 0) && newBottomGap === bottomGap) return null;
 
   for (const p of primitives) {
-    const r = owner.get(p);
-    if (r === undefined || offsets[r] === 0) continue;
-    translatePrimitiveY(p, offsets[r]);
+    const r = rowOf(p, rows);
+    if (offsets[r] !== 0) translatePrimitiveY(p, offsets[r]);
   }
 
   return {
-    owners: owner,
-    ink: rows.map((_, r) => ({ top: inkTop[r] + offsets[r], bottom: inkBottom[r] + offsets[r] })),
     heightSp: rows[last].staffBottom + offsets[last] + newBottomGap,
     rows: rows.map((b, r) => ({
       staffTop: b.staffTop + offsets[r],
@@ -248,40 +188,24 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
 }
 
 /**
- * Re-measures the gaps after each move, until the row bands settle.
- *
- * Ownership is NOT re-measured. Pass one decides which row emitted each
- * primitive, on the only geometry where that question has a geometric answer,
- * and every later pass reuses it. Re-deriving it was the bug: closing the gaps
- * moves the midpoint boundary past any ink that reaches well beyond its own
- * staff, and the next pass then carries that ink away with the neighbouring
- * row.
+ * Re-measures the gaps after each move, until the row bands settle. Each pass
+ * files ink by the row it was drawn for, so moving rows never changes what moves
+ * with them.
  */
 export function fitRowsToClearance(args: TightenRowsArgs): TightenedRows | null {
   let rows = args.rows;
   let heightSp = args.heightSp;
   let final: TightenedRows | null = null;
-  // Ownership is settled on the FIRST pass and carried, never re-measured.
-  // Re-deriving it each pass was the bug: pass one closes the gaps, and a flag
-  // on an up-stem — anchored at the stem tip, well above its own staff — then
-  // falls on the far side of the risen boundary. Pass two duly translates it
-  // with the row above while its stem goes with the row below, and the two
-  // separate for good. It only ever bit when rows CLOSE UP, which is why the
-  // tight half of the clearance range showed it and the spacious half did not.
-  let owners: ReadonlyMap<Primitive, number> | undefined = args.owners;
-  // A primitive can cross at most one ordered boundary per pass. The extra
-  // pass proves the fixed point; the cap protects malformed input.
+  // The extra pass proves the fixed point; the cap protects malformed input.
   for (let pass = 0; pass <= args.rows.length; pass++) {
     const next = tightenRows({
       ...args,
-      owners,
       rows,
       heightSp,
       preserveOuterMargins: pass > 0
     });
     if (!next) return final;
     final = next;
-    owners = next.owners;
     rows = next.rows;
     heightSp = next.heightSp;
   }
@@ -305,8 +229,7 @@ export function fitRowsToClearance(args: TightenRowsArgs): TightenedRows | null 
  * density question — but it is a no-op whenever the reservation was already
  * enough, which is every scenario in the corpus that has no labels.
  *
- * It reports no ownership: every primitive moves by the same `dy`, so nothing
- * changes row and there is no attribution to carry.
+ * Every primitive moves by the same `dy`.
  */
 export function ensureTopMargin(
   primitives: Primitive[],
@@ -325,25 +248,26 @@ export function ensureTopMargin(
   };
 }
 
-/** Row-ownership boundaries between consecutive bands: the gap's midpoint,
- *  pushed past any below-staff reservation (a lyric verse block) so deep
- *  content stays with the row it hangs from. ONE rule, used by tightenRows
- *  and by the conformance measurement that checks its identity — the two
- *  diverging is exactly the bug the reservation exists to prevent. */
-export function rowBoundariesSp(rows: readonly RowBandSp[], reservedBelowSp = 0, reservedAboveSp = 0): number[] {
-  const boundaries: number[] = [];
-  for (let r = 0; r + 1 < rows.length; r++) {
-    const mid = (rows[r].staffBottom + rows[r + 1].staffTop) / 2;
-    // A reservation ABOVE (verses stood over a tab staff) pulls the boundary
-    // up past the block, so it stays with the staff it heads.
-    const pulled = Math.min(Math.max(mid, rows[r].staffBottom + reservedBelowSp), rows[r + 1].staffTop - reservedAboveSp);
-    boundaries.push(Math.min(rows[r + 1].staffTop, Math.max(rows[r].staffBottom, pulled)));
-  }
-  return boundaries;
+/**
+ * The row a primitive was drawn for. Ink without an `origin` is a layout bug the
+ * census (harness/conformance/ink-origin.test.ts) names; it goes with the nearest
+ * band, so the mistake shows as a misplaced mark rather than a crash.
+ */
+export function rowOf(p: Primitive, rows: readonly RowBandSp[]): number {
+  const row = p.origin?.row;
+  if (row !== undefined && row >= 0 && row < rows.length) return row;
+  const y = anchorY(p);
+  let best = 0;
+  rows.forEach((band, r) => {
+    const distance = Math.max(0, band.staffTop - y, y - band.staffBottom);
+    const bestDistance = Math.max(0, rows[best]!.staffTop - y, y - rows[best]!.staffBottom);
+    if (distance < bestDistance) best = r;
+  });
+  return best;
 }
 
-/** The y a primitive is anchored at, for deciding which row (or display
- *  band) owns it — shared with the display-gap measurement in notation.ts. */
+/** The y a primitive is anchored at, for deciding which display band within
+ *  its row owns it (the display-gap measurement in notation.ts). */
 export function anchorY(p: Primitive): number {
   switch (p.kind) {
     case 'glyph':

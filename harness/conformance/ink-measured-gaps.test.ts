@@ -29,8 +29,7 @@ import {
   TAB_CLEF_SCALE,
   TAB_STAFF_HEIGHT_SP
 } from '../../src/engine/layout/tabStaff.ts';
-import { anchorY, rowBoundariesSp } from '../../src/engine/layout/verticalDensity.ts';
-import { lyricReachBelowRows } from '../../src/engine/layout/lyricRuns.ts';
+import { anchorY, rowOf } from '../../src/engine/layout/verticalDensity.ts';
 import {
   COHESION_CLEAR_SP,
   NAV_BOTTOM_RISE_SP,
@@ -557,20 +556,10 @@ describe('ink-measured gaps — stage D, between systems', () => {
    *  boundary rule, reservation included, or a deep verse row measures as
    *  the next system's ink and the identity below reads broken when it is
    *  not (found by lab/lyrics/tab-verses, the first wrapped lyric doc). */
-  function rowInk(layout: LayoutResult, reservedBelowSp = 0): { top: number; bottom: number }[] {
+  function rowInk(layout: LayoutResult): { top: number; bottom: number }[] {
     const rows = layout.rows;
-    // Once a compact gap moves its midpoint past overhanging ink, geometry can
-    // no longer rediscover which row emitted that primitive. The layout carries
-    // the ownership-preserving measurement from the pre-move pass.
-    if (layout.rowInkSp) return layout.rowInkSp;
-    const bounds = rowBoundariesSp(rows, reservedBelowSp);
     const buckets: Primitive[][] = rows.map(() => []);
-    for (const p of layout.primitives) {
-      const y = anchorY(p);
-      let r = 0;
-      while (r < bounds.length && y >= bounds[r]) r++;
-      buckets[r].push(p);
-    }
+    for (const p of layout.primitives) buckets[rowOf(p, rows)]!.push(p);
     return rows.map((b, r) => {
       const bb = computeBoundsSp(buckets[r]);
       return {
@@ -580,9 +569,9 @@ describe('ink-measured gaps — stage D, between systems', () => {
     });
   }
 
-  const gapsOf = (layout: LayoutResult, reservedBelowSp = 0) => {
+  const gapsOf = (layout: LayoutResult) => {
     const rows = layout.rows;
-    const ink = rowInk(layout, reservedBelowSp);
+    const ink = rowInk(layout);
     return rows.slice(0, -1).map((b, r) => ({
       lineGap: rows[r + 1].staffTop - b.staffBottom,
       inkGap: rows[r + 1].staffTop - b.staffBottom
@@ -591,56 +580,27 @@ describe('ink-measured gaps — stage D, between systems', () => {
     }));
   };
 
-  /**
-   * A gap holding a SCORE TITLE is excluded, and the reason is the same one
-   * stage C met with `between` directions: a title sits between two score
-   * blocks and belongs to neither system, so it is content the gap must HOLD
-   * rather than a demand either side makes. `tightenRows` buckets it to one
-   * row by the midpoint rule, and which row that is flips as the gap closes —
-   * so the identity below is not the right claim there. It keeps room for the
-   * title either way, which is what matters; four gaps in two multi-score
-   * scenarios are affected.
-   */
-  const holdsTitle = (layout: LayoutResult, r: number) => {
-    const rows = layout.rows;
-    return layout.primitives.some(
-      p => cls(p) === 'score-title' && anchorY(p) > rows[r].staffBottom && anchorY(p) < rows[r + 1].staffTop
-    );
-  };
-
+  // A score title heads the system below it (its `origin.row`), so a gap holding
+  // one obeys the same identity: it used to be excluded, when the midpoint rule
+  // filed the title with whichever row was nearer and that flipped as gaps closed.
   it('every inter-system gap is the ink either side plus one separation, corpus-wide', () => {
     initSmufl();
     const systemInk = clearanceSpacing().systemInk;
     let checked = 0;
-    let skipped = 0;
     for (const s of corpus) {
       let layout: LayoutResult;
-      let reservedBelowSp = 0;
       try {
-        const doc = readDoc(s.dir);
-        layout = layoutNotation({ mnx: doc, widthSp: WIDTH_SP });
-        // The layout's own reservation: how deep its verses actually hang.
-        reservedBelowSp = lyricReachBelowRows(layout.primitives, layout.rows);
+        layout = layoutNotation({ mnx: readDoc(s.dir), widthSp: WIDTH_SP });
       } catch {
         continue;
       }
       if (layout.rows.length < 2) continue;
-      gapsOf(layout, reservedBelowSp).forEach((gap, r) => {
-        if (holdsTitle(layout, r)) {
-          skipped++;
-          // Still bounded: a title never makes a gap TIGHTER than the rule.
-          expect(gap.inkGap).toBeGreaterThan(systemInk - 1e-6);
-          return;
-        }
+      gapsOf(layout).forEach(gap => {
         checked++;
         expect(gap.inkGap).toBeCloseTo(systemInk, 6);
       });
     }
     expect(checked).toBeGreaterThan(0);
-    // The exclusion is narrow — if it ever starts swallowing ordinary gaps,
-    // this is where that shows up. (Today: 4 title gaps against 14 ordinary
-    // ones, in a corpus where multi-system scores are the minority.)
-    expect(checked).toBeGreaterThan(skipped * 2);
   });
 
   it('a system under a section label keeps room for it; one without closes up', () => {

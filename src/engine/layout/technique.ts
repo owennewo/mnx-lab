@@ -1,5 +1,5 @@
 import type { MnxNote, MnxTabTechnique } from '../../model/mnx.ts';
-import type { Primitive, Point } from '../primitives.ts';
+import { stampRow, type Primitive, type Point } from '../primitives.ts';
 
 /**
  * PLAYING TECHNIQUE — the drawing half of
@@ -313,8 +313,13 @@ function drawSplit(
   }
   const right = input.rowEdges.get(from.row)?.right ?? from.x + STUB_SP;
   const left = input.rowEdges.get(to.row)?.left ?? to.x - STUB_SP;
+  // Each half is drawn for the row it sits on.
+  let start = input.primitives.length;
   emit(from.x, from.y, Math.max(right - 0.4, from.x + STUB_SP), from.y);
+  stampRow(input.primitives, start, from.row);
+  start = input.primitives.length;
   emit(Math.min(left + 0.2, to.x - STUB_SP), to.y, to.x, to.y);
+  stampRow(input.primitives, start, to.row);
 }
 
 /** A tapered slur between two points; `dir` is -1 to bulge up, 1 to bulge
@@ -455,6 +460,14 @@ function emitPalmMute(
   runs: { first: TechniqueSite; last: TechniqueSite; length: number }[]
 ): void {
   for (const { first, last, length } of runs) {
+    const start = input.primitives.length;
+    emitPalmMuteRun(input, first, last, length);
+    stampRow(input.primitives, start, first.row);
+  }
+}
+
+function emitPalmMuteRun(input: TechniqueInput, first: TechniqueSite, last: TechniqueSite, length: number): void {
+  {
     const y = first.laneY - LANE_LABEL_DROP_SP;
     const text = 'P.M.';
     input.primitives.push({
@@ -472,11 +485,11 @@ function emitPalmMute(
     // A run of ONE is the abbreviation alone: the dash says "keep muting as
     // far as here", and over a single note the label has already said it. A
     // stub the width of one column reads as a printing accident.
-    if (length < 2) continue;
+    if (length < 2) return;
     const dashDx = -first.halfWidthSp + LABEL_SP * 0.6 * text.length + CLEAR_SP;
     const from = first.x + dashDx * input.ink;
     const to = last.endX - CLEAR_SP * input.ink;
-    if (to <= from) continue;
+    if (to <= from) return;
     input.primitives.push({
       kind: 'line',
       x1: first.x, dx1: dashDx,
@@ -707,6 +720,14 @@ export function emitTabTechnique(input: TechniqueInput): void {
   for (const site of sites) {
     const t = site.technique;
     if (!t) continue;
+    const start = primitives.length;
+    emitSite(site, t);
+    stampRow(primitives, start, site.row);
+  }
+
+  emitPalmMute(input, palmMuteRuns(sites));
+
+  function emitSite(site: TechniqueSite, t: MnxTabTechnique): void {
     const lane = site.laneY;
 
     if (t.bend) emitBend(input, site, site.y, t.bend);
@@ -763,8 +784,6 @@ export function emitTabTechnique(input: TechniqueInput): void {
       emitSlide(input, site, t.slide, (a, b) => ({ y: Math.min(a.laneY, b.laneY), dir: -1 }));
     }
   }
-
-  emitPalmMute(input, palmMuteRuns(sites));
 }
 
 // ---------- The notation staff ----------
@@ -790,6 +809,14 @@ export function emitNotationTechnique(input: TechniqueInput): void {
   for (const site of sites) {
     const t = site.technique;
     if (!t) continue;
+    const start = primitives.length;
+    emitSite(site, t);
+    stampRow(primitives, start, site.row);
+  }
+
+  emitPalmMute(input, palmMuteRuns(sites));
+
+  function emitSite(site: TechniqueSite, t: MnxTabTechnique): void {
     const lane = site.laneY;
 
     // Rises from the NOTE, exactly as the tab copy rises from its fret.
@@ -870,8 +897,6 @@ export function emitNotationTechnique(input: TechniqueInput): void {
       });
     }
   }
-
-  emitPalmMute(input, palmMuteRuns(sites));
 }
 
 // ---------- Collecting sites ----------

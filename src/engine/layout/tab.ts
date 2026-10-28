@@ -5,9 +5,9 @@ import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
 import type { HorizontalPlan, PlanOptions } from './spacing.ts';
 import { buildScoreJobs, layoutNotation } from './notation.ts';
-import { tagElement, translatePrimitiveY } from '../primitives.ts';
+import { offsetRows, stampRow, tagElement, translatePrimitiveY } from '../primitives.ts';
+import { rowOf } from './verticalDensity.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
-import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, tieOrigins } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
@@ -30,7 +30,6 @@ import {
 } from './tabStaff.ts';
 import {
   emitLyricRuns,
-  lyricReachAboveRows,
   lyricBlockSpFor,
   orderedLyricLineIds,
   syllablePlaybackKey,
@@ -287,12 +286,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const lyricBlockSp = lyricBlockSpFor(lyricLineIds.length);
   rowHeightSp += Math.max(0, lyricBlockSp - ROW_PAD_BOTTOM_SP);
   rowPadTopSp += Math.max(0, lyricBlockSp - ROW_PAD_BOTTOM_SP);
-  // How far below / above its staff a row's own ink can reach: halfway to the
-  // next system / to the one before.
-  const lyricBandBottom = (row: number): number =>
-    row + 1 < plan.rowCount ? (rowBand(row).staffBottom + rowBand(row + 1).staffTop) / 2 : Infinity;
-  const lyricBandTop = (row: number): number =>
-    row > 0 ? (rowBand(row - 1).staffBottom + rowBand(row).staffTop) / 2 : -Infinity;
 
   // Playing technique is drawn AFTER the measure walk: a hammer-on names its
   // destination by note id, and that note may be measures away — so the marks
@@ -303,11 +296,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // Where each row's primitives begin — rows are emitted in order, so a row's
   // primitives are exactly the slice from its first measure onward.
   const rowStart: number[] = [];
-  // Volta brackets belong to the row that drew them (endings.ts).
-  const endingOwners = new Map<Primitive, number>();
-  // Directions can hang past the midpoint to the next system; their emitting
-  // row is a fact, so carry it into the compaction pass like lyrics/voltas.
-  const directionOwners = new Map<Primitive, number>();
   let openingScoreText: Primitive[] = [];
   // Which bars declare a feel, and which of those are a change worth printing.
   const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
@@ -320,7 +308,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       rowStart[m.row] = primitives.length;
       // This row's voltas first, so the labels placed below scan them as ink
       // and stack above (core-measure-attributes-gaps.md, item 5).
-      if (!m.entry && (!context || context.globalLabels)) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + rowPadTopSp, primitives, m.row, endingOwners, opts.elementTargets);
+      if (!m.entry && (!context || context.globalLabels)) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + rowPadTopSp, primitives, m.row, opts.elementTargets);
     }
     const edges = rowEdges.get(m.row);
     rowEdges.set(m.row, {
@@ -416,8 +404,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
             row: m.row,
             staffTop,
             staffBottom,
-            bandBottom: lyricBandBottom(m.row),
-            bandTop: lyricBandTop(m.row),
+            bandBottom: Infinity,
             text: line.text,
             continues: line.type === 'start' || line.type === 'middle',
             ...(playbackId === undefined ? {} : { playbackId, lyricLine: lineId })
@@ -429,7 +416,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
             if (event.lyrics?.lines?.[lineId]?.text?.trim()) return;
             lyricRuns.set(lineId, [...(lyricRuns.get(lineId) ?? []), {
               x, verse, row: m.row, staffTop, staffBottom,
-              bandBottom: lyricBandBottom(m.row), bandTop: lyricBandTop(m.row),
+              bandBottom: Infinity,
               text: '', continues: false, playbackId, lyricLine: lineId, gap: true
             }]);
           });
@@ -509,9 +496,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       emitDirections({
         ...positionedArgs,
         staffTops: [staffTop],
-        scan: primitives.slice(rowStart[m.row]),
-        owners: directionOwners,
-        row: m.row
+        scan: primitives.slice(rowStart[m.row])
       });
     }
 
@@ -595,6 +580,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       for (const issue of measureIssues) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
     qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, selectedNoteIds);
+    // Everything this bar drew — its voltas, labels and directions too — is its row's.
+    stampRow(primitives, measurePrimitiveStart, m.row);
   }
 
   // Before the frame is fitted: the marks are ink like any other, and both
@@ -625,10 +612,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // itself — score text, voltas, technique, the top string's digits
   // (lyricRuns.ts).
   const clearance = clearanceSpacing(display.clearance, opts.densityPad);
-  const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearance.lyricInk, { verseCount: lyricLineIds.length });
+  emitLyricRuns(lyricRuns.values(), primitives, clearance.lyricInk, { verseCount: lyricLineIds.length });
   const versedRows = new Set([...lyricRuns.values()].flat().map(syl => syl.row));
-  for (const [p, row] of directionOwners) lyricOwners.set(p, row);
-  for (const [p, row] of endingOwners) lyricOwners.set(p, row);
 
   const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * rowHeightSp;
   const baseRows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
@@ -646,11 +631,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     : tightenRows;
   const tightened = fitRows({
     primitives, rows, heightSp, padDensity: opts.densityPad, clearance: display.clearance,
-    // Deep ink belongs to the row that emitted it — by fact, not midpoint:
-    // verses and below-directions can hang past the frame. Voltas likewise.
-    owners: lyricOwners,
-    // Verses are filed by owner above; nothing else of a row hangs past the
-    // midpoint, so the boundary needs no reservation.
     // A versed system gets extra air over it, so its words head it.
     airAboveSp: Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => versedRows.has(r) ? clearance.versesAbove : 0)
   });
@@ -662,7 +642,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp,
     usedWidthSp: plan.usedWidthSp, naturalWidthSp,
     index, diagnostics, rows: finalRows, displays: finalDisplays,
-    ...(tightened ? { rowInkSp: tightened.ink } : {}),
     packings: [plan.packing]
   };
 }
@@ -689,8 +668,9 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
   for (const job of jobs) {
     if (job.title !== null && display.title !== 'hide') {
       cursorY += 2.4;
+      // A title heads the system below it.
       const title: Primitive = { kind: 'text', text: job.title, x: widthSp / 2, y: cursorY,
-        font: 'body', size: 2.4, anchor: 'middle', className: 'score-title' };
+        font: 'body', size: 2.4, anchor: 'middle', className: 'score-title', origin: { row: rows.length } };
       primitives.push(title);
       const titleInk = computeBoundsSp([title]);
       cursorY = (titleInk ? titleInk.y + titleInk.h : cursorY) + TITLE_SYSTEM_INK_SP;
@@ -734,14 +714,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
           if (!diagnostics.some(existing => existing.measureIndex === diagnostic.measureIndex && existing.message === diagnostic.message)) diagnostics.push(diagnostic);
         }
         const bands = result.rows;
-        // Each verse stays with the staff it heads: the measured reach.
-        const boundaries = rowBoundariesSp(bands, 0, lyricReachAboveRows(result.primitives, bands));
         const bins: Primitive[][] = bands.map(() => []);
-        for (const primitive of result.primitives) {
-          let row = 0;
-          while (row < boundaries.length && anchorY(primitive) >= boundaries[row]) row++;
-          bins[row].push(primitive);
-        }
+        for (const primitive of result.primitives) bins[rowOf(primitive, bands)]!.push(primitive);
         return { bands, bins };
       });
       for (let row = 0; row < plan.rowCount; row++) {
@@ -755,6 +729,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
           // single-staff fit gives a versed system.
           if ((rows.length > 0 || system.length > 0) && staff.bins[row].some(p => /lyric/.test(p.className ?? ''))) cursorY += clearance.versesAbove;
           const dy = cursorY - top;
+          offsetRows(staff.bins[row], rows.length - row);
           for (const primitive of staff.bins[row]) {
             translatePrimitiveY(primitive, dy);
             primitives.push(primitive);

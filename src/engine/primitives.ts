@@ -80,6 +80,38 @@ export interface PrimitiveBase {
    * goldens never do, so no committed primitive carries it.
    */
   element?: ElementTag;
+  /**
+   * What this ink was drawn for, stamped where it is drawn
+   * (roadmap/inprogress/core-ink-provenance.md). Readers take it from here rather
+   * than working it back out from where the ink landed. Never part of a golden:
+   * `rounded()` strips it and the SVG emitter does not write it.
+   */
+  origin?: InkOrigin;
+}
+
+/** Where a primitive came from — see `PrimitiveBase.origin`. */
+export interface InkOrigin {
+  /** The system row it was drawn for: an index into the layout's `rows`. */
+  row: number;
+}
+
+/**
+ * Stamp everything pushed since `from` that has no row yet as drawn for `row`. Emitters
+ * stamp the range they pushed; an inner emitter that drew across rows has already stamped
+ * each piece, and keeps its own.
+ */
+export function stampRow(primitives: readonly Primitive[], from: number, row: number): void {
+  for (let k = from; k < primitives.length; k++) {
+    const p = primitives[k]!;
+    if (p.origin === undefined) p.origin = { row };
+  }
+}
+
+/** Offset the rows of primitives laid out on their own (a segment, a score block, a staff
+ *  composed into a system) to where their first row lands in the whole layout. */
+export function offsetRows(primitives: readonly Primitive[], by: number): void {
+  if (by === 0) return;
+  for (const p of primitives) if (p.origin) p.origin = { ...p.origin, row: p.origin.row + by };
 }
 
 /** Which element a piece of ink belongs to: its kind (`edit/elementWalk.ts`'s
@@ -283,17 +315,6 @@ export interface RowBandSp {
 
 export interface LayoutResult {
   primitives: Primitive[];
-  /**
-   * Vertical ink extent of each row, as the vertical pass measured it.
-   *
-   * Reported because it can no longer be recovered from the output: ownership
-   * is settled from the geometry BEFORE rows move, so ink that reaches well
-   * past its own staff — a flag on an up-stem — can finish nearer a neighbour
-   * than the row that owns it. Bucketing by a midpoint after the fact would
-   * file that flag with the wrong row. Absent when no row moved, where a
-   * midpoint and the true owner agree by construction.
-   */
-  rowInkSp?: { top: number; bottom: number }[];
   /** Total layout width in staff spaces. */
   widthSp: number;
   /** Total layout height in staff spaces. */

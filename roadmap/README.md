@@ -148,6 +148,10 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-ink-provenance.md](inprogress/core-ink-provenance.md)** — **in progress 2026-10-28**:
+  every primitive carries what it was drawn for (`origin`: row, display staff, bar, visit, role),
+  and the engine and overlays read it instead of reconstructing it from geometry and class names.
+  Three phases: row (fixes verses over a stacked section label), staff + bar + bar geometry, visit + role.
 - **[studio-mix-layers.md](inprogress/studio-mix-layers.md)** — **built 2026-10-22**, awaiting the
   owner's hands-on check: a recording, the synth and a click as three layers, toggled from the
   tray's Mix field and headed the same in the Mix panel; the synth follows a recording through its

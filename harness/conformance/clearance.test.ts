@@ -6,7 +6,7 @@ import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { planHorizontal, packSystems } from '../../src/engine/layout/spacing.ts';
-import { anchorY, tightenRows } from '../../src/engine/layout/verticalDensity.ts';
+import { rowOf, tightenRows } from '../../src/engine/layout/verticalDensity.ts';
 import { computeBoundsSp } from '../../src/engine/render/bounds.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import type { Primitive } from '../../src/engine/primitives.ts';
@@ -20,26 +20,11 @@ const layouts = { notation: layoutNotation, tab: layoutTab, both: layoutBothSyst
 
 // Keep stable content extents and measure the result independently of its policy.
 //
-// Buckets by the layout's OWN ownership when it reports any. Re-deriving it
-// from a midpoint would measure the wrong thing: ownership is settled before
-// rows move, so ink that reaches past its own staff can finish nearer a
-// neighbour, and filing it there would score a row's own flag as the row
-// above's overhang. The midpoint remains the fallback for a layout that moved
-// no row, where the two agree by construction.
+// Buckets by the row each primitive was drawn for (`origin.row`): the fact the
+// fit itself moves by, so a row's own flag is never scored as the row above's.
 function rowInk(result: ReturnType<typeof layoutNotation>) {
-  if (result.rowInkSp) {
-    return result.rowInkSp.map(({ top, bottom }) => ({ y: top, h: bottom - top }));
-  }
-  const rows = result.rows;
-  const boundaries = rows.slice(0, -1).map((row, index) =>
-    (row.staffBottom + rows[index + 1].staffTop) / 2
-  );
-  const buckets: Primitive[][] = rows.map(() => []);
-  for (const p of result.primitives) {
-    let row = 0;
-    while (row < boundaries.length && anchorY(p) >= boundaries[row]) row++;
-    buckets[row].push(p);
-  }
+  const buckets: Primitive[][] = result.rows.map(() => []);
+  for (const p of result.primitives) buckets[rowOf(p, result.rows)]!.push(p);
   return buckets.map(bucket => computeBoundsSp(bucket)!);
 }
 
@@ -90,12 +75,13 @@ describe('clearance levels', () => {
   });
 
   it('keeps an above-staff heading with the system it names', () => {
+    // Nearer the system above than its own: it moves with the row it was drawn for.
     const heading: Primitive = {
       kind: 'text', text: 'Bridge', x: 2, y: 14, size: 1.5,
-      font: 'body', anchor: 'start', className: 'section-label'
+      font: 'body', anchor: 'start', className: 'section-label', origin: { row: 1 }
     };
-    const upper: Primitive = { kind: 'rect', x: 0, y: 6, w: 5, h: 4, className: 'content' };
-    const lower: Primitive = { kind: 'rect', x: 0, y: 26, w: 5, h: 4, className: 'content' };
+    const upper: Primitive = { kind: 'rect', x: 0, y: 6, w: 5, h: 4, className: 'content', origin: { row: 0 } };
+    const lower: Primitive = { kind: 'rect', x: 0, y: 26, w: 5, h: 4, className: 'content', origin: { row: 1 } };
     const result = tightenRows({
       primitives: [upper, heading, lower],
       rows: [{ staffTop: 6, staffBottom: 10 }, { staffTop: 26, staffBottom: 30 }],

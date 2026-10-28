@@ -18,9 +18,7 @@ import {
   LYRIC_FIRST_BASELINE_DROP_SP,
   LYRIC_LINE_SPACING_SP,
   TAB_LYRIC_CLEARANCE_SP,
-  documentLyricLineCount,
   emitLyricRuns,
-  lyricBlockSpFor,
   orderedLyricLineIds,
   syllablePlaybackKey,
   type LyricSyllable
@@ -75,7 +73,7 @@ import {
   BeamHookSpec
 } from './beams.ts';
 import {
-  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, tagElement, translatePrimitiveY
+  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, offsetRows, stampRow, tagElement, translatePrimitiveY
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import {
@@ -87,6 +85,7 @@ import {
 import {
   anchorY,
   fitRowsToClearance,
+  rowOf,
   tightenRows,
   SEPARATION_CLEAR_SP
 } from './verticalDensity.ts';
@@ -908,7 +907,6 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   let usedWidthSp = 0;
   let naturalWidthSp: number | undefined;
   const rows: RowBandSp[] = [];
-  const lyricOwners = new Map<Primitive, number>();
   const displays: RowBandSp[][] = [];
   // One per laid-out segment: a score with per-system layouts packs each range
   // separately, and a density value is only degenerate when it changes NONE of
@@ -963,7 +961,9 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         font: 'body',
         size: TITLE_SIZE_SP,
         anchor: 'middle',
-        className: 'score-title'
+        className: 'score-title',
+        // A title heads the system below it.
+        origin: { row: rows.length }
       };
       primitives.push(title);
       const titleBottom = inkEdgesSp(title).bottom;
@@ -975,8 +975,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       if (cursorY !== 0) {
         for (const p of r.primitives) translatePrimitiveY(p, cursorY);
       }
+      offsetRows(r.primitives, rows.length);
       primitives.push(...r.primitives);
-      for (const [p, row] of r.owners ?? []) lyricOwners.set(p, rows.length + row);
       for (const band of r.rows) {
         rows.push({ staffTop: band.staffTop + cursorY, staffBottom: band.staffBottom + cursorY });
       }
@@ -997,12 +997,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     ? fitRowsToClearance
     : tightenRows;
   const tightened = fitRows({
-    primitives, rows, heightSp: cursorY, padDensity: opts.densityPad, clearance: display.clearance,
-    // Deep ink belongs to the row that emitted it — by fact, not midpoint:
-    // verses and below-directions can hang beyond the provisional frame.
-    owners: lyricOwners,
-    // The frame's reservation still files everything else as it always has.
-    reservedBelowSp: lyricBlockSpFor(selectedLyrics?.length ?? documentLyricLineCount(mnx))
+    primitives, rows, heightSp: cursorY, padDensity: opts.densityPad, clearance: display.clearance
   });
 
   const finalDisplays = tightened
@@ -1016,7 +1011,6 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, naturalWidthSp,
     index, diagnostics,
-    ...(tightened ? { rowInkSp: tightened.ink } : {}),
     rows: tightened?.rows ?? rows,
     // Display bands ride with their rows when the density pass moves them.
     displays: finalDisplays,
@@ -1070,8 +1064,6 @@ interface SegmentResult {
   packing: PackingInput;
   /** This segment's width at density 1 — see `LayoutResult.naturalWidthSp`. */
   naturalWidthSp?: number;
-  /** Local system row of ink whose ownership was known when it was emitted. */
-  owners?: ReadonlyMap<Primitive, number>;
 }
 
 /**
@@ -1097,8 +1089,9 @@ function renderSegment(args: RenderSegmentArgs): SegmentResult {
  * gap stays provisional. Null overall when no gap is measured.
  *
  * Ink is what the first pass drew, measured through the same SMuFL boxes
- * `tightenRows` trusts; a primitive belongs to the band its anchor falls in
- * (midpoints between bands), and structural primitives — barlines, braces,
+ * `tightenRows` trusts; a primitive belongs to the row it was drawn for and,
+ * within it, to the band its anchor falls in (midpoints between the row's
+ * bands), and structural primitives — barlines, braces,
  * the staff lines — are not ink. Ownership only matters for something that
  * straddles a boundary, and those are exactly the structural ones.
  */
@@ -1108,12 +1101,6 @@ function measureDisplayGaps(seg: SegmentResult, clearance: ClearanceSpacing): (n
   const measured = (d: number) => isMeasuredGap(d, tabDisplayIndexes);
   if (!Array.from({ length: displayCount }, (_, d) => d).some(measured)) return null;
 
-  const rowBounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
-  const rowOf = (y: number) => {
-    let r = 0;
-    while (r < rowBounds.length && y >= rowBounds[r]) r++;
-    return r;
-  };
   const buckets: Primitive[][][] = displays.map(bands => bands.map(() => []));
   // Content placed BY the gap rather than by a staff — a `between` direction
   // sits at the gap's midpoint — is not a demand on either side; it is
@@ -1123,7 +1110,7 @@ function measureDisplayGaps(seg: SegmentResult, clearance: ClearanceSpacing): (n
     const tokens = (p.className ?? '').split(' ');
     if (STRUCTURAL_CLASSES.has(tokens[0])) continue;
     const y = anchorY(p);
-    const r = rowOf(y);
+    const r = rowOf(p, rows);
     const bands = displays[r];
     if (tokens.includes('direction-between')) {
       let d = 1;
@@ -1509,8 +1496,7 @@ function assembleSegment(
   const lyricBandBottom = (row: number, s: number): number => {
     const d = displayOfPlan[s];
     const bottom = displayTopOf(row, d) + displayHeights[d];
-    if (d + 1 < displayCount) return (bottom + displayTopOf(row, d + 1)) / 2;
-    return row + 1 < rowCount ? (bottom + displayTopOf(row + 1, 0)) / 2 : Infinity;
+    return d + 1 < displayCount ? (bottom + displayTopOf(row, d + 1)) / 2 : Infinity;
   };
 
   // Ottava lines are a post-pass (they cross measures/system breaks), but their
@@ -1533,10 +1519,6 @@ function assembleSegment(
   // Where each row's primitives begin in the measure loop — rows are emitted
   // in order — so the text pass can scan exactly one row's ink.
   const rowLoopStart: number[] = [];
-  // Ink that can extend past a geometric row boundary keeps the row that
-  // emitted it. Directions join lyrics and voltas here: a deep below-staff
-  // stack must not be picked up by the following system when gaps tighten.
-  const explicitOwners = new Map<Primitive, number>();
   const aboveDirections: ((scan: readonly Primitive[]) => void)[][] = [];
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
@@ -2232,9 +2214,7 @@ function assembleSegment(
         emitDynamics(groupArgs);
         const directionArgs = {
           ...groupArgs,
-          staffTops: staffTops.slice(g.start, g.start + g.count),
-          owners: explicitOwners,
-          row: m.row
+          staffTops: staffTops.slice(g.start, g.start + g.count)
         };
         emitDirections({ ...directionArgs, phase: 'staffSide' });
         // `above` directions clear the beams, which are drawn after the loop —
@@ -2282,11 +2262,19 @@ function assembleSegment(
       for (const issue of measureIssues) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
     qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, [...selectedNoteIds, ...selectedEventIds]);
+    // Everything this bar drew is its row's.
+    stampRow(primitives, measurePrimitiveStart, m.row);
   }
 
   const loopEnd = primitives.length;
 
-  for (const run of beams.runs) emitBeamRun(run, primitives, beamSlantSp);
+  for (const run of beams.runs) {
+    // A run is the part of a beam group on one system row; its stems are keyed by plan measure.
+    const key = run.memberIds.find(id => run.stems.has(id));
+    const from = primitives.length;
+    emitBeamRun(run, primitives, beamSlantSp);
+    if (key !== undefined) stampRow(primitives, from, plan.measures[Number(key.split(':')[0])]!.row);
+  }
 
   emitSlursAndTies(segment, plan, curveAnchors, primitives);
 
@@ -2321,9 +2309,7 @@ function assembleSegment(
     });
   }
 
-  // Volta brackets belong to the row that drew them (endings.ts).
-  const endingOwners = new Map<Primitive, number>();
-  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives, undefined, endingOwners, elementTargets);
+  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives, undefined, elementTargets);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
   if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
 
@@ -2333,21 +2319,16 @@ function assembleSegment(
   // voltas and ottava brackets included, which is why this runs here rather
   // than inside the measure loop. Tempo first, so the labels stack over it.
   // Each row's scan: its slice of the measure loop, the post-loop passes'
-  // primitives (beams, curves, voltas, ottavas) that its band owns by
-  // anchor — those sit near their staff, so the midpoint rule is safe for
-  // them — and the text this pass has already placed on the row. Never the
-  // row above: clearing it is tightenRows' job.
+  // primitives (beams, curves, voltas, ottavas) drawn for it, and the text this
+  // pass has already placed on the row. Never the row above: clearing it is
+  // tightenRows' job.
+  const rowBands = Array.from({ length: rowCount }, (_, r): RowBandSp => ({
+    staffTop: displayTopOf(r, 0),
+    staffBottom: displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1]
+  }));
   const textPassStart = primitives.length;
-  const rowBoundaries = Array.from({ length: rowCount - 1 }, (_, r) =>
-    (displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1] + displayTopOf(r + 1, 0)) / 2
-  );
   const postLoopByRow: Primitive[][] = Array.from({ length: rowCount }, () => []);
-  for (const p of primitives.slice(loopEnd, textPassStart)) {
-    const y = anchorY(p);
-    let r = 0;
-    while (r < rowBoundaries.length && y >= rowBoundaries[r]) r++;
-    postLoopByRow[r].push(p);
-  }
+  for (const p of primitives.slice(loopEnd, textPassStart)) postLoopByRow[rowOf(p, rowBands)]!.push(p);
   const rowTextStart: number[] = [];
   // Which bars declare a feel, and which of those are a change worth printing.
   const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
@@ -2355,6 +2336,7 @@ function assembleSegment(
     const m = plan.measures[i];
     if (m.hidden) continue;
     if (rowTextStart[m.row] === undefined) rowTextStart[m.row] = primitives.length;
+    const textFrom = primitives.length;
     const gm = mnx.global.measures[writtenIndex(plan, i)] ?? {};
     const staffTop = staffTopOf(m.row, 0);
     const scan = () => [
@@ -2380,21 +2362,15 @@ function assembleSegment(
       clearAbove: tempoTop, primitives
     });
     emitOccurrenceLabel(m, staffTop, primitives);
+    stampRow(primitives, textFrom, m.row);
   }
 
   // Lyrics last of all (lyricRuns.ts): a verse sits under everything its staff
-  // hangs below itself — hairpins and ottava brackets included — and after the
-  // score-text pass, whose midpoint scan must never mistake a deep verse for
-  // the next system's ink. The fit takes their rows, directions and voltas as fact.
-  const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(args.display.clearance, args.densityPad).lyricInk);
-  for (const [p, row] of explicitOwners) lyricOwners.set(p, row);
-  for (const [p, row] of endingOwners) lyricOwners.set(p, row);
+  // hangs below itself — hairpins and ottava brackets included.
+  emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(args.display.clearance, args.densityPad).lyricInk);
 
   const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);
-  const rows = Array.from({ length: rowCount }, (_, r): RowBandSp => ({
-    staffTop: displayTopOf(r, 0),
-    staffBottom: displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1]
-  }));
+  const rows = rowBands;
   const displays = Array.from({ length: rowCount }, (_, r) =>
     displayHeights.map((h, d): RowBandSp => ({
       staffTop: displayTopOf(r, d),
@@ -2404,7 +2380,7 @@ function assembleSegment(
 
   return {
     primitives, heightSp, usedWidthSp: plan.usedWidthSp, naturalWidthSp,
-    rows, displays, tabDisplayIndexes, packing: plan.packing, owners: lyricOwners
+    rows, displays, tabDisplayIndexes, packing: plan.packing
   };
 }
 
@@ -2892,7 +2868,9 @@ function emitSlursAndTies(
   const curve = (
     x0: number, y0: number, x1: number, y1: number,
     dir: 1 | -1, // -1 bulges up (y grows downward), 1 bulges down
-    kind: 'slur' | 'tie'
+    kind: 'slur' | 'tie',
+    /** The system row the curve is drawn on. */
+    row: number
   ) => {
     const span = Math.max(x1 - x0, 0.8);
     const h = kind === 'slur'
@@ -2908,7 +2886,8 @@ function emitSlursAndTies(
       ],
       thickness: kind === 'slur' ? SLUR_THICKNESS_SP : TIE_THICKNESS_SP,
       taper: true,
-      className: kind
+      className: kind,
+      origin: { row }
     });
   };
 
@@ -2922,11 +2901,11 @@ function emitSlursAndTies(
     if (row0 !== row1) {
       const cutX = Math.max((rowRight.get(row0) ?? x0) - 0.4, x0 + 1.5);
       const resumeX = Math.min((rowLeft.get(row1) ?? x1) + 0.2, x1 - 1.5);
-      curve(x0, y0, cutX, y0, dir, kind);
-      curve(resumeX, y1, x1, y1, dir, kind);
+      curve(x0, y0, cutX, y0, dir, kind, row0);
+      curve(resumeX, y1, x1, y1, dir, kind, row1);
       return;
     }
-    curve(x0, y0, x1, y1, dir, kind);
+    curve(x0, y0, x1, y1, dir, kind, row0);
   };
 
   segment.staves.forEach((spec, si) => {
@@ -2973,7 +2952,7 @@ function emitSlursAndTies(
               if (!tie.target) {
                 if (tie.lv) {
                   const x0 = start.x + TIE_END_GAP_SP;
-                  curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie');
+                  curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie', start.row);
                 }
                 continue;
               }
@@ -2985,7 +2964,7 @@ function emitSlursAndTies(
                 // organ-layout's pedal tie into a never-encoded next bar) —
                 // draw the outgoing stub rather than dropping the tie.
                 const x0 = start.x + TIE_END_GAP_SP * plan.inkRatio;
-                curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie');
+                curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie', start.row);
                 continue;
               }
               const targetY = target.anchor.headYs[target.noteIndex] + pad;
@@ -2995,7 +2974,7 @@ function emitSlursAndTies(
                 // would span the music skipped by the jump, and the source
                 // side already carries the first-time tie.
                 const x1 = target.anchor.x - TIE_END_GAP_SP * plan.inkRatio;
-                curve(x1 - LV_TIE_LENGTH_SP, targetY, x1, targetY, dir, 'tie');
+                curve(x1 - LV_TIE_LENGTH_SP, targetY, x1, targetY, dir, 'tie', target.anchor.row);
                 continue;
               }
               draw(
@@ -3258,6 +3237,7 @@ function emitOttavas(
     let first = true;
     while (a <= endIdx) {
       const row = plan.measures[a].row;
+      const drawnFrom = primitives.length;
       let b = a;
       while (b + 1 <= endIdx && plan.measures[b + 1].row === row) b++;
       const last = b === endIdx;
@@ -3301,6 +3281,7 @@ function emitOttavas(
           className: 'ottava'
         });
       }
+      stampRow(primitives, drawnFrom, row);
       first = false;
       a = b + 1;
     }
@@ -3500,6 +3481,7 @@ function emitHairpins(
     let first = true;
     while (a <= sp.endIdx) {
       const row = plan.measures[a].row;
+      const drawnFrom = primitives.length;
       let b = a;
       while (b + 1 <= sp.endIdx && plan.measures[b + 1].row === row) b++;
       const last = b === sp.endIdx;
@@ -3516,6 +3498,7 @@ function emitHairpins(
           className: `hairpin hairpin-${sp.wedge}`
         });
       }
+      stampRow(primitives, drawnFrom, row);
       first = false;
       a = b + 1;
     }
@@ -3531,10 +3514,6 @@ interface EmitDirectionsArgs {
   staffTops: number[];
   staffBottoms: number[];
   primitives: Primitive[];
-  /** Row ownership known at emission time. Below directions can hang beyond
-   *  the midpoint to the next system, where geometry would mis-file them. */
-  owners?: Map<Primitive, number>;
-  row?: number;
   /**
    * THIS ROW's ink drawn so far, for an `above` direction to clear: it sits one
    * cohesion clearance over whatever rises above the staff under its own
@@ -3564,7 +3543,7 @@ interface EmitDirectionsArgs {
  * either staff. With one staff there is no "between", so it falls back to below.
  */
 export function emitDirections(args: EmitDirectionsArgs): void {
-  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives, scan, phase, owners, row } = args;
+  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives, scan, phase } = args;
   const directions = partMeasure.directions ?? [];
   if (directions.length === 0) return;
   const callStart = primitives.length;
@@ -3647,9 +3626,6 @@ export function emitDirections(args: EmitDirectionsArgs): void {
             className: between ? 'direction direction-between' : 'direction'
           }
     );
-    if (owners && row !== undefined) {
-      for (const p of primitives.slice(firstNew)) owners.set(p, row);
-    }
     if (placed) {
       const box = computeBoundsSp(primitives.slice(firstNew));
       if (box) {

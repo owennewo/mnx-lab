@@ -15,7 +15,7 @@ import type { MnxEvent, MnxStructure } from '../../model/mnx.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import { occurrenceKey, syntheticEventKey, type ContainerIndex } from '../../model/noteKeys.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
-import type { Primitive, RowBandSp, TextPrim } from '../primitives.ts';
+import type { Primitive, TextPrim } from '../primitives.ts';
 import { inkEdgesSp } from '../render/bounds.ts';
 
 // The FRAME's first-verse drop: what a system provisionally reserves below its
@@ -71,13 +71,11 @@ export interface LyricSyllable {
   /** The system row this syllable's staff belongs to — the row fit's owner. */
   row: number;
   /** The staff this syllable hangs from, in THIS system: its lines, and how
-   *  far below them its own ink can reach (halfway to whatever comes next). */
+   *  far below them its own ink can reach — halfway to the next staff of its
+   *  system; the last staff's reaches as far as its system's ink goes. */
   staffTop: number;
   staffBottom: number;
   bandBottom: number;
-  /** How far ABOVE its staff its own ink can reach (halfway to the system
-   *  above) — read only when the verses stand over the staff. */
-  bandTop?: number;
   text: string;
   /** start/middle syllables reach for the next one with a hyphen. */
   continues: boolean;
@@ -171,9 +169,9 @@ function hangY(p: Primitive): number {
  * LYRIC_LINE_SPACING_SP. One baseline per staff per system, so a verse reads
  * level. `airSp` is the clearance control's `lyricInk`: at the tight end a
  * verse all but touches the system that owns it. Run it after everything else
- * a staff hangs below itself has been emitted. Returns the system row each
- * verse primitive belongs to: the row fit's ownership, a fact rather than a
- * guess from geometry — a verse can hang deeper than the frame reserved.
+ * a staff hangs below itself has been emitted. Each verse primitive is
+ * stamped with its syllable's row, so the row fit carries it with the system
+ * it belongs to however deep it hangs.
  */
 export function emitLyricRuns(
   runs: Iterable<LyricSyllable[]>,
@@ -183,21 +181,20 @@ export function emitLyricRuns(
    *  is the document's verse-row count: rows are global, so the last verse
    *  sits nearest the staff in every system, whichever verses it carries. */
   above?: { verseCount: number }
-): Map<Primitive, number> {
+): void {
   // Gaps stand on rows the words already placed, and only where their staff
   // carries words in that system: they never move a row nor make one.
   const given = [...runs];
   const all = given.map(run => run.filter(syl => !syl.gap)).filter(run => run.length);
   const worded = new Set(all.flat().map(syl => syl.staffBottom));
   const gaps = given.flat().filter(syl => syl.gap && worded.has(syl.staffBottom));
-  const owners = new Map<Primitive, number>();
   const firstBaseline = above ? baselinesAbove(all, primitives, airSp, above.verseCount) : new Map<number, number>();
   for (const run of above ? [] : all) {
     for (const syl of run) {
       if (firstBaseline.has(syl.staffBottom)) continue;
       let deepest = syl.staffBottom;
       for (const p of primitives) {
-        if (NOT_HANGING_INK.test(p.className ?? '')) continue;
+        if (p.origin?.row !== syl.row || NOT_HANGING_INK.test(p.className ?? '')) continue;
         const y = hangY(p);
         if (y < syl.staffTop || y >= syl.bandBottom) continue;
         deepest = Math.max(deepest, inkEdgesSp(p).bottom);
@@ -210,12 +207,11 @@ export function emitLyricRuns(
     const h = (LYRIC_ASCENT_SP + LYRIC_DESCENT_SP) * (1 + 2 * GAP_PAD_Y), w = h * GAP_ASPECT;
     const gap: Primitive = {
       kind: 'rect', x: syl.x - w / 2, y: y - LYRIC_ASCENT_SP - h * GAP_PAD_Y, w, h, radius: h * 0.2,
-      fill: 'none', className: 'lyric-gap',
+      fill: 'none', className: 'lyric-gap', origin: { row: syl.row },
       ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
       ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
     };
     primitives.push(gap);
-    owners.set(gap, syl.row);
   }
   for (const run of all) {
     run.forEach((syl, k) => {
@@ -229,11 +225,11 @@ export function emitLyricRuns(
         size: LYRIC_SIZE_SP,
         anchor: 'middle',
         className: 'lyric',
+        origin: { row: syl.row },
         ...(syl.playbackId === undefined ? {} : { playbackId: syl.playbackId }),
         ...(syl.lyricLine === undefined ? {} : { lyricLine: syl.lyricLine })
       };
       primitives.push(syllable);
-      owners.set(syllable, syl.row);
       const next = run[k + 1];
       if (syl.continues && next && next.staffBottom === syl.staffBottom && next.verse === syl.verse && next.x > syl.x) {
         const hyphen: Primitive = {
@@ -244,14 +240,13 @@ export function emitLyricRuns(
           font: 'lyric',
           size: LYRIC_SIZE_SP,
           anchor: 'middle',
-          className: 'lyric-hyphen'
+          className: 'lyric-hyphen',
+          origin: { row: syl.row }
         };
         primitives.push(hyphen);
-        owners.set(hyphen, syl.row);
       }
     });
   }
-  return owners;
 }
 
 /**
@@ -283,52 +278,19 @@ function baselinesAbove(
   }
   const first = new Map<number, number>();
   for (const [staffBottom, { syl, x0, x1 }] of staffs) {
-    const bandTop = syl.bandTop ?? -Infinity;
     let ceiling = syl.staffTop;
     for (const p of primitives) {
-      if (NOT_HANGING_INK.test(p.className ?? '')) continue;
+      // Its own system's ink only: whatever the system above hangs is the row fit's to clear.
+      if (p.origin?.row !== syl.row || NOT_HANGING_INK.test(p.className ?? '')) continue;
       const e = inkEdgesSp(p);
       if (e.right < x0 || e.left > x1) continue;
-      if (e.top >= syl.staffTop || e.bottom > staffBottom || e.bottom <= bandTop) continue;
+      if (e.top >= syl.staffTop || e.bottom > staffBottom) continue;
       ceiling = Math.min(ceiling, e.top);
     }
     const lastBaseline = ceiling - airSp - LYRIC_DESCENT_SP;
     first.set(staffBottom, lastBaseline - (Math.max(1, verseCount) - 1) * LYRIC_LINE_SPACING_SP);
   }
   return first;
-}
-
-/**
- * How far any verse reaches below the bottom line of the system it hangs
- * from — the reservation the row fit needs so its midpoint attribution never
- * files a verse with the system below. Measured, because placement is.
- */
-export function lyricReachBelowRows(primitives: readonly Primitive[], rows: readonly RowBandSp[]): number {
-  let reach = 0;
-  for (const p of primitives) {
-    if (p.kind !== 'text' || !/lyric/.test(p.className ?? '')) continue;
-    let r = -1;
-    while (r + 1 < rows.length && rows[r + 1].staffBottom < p.y) r++;
-    if (r < 0 || (r + 1 < rows.length && p.y > rows[r + 1].staffTop)) continue;
-    reach = Math.max(reach, inkEdgesSp(p).bottom - rows[r].staffBottom);
-  }
-  return reach;
-}
-
-/**
- * How far any verse stood over its staff reaches above that staff's top line —
- * the mirror of `lyricReachBelowRows`, for a layout that sets verses above
- * (the tab view), so the row split files them with the staff they head.
- */
-export function lyricReachAboveRows(primitives: readonly Primitive[], rows: readonly RowBandSp[]): number {
-  let reach = 0;
-  for (const p of primitives) {
-    if (p.kind !== 'text' || !/lyric/.test(p.className ?? '')) continue;
-    const r = rows.findIndex(row => p.y < row.staffTop);
-    if (r < 0) continue;
-    reach = Math.max(reach, rows[r].staffTop - inkEdgesSp(p).top);
-  }
-  return reach;
 }
 
 /** The lyric line ids with words in these sequences, through event containers. */

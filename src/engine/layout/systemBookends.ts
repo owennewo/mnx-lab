@@ -28,20 +28,18 @@ export function appendSystemBookends(
 ): void {
   if (!bookends || displays.length === 0) return;
 
-  const edge = (bands: readonly RowBandSp[], side: 'leading' | 'trailing'): number | null => {
-    const top = Math.min(...bands.map(b => b.staffTop));
-    const bottom = Math.max(...bands.map(b => b.staffBottom));
+  const edge = (row: number, side: 'leading' | 'trailing'): number | null => {
     const xs: number[] = [];
     for (const primitive of primitives) {
-      if (primitive.kind !== 'line' || primitive.className !== 'staff-line') continue;
-      if (primitive.y1 < top - 0.01 || primitive.y1 > bottom + 0.01) continue;
+      if (primitive.kind !== 'line' || primitive.className !== 'staff-line' || primitive.origin?.row !== row) continue;
       xs.push(primitive.x1, primitive.x2);
     }
     return xs.length ? (side === 'leading' ? Math.min(...xs) : Math.max(...xs)) : null;
   };
 
-  const add = (side: 'leading' | 'trailing', bookend: SystemBookend, bands: readonly RowBandSp[]) => {
-    const musicEdge = edge(bands, side);
+  const add = (side: 'leading' | 'trailing', bookend: SystemBookend, row: number) => {
+    const bands = displays[row]!;
+    const musicEdge = edge(row, side);
     if (musicEdge === null) return;
     const top = Math.min(...bands.map(b => b.staffTop));
     const bottom = Math.max(...bands.map(b => b.staffBottom));
@@ -56,12 +54,12 @@ export function appendSystemBookends(
       : SYSTEM_BOOKEND_GAP_SP + SYSTEM_BOOKEND_WIDTH_SP / 2;
     const className = `recording-bookend recording-bookend-${side}`;
     primitives.push({ kind: 'rect', x: musicEdge, dx, y: top, w: SYSTEM_BOOKEND_WIDTH_SP, h: bottom - top,
-      radius: 0.15, className: `${className} recording-bookend-block`, title: bookend.title });
+      radius: 0.15, className: `${className} recording-bookend-block`, title: bookend.title, origin: { row } });
     primitives.push({ kind: 'text', text: bookend.label, x: musicEdge, dx: labelDx,
       y: (top + bottom) / 2, font: 'body', size: 1.45, anchor: 'middle', baseline: 'central',
-      className: `${className} recording-bookend-label`, title: bookend.title });
+      className: `${className} recording-bookend-label`, title: bookend.title, origin: { row } });
   };
 
-  if (bookends.leading) add('leading', bookends.leading, displays[0]);
-  if (bookends.trailing) add('trailing', bookends.trailing, displays[displays.length - 1]);
+  if (bookends.leading) add('leading', bookends.leading, 0);
+  if (bookends.trailing) add('trailing', bookends.trailing, displays.length - 1);
 }
