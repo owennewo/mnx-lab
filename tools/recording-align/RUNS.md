@@ -358,3 +358,11 @@ to do — each is a gap to close.
   the report was read through a filter. Restored from the old sync's cuts (revision 17). Fixed:
   `score` takes a one-segment-a-bar sync's bar lines from its cuts and reports STALE SYNC bars;
   `sync` refuses a replacement that reaches fewer bars; Step 7 says both.
+- **Drafting the empty bars from the recording** (the solo, 66–71): 118 notes heard, 15 dropped as
+  slap ring, 14 slaps; the owner's review changed one event in six bars. Two things the draft
+  cannot hear yet, both found there: a **bass overtone taken for a note** (an F5 that rose and fell
+  with the C♯3 under it — its 5th partial; the real top note was 9 dB louder and already sounding),
+  and a **natural harmonic taken for a fretted note** (G4 written s2 f9; its attack and an almost
+  undecayed ring said s3 12th-fret harmonic — the owner's ear first). Both are checks for the next
+  draft: a high note on a simultaneous bass note's 3rd–6th partial is suspect; a long-ringing note
+  at an open string's 12th/7th/5th-fret harmonic is offered as one.

@@ -175,7 +175,13 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   Copies: choruses 80–85 (from 40–45), 96–101 (from 52–57), 90–91 (from 44–45); the outro's riff
   102–109 (28 29 6 29 6 29 28 29) — every copied bar 13–20 of its notes found. The sync went stale
   over the copies (it counts beats per bar) and was rewritten (revision 17).
-- Open, to draft a section at a time: solo 66–71, solo 2 72–79, interlude 58–61 (→ 62–65, 92–95),
+- **The solo, 66–71, drafted** (revision 18) from the recording on the sync's bar lines — MuScriptor
+  notes, the pipeline's quantize and fret steps, the drum hits as slaps, each slap's ring (open
+  D♯2/D♯3, re-sounded notes) dropped — then reviewed by the owner in the editor. One correction
+  (revision 19): bar 67's first note, an F5, was the C♯3 bass's 5th overtone; the owner heard a
+  harmonic, and its attack put it an eighth earlier — the s3 12th-fret harmonic on bar 66's last
+  eighth, ringing over the bar line. Banked as it stands.
+- Open, to draft a section at a time: solo 2 72–79, interlude 58–61 (→ 62–65, 92–95),
   the fourth chorus's opening 86–89 (a variation), bridge 46–51, the line over the outro 104–108,
   the ending 110–111. To listen to: bars 18/36's downbeat; bars 42/54's last eighth (G2 a beat
   early?).
