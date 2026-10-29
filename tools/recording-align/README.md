@@ -12,19 +12,19 @@ Two halves, split by what each needs:
   recording's audio (`audio`), and the sync as the sync bar edits it (`sync`, built with
   `segmentsFromBarStarts` in `src/model/syncSegments.ts` and checked by studio's decoders).
 - **`align.py`** (the MuScriptor environment's Python, below) does the audio: `transcribe`
-  (MuScriptor), `check` (key/capo, tuning, density), `structure` (the free-order bar search and
-  its report) and `selftest` (the search on synthetic performances).
+  (MuScriptor), `check` (key/capo, tuning, density), `structure` (the bar search and its report: free order by
+  default, or held to the score's order with `--fixed-order [--near-sync [s]]`) and `selftest` (the search on synthetic performances).
 
 Each command reads and writes files in `--out`:
 
 | file | written by | what |
 |---|---|---|
 | `piece.json`, `score.mnx.json` | `fetch` | the piece, its recording, its stored score |
-| `score.json` | `score` | performed order, bars, notes, the score's own jumps |
+| `score.json` | `score` | performed order, bars (with the length their time signature gives), notes, the score's own jumps, the recording's existing sync as bar-line seconds |
 | `audio/mono.wav` | `audio` | 22.05 kHz mono; downloaded data, kept apart |
 | `notes.json`, `transcription.mid`, `transcription.json`, `transcription.events.json` | `transcribe` | what MuScriptor heard (its raw events too), which instruments were asked for and kept, the tuning measured from the audio, and at which speed (`--half-speed`: a pitch-preserving stretch, times scaled back) |
 | `check.json` | `check` | key fit by shift, tuning, density, flags |
-| `structure.json`, `report.md` | `structure` | bar by bar: when, how fast, notes found |
+| `structure.json`, `report.md` | `structure` | bar by bar: when, how fast, notes found; which search, bars placed by onsets only, weak runs, unexplained notes, how far the bar lines moved from the existing sync |
 | `sync-payload.json` | `sync` | the segments and sync points that would be written |
 | `screen/pages.json`, `screen/page-NN*.png` | `screen.py pages` | the notation a video shows: when each page is on screen, each page and overlapping slices of it |
 | `score.gp`, `score.built.mnx.json`, `score.storage.json`, `score.mnx.json`, `preview.png` | `build` | from `score.tab.txt`: the `.gp` studio would store, the built document, its storage check, the document read back from the `.gp` (what `score` reads), a picture of it |

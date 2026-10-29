@@ -29,6 +29,11 @@ to do — each is a gap to close.
   the score's: it lowers chance, and the margin is what keeps a lookalike passage out (run 7:
   Sun Did Glide's outro, which Basic Pitch took for bars 9–14).
 
+- **A sync with the right order can be tightened without searching for the order** (run 9):
+  `--fixed-order --near-sync` held to the existing sync's bar lines finds the timing even on a
+  half-written score, where the free search wanders. Two of two Soundslice syncs measured were
+  early (runs 6, 9); whether that is general is the next thing to measure.
+
 ## Open questions
 
 - A recording that departs from the score's order: which of the three options do owners
@@ -291,3 +296,42 @@ to do — each is a gap to close.
 - **Changed**: Step 3 separates by kind of recording; README "Separating the guitar" has the table,
   the models and the environments; `separate_hyperace.py` runs HyperACE and refuses any model
   code other than the version that was audited.
+
+## Run 9 — 2026-10-29 — Everybody Wants To Rule The World (Gabriella Quevedo): the fixed-order search
+
+- **Piece** `2b156138db0c7716` r4 — the owner's transcription of Gabriella Quevedo's arrangement,
+  Open E♭ (D♯ A♯ D♯ G A♯ D♯), 12/8; 111 bars laid out from Soundslice with sections, bars 1–45
+  and 52–57 written, the rest placeholder rests. **Recording** YouTube `aqx5AO4fxDU`, 250 s, guitar
+  alone; Soundslice sync on every bar. First piece of the glow-up log.
+- **Tuning**: she tunes to A=428 (her description). `check` read −48 cents and **key fit −1**:
+  near a quarter-tone flat, most notes round down. Retuned +48 cents (Rubber Band) and transcribed
+  again: +3 cents, key +0, 3213 notes heard instead of 2330.
+- **The free search wandered**: 87% / 79% found against 49% chance, but 20 departures — the empty
+  bars score nothing anywhere, and the riff bars (6–13, 28–31, the outro) are lookalikes.
+- **The existing sync** (measured per bar against the written notes): 100 ms early at the start,
+  200 ms by bar 40 — past the owner's 80 ms. On it, the written bars score 57%; with each bar's
+  best offset, 84% exact against 4% chance.
+- **Built: the fixed-order search** (`structure --fixed-order [--near-sync [s]]`): the score's
+  performed order, timing only; unwritten bars placed by heard onsets and measured by their time
+  signature; weak runs and unexplained notes flag a recording that leaves the order; the report
+  says how far bar lines moved from the existing sync. `score` now writes the existing sync
+  (through `createRecordingSync`) and each bar's time-signature length, and lists bars whose
+  contents do not fill it. Selftest: the free cases unchanged, the same five in fixed order (the
+  skipped repeat flagged), lookalike bars, unwritten bars with misfit placeholders, an early sync
+  tightened. Jansch: free search unchanged (86/86 against 11%, within 39 ms of the stored sync);
+  fixed order identical to it, with and without `--near-sync`.
+- **On this piece**: `--fixed-order --near-sync`: 111 of 111 bars, 86% / 82% found against 44%
+  chance (the riff makes chance high), downbeats median 10 ms; bar lines moved +100 ms median,
+  90% within 182 ms. Without the window, the 54 unwritten bars after bar 57 stretched up to 7 s
+  to fill the recording's tail — hence the UNWRITTEN STRETCH warning.
+- **Findings about the score**: the pickup is wrong — she plays six eighths (D♯5 A♯4 D♯4 G4 D♯4
+  G4, 1.34–2.45 s), bar 1 holds four sixteenths and is a sixteenth over its 4/8; so bar 2 starts
+  ~150 ms early and the sync's beat unit falls to 1/16. Placeholder rests misfit 12/8 in 46–51
+  (2 wholes), 80–84 and 102–111 (1 whole).
+- **Improvised** (gaps): retuning (now in Step 4; a `transcribe --retune` would save the
+  command); measuring the existing sync's offset per bar (now the report's "from the existing
+  sync"); the lookalike map of unwritten bars against written ones (which written bar an empty
+  bar sounds like — the copy list for an unfinished score) and the recording's self-similarity by
+  section (does she repeat closely enough for repeat signs) — both one-off scripts, kept out until
+  a second piece wants them.
+- **Not written**: the owner has the analysis; the sync waits for their word.

@@ -168,10 +168,33 @@ and why, and record both columns in the run entry.
 
 - **Key fit not at +0**: the recording's capo or tuning differs from the score's. **Stop and
   ask** — usually the score's capo needs changing (Step 2's capo against the video).
-- **Tuning beyond ±35 cents**: matches may slip a semitone; carry on, but say so.
+- **Tuning beyond ±35 cents**: matches may slip a semitone, and near a quarter-tone most do —
+  the key fit then reads ±1 as well (run 9: a player at A=428, −48 cents). Retune the audio by
+  the measured amount and transcribe again: `ffmpeg -i $OUT/audio/source.wav -af
+  "rubberband=pitch=<2^(-cents/1200)>:transients=crisp:detector=percussive" $OUT/audio/retuned.wav`,
+  then `transcribe --audio` it (after any separation), and `check` should read near 0 cents.
 - **Ambiguous key fit**: the recording may not be this piece. Say so before going on.
 
 ## Step 5 — which bar is played when: `$PY structure --out $OUT`
+
+Two searches. The **free search** (the default) finds the order: any bar may follow any other,
+at a cost. The **fixed-order search** (`--fixed-order`) holds to the score's own performed order
+and only finds the timing; with `--near-sync [s]` each bar line also stays within `s` (0.3) of
+the recording's existing sync. Use the fixed order when the order is known and the free search
+cannot see it:
+
+- **Tightening an existing sync** whose order is right but timing is off (the Soundslice
+  imports: run 6's was early, run 9's 100–200 ms early) → `--fixed-order --near-sync`.
+- **An unfinished score** — empty bars fit anywhere in the free search (run 9: 20 departures on
+  a half-written score). Empty bars are placed by heard onsets and the tempo; a long run of them
+  needs `--near-sync`, or it stretches to fill whatever audio follows (run 9: up to 7 s).
+- **Lookalike bars** (riffs, run 4's repeated parts), where the free search's departures are
+  only it choosing between identical bars.
+
+The fixed order cannot report a departure; it says so instead with **weak runs** (three or more
+weak bars in a row) and **unexplained** notes before its first bar or after its last. Either
+one: run the free search and compare before believing the fixed one. Where both run, they
+should agree (the Jansch run: identical bar lines).
 
 Then read `$OUT/report.md`. Judge, in this order:
 
@@ -181,6 +204,7 @@ Then read `$OUT/report.md`. Judge, in this order:
 2. **Tempo.** A range that is musically impossible (a doubling, 400 bpm) means the search was
    forced; look at where the rows go wrong before believing anything after it.
 3. **Order.** *Follows the score's performed order* — yes is the case a sync can express.
+   (Fixed order: assumed, so read weak runs and unexplained notes here instead.)
    **Departures** (the performer repeated a section the score does not, skipped one, started
    mid-score) — **stop and present the options**: change the score's repeats so its performed
    order is what was played, then rerun; or sync only the stretch up to the departure; or (if

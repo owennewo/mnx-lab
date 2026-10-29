@@ -7,7 +7,8 @@
 //   npx vite-node --config vitest.config.ts tools/recording-align/align.ts -- <command> --out <dir> [options]
 //
 //   fetch  --piece <id> [--recording <id>]   the piece, its stored score and the recording to align
-//   score                                     the performed score: bar order, notes, structural starts
+//   score                                     the performed score: bar order, notes, structural starts,
+//                                             and the recording's existing sync as bar-line seconds
 //   audio  [--video <url>]                    the recording's audio as mono 22.05 kHz WAV (yt-dlp / the library)
 //   sync   [--write] [--replace]              the sync from structure.json; written only with --write
 //
@@ -30,6 +31,8 @@ import { linearizePasses } from '../../src/model/passes.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { segmentsFromBarStarts, syncpointsFromSegments, SYNC_SEGMENTS_FORMAT } from '../../src/model/syncSegments.ts';
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
+import { createRecordingSync } from '../../src/audio/recordingSync.ts';
+import { ZERO } from '../../src/audio/time.ts';
 import { checkStorage } from '../../src/importers/storageCheckCore.ts';
 import { derivedLibraryTags } from '../../src/model/libraryTags.ts';
 import { computeBothSystem } from '../../src/engine/headless.ts';
@@ -96,12 +99,19 @@ function score() {
   const p = compiled.performance;
   const measures = p.measures.map(m => ({ ordinal: m.ordinal, bar: m.measureIndex + 1, position: n(m.position), duration: n(m.duration), metricDuration: n(m.metricDuration) }));
   const sounding = p.sounding.map(s => ({ position: n(s.position), duration: n(s.duration), midi: s.midi }));
+  // What each bar's time signature holds, in whole notes: an unfinished score's placeholder rests
+  // rarely fill it exactly, so an empty bar is measured by this instead (align.py).
+  const signatures: number[] = [];
+  let time: { count: number; unit: number } | undefined;
+  for (const g of document.global.measures) { time = g.time ?? time; signatures.push(time ? time.count / time.unit : NaN); }
   // Each written bar's notes, from its first visit, as offsets in whole notes.
-  const written: Record<number, { duration: number; notes: [number, number][] }> = {};
+  const written: Record<number, { duration: number; signature: number | null; notes: [number, number][] }> = {};
   for (const m of measures) {
     if (written[m.bar]) continue;
-    written[m.bar] = { duration: m.metricDuration, notes: sounding.filter(s => s.position >= m.position - 1e-9 && s.position < m.position + m.duration - 1e-9).map(s => [s.position - m.position, s.midi]) };
+    const signature = signatures[m.bar - 1];
+    written[m.bar] = { duration: m.metricDuration, signature: Number.isFinite(signature) ? signature : null, notes: sounding.filter(s => s.position >= m.position - 1e-9 && s.position < m.position + m.duration - 1e-9).map(s => [s.position - m.position, s.midi]) };
   }
+  const misfits = Object.entries(written).filter(([, w]) => w.signature !== null && Math.abs(w.duration - w.signature) > 1e-9);
   // Where the score itself jumps: the bars a performance can plausibly restart at.
   const order = measures.map(m => m.bar);
   const edges = new Set<string>();
@@ -110,8 +120,21 @@ function score() {
     edges.add(`${order[i - 1]}>${order[i]}`);
     if (order[i] !== order[i - 1] + 1) starts.add(order[i]);
   }
+  // The recording's sync as it stands, as seconds at each performed bar line (and the end):
+  // what `structure --fixed-order --near-sync` tightens. Read through the player's own map.
+  const piece = existsSync(join(out, 'piece.json')) ? readJson('piece.json') : null;
+  let existingSync: (number | null)[] | null = null;
+  if (piece?.recording?.syncpoints) {
+    const map = createRecordingSync(JSON.parse(piece.recording.syncpoints), compiled, passes);
+    if (map.ok) {
+      existingSync = Array.from({ length: order.length + 1 }, (_, ordinal) => {
+        const at = map.value.secondsAt({ ordinal, metricOffset: ZERO });
+        return at.ok ? at.value : null;
+      });
+    } else console.log(`  the existing sync does not read against this score: ${map.diagnostic.message}`);
+  }
   const value = {
-    order, measures, sounding, written,
+    order, measures, sounding, written, existingSync,
     edges: [...edges].map(e => e.split('>').map(Number)),
     structuralStarts: [...starts].sort((a, b) => a - b),
     capo: document.parts.map(part => part._x?.mnxLab?.capo ?? 0),
@@ -123,6 +146,8 @@ function score() {
   console.log(`performed: ${order.length} bars (${Object.keys(written).length} written), order ${order.join(' ')}`);
   console.log(`capo ${value.capo.join('/')}; marked ${value.tempo[0]?.bpm ?? '?'} bpm (${(span * 4 * 60 / (value.tempo[0]?.bpm ?? 120)).toFixed(0)} s at that tempo); structural starts ${value.structuralStarts.join(' ')}`);
   for (const d of passes.diagnostics) console.log(`  pass diagnostic: bar ${d.measureIndex + 1} — ${d.message}`);
+  if (existingSync) console.log(`existing sync: ${existingSync.filter(x => x !== null).length} of ${existingSync.length} bar lines placed`);
+  if (misfits.length) console.log(`bars that hold more or less than their time signature: ${misfits.map(([bar, w]) => `${bar} (${w.duration} of ${w.signature}${w.notes.length ? '' : ', empty'})`).join(', ')}`);
 }
 
 /** The recording's audio, in a directory of its own (downloaded data stays apart from code). */
