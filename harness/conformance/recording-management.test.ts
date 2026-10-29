@@ -4,7 +4,7 @@ import { libraryDatabase, useLibraryRuntime } from '../helpers/libraryRuntime.ts
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library } from '../../worker/library/index.ts';
 import { RecordingManager } from '../../worker/library/recordings.ts';
-import { attachmentSync, storedSyncSegments, MAX_AUDIO_BYTES } from '../../src/model/recordingAttachment.ts';
+import { attachmentSync, storedSyncSegments, storedTuningCents, MAX_AUDIO_BYTES } from '../../src/model/recordingAttachment.ts';
 import { SYNC_SEGMENTS_FORMAT, emptySyncSegments, placeEnd, placeStart, setBpm } from '../../src/model/syncSegments.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -127,4 +127,35 @@ it('stamps a score shape into whatever provenance a recording has, without touch
   await db.prepare('UPDATE recordings SET provenance=NULL WHERE id=?').bind(take).run();
   await manager.save('alice','piece',take,resynced.piece.revision,{ name: 'Take', scoreShape: '4x1/1' });
   expect(JSON.parse((await row())!.provenance)).toEqual({ scoreShape: '4x1/1' });
+});
+// A recording off concert pitch (open E♭ at A=428 = open D +52): the synth following it shifts by it.
+it("keeps a recording's tuning beside its sync, through a new sync, until it is cleared", async () => {
+  const take = id();
+  const before = await manager.save('alice','piece',take,0,change);
+  const provenance = async () => (await db.prepare('SELECT provenance FROM recordings WHERE id=?').bind(take).first<{ provenance: string | null }>())!.provenance;
+  const tuned = await manager.save('alice','piece',take,before.piece.revision,{ name: 'Take', tuningCents: 52 });
+  expect(storedTuningCents(await provenance())).toBe(52);
+  expect(JSON.parse((await provenance())!)).toMatchObject({ format: 'soundslice-sync-array', tuningCents: 52 });
+  // A new sync replaces the provenance, and the tuning — the recording's, not the sync's — comes with it.
+  const resynced = await manager.save('alice','piece',take,tuned.piece.revision,{ name: 'Take', rawSync: [[0,0],[1,3]] });
+  expect(storedTuningCents(await provenance())).toBe(52);
+  // A shape stamp leaves it; null clears it; a value out of range or not a number is refused.
+  const shaped = await manager.save('alice','piece',take,resynced.piece.revision,{ name: 'Take', scoreShape: '4x1/1' });
+  expect(JSON.parse((await provenance())!)).toMatchObject({ scoreShape: '4x1/1', tuningCents: 52 });
+  await expect(manager.save('alice','piece',take,shaped.piece.revision,{ name: 'Take', tuningCents: 1201 })).rejects.toThrow('cents');
+  await expect(manager.save('alice','piece',take,shaped.piece.revision,{ name: 'Take', tuningCents: '52' as unknown as number })).rejects.toThrow('cents');
+  await manager.save('alice','piece',take,shaped.piece.revision,{ name: 'Take', tuningCents: null });
+  expect(storedTuningCents(await provenance())).toBeNull();
+  expect(JSON.parse((await provenance())!)).toHaveProperty('scoreShape', '4x1/1');
+});
+it("takes a recording's tuning over HTTP", async () => {
+  await db.prepare('INSERT INTO users (id,email,active,created_at) VALUES (?,?,1,?)').bind('alice','owner@example.test','now').run();
+  const identity=await testIdentity(); const jwt=await identity.sign(); const env={...identity.config,LIBRARY_DB:db,LIBRARY_BUCKET:bucket};
+  const take=id(), url='/api/library/pieces/piece/recordings/'+take;
+  const put=(body: unknown)=>realApp.request(url,{method:'PUT',headers:{'Content-Type':'application/json','Cf-Access-Jwt-Assertion':jwt},body:JSON.stringify(body)},env);
+  const made=await put({...change,expected_revision:0}); expect(made.status,await made.clone().text()).toBe(200);
+  const tuned=await put({name:'Take',tuningCents:-47.9,expected_revision:(await made.json()).snapshot.piece.revision});
+  expect(tuned.status,await tuned.clone().text()).toBe(200);
+  const row=(await tuned.json()).snapshot.recordings.find((r: { id: string })=>r.id===take);
+  expect(storedTuningCents(row.provenance)).toBe(-47.9);
 });

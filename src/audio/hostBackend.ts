@@ -95,6 +95,9 @@ export interface HostBackendOptions {
 export interface FollowSource {
   read(): MediaReading | null;
   readonly sync: RecordingSyncMap;
+  /** How far the recording sounds from the score's pitch, in cents: the synth plays along that far
+   *  from its own (a player tuned off concert pitch, as the recording's provenance says). Default 0. */
+  readonly tuningCents?: number;
 }
 /** The layers this host plays: the synth's notes, and the click with its level. */
 export interface HostLayers { synth: boolean; click: boolean; clickLevel: number }
@@ -467,7 +470,7 @@ export class HostBackend implements PlaybackBackend {
       this.following = undefined;
       return;
     }
-    const events = this.followEvents(source.sync);
+    const events = this.followEvents(source.sync, source.tuningCents ?? 0);
     if (this.following) { this.following.source = source; this.following.follower.replace(events); return; }
     const port = this.port;
     const follower = new MediaFollower({
@@ -486,13 +489,16 @@ export class HostBackend implements PlaybackBackend {
     this.following = { source, follower, timer: undefined };
     tick();
   }
-  private followEvents(sync: RecordingSyncMap): FollowEvents {
+  private followEvents(sync: RecordingSyncMap, tuningCents: number): FollowEvents {
     const warp = mediaWarp(this.performance, this.stream.secondsAt, sync);
+    // The synth takes a fractional pitch (mnx-sound/2's target.pitch is a number): the recording's tuning
+    // moves every pitched note, and leaves a kit's pieces where they are.
+    const notes = tuningCents ? this.notes.map(n => 'pitch' in n.target ? { ...n, target: { pitch: n.target.pitch + tuningCents / 100 } } : n) : this.notes;
     const clicks = this.clicking ? this.beats.flatMap(b => {
       const at = sync.secondsAt({ ordinal: b.ordinal, metricOffset: b.metricOffset });
       return at.ok ? [{ at: at.value, accent: b.accent }] : [];
     }) : [];
-    return { notes: warpNotes(this.notes, warp), clicks,
+    return { notes: warpNotes(notes, warp), clicks,
       bpmAt: media => { const synth = warp.toSynth(media); return synth === null ? 120 : this.bpmAt(synth) / warp.slope(synth); } };
   }
 

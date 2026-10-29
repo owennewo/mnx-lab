@@ -173,6 +173,10 @@ and why, and record both columns in the run entry.
   the measured amount and transcribe again: `ffmpeg -i $OUT/audio/source.wav -af
   "rubberband=pitch=<2^(-cents/1200)>:transients=crisp:detector=percussive" $OUT/audio/retuned.wav`,
   then `transcribe --audio` it (after any separation), and `check` should read near 0 cents.
+  Then, once the sync is written, give the recording its tuning so the synth following it matches it:
+  `$T tuning --cents <c> --write`, where `c` is how far the recording sounds from the SCORE's pitch —
+  run 9's open E♭ at A=428 against a score in open D is +52 (−48 from E♭: which one is the score's
+  naming, its key fit, not the audio's).
 - **Ambiguous key fit**: the recording may not be this piece. Say so before going on.
 
 ## Step 5 — which bar is played when: `$PY structure --out $OUT`

@@ -170,7 +170,7 @@ export class Player extends LitElement {
    *  the source, dropped when the synth is again. */
   private auditioner?: HostBackend;
   /** What `applyLayers` last applied, so a session's frequent frames cost nothing. */
-  private applied: { backend?: PlaybackBackend; key?: string; sync?: unknown; companion?: HostBackend } = {};
+  private applied: { backend?: PlaybackBackend; key?: string; sync?: unknown; companion?: HostBackend; tuning?: number } = {};
   private applying = false;
   /** A note an edit made or changed, sounded once the edit reaches the performance. */
   private pendingAudition?: { noteKey: string; ordinal: number; at: number };
@@ -1276,7 +1276,8 @@ export class Player extends LitElement {
       this.session.backend.setPartMix(this.partMix);
     if (changed.has('partMix')) this.auditioner?.setPartMix(this.partMix);
     if (changed.has('sampleRate') && changed.get('sampleRate') !== this.sampleRate) this.dropAuditioner();
-    if (changed.has('layers') || changed.has('sampleRate')) this.applyLayers();
+    // A recording's tuning arrives with the recordings: the companion follows it again when it moved.
+    if (changed.has('layers') || changed.has('sampleRate') || changed.has('recordings')) this.applyLayers();
   }
   /** The performance's notes by visit, for the parked cursor's lamp. */
   private writtenCache: { performance: Performance; byVisit: WrittenByVisit } | null = null;
@@ -1451,12 +1452,13 @@ export class Player extends LitElement {
         this.auditioner?.followMedia(null);
         return;
       }
-      const companion = this.companion();
-      this.applied = { backend, key, sync, companion };
+      const companion = this.companion(), tuning = this.activeRecording?.tuningCents ?? 0;
+      this.applied = { backend, key, sync, companion, tuning };
       if (fresh) backend.setLevel(layers.recordingLevel);
       if (fresh || before.companion !== companion) companion.setLayers(layers);
-      if (fresh || before.companion !== companion || before.sync !== sync) {
-        companion.followMedia({ sync, read: () => {
+      if (fresh || before.companion !== companion || before.sync !== sync || before.tuning !== tuning) {
+        // A recording off concert pitch (its tuning, in cents) is followed that far off.
+        companion.followMedia({ sync, tuningCents: tuning, read: () => {
           const s = backend.snapshot;
           return s.mediaTime === undefined ? null : { mediaTime: s.mediaTime, rate: s.rate, playing: s.state === 'playing' };
         } });

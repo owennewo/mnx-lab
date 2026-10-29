@@ -12,6 +12,8 @@
 //   audio  [--video <url>]                    the recording's audio as mono 22.05 kHz WAV (yt-dlp / the library)
 //   sync   [--write] [--replace [--shorter]]  the sync from structure.json; written only with --write; never
 //                                             over a sync covering more bars without --shorter
+//   tuning --cents <c> | --clear [--write]    how far the recording sounds from the score's pitch (the synth
+//                                             following it plays that far off)
 //
 // A piece that does not exist yet — written as tab text (tabText.ts), say read off a video:
 //
@@ -32,6 +34,7 @@ import { linearizePasses } from '../../src/model/passes.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { segmentsFromBarStarts, syncpointsFromSegments, decodeSyncSegments, SYNC_SEGMENTS_FORMAT } from '../../src/model/syncSegments.ts';
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
+import { storedTuningCents } from '../../src/model/recordingAttachment.ts';
 import { createRecordingSync } from '../../src/audio/recordingSync.ts';
 import { ZERO } from '../../src/audio/time.ts';
 import { checkStorage } from '../../src/importers/storageCheckCore.ts';
@@ -316,6 +319,28 @@ async function attach() {
   console.log(`attached recording ${id} (youtube ${recording.external_id}); piece revision ${body.snapshot.piece.revision}`);
 }
 
-const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, build, create, attach };
+/** The recording's tuning against the score's pitch, in cents: a player tuned off concert pitch (run 9:
+ *  open E♭ at A=428, the score in open D — +52). The synth following the recording shifts by it. */
+async function tuning() {
+  const value = flag('clear') ? null : Number(option('cents') ?? fail('--cents <c> or --clear is required'));
+  if (value !== null && !Number.isFinite(value)) fail('--cents takes a number of cents');
+  const { pieceId, recording } = readJson('piece.json');
+  if (!recording) fail('piece.json names no recording');
+  // Not read from check.json: its tuning is the audio's against concert pitch, before any retune, and only
+  // the nearest semitone's remainder — whether +52 or −48 is the score's question (its key fit), not the audio's.
+  const stored = storedTuningCents(recording.provenance);
+  console.log(`recording ${recording.id}: tuning ${stored === null ? 'unset' : `${stored} cents`} → ${value === null ? 'unset' : `${value} cents`}`);
+  if (!flag('write')) { console.log('dry run: nothing written (pass --write)'); return; }
+  const live = await (await api(`/pieces/${encodeURIComponent(pieceId)}`)).json();
+  const row = live.snapshot.recordings.find((r: { id: string }) => r.id === recording.id) ?? fail('the recording is no longer on the piece');
+  const response = await api(`/pieces/${encodeURIComponent(pieceId)}/recordings/${encodeURIComponent(row.id)}`, { method: 'PUT',
+    body: JSON.stringify({ expected_revision: live.snapshot.piece.revision, name: row.name || 'Recording', tuningCents: value }) });
+  const body = await response.json();
+  if (!response.ok) fail(`write refused (${response.status}): ${JSON.stringify(body)}`);
+  const saved = body.snapshot.recordings.find((r: { id: string }) => r.id === row.id);
+  console.log(`written: piece revision ${body.snapshot.piece.revision}; tuning ${storedTuningCents(saved.provenance) ?? 'unset'}`);
+}
+
+const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, build, create, attach, tuning };
 if (!commands[command]) fail(`unknown command ${command ?? '(none)'}; one of ${Object.keys(commands).join(', ')}`);
 await commands[command]();

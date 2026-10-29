@@ -51,6 +51,19 @@ export function storedScoreShape(provenance: unknown): string | null {
   const shape = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>).scoreShape : null;
   return typeof shape === 'string' && shape ? shape : null;
 }
+/** A recording's tuning is within an octave of the score's pitch. */
+export const MAX_TUNING_CENTS = 1200;
+/**
+ * How far a recording sounds from the score's own pitch, in cents, kept beside whatever else
+ * its provenance holds (worker/library/recordings.ts): a player tuned off concert pitch — open
+ * E♭ at A=428 is open D +52. The synth following the recording shifts by it. Null when unset.
+ */
+export function storedTuningCents(provenance: unknown): number | null {
+  let value = provenance;
+  if (typeof value === 'string') { try { value = JSON.parse(value); } catch { return null; } }
+  const cents = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>).tuningCents : null;
+  return typeof cents === 'number' && Number.isFinite(cents) && Math.abs(cents) <= MAX_TUNING_CENTS ? cents : null;
+}
 /** True for a sync with tuples and no segments: imported, bar-indexed, nothing to re-derive from. */
 export function isImportedSync(recording: { syncpoints: string | null; provenance?: unknown }): boolean {
   if (!recording.syncpoints || recording.syncpoints === 'null' || recording.syncpoints === '[]') return false;

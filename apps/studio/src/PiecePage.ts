@@ -67,7 +67,7 @@ import { documentLyricLineCount } from '../../../src/engine/layout/lyricRuns.ts'
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { MixLayers, Player, SyncEdit } from '../../../src/elements/Player.ts';
-import { isImportedSync, storedScoreShape, storedSyncSegments } from '../../../src/model/recordingAttachment.ts';
+import { isImportedSync, storedScoreShape, storedSyncSegments, storedTuningCents } from '../../../src/model/recordingAttachment.ts';
 import { performedShape } from '../../../src/audio/scoreShape.ts';
 import { SYNC_SEGMENTS_FORMAT, type StudioSyncPayload } from '../../../src/model/syncSegments.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
@@ -928,7 +928,8 @@ export class PiecePage extends LitElement {
       let syncpoints: unknown = null;
       try { syncpoints = r.syncpoints === null ? null : JSON.parse(r.syncpoints); } catch { syncpoints = r.syncpoints; }
       const syncSegments = storedSyncSegments(r.provenance) ?? undefined;
-      return r.kind === 'youtube' ? { kind: 'youtube', id: r.id, name: r.name || 'YouTube recording', video: r.external_id!, syncpoints, syncSegments } : { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints, syncSegments };
+      const cents = storedTuningCents(r.provenance), tuning = cents === null ? {} : { tuningCents: cents };
+      return r.kind === 'youtube' ? { kind: 'youtube', id: r.id, name: r.name || 'YouTube recording', video: r.external_id!, syncpoints, syncSegments, ...tuning } : { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints, syncSegments, ...tuning };
     });
     if (JSON.stringify(recordings) !== JSON.stringify(this.recordings)) this.recordings = recordings;
   }

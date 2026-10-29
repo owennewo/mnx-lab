@@ -11,6 +11,8 @@ export interface AudioRecordingSource {
   readonly syncpoints: unknown;
   /** The sync bar's authoring model, when this sync was made in Studio. */
   readonly syncSegments?: unknown;
+  /** How far the recording sounds from the score's pitch, in cents (storedTuningCents). */
+  readonly tuningCents?: number;
 }
 export interface YouTubeRecordingSource {
   readonly kind: 'youtube';
@@ -20,6 +22,7 @@ export interface YouTubeRecordingSource {
   readonly video: string;
   readonly syncpoints: unknown;
   readonly syncSegments?: unknown;
+  readonly tuningCents?: number;
 }
 export type RecordingSource = AudioRecordingSource | YouTubeRecordingSource;
 export interface PlaybackCapabilities {

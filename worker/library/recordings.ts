@@ -1,20 +1,32 @@
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
-import { attachmentSync, MAX_AUDIO_BYTES, MAX_SYNC_BYTES, AUDIO_FORMATS } from '../../src/model/recordingAttachment.ts';
+import { attachmentSync, storedTuningCents, MAX_AUDIO_BYTES, MAX_SYNC_BYTES, AUDIO_FORMATS, MAX_TUNING_CENTS } from '../../src/model/recordingAttachment.ts';
 import { youtubeVideoId } from '../../src/model/youtubeUrl.ts';
 import { Library } from './index.ts';
 import { LibraryError, json, type Json, type Recording, type Snapshot } from './types.ts';
 
 export interface RecordingChange { name: string; rawSync?: unknown; selectedId?: string | null; video?: string;
   /** The score shape this sync is known good for; null forgets it. Rides in the provenance, whatever else is there. */
-  scoreShape?: string | null }
+  scoreShape?: string | null;
+  /** How far the recording sounds from the score's own pitch, in cents (a player tuned off concert
+   *  pitch: open E♭ at A=428 is open D +52); null forgets it. Rides in the provenance like the shape,
+   *  but outlives a new sync — the tuning is the recording's, not the sync's. */
+  tuningCents?: number | null }
 interface Metadata { name: string; syncpoints: string | null; provenance: string | null; external_id: string | null }
 interface Upload { id: string; owner: string; piece_id: string; expected_revision: number; metadata: string; sha256: string; bytes: number; mime: string; state: 'pending' | 'complete' | 'cancelled'; expires_at: string }
 function invalid(message: string): never { throw new LibraryError('invalid', message); }
 function revision(value: number) { if (!Number.isSafeInteger(value) || value < 0 || value >= Number.MAX_SAFE_INTEGER) invalid('Expected the piece revision.'); }
 export function recordingId(id: string) { if (!/^studio-[0-9a-f-]{36}$/.test(id)) invalid('Expected a Studio recording ID.'); }
+/** The provenance with one key set beside whatever else it holds (null: removed). */
+function stamped(provenance: string | null, key: string, value: Json | null): string | null {
+  let held: Record<string, Json> = {};
+  try { const parsed = provenance === null ? null : JSON.parse(provenance); if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) held = parsed; } catch { /* unreadable provenance is replaced by the stamp alone */ }
+  if (value === null) delete held[key]; else held[key] = value;
+  return Object.keys(held).length ? json(held) : null;
+}
 function metadata(change: RecordingChange, old?: Recording): Metadata {
   if (typeof change.name !== 'string' || !change.name.trim() || change.name.length > 200) invalid('Name the recording (up to 200 characters).');
   let syncpoints = old?.syncpoints ?? null, provenance = old?.provenance ?? null;
+  const tuning = storedTuningCents(provenance);
   if (change.rawSync !== undefined || !old) {
     if (new TextEncoder().encode(JSON.stringify(change.rawSync ?? null)).length > MAX_SYNC_BYTES) invalid('Sync JSON exceeds 1 MiB.');
     try {
@@ -25,10 +37,13 @@ function metadata(change: RecordingChange, old?: Recording): Metadata {
   }
   if (change.scoreShape !== undefined) {
     if (change.scoreShape !== null && (typeof change.scoreShape !== 'string' || !change.scoreShape || change.scoreShape.length > 4096)) invalid('A score shape is up to 4096 characters.');
-    let held: Record<string, Json> = {};
-    try { const parsed = provenance === null ? null : JSON.parse(provenance); if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) held = parsed; } catch { /* unreadable provenance is replaced by the stamp alone */ }
-    if (change.scoreShape === null) delete held.scoreShape; else held.scoreShape = change.scoreShape;
-    provenance = Object.keys(held).length ? json(held) : null;
+    provenance = stamped(provenance, 'scoreShape', change.scoreShape);
+  }
+  // A new sync replaces the provenance; the recording's tuning is carried over unless this change sets it.
+  const cents = change.tuningCents !== undefined ? change.tuningCents : change.rawSync !== undefined && tuning !== null ? tuning : undefined;
+  if (cents !== undefined) {
+    if (cents !== null && (typeof cents !== 'number' || !Number.isFinite(cents) || Math.abs(cents) > MAX_TUNING_CENTS)) invalid(`A recording's tuning is a number of cents within ±${MAX_TUNING_CENTS}.`);
+    provenance = stamped(provenance, 'tuningCents', cents);
   }
   let external_id = old?.external_id ?? null;
   if (change.video !== undefined) { try { external_id = youtubeVideoId(change.video); } catch (e) { invalid(String(e instanceof Error ? e.message : e)); } }
