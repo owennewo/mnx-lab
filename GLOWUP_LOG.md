@@ -191,10 +191,21 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   its bars 2 and 4, a D♯5 at its end.
 - **The 4th chorus opening, 86–89, drafted** (revision 22) and banked: the chorus bass (F2 G2 G♯2
   G2) under a different top — A♯3+C4 restruck on the eighths, G4 and F4 above.
-- Open, to draft a section at a time:
-  the fourth chorus's opening 86–89 (a variation), bridge 46–51, the line over the outro 104–108,
-  the ending 110–111. To listen to: bars 18/36's downbeat; bars 42/54's last eighth (G2 a beat
-  early?).
+- **The outro, 104–109**: a redraft from the recording (revision 23) read as strumming — it was the
+  transcriber re-reporting the whole ringing chord on every eighth, and the owner heard the opening
+  riff; replaced by bars 8–13 again, bar for bar (revision 24, 87–100% of each bar's notes found).
+  The owner then added slaps on 2 and 4 to bar 109.
+- **The ending**: bar 109 slows into one chord at 238.29 s (open D♯2 A♯2 D♯3 under A♯3 D4 D♯4) that
+  rings to the end of the video. Bar 110 is a 6/8 bar holding it — with the 6/8 pickup, one whole
+  bar (the owner's reading) — and bar 111 is gone (revision 25); 110 bars. No fermata: Guitar Pro
+  storage does not carry one yet. The sync was rewritten to 110 bars (`--shorter`, revision 26).
+- **The bridge, 46–51**: a two-bar unit played three times, drafted from its passes voting; bar 51
+  keeps the third pass's F-minor chord into the chorus (revision 28). The owner: bar 47's chord is
+  up the neck, not open — the second bar of the unit refingered at frets 2–7 (revision 30). Sync
+  rewritten for the bridge's bar lengths (revision 29).
+- **Every bar is now written**: 93% of written notes found (87% exact) against 40% chance.
+- Open: the notes check over all 110 bars (bar 13's beats 2 and 4 score like slaps; bars 18/36's
+  downbeat; bars 42/54's last eighth), then repeats, then the final sync.
 
 ### 2026-10-28 — Blackbird (Beatles) · `b0bcd1230724657d`
 

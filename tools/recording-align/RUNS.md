@@ -385,3 +385,15 @@ to do — each is a gap to close.
   rather than snapping it onto beat 1 — bar 86's downbeat F2, 20 ms early, was lost. Drafting a
   section from the middle of a piece, notes up to 50 ms before its first bar line are now moved
   onto it first.
+- **The same chord reported on every eighth is ringing, not strumming** (the outro): the transcriber
+  re-reports a held chord, open strings and all, each time something new is plucked — six notes
+  twelve times in a bar. I read it as strumming and saw strumming in the video because I expected
+  it; the owner heard the opening riff, and bars 8–13 fit. Look for a repeated identical cluster
+  before believing a dense bar; the video confirms nothing it is asked leading questions.
+- **A ringing final chord breaks the bar search's tempo model**: bar 109 slows, the last chord
+  rings 11.6 s; bar 110 placed by hand from the chord's attack to the end of the recording.
+- **The fret step prefers open strings, and in an open tuning that is often wrong** (the bridge's
+  bar 47: an E♭ chord at frets 5-4-3-5 drafted as open strings). A per-bar position hint — from the
+  video or the owner — is the next thing the drafting step needs; here a no-open re-run did it.
+- **A unit can be shorter than a section**: the bridge is a two-bar unit played three times — one
+  analysis compared its halves misaligned (0.14) and called it unrepeated. Vote over the unit.
