@@ -95,9 +95,6 @@ export interface HostBackendOptions {
 export interface FollowSource {
   read(): MediaReading | null;
   readonly sync: RecordingSyncMap;
-  /** How far the recording sounds from the score's pitch, in cents: the synth plays along that far
-   *  from its own (a player tuned off concert pitch, as the recording's provenance says). Default 0. */
-  readonly tuningCents?: number;
 }
 /** The layers this host plays: the synth's notes, and the click with its level. */
 export interface HostLayers { synth: boolean; click: boolean; clickLevel: number }
@@ -159,6 +156,8 @@ export class HostBackend implements PlaybackBackend {
   private readonly timers: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
   private readonly monotonic: () => number;
   private following: { source: FollowSource; follower: MediaFollower; timer: unknown } | undefined;
+  /** How far from the score's pitch every note is played, in cents (`setTuning`). */
+  private tuning = 0;
   private readonly lead: number;
   private readonly ahead: number;
   private readonly clock: Clock;
@@ -403,7 +402,7 @@ export class HostBackend implements PlaybackBackend {
       return [t];
     });
     v.emitted.add(n.id);
-    const { techniques: _, ...rest } = n;
+    const { techniques: _, ...rest } = this.tuned(n);
     return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - n.at) / v.speed), ...(techniques.length ? { techniques } : {}) };
   }
   /** A note already sounding where play starts: struck again there, for what is left of it. */
@@ -411,8 +410,25 @@ export class HostBackend implements PlaybackBackend {
     const end = Math.min(n.at + n.duration, v.ve);
     const techniques = (n.techniques ?? []).filter(t => t.type === 'mute' || t.type === 'harmonic');
     v.emitted.add(n.id);
-    const { techniques: _, ...rest } = n;
+    const { techniques: _, ...rest } = this.tuned(n);
     return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - v.vs) / v.speed), ...(techniques.length ? { techniques } : {}) };
+  }
+
+  /**
+   * Play every note this far from the score's pitch, in cents — the pitch of the recording played
+   * along with (a player tuned off concert pitch: open E♭ at A=428 against a score in open D is +52).
+   * Playing, following and a clicked note alike; a plan or a recording followed is sent again.
+   */
+  setTuning(cents: number) {
+    if (this.closed || cents === this.tuning) return;
+    this.tuning = cents;
+    if (this.plan) this.dirty = true;
+    if (this.following) this.following.follower.replace(this.followEvents(this.following.source.sync));
+  }
+  /** The synth takes a fractional pitch (mnx-sound/2's target.pitch is a number): the tuning moves every
+   *  pitched note, and leaves a kit's pieces where they are. */
+  private tuned(n: Note): Note {
+    return this.tuning && 'pitch' in n.target ? { ...n, target: { pitch: n.target.pitch + this.tuning / 100 } } : n;
   }
 
   /**
@@ -470,7 +486,7 @@ export class HostBackend implements PlaybackBackend {
       this.following = undefined;
       return;
     }
-    const events = this.followEvents(source.sync, source.tuningCents ?? 0);
+    const events = this.followEvents(source.sync);
     if (this.following) { this.following.source = source; this.following.follower.replace(events); return; }
     const port = this.port;
     const follower = new MediaFollower({
@@ -489,11 +505,9 @@ export class HostBackend implements PlaybackBackend {
     this.following = { source, follower, timer: undefined };
     tick();
   }
-  private followEvents(sync: RecordingSyncMap, tuningCents: number): FollowEvents {
+  private followEvents(sync: RecordingSyncMap): FollowEvents {
     const warp = mediaWarp(this.performance, this.stream.secondsAt, sync);
-    // The synth takes a fractional pitch (mnx-sound/2's target.pitch is a number): the recording's tuning
-    // moves every pitched note, and leaves a kit's pieces where they are.
-    const notes = tuningCents ? this.notes.map(n => 'pitch' in n.target ? { ...n, target: { pitch: n.target.pitch + tuningCents / 100 } } : n) : this.notes;
+    const notes = this.tuning ? this.notes.map(n => this.tuned(n)) : this.notes;
     const clicks = this.clicking ? this.beats.flatMap(b => {
       const at = sync.secondsAt({ ordinal: b.ordinal, metricOffset: b.metricOffset });
       return at.ok ? [{ at: at.value, accent: b.accent }] : [];

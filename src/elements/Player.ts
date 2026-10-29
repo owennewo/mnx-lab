@@ -170,7 +170,7 @@ export class Player extends LitElement {
    *  the source, dropped when the synth is again. */
   private auditioner?: HostBackend;
   /** What `applyLayers` last applied, so a session's frequent frames cost nothing. */
-  private applied: { backend?: PlaybackBackend; key?: string; sync?: unknown; companion?: HostBackend; tuning?: number } = {};
+  private applied: { backend?: PlaybackBackend; key?: string; sync?: unknown; companion?: HostBackend } = {};
   private applying = false;
   /** A note an edit made or changed, sounded once the edit reaches the performance. */
   private pendingAudition?: { noteKey: string; ordinal: number; at: number };
@@ -1276,8 +1276,8 @@ export class Player extends LitElement {
       this.session.backend.setPartMix(this.partMix);
     if (changed.has('partMix')) this.auditioner?.setPartMix(this.partMix);
     if (changed.has('sampleRate') && changed.get('sampleRate') !== this.sampleRate) this.dropAuditioner();
-    // A recording's tuning arrives with the recordings: the companion follows it again when it moved.
-    if (changed.has('layers') || changed.has('sampleRate') || changed.has('recordings')) this.applyLayers();
+    // A recording's tuning arrives with the recordings, and which recording is chosen can move it.
+    if (changed.has('layers') || changed.has('sampleRate') || changed.has('recordings') || changed.has('recordingChoice')) this.applyLayers();
   }
   /** The performance's notes by visit, for the parked cursor's lamp. */
   private writtenCache: { performance: Performance; byVisit: WrittenByVisit } | null = null;
@@ -1434,6 +1434,9 @@ export class Player extends LitElement {
    */
   private applyLayers() {
     const backend = this.session?.backend, layers = this.layers;
+    // The synth plays at the pitch of the recording played along with, leading or not.
+    if (backend instanceof HostBackend) backend.setTuning(this.tuning);
+    this.auditioner?.setTuning(this.tuning);
     if (!backend || !layers || this.applying) return;
     // What is applied is noted first: a backend that notifies as it is set must not loop back here.
     this.applying = true;
@@ -1452,13 +1455,12 @@ export class Player extends LitElement {
         this.auditioner?.followMedia(null);
         return;
       }
-      const companion = this.companion(), tuning = this.activeRecording?.tuningCents ?? 0;
-      this.applied = { backend, key, sync, companion, tuning };
+      const companion = this.companion();
+      this.applied = { backend, key, sync, companion };
       if (fresh) backend.setLevel(layers.recordingLevel);
       if (fresh || before.companion !== companion) companion.setLayers(layers);
-      if (fresh || before.companion !== companion || before.sync !== sync || before.tuning !== tuning) {
-        // A recording off concert pitch (its tuning, in cents) is followed that far off.
-        companion.followMedia({ sync, tuningCents: tuning, read: () => {
+      if (fresh || before.companion !== companion || before.sync !== sync) {
+        companion.followMedia({ sync, read: () => {
           const s = backend.snapshot;
           return s.mediaTime === undefined ? null : { mediaTime: s.mediaTime, rate: s.rate, playing: s.state === 'playing' };
         } });
@@ -1467,9 +1469,16 @@ export class Player extends LitElement {
   }
   /** The player's own synth while a recording is the source (`auditioner`). */
   private companion() {
-    return this.auditioner ??= new HostBackend(this.performance!, this.document ?? NO_DOCUMENT,
-      new NativeHostPort({ volume: this.volume, sampleRate: this.sampleRate }), { volume: this.volume, partMix: this.partMix }, () => {});
+    if (!this.auditioner) {
+      this.auditioner = new HostBackend(this.performance!, this.document ?? NO_DOCUMENT,
+        new NativeHostPort({ volume: this.volume, sampleRate: this.sampleRate }), { volume: this.volume, partMix: this.partMix }, () => {});
+      this.auditioner.setTuning(this.tuning);
+    }
+    return this.auditioner;
   }
+  /** How far from the score's pitch the synth plays, in cents: the tuning of the recording played
+   *  along with (`chosenRecording` — the one playing, else the host's choice, else the first). */
+  private get tuning() { return this.chosenRecording?.tuningCents ?? 0; }
   /**
    * An edit: the same document with a new performance. The session and its backend stay;
    * the backend takes the performance in place. A recording's sync is derived again against
@@ -1596,9 +1605,12 @@ export class Player extends LitElement {
   }
   private soundNote(noteKey: string, ordinal: number): boolean {
     const backend = this.session?.backend;
-    if (backend instanceof HostBackend) { this.dropAuditioner(); return backend.audition(noteKey, ordinal); }
+    // A clicked note sounds at the pitch the synth plays along at (`tuning`).
+    if (backend instanceof HostBackend) { this.dropAuditioner(); backend.setTuning(this.tuning); return backend.audition(noteKey, ordinal); }
     if (!this.performance) return false;
-    return this.companion().audition(noteKey, ordinal);
+    const companion = this.companion();
+    companion.setTuning(this.tuning);
+    return companion.audition(noteKey, ordinal);
   }
   private dropAuditioner() { this.auditioner?.dispose(); this.auditioner = undefined; this.applied = { ...this.applied, companion: undefined }; }
   stop() { this.localError = ''; this.session?.stop(); }

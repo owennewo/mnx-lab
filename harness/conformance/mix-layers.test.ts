@@ -206,26 +206,49 @@ it('following a recording, each note and beat is sent the output\'s latency earl
   r.backend.dispose();
 }, 60_000);
 
-it("a recording off concert pitch is followed that far off: every pitched note shifted by its tuning, the warp unchanged", async () => {
-  const sent = async (tuningCents?: number) => {
+// A recording off concert pitch (open E♭ at A=428 against a score in open D: +52) — the synth plays at
+// its pitch everywhere: following it, playing on its own, and a clicked note.
+it("the synth's tuning moves every pitched note it sends, following, playing and auditioning — timing unchanged", async () => {
+  const pitch = (n: Note) => (n.target as { pitch: number }).pitch;
+  const written = (r: ReturnType<typeof rig>, n: Note) => pitch(r.stream.notes.find(m => m.id === base(n.id))!);
+  const following = async (cents: number) => {
     const r = rig(), sync = slowRecording(r, 3);
     const media = { time: 2, rate: 1, playing: true, at: r.port.now() };
     const read = () => ({ mediaTime: media.time + (r.port.now() - media.at) * media.rate, rate: media.rate, playing: media.playing });
     r.backend.setLayers({ synth: true, click: false, clickLevel: 0 });
-    r.backend.followMedia({ read, sync, ...(tuningCents === undefined ? {} : { tuningCents }) });
+    r.backend.setTuning(cents);
+    r.backend.followMedia({ read, sync });
     await r.run(4);
     const notes = r.port.batches.flatMap(b => b.notes);
-    const warned = warnings(r.port);
     r.backend.followMedia(null); r.backend.dispose();
-    return { notes, warned, stream: r.stream };
+    return { r, notes };
   };
-  const plain = await sent(), tuned = await sent(52);
+  const plain = await following(0), tuned = await following(52);
   expect(plain.notes.length).toBeGreaterThan(0);
   expect(tuned.notes.map(n => [n.id, n.at, n.duration])).toEqual(plain.notes.map(n => [n.id, n.at, n.duration]));
-  for (const [i, n] of tuned.notes.entries()) {
-    const written = (plain.stream.notes.find(m => m.id === base(n.id))!.target as { pitch: number }).pitch;
-    expect((plain.notes[i]!.target as { pitch: number }).pitch).toBe(written);
-    expect((n.target as { pitch: number }).pitch).toBeCloseTo(written + 0.52, 9);
-  }
-  expect(tuned.warned, JSON.stringify(tuned.warned)).toEqual([]);
+  for (const n of plain.notes) expect(pitch(n)).toBe(written(plain.r, n));
+  for (const n of tuned.notes) expect(pitch(n)).toBeCloseTo(written(tuned.r, n) + 0.52, 9);
+
+  // Playing on its own, and set while following: the notes still to come are sent again, tuned.
+  const r = rig();
+  r.backend.setLayers({ synth: true, click: false, clickLevel: 0 });
+  await r.backend.play(); await r.flush();
+  await r.run(1);
+  r.port.batches = [];
+  r.backend.setTuning(-48);
+  await r.run(2);
+  const later = r.port.batches.flatMap(b => b.notes);
+  expect(later.length).toBeGreaterThan(0);
+  for (const n of later) expect(pitch(n)).toBeCloseTo(written(r, n) - 0.48, 9);
+  r.backend.pause(); await r.run(0.3);
+
+  // A clicked note.
+  r.port.batches = [];
+  const key = r.performance.written.find(w => w.soundingIds.length)!;
+  expect(r.backend.audition(key.noteKey, key.ordinal)).toBe(true); await r.flush(); await r.run(0.2);
+  const clicked = r.port.batches.flatMap(b => b.notes);
+  expect(clicked.length).toBeGreaterThan(0);
+  for (const n of clicked) expect(pitch(n)).toBeCloseTo(written(r, n) - 0.48, 9);
+  expect(warnings(r.port), JSON.stringify(warnings(r.port))).toEqual([]);
+  r.backend.dispose();
 });
