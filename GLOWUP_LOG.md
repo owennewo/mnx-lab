@@ -218,6 +218,12 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   slap-like beats 2 and 4 in intro bar 2. Dismissed as artefacts: grace notes heard a sixteenth off,
   bar 109's slowing, the interlude's light beat-2 slaps. The findings file and the session's tools
   are in `.scratchpad/glowup/` (not tracked).
+- **Tuning named as open D** (DADF♯AD; revision 32), at the owner's wish — the commoner name for the
+  same frets: every pitch a semitone down, frets unchanged, the library's tuning tag following. Her
+  A=428 open E♭ is open D **+52 cents** (−47.9 from E♭). Published MNX, `_x.mnxLab` and the `.gp`
+  storage carry no cents offset, so the synth plays 52 cents flat of the video; the offset belongs
+  to the recording, not the score — to raise as a proposal. Re-running the analysis: retune the
+  audio −52 cents (to D at A440), not +48.
 - **Not done**: repeats (the interlude ×3 and the bridge unit ×3 are written identically, ready to
   fold; the owner's rule — merge passes a note apart); the final sync on the finished score — the
   current one already covers all 110 bars with every bar's beats matching.
