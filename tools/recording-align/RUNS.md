@@ -334,4 +334,20 @@ to do — each is a gap to close.
   bar sounds like — the copy list for an unfinished score) and the recording's self-similarity by
   section (does she repeat closely enough for repeat signs) — both one-off scripts, kept out until
   a second piece wants them.
-- **Not written**: the owner has the analysis; the sync waits for their word.
+- **Then, with the owner's go-ahead** (same day): five named versions corrected the written half
+  (GLOWUP_LOG.md has the list), and the sync was replaced by the fixed-order search, held near
+  the old one (revision 11): no weak bars, 89% / 82% found against 44% chance.
+- **Slaps** (thumb hits on beats 2 and 4, written as dead notes): MuScriptor's guitar transcription
+  hears each as ~4 pitched notes (open D♯2 + D♯3 and the held chord); `transcribe --instruments
+  acoustic_guitar,drums` hears them as snare / side-stick hits (81, recall ~60%, precise where
+  checked); a high-band percussive onset measure (HPSS, 2–8 kHz) separates them from plain beats
+  (median 1.9 against 0.6). The video settled the in-between ones: a lighter slap, not a missing
+  one. Studio plays a dead note at its open string's pitch, so a slap written on string 5 reads
+  as a "missing A♯2" to the notes check.
+- **A weak bar at a tempo jump can be a bar of another length**: bar 5 measured as an 8% rush the
+  search's tempo smoothing could not follow; its eighths were even — it is 11/8. Read the heard
+  onsets of a weak bar before blaming the transcription.
+- **Gaps**: `transcribe` with `drums` kept writes the hits into `notes.json` as pitches (D2, C♯2)
+  — percussion wants a file of its own, and the notes check should judge a dead note against it;
+  the edits were a one-off script (`save-version`: export check, other bars unchanged, a picture,
+  a named version) — run 4's and run 6's gap a third time, so it now earns a tool.

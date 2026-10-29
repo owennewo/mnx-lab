@@ -70,7 +70,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Eleanor Rigby | Beatles (fingerstyle book) | `243e798f04b5ff1f` |  | no recording |  |  |  |
 | Erwan | Meic Stevens | `2ba9acbdad27fe6b` |  | Soundslice |  |  |  |
 | Every Breath You Take | The Police | `05fa6b889b0481b6` |  | Soundslice |  |  |  |
-| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` |  | Soundslice |  |  |  |
+| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 (interim) | 🟡 10-29 | 🟡 10-29 | — |
 | Fast Car | Tracy Chapman | `10537b9c88cc5329` |  | Soundslice |  |  |  |
 | Fingerstyle Mastery: Travis Picking Part 2 | Mike Dawes | `8dee0f5649ee664d` |  | no recording |  |  |  |
 | Freight Train | Elizabeth Cotton | `b9cc081329df0d07` |  | Soundslice |  |  |  |
@@ -143,6 +143,36 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-10-29 — Everybody Wants To Rule The World (Gabriella Quevedo's arrangement) · `2b156138db0c7716` — [run 9](tools/recording-align/RUNS.md#run-9--2026-10-29--everybody-wants-to-rule-the-world-gabriella-quevedo-the-fixed-order-search) · in progress
+
+The first piece put through the glow-up on purpose. The owner's transcription covers bars 1–45
+and 52–57 of 111; the rest are placeholder bars. Recording YouTube `aqx5AO4fxDU`, guitar alone,
+Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
+
+- **Notes** 🟡 (the written half), five named versions, each checked so that no other bar moves:
+  bar 1 is the pickup she plays (six eighths in 6/8); slaps she plays and the score left out
+  (beat 4 in bars 10 12 14 18 32 36, beats 2 and 4 in every chorus — heard by MuScriptor's
+  `drums` and a percussive measure, two of them confirmed on the video); the F♯–G ornament on
+  beat 3 in bars 19 21 37 39; chorus bar 6 (27 45 57) ending F3 pulled off to D♯3; bar 5 is
+  11/8 (she drops an eighth before bar 6).
+- **Sync**: the Soundslice sync was 100–200 ms early. Replaced (revision 11) by the fixed-order
+  search held near it — interim, for transcribing along to the video; the final sync comes when
+  the score is complete. Every written bar now matches; 89% of written notes found against 44%
+  chance (the riff makes chance high). The Soundslice sync is kept in the run directory.
+- **Slaps**: none of the written ones turned out to be missing; the writing had too few, not too
+  many. A slap is heard by the guitar transcriber as a burst of pitched notes (open D♯2 + D♯3
+  and the held chord) — only the `drums` instrument hears it as a hit.
+- **Owner's direction** (2026-10-29), for the repeats step: *"if bars are almost the same in a
+  repeat e.g. one note difference (perhaps a mistake or mishear) then I'd accept the
+  merge/repeat. i.e. a slight preference for repeats"*.
+- **The plan, agreed**: notes before repeats (a repeat claims the passes are the same, which only
+  the written-out check can show); the written half corrected in one go; the empty half a section
+  at a time — the chorus and outro copies first, then drafts of the solos, interludes and bridge
+  with slaps from the start; then a notes check over every pass; then repeats; then the final sync.
+- Open: everything after bar 57 except bar 52–57's chorus; to listen to — chorus bar 5's bass
+  (F2/G2 written, D♯2 heard at slap-like moments), bars 18/36's downbeat, the G2 bass in the
+  later choruses' bar 3 (42, 54).
 
 ### 2026-10-28 — Blackbird (Beatles) · `b0bcd1230724657d`
 
