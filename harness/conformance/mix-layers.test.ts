@@ -107,6 +107,12 @@ it('with the click off, a port without levels hears no beats; a port with levels
   expect(switched.port.levels.at(-1)).toEqual({ synth: 0, click: 0 });
   switched.backend.setLayers({ synth: true, click: true, clickLevel: 0.4 });
   expect(switched.port.levels.at(-1)).toEqual({ synth: 1, click: 0.4 });
+  // The synth's own level (the Mix panel's Synth heading, over every part's), off still silencing it.
+  switched.backend.setLayers({ synth: true, click: true, clickLevel: 0.4, synthLevel: 0.5 });
+  expect(switched.port.levels.at(-1)).toEqual({ synth: 0.5, click: 0.4 });
+  switched.backend.setLayers({ synth: false, click: true, clickLevel: 0.4, synthLevel: 0.5 });
+  expect(switched.port.levels.at(-1)).toEqual({ synth: 0, click: 0.4 });
+  switched.backend.setLayers({ synth: true, click: true, clickLevel: 0.4 });
   await switched.run(0.1); await switched.backend.play(); await switched.flush(); await switched.run(3);
   expect(switched.port.clicks.length).toBeGreaterThan(4);
 }, 60_000);

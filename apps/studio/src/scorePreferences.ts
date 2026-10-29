@@ -162,7 +162,7 @@ export function normalizePiecePrefs(raw: unknown): PiecePreferences {
 }
 /** The layers a piece opens with when nothing is stored: the synth, no click — and, where a
  *  recording was stored as what plays, the recording alone, as before the layers. */
-export const DEFAULT_LAYERS: MixLayers = Object.freeze({ synth: true, click: false, clickLevel: 0.6, recordingLevel: 1 });
+export const DEFAULT_LAYERS: MixLayers = Object.freeze({ synth: true, click: false, clickLevel: 0.6, recordingLevel: 1, synthLevel: 1 });
 export function normalizeLayers(raw: unknown): MixLayers {
   const source = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const level = (v: unknown, d: number) => typeof v === 'number' && v >= 0 && v <= 1 ? v : d;
@@ -171,6 +171,7 @@ export function normalizeLayers(raw: unknown): MixLayers {
     click: typeof source.click === 'boolean' ? source.click : DEFAULT_LAYERS.click,
     clickLevel: level(source.clickLevel, DEFAULT_LAYERS.clickLevel),
     recordingLevel: level(source.recordingLevel, DEFAULT_LAYERS.recordingLevel),
+    synthLevel: level(source.synthLevel, DEFAULT_LAYERS.synthLevel!),
   };
 }
 /** Key order never decides whether preferences changed. */

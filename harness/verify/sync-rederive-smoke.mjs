@@ -79,12 +79,10 @@ try {
    player.shadowRoot.querySelector('[data-mix-open]').click();
    await until(()=>page.shadowRoot.querySelector('mnx-studio-mix')?.shadowRoot?.querySelectorAll('[data-source]').length===3,'no Mix panel');
    const sheet=page.shadowRoot.querySelector('mnx-studio-mix').shadowRoot;
-   // The chosen recording's row says how it follows the score: each in turn.
-   const sub=async name=>{[...sheet.querySelectorAll('[data-source]')].find(s=>s.textContent.includes(name)).click();
-     await until(()=>sheet.querySelector('.ch [data-edit]')?.closest('.ch')?.textContent.includes(name),'did not choose '+name);
-     return sheet.querySelector('.ch [data-edit]').textContent;};
-   for(const [name,says] of [['Studio take','follows the whole score'],['Imported, never opened','follows the whole score'],['Imported, other bars','may be out of date']]){
-     const text=await sub(name);check(text.includes(says),name+': '+text);}
+   // The list marks the recording whose sync to distrust, by its name; the others carry no mark.
+   const mark=name=>[...sheet.querySelectorAll('[data-source]')].find(s=>s.textContent.includes(name))?.querySelector('[data-alarm]')?.dataset.alarm??'';
+   for(const [name,says] of [['Studio take',''],['Imported, never opened',''],['Imported, other bars','may be out of date']]){
+     check(mark(name)===says,name+': '+JSON.stringify(mark(name)));}
    await player.selectSource(rows[2].id);
    await until(()=>!!sheet.querySelector('[data-out-of-date]'),'no out-of-date explanation for the playing recording');
    player.pause();

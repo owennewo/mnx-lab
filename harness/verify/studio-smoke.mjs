@@ -159,7 +159,10 @@ try {
   // A lone part cannot leave the score; a level and a sound reach the player's mix and the
   // per-piece preference, and the click layer reaches the player and the tray.
   await wait(`${part}.querySelector('button[aria-label^="Hide"]').disabled`);
-  await c.evaluate(`{ const r = ${part}.querySelector('input[type=range]'); r.value = '0.5'; r.dispatchEvent(new Event('input')); }`);
+  // A lone part's level is the Synth heading's slider: the part's row keeps its sound, not a second slider.
+  const partLevel = `${mix}?.querySelector('section[aria-label="Synth"] .head input[type=range]')`;
+  assert.equal(await c.evaluate(`!${part}.querySelector('input[type=range]') && ${partLevel}.getAttribute('aria-label').endsWith(' volume')`), true, 'a lone part\'s level is not in the Synth heading');
+  await c.evaluate(`{ const r = ${partLevel}; r.value = '0.5'; r.dispatchEvent(new Event('input')); }`);
   await wait(`${player}.partMix[0]?.volume === 0.5 && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].volume === 0.5`);
   await c.evaluate(`${mix}.querySelector('[data-layer="click"]').click()`);
   await wait(`${player}.layers.click === true && ${player}.shadowRoot.querySelector('[data-layer="click"]').getAttribute('aria-pressed') === 'true' && ${handle}.getAttribute('aria-label').startsWith('Mix: Synth + Click')`);
@@ -171,7 +174,7 @@ try {
   await wait(`${player}.masterVolume === 0.5 && ${handle}.getAttribute('aria-label').endsWith('master 50')`);
   const mixShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-mix.png',Buffer.from(mixShot.result.data,'base64'));
   // Put the mix back so the next run starts from the default.
-  await c.evaluate(`{ const r = ${part}.querySelector('input[type=range]'); r.value = '1'; r.dispatchEvent(new Event('input')); }`);
+  await c.evaluate(`{ const r = ${partLevel}; r.value = '1'; r.dispatchEvent(new Event('input')); }`);
   await c.evaluate(`${player}.shadowRoot.querySelector('[data-layer="click"]').click()`);
   await c.evaluate(`{ const s = ${mix}.querySelector('select'); s.value = s.options[0].value; s.dispatchEvent(new Event('change')); }`);
   await c.evaluate(`{ const r = ${mix}.querySelector('input[aria-label="Master volume"]'); r.value = '0.7'; r.dispatchEvent(new Event('input')); }`);

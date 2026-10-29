@@ -97,7 +97,11 @@ export interface FollowSource {
   readonly sync: RecordingSyncMap;
 }
 /** The layers this host plays: the synth's notes, and the click with its level. */
-export interface HostLayers { synth: boolean; click: boolean; clickLevel: number }
+export interface HostLayers {
+  synth: boolean; click: boolean; clickLevel: number;
+  /** The synth's level under the master, over every part's own (default 1). */
+  synthLevel?: number;
+}
 
 /** The stream's controls are its tempo changes (contractStream.ts). */
 type Tempo = { id: string; at: number; type: 'tempo'; bpm: number };
@@ -469,7 +473,7 @@ export class HostBackend implements PlaybackBackend {
   setLayers(layers: HostLayers) {
     if (this.closed) return;
     this.layers = { ...layers };
-    this.port.setLevels?.({ synth: layers.synth ? 1 : 0, click: layers.click ? layers.clickLevel : 0 });
+    this.port.setLevels?.({ synth: layers.synth ? layers.synthLevel ?? 1 : 0, click: layers.click ? layers.clickLevel : 0 });
   }
 
   /**
