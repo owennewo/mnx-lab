@@ -113,6 +113,15 @@ try {
     check(stats[0]==='3'&&stats[1].includes('Performed bar 1')&&stats[1].includes('1 s')&&stats[2].includes('Performed bar 3')&&stats[2].includes('11 s'),'Wrong sync statistics');
     await input('Recording name','Renamed take');button('Save changes').click();await delay(300);await saved(2);
     check(page.snapshot.recordings.find(r=>r.id===audioId).syncpoints==='[[0,1],[1,6,240],[2,11]]','Rename changed sync data');
+    // A recording off concert pitch: its tuning is saved beside the sync, reaches the player, and clears.
+    await input('Recording tuning in cents','52');check(sheet().shadowRoot.querySelector('[aria-label="Tuning explained"]').textContent.includes('453.4 Hz'),'Tuning hint does not name the A4');
+    button('Save changes').click();await delay(300);await saved(2);
+    const tuned=page.snapshot.recordings.find(r=>r.id===audioId);
+    check(JSON.parse(tuned.provenance).tuningCents===52&&tuned.syncpoints==='[[0,1],[1,6,240],[2,11]]','Tuning not saved beside an unchanged sync');
+    await page.updateComplete;check(player.recordings.find(r=>r.id===audioId)?.tuningCents===52,'Tuning did not reach the player');
+    check(sheet().shadowRoot.querySelector('[aria-label="Recording tuning in cents"]').value==='52','Saved tuning not shown');
+    await input('Recording tuning in cents','');button('Save changes').click();await delay(300);await saved(2);
+    check(!('tuningCents' in (JSON.parse(page.snapshot.recordings.find(r=>r.id===audioId).provenance)??{})),'Clearing the tuning did not remove it');
     await input('Recording name','Conflict draft');await page.client.changeTags('piece',sheet().snapshot.piece.revision,{add:[{dimension:'practice',value:'today'}]});
     button('Save changes').click();await delay(250);check(sheet().conflict,'Stale write did not conflict');
     button('Reload and review').click();await delay(250);check(!sheet().conflict&&sheet().name==='Renamed take','Reload did not restore saved recording');

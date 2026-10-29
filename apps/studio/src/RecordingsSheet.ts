@@ -6,6 +6,7 @@ import { youtubeVideoId } from '../../../src/model/youtubeUrl.ts';
 import type { MnxDocument } from '../../../src/model/mnx.ts';
 import { linearizePasses } from '../../../src/model/passes.ts';
 import { compilePerformance } from '../../../src/audio/performance.ts';
+import { storedTuningCents, MAX_TUNING_CENTS } from '../../../src/model/recordingAttachment.ts';
 import { syncSummary } from './syncSummary.ts';
 
 const backGlyph = html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>`;
@@ -22,6 +23,8 @@ export class RecordingsSheet extends LitElement {
   @state() private kind = 'youtube';
   @state() private video = '';
   @state() private file: File | null = null;
+  /** The recording's tuning against the score's pitch, in cents, as typed ('' = in tune). */
+  @state() private tuning = '';
   @state() private busy = false;
   @state() private stage = '';
   @state() private error = '';
@@ -57,6 +60,7 @@ export class RecordingsSheet extends LitElement {
   private reset(row: LibraryRecording | null = null) {
     this.changed(); this.editing = row; this.expectedRevision = this.snapshot.piece.revision;
     this.name = row?.name ?? ''; this.kind = row?.kind ?? 'youtube'; this.video = row?.external_id ?? ''; this.file = null; this.removing = '';
+    const cents = storedTuningCents(row?.provenance ?? null); this.tuning = cents === null ? '' : String(cents);
   }
   private syncDetails() {
     return syncSummary(this.editing, this.compiled, this.passes);
@@ -70,6 +74,11 @@ export class RecordingsSheet extends LitElement {
     this.error = ''; this.stage = '';
     const change: RecordingChange = { name: this.name };
     try {
+      // Sent only when it moved: 0 or empty is in tune, which the library keeps as no tuning at all.
+      const cents = this.tuning.trim() === '' ? 0 : Number(this.tuning);
+      if (!Number.isFinite(cents) || Math.abs(cents) > MAX_TUNING_CENTS) throw new Error(`Tuning is a number of cents between −${MAX_TUNING_CENTS} and ${MAX_TUNING_CENTS}.`);
+      const tuning = cents === 0 ? null : cents;
+      if (tuning !== (this.editing ? storedTuningCents(this.editing.provenance) : null)) change.tuningCents = tuning;
       if (!this.editing && this.kind === 'youtube') change.video = youtubeVideoId(this.video);
       if (!this.editing) change.rawSync = null;
       if (!this.editing && this.kind === 'audio' && !this.file) throw new Error('Choose an audio file.');
@@ -102,6 +111,14 @@ export class RecordingsSheet extends LitElement {
     try { const { snapshot } = await this.client.removeRecording(this.snapshot.piece.id, row.id, this.snapshot.piece.revision); this.snapshot = snapshot; this.publish(snapshot); this.dispatchEvent(new CustomEvent('recording-deleted')); this.stage = 'Recording removed from this piece.'; }
     catch (e) { this.error = e instanceof Error ? e.message : 'Could not remove.'; this.conflict = e instanceof LibraryRequestError && e.status === 409; } finally { this.busy = false; }
   }
+  /** The tuning in a player's words: where the score's A4 sounds, and what the synth does about it. */
+  private tuningHint() {
+    const cents = this.tuning.trim() === '' ? 0 : Number(this.tuning);
+    if (!Number.isFinite(cents) || Math.abs(cents) > MAX_TUNING_CENTS) return `Between −${MAX_TUNING_CENTS} and ${MAX_TUNING_CENTS} cents.`;
+    if (cents === 0) return 'In tune with the score (A4 = 440 Hz). If the player tuned off concert pitch, say how far, and the synth plays along at that pitch.';
+    const hz = 440 * 2 ** (cents / 1200);
+    return `${cents > 0 ? '+' : '−'}${Math.abs(cents)} cents: the score's A4 sounds at ${hz.toFixed(1)} Hz in this recording. The synth plays at this pitch while this is the recording you play along with.`;
+  }
   private sourceLink(row: LibraryRecording) {
     if (row.kind !== 'youtube') return nothing;
     let url: string;
@@ -118,6 +135,8 @@ export class RecordingsSheet extends LitElement {
           <label>Name<input aria-label="Recording name" maxlength="200" .value=${this.name} @input=${(e: Event) => { this.changed(); this.name = (e.target as HTMLInputElement).value; }}></label>
           ${!this.editing ? html`<label>Source<select aria-label="Recording type" .value=${this.kind} @change=${(e: Event) => { this.changed(); this.kind = (e.target as HTMLSelectElement).value; }}><option value="youtube">YouTube link</option><option value="audio">Audio file</option></select></label>
             ${this.kind === 'youtube' ? html`<label>YouTube URL<input aria-label="YouTube URL" .value=${this.video} @input=${(e: Event) => { this.changed(); this.video = (e.target as HTMLInputElement).value; }}></label>` : html`<p class="hint">MP3, M4A, WAV, Ogg or FLAC, up to 64 MiB. Playback depends on your browser's codec support. Retry restarts the transfer; no partial recording is attached.</p><label>Audio file<input aria-label="Audio file" type="file" accept=".mp3,.m4a,.wav,.ogg,.flac" @change=${(e: Event) => { this.changed(); this.file = (e.target as HTMLInputElement).files?.[0] ?? null; }}></label>`}` : html`${this.sourceLink(this.editing)}<p class="hint">${this.editing.kind === 'youtube' ? 'YouTube recording' : 'Audio recording'}</p>`}
+          <label>Tuning, cents from the score's pitch<input aria-label="Recording tuning in cents" type="number" step="0.1" min=${-MAX_TUNING_CENTS} max=${MAX_TUNING_CENTS} placeholder="0" .value=${this.tuning} @input=${(e: Event) => { this.changed(); this.tuning = (e.target as HTMLInputElement).value; }}></label>
+          <p class="hint" aria-label="Tuning explained">${this.tuningHint()}</p>
           <strong>Sync points</strong>
           <dl aria-label="Sync point statistics"><dt>Count in use</dt><dd>${sync.points.length}</dd><dt>Start location</dt><dd>${this.location(sync.points[0])}</dd><dt>End location</dt><dd>${this.location(sync.points.at(-1))}</dd></dl>
           <p class="hint">Locations count performed bars, including repeats, starting at 1. Times are measured from the start of the recording.</p>
