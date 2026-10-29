@@ -70,7 +70,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Eleanor Rigby | Beatles (fingerstyle book) | `243e798f04b5ff1f` |  | no recording |  |  |  |
 | Erwan | Meic Stevens | `2ba9acbdad27fe6b` |  | Soundslice |  |  |  |
 | Every Breath You Take | The Police | `05fa6b889b0481b6` |  | Soundslice |  |  |  |
-| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 (interim) | 🟡 10-29 (written half + copies) | 🟡 10-29 | — |
+| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 | 🟡 10-29 much improved; strings to check | 🟡 10-29 (no repeats yet) | — |
 | Fast Car | Tracy Chapman | `10537b9c88cc5329` |  | Soundslice |  |  |  |
 | Fingerstyle Mastery: Travis Picking Part 2 | Mike Dawes | `8dee0f5649ee664d` |  | no recording |  |  |  |
 | Freight Train | Elizabeth Cotton | `b9cc081329df0d07` |  | Soundslice |  |  |  |
@@ -144,7 +144,7 @@ worked, the checkpoints it left, and what is still open on the piece. Entries be
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
 
-### 2026-10-29 — Everybody Wants To Rule The World (Gabriella Quevedo's arrangement) · `2b156138db0c7716` — [run 9](tools/recording-align/RUNS.md#run-9--2026-10-29--everybody-wants-to-rule-the-world-gabriella-quevedo-the-fixed-order-search) · in progress
+### 2026-10-29 — Everybody Wants To Rule The World (Gabriella Quevedo's arrangement) · `2b156138db0c7716` — [run 9](tools/recording-align/RUNS.md#run-9--2026-10-29--everybody-wants-to-rule-the-world-gabriella-quevedo-the-fixed-order-search) · wrapped up
 
 The first piece put through the glow-up on purpose. The owner's transcription covers bars 1–45
 and 52–57 of 111; the rest are placeholder bars. Recording YouTube `aqx5AO4fxDU`, guitar alone,
@@ -204,8 +204,23 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   up the neck, not open — the second bar of the unit refingered at frets 2–7 (revision 30). Sync
   rewritten for the bridge's bar lengths (revision 29).
 - **Every bar is now written**: 93% of written notes found (87% exact) against 40% chance.
-- Open: the notes check over all 110 bars (bar 13's beats 2 and 4 score like slaps; bars 18/36's
-  downbeat; bars 42/54's last eighth), then repeats, then the final sync.
+- **Wrapped up** (revision 30). The owner's verdict: *"much improved but some string selection
+  issues i.e. pitch is pretty good but fingers are on different strings at different frets in some
+  bars. This has been a great help but I'll need to go through it in more detail."* The drafted
+  bars (46–51, 58–79, 86–89, 92–95) carry the fret step's guesses; their pitches and rhythm come
+  from the recording, their strings do not.
+- **The notes check** (all 110 bars, both ways, slaps included; 95% of 1790 written attacks heard)
+  left unapplied for the owner's own pass. Heard in every pass, or all but one: C4 on beat 4 of
+  chorus bar 4 (25 43 53 55 83 97 99); chorus bar 3's last bass eighth G2 not G♯2, and a C4 on beat
+  2's second eighth (24 42 54 82 98); the G♯3+C4 chord on the downbeat of riff bars 7 9 11 (105
+  107); C4 on beat 2 of 19 21 39; slaps on 13's beats 2 and 4, 31's and 6's beat 4. For the ear: a
+  G♯3 inner voice through the choruses (22 40 80, 26 group, 52 96); bars 18/36's D4 downbeat and C4;
+  slap-like beats 2 and 4 in intro bar 2. Dismissed as artefacts: grace notes heard a sixteenth off,
+  bar 109's slowing, the interlude's light beat-2 slaps. The findings file and the session's tools
+  are in `.scratchpad/glowup/` (not tracked).
+- **Not done**: repeats (the interlude ×3 and the bridge unit ×3 are written identically, ready to
+  fold; the owner's rule — merge passes a note apart); the final sync on the finished score — the
+  current one already covers all 110 bars with every bar's beats matching.
 
 ### 2026-10-28 — Blackbird (Beatles) · `b0bcd1230724657d`
 

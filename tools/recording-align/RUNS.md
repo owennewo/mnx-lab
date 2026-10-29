@@ -397,3 +397,9 @@ to do — each is a gap to close.
   video or the owner — is the next thing the drafting step needs; here a no-open re-run did it.
 - **A unit can be shorter than a section**: the bridge is a two-bar unit played three times — one
   analysis compared its halves misaligned (0.14) and called it unrepeated. Vote over the unit.
+- **Wrapped up**: every bar written; sync covers all 110 (revision 29). Owner: *"much improved but
+  some string selection issues … pitch is pretty good"*. The weak link of drafting is the fret step,
+  as the bridge showed: strings and positions need evidence it does not have (video, the owner's
+  hand). The session's tools wait in `.scratchpad/glowup/` for a second piece to earn promotion.
+- **Time**: one long session — analysis, two tool changes landed (fixed-order search; stale-sync
+  and shorter-sync guards), 20 named versions, five drafted sections.
