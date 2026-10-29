@@ -351,3 +351,10 @@ to do — each is a gap to close.
   — percussion wants a file of its own, and the notes check should judge a dead note against it;
   the edits were a one-off script (`save-version`: export check, other bars unchanged, a picture,
   a named version) — run 4's and run 6's gap a third time, so it now earns a tool.
+- **A stale sync, then a short one** (same day): copying choruses into placeholder bars of 8
+  eighths made them 12, and the sync, which counts beats per bar, played them 1.5× fast (the owner
+  heard it). Rewriting it, `score` read the old sync through the player's map — by beats, so wrong
+  from bar 81 — the near-sync window held the search to bar 80, and an 80-bar sync went out because
+  the report was read through a filter. Restored from the old sync's cuts (revision 17). Fixed:
+  `score` takes a one-segment-a-bar sync's bar lines from its cuts and reports STALE SYNC bars;
+  `sync` refuses a replacement that reaches fewer bars; Step 7 says both.

@@ -10,7 +10,8 @@
 //   score                                     the performed score: bar order, notes, structural starts,
 //                                             and the recording's existing sync as bar-line seconds
 //   audio  [--video <url>]                    the recording's audio as mono 22.05 kHz WAV (yt-dlp / the library)
-//   sync   [--write] [--replace]              the sync from structure.json; written only with --write
+//   sync   [--write] [--replace [--shorter]]  the sync from structure.json; written only with --write; never
+//                                             over a sync covering more bars without --shorter
 //
 // A piece that does not exist yet — written as tab text (tabText.ts), say read off a video:
 //
@@ -29,7 +30,7 @@ import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cle
 import { upgradeTabExtension } from '../../src/model/upgradeTabExtension.ts';
 import { linearizePasses } from '../../src/model/passes.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
-import { segmentsFromBarStarts, syncpointsFromSegments, SYNC_SEGMENTS_FORMAT } from '../../src/model/syncSegments.ts';
+import { segmentsFromBarStarts, syncpointsFromSegments, decodeSyncSegments, SYNC_SEGMENTS_FORMAT } from '../../src/model/syncSegments.ts';
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
 import { createRecordingSync } from '../../src/audio/recordingSync.ts';
 import { ZERO } from '../../src/audio/time.ts';
@@ -121,10 +122,22 @@ function score() {
     if (order[i] !== order[i - 1] + 1) starts.add(order[i]);
   }
   // The recording's sync as it stands, as seconds at each performed bar line (and the end):
-  // what `structure --fixed-order --near-sync` tightens. Read through the player's own map.
+  // what `structure --fixed-order --near-sync` tightens. A sync the sync bar edits, one segment a
+  // performed bar, keeps its bar lines as cuts, and those stay true when a bar's length changes —
+  // the beats each segment counts do not, and the player reads the sync by its beats, so a stale
+  // count is reported (run 9: copied bars of 12 eighths over segments of 8 played 1.5× fast).
+  // Any other sync is read through the player's own map.
   const piece = existsSync(join(out, 'piece.json')) ? readJson('piece.json') : null;
   let existingSync: (number | null)[] | null = null;
-  if (piece?.recording?.syncpoints) {
+  let provenance: { format?: string; raw?: unknown } | null = null;
+  try { provenance = JSON.parse(piece?.recording?.provenance ?? 'null'); } catch { /* not ours */ }
+  const segments = provenance?.format === SYNC_SEGMENTS_FORMAT ? decodeSyncSegments(provenance.raw) : null;
+  if (segments?.ok && segments.value.segments.length === order.length && segments.value.cuts.length === order.length + 1) {
+    existingSync = [...segments.value.cuts];
+    const unit = segments.value.beat[0] / segments.value.beat[1];
+    const stale = measures.flatMap((m, i) => segments.value.segments[i].beats !== m.metricDuration / unit ? [m.bar] : []);
+    if (stale.length) console.log(`STALE SYNC: ${stale.length} bars are not as long as the sync's segments count (bars ${stale.join(' ')}) — the player runs them at the wrong speed; write the sync again`);
+  } else if (piece?.recording?.syncpoints) {
     const map = createRecordingSync(JSON.parse(piece.recording.syncpoints), compiled, passes);
     if (map.ok) {
       existingSync = Array.from({ length: order.length + 1 }, (_, ordinal) => {
@@ -201,11 +214,23 @@ async function sync() {
   writeJson('sync-payload.json', payload);
   const gaps = cuts.slice(1).map((c, i) => c - cuts[i]);
   console.log(`${segments.segments.length} segments over ordinals 0–${rows.length - 1} of ${s.order.length}; ${cuts.length} cuts (${snapped} snapped to a heard downbeat), ${cuts[0].toFixed(2)}–${cuts.at(-1)!.toFixed(2)} s; bars ${Math.min(...gaps).toFixed(2)}–${Math.max(...gaps).toFixed(2)} s; beat 1/${segments.beat[1]}`);
-  if (!flag('write')) { console.log('dry run: nothing written (pass --write)'); return; }
+  // A replacement that covers fewer bars than the sync it replaces loses the rest (run 9: a stale
+  // sync held the search to bar 80, and the 80-bar result went out unread).
+  // How far a sync reaches: the last performed bar line it places (the end of its last bar).
+  const reach = (syncpoints: string | null | undefined) => syncpoints ? Math.max(...(JSON.parse(syncpoints) as number[][]).map(p => p[0])) : 0;
+  const shorter = (before: number) => rows.length < before && !flag('shorter')
+    ? `this sync reaches the end of performed bar ${rows.length}, the one it would replace bar ${before}: read the report (a search that stopped early?); --shorter only when that is meant` : null;
+  if (!flag('write')) {
+    const refusal = shorter(reach(readJson('piece.json').recording?.syncpoints));
+    console.log(refusal ? `dry run; --write would REFUSE: ${refusal}` : 'dry run: nothing written (pass --write)');
+    return;
+  }
   const { pieceId, recording } = readJson('piece.json');
   const live = await (await api(`/pieces/${encodeURIComponent(pieceId)}`)).json();
   const row = live.snapshot.recordings.find((r: { id: string }) => r.id === recording.id) ?? fail('the recording is no longer on the piece');
   if (row.syncpoints && !flag('replace')) fail('the recording already has a sync; pass --replace only when the owner has said to replace it');
+  const refusal = shorter(reach(row.syncpoints));
+  if (refusal) fail(refusal);
   const response = await api(`/pieces/${encodeURIComponent(pieceId)}/recordings/${encodeURIComponent(row.id)}`, { method: 'PUT',
     body: JSON.stringify({ expected_revision: live.snapshot.piece.revision, name: row.name || 'Recording', rawSync: payload }) });
   const body = await response.json();

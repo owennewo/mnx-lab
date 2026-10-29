@@ -224,6 +224,17 @@ and say what it would write (segments, cuts, how many snapped). **Ask before wri
 
 ## Step 7 — write: `$T sync --out $OUT --write`
 
+Read the **whole** structure report before writing — every flag, not a filtered few lines (run 9
+wrote an 80-bar sync over a 111-bar one past an UNEXPLAINED flag; `sync` now refuses a replacement
+that reaches fewer bars, unless `--shorter`).
+
+**A sync counts beats per bar, so it goes stale when a bar's length changes** — a copy into a
+placeholder bar, a time signature fixed. The player then runs those bars at the wrong speed (run 9:
+copied bars of 12 eighths over segments of 8 played 1.5× fast). After any such edit, rerun `score`:
+it reports STALE SYNC, and `structure --fixed-order --near-sync` then `sync --write --replace`
+writes the same bar lines with the right beats (`score` reads them from the sync's cuts, which a
+length change does not move).
+
 Then tell the owner to **reload the piece page before touching it** — an open page holds the
 old revision, and a sync edit from it would replace this one. Point them at the weak bars to
 check by ear.

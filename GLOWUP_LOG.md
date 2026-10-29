@@ -70,7 +70,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Eleanor Rigby | Beatles (fingerstyle book) | `243e798f04b5ff1f` |  | no recording |  |  |  |
 | Erwan | Meic Stevens | `2ba9acbdad27fe6b` |  | Soundslice |  |  |  |
 | Every Breath You Take | The Police | `05fa6b889b0481b6` |  | Soundslice |  |  |  |
-| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 (interim) | 🟡 10-29 | 🟡 10-29 | — |
+| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 (interim) | 🟡 10-29 (written half + copies) | 🟡 10-29 | — |
 | Fast Car | Tracy Chapman | `10537b9c88cc5329` |  | Soundslice |  |  |  |
 | Fingerstyle Mastery: Travis Picking Part 2 | Mike Dawes | `8dee0f5649ee664d` |  | no recording |  |  |  |
 | Freight Train | Elizabeth Cotton | `b9cc081329df0d07` |  | Soundslice |  |  |  |
@@ -170,9 +170,15 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   the written-out check can show); the written half corrected in one go; the empty half a section
   at a time — the chorus and outro copies first, then drafts of the solos, interludes and bridge
   with slaps from the start; then a notes check over every pass; then repeats; then the final sync.
-- Open: everything after bar 57 except bar 52–57's chorus; to listen to — chorus bar 5's bass
-  (F2/G2 written, D♯2 heard at slap-like moments), bars 18/36's downbeat, the G2 bass in the
-  later choruses' bar 3 (42, 54).
+- **Then**: chorus bar 5 (26 44 56) — the open D♯2 heard on eighths 6 and 12 is her finger
+  leaving the string as she shifts (the owner, from the video), written as pull-offs 2⌒0, 4⌒0.
+  Copies: choruses 80–85 (from 40–45), 96–101 (from 52–57), 90–91 (from 44–45); the outro's riff
+  102–109 (28 29 6 29 6 29 28 29) — every copied bar 13–20 of its notes found. The sync went stale
+  over the copies (it counts beats per bar) and was rewritten (revision 17).
+- Open, to draft a section at a time: solo 66–71, solo 2 72–79, interlude 58–61 (→ 62–65, 92–95),
+  the fourth chorus's opening 86–89 (a variation), bridge 46–51, the line over the outro 104–108,
+  the ending 110–111. To listen to: bars 18/36's downbeat; bars 42/54's last eighth (G2 a beat
+  early?).
 
 ### 2026-10-28 — Blackbird (Beatles) · `b0bcd1230724657d`
 
