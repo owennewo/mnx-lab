@@ -189,6 +189,8 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   once, it matches every pass: 16–23 of each bar's notes found. The whole score: 93% found (87%
   exact) against 41% chance, no weak bars. Heard in one pass only, so dropped: F4 on beat 3 of
   its bars 2 and 4, a D♯5 at its end.
+- **The 4th chorus opening, 86–89, drafted** (revision 22) and banked: the chorus bass (F2 G2 G♯2
+  G2) under a different top — A♯3+C4 restruck on the eighths, G4 and F4 above.
 - Open, to draft a section at a time:
   the fourth chorus's opening 86–89 (a variation), bridge 46–51, the line over the outro 104–108,
   the ending 110–111. To listen to: bars 18/36's downbeat; bars 42/54's last eighth (G2 a beat

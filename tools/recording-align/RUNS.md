@@ -381,3 +381,7 @@ to do — each is a gap to close.
   below the lowest string, a few one-off melody notes — and what stood was one figure repeated
   exactly, which then matched every pass (16–23 notes found a bar). A vote is the cheapest cleaner
   there is; use it wherever a section repeats.
+- **The pipeline's `quantize` drops a note heard before the first bar line** of what it is given,
+  rather than snapping it onto beat 1 — bar 86's downbeat F2, 20 ms early, was lost. Drafting a
+  section from the middle of a piece, notes up to 50 ms before its first bar line are now moved
+  onto it first.
