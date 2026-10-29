@@ -181,7 +181,10 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
   (revision 19): bar 67's first note, an F5, was the C♯3 bass's 5th overtone; the owner heard a
   harmonic, and its attack put it an eighth earlier — the s3 12th-fret harmonic on bar 66's last
   eighth, ringing over the bar line. Banked as it stands.
-- Open, to draft a section at a time: solo 2 72–79, interlude 58–61 (→ 62–65, 92–95),
+- **Solo 2, 72–79, drafted** (revision 20) and banked by the owner unchanged: its own texture —
+  an eighth-note figure on strings 2–3 (mostly C4/D4), melody notes over it, the open D♯2 pedal,
+  slaps on 2 and 4 (found by the percussive measure; the drum transcription heard none here).
+- Open, to draft a section at a time: interlude 58–61 (→ 62–65, 92–95),
   the fourth chorus's opening 86–89 (a variation), bridge 46–51, the line over the outro 104–108,
   the ending 110–111. To listen to: bars 18/36's downbeat; bars 42/54's last eighth (G2 a beat
   early?).

@@ -366,3 +366,12 @@ to do — each is a gap to close.
   undecayed ring said s3 12th-fret harmonic — the owner's ear first). Both are checks for the next
   draft: a high note on a simultaneous bass note's 3rd–6th partial is suspect; a long-ringing note
   at an open string's 12th/7th/5th-fret harmonic is offered as one.
+- **Drafting solo 2 (72–79) revised all three draft rules**, each by a failure on it:
+  the **overtone check** runs only over a fretted bass note — over an open-string pedal (D♯2 on every
+  eighth) it dropped eight G4s that are melody, since an open string's partials are always there;
+  **slaps** come from the percussive measure on beats 2 and 4 as well as from drum hits — the drum
+  transcription heard none of this section's 13; a slap removes **only the open D♯2/D♯3 it rings** —
+  dropping notes "re-sounded" before it ate the chord she plays with each slap and a repeating
+  figure (45 notes, then 35, then the right 24). **Harmonic detection was tried and dropped**: in an
+  open tuning the open strings sound the harmonic pitches and ring in sympathy — 23 candidates in
+  the solo for one real harmonic. Harmonics stay with the owner's ear and the video.
