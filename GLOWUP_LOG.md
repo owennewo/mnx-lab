@@ -184,7 +184,12 @@ Open E♭, tuned to A=428 (retuned +48 cents before transcribing).
 - **Solo 2, 72–79, drafted** (revision 20) and banked by the owner unchanged: its own texture —
   an eighth-note figure on strings 2–3 (mostly C4/D4), melody notes over it, the open D♯2 pedal,
   slaps on 2 and 4 (found by the percussive measure; the drum transcription heard none here).
-- Open, to draft a section at a time: interlude 58–61 (→ 62–65, 92–95),
+- **The interlude, drafted once from its three passes voting** (a note stands where 2 of 3 passes
+  have it; revision 21) and written into 58–61, 62–65 and 92–95 alike; banked unchanged. Written
+  once, it matches every pass: 16–23 of each bar's notes found. The whole score: 93% found (87%
+  exact) against 41% chance, no weak bars. Heard in one pass only, so dropped: F4 on beat 3 of
+  its bars 2 and 4, a D♯5 at its end.
+- Open, to draft a section at a time:
   the fourth chorus's opening 86–89 (a variation), bridge 46–51, the line over the outro 104–108,
   the ending 110–111. To listen to: bars 18/36's downbeat; bars 42/54's last eighth (G2 a beat
   early?).

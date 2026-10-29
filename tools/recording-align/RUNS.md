@@ -375,3 +375,9 @@ to do — each is a gap to close.
   figure (45 notes, then 35, then the right 24). **Harmonic detection was tried and dropped**: in an
   open tuning the open strings sound the harmonic pitches and ring in sympathy — 23 candidates in
   the solo for one real harmonic. Harmonics stay with the owner's ear and the video.
+- **A passage played more than once is drafted from all its passes voting** (the interlude, three
+  passes): each pass cleaned and quantized alone, then a note (pitch, sixteenth ±1) stands where
+  most passes have it, slaps likewise. 40 single-pass notes fell away — open-string ring, a G♯1
+  below the lowest string, a few one-off melody notes — and what stood was one figure repeated
+  exactly, which then matched every pass (16–23 notes found a bar). A vote is the cheapest cleaner
+  there is; use it wherever a section repeats.
