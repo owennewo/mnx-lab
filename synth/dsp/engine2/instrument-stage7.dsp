@@ -128,5 +128,33 @@ send(i,x)=x*soakEnvelope(i)*(j.available(i) : si.smooth(ba.tau2pole(0.003)));
 body(a0,a1,a2,a3,a4,a5)=4*soakBody*soakBodyTrim*on*enable((send(0,a0)+send(1,a1)+send(2,a2)
     +send(3,a3)+send(4,a4)+send(5,a5)) <: par(i,12,r.radiationMode(i)) :> _,on)
 with { on=(soakBody>0)*soaking; };
-present=si.bus(6) <: (k.mixdown,body) :> _ <: (r.radiation(24) : b.output),_;
-process=strings <: (present,si.bus(6));
+// A dead note is a strike: the string is hit but sounds no pitch, and what is heard is the
+// hit itself. A thumb slapping the bass strings snaps them against the frets (a burst of noise
+// in 1.5–10 kHz, the crack) and lands on the top, which rings the body's resonances (the thump).
+// An electric's pickups hear the strings, not the body: it has the crack without the thump.
+// The planner raises s%i-strike for the pluck of a dead note only; it is latched at the
+// pluck like the velocity, and both parts grow with its square. The constants were set by ear
+// on a recorded fingerstyle piece (Everybody Wants To Rule The World, its thumb slaps): a crack
+// fitted to the recording by band (a slap's first 40 ms against a picked note's) sounded dull,
+// and the owner chose this one, brighter and some 8 dB louder (29 October 2026;
+// harness/tools/render-piece.ts renders a piece for listening).
+// Not computed while no strike is sounding: once every envelope is under 1e-5 the body has
+// rung out.
+strikeCrack=0.12;   // the crack's level
+strikeThump=3;      // the thump's level, into the body modes
+strikeTime=0.012;   // the crack's decay time constant, seconds
+strikePulse=0.0015; // the thumb's contact, seconds (a half-sine)
+strikeAmount(i)=v*v*hslider("s%i-strike",0,0,1,1) : ba.sAndH(hit)
+with { hit=b.trigger(i)>b.trigger(i)'; v=b.velocity(i); };
+strikeEnvelope(i,time)=+(hit*strikeAmount(i))~*(exp(-1/(ma.SR*time))*(1-hit))
+with { hit=b.trigger(i)>b.trigger(i)'; };
+crack(i,noise)=noise*strikeEnvelope(i,strikeTime);
+thump(i)=strikeAmount(i)*(age<n)*sin(ma.PI*age/n)
+with { hit=b.trigger(i)>b.trigger(i)'; n=max(1,strikePulse*ma.SR); age=ba.countup(100000,hit); };
+striking=(strikeEnvelope(0,0.05)+strikeEnvelope(1,0.05)+strikeEnvelope(2,0.05)
+    +strikeEnvelope(3,0.05)+strikeEnvelope(4,0.05)+strikeEnvelope(5,0.05))>1e-5;
+strike(n0,n1,n2,n3,n4,n5)=striking*enable(
+    strikeCrack*((crack(0,n0)+crack(1,n1)+crack(2,n2)+crack(3,n3)+crack(4,n4)+crack(5,n5)) : fi.highpass(2,1500) : fi.lowpass(2,10000))
+    +strikeThump*(1-b.electric)*((thump(0)+thump(1)+thump(2)+thump(3)+thump(4)+thump(5)) <: par(i,12,r.radiationMode(i)) :> _),striking);
+present(extra)=si.bus(6) <: (k.mixdown,body),extra :> _ <: (r.radiation(24) : b.output),_;
+process(n0,n1,n2,n3,n4,n5)=strings(n0,n1,n2,n3,n4,n5) <: (present(strike(n0,n1,n2,n3,n4,n5)),si.bus(6));

@@ -340,7 +340,7 @@
   {
    "kind": "silentWithin",
    "note": "x1",
-   "seconds": 0.08,
+   "seconds": 0.2,
    "belowDb": -40
   },
   {

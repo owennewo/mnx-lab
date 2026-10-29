@@ -1,7 +1,7 @@
 {
  "schema": "synth-references/1",
  "version": "0.2.0",
- "captured": "2026-10-09",
+ "captured": "2026-10-29",
  "note": "Float32 interleaved output hashes at 48 kHz. Re-capture only for a deliberate sound change (chain campaign C3).",
  "cases": {
   "fixture:chord-gestures": {
@@ -26,8 +26,8 @@
   },
   "fixture:plucked-techniques": {
    "frames": 912000,
-   "peak": 0.8826768398284912,
-   "sha256": "1fdb0dbc1371b9972cd37e46a970dec34f1a132e8ca7dbe736bf4f71fae238fc"
+   "peak": 0.8912509083747864,
+   "sha256": "eb5301a6f741c748945c55a1b14de518d443e155a2187bda67df31a40b2e05b4"
   },
   "fixture:ukulele-layout": {
    "frames": 384000,
@@ -62,7 +62,7 @@
   "piece:guitar-legato": {
    "frames": 604800,
    "peak": 0.7364721298217773,
-   "sha256": "09ed372e909202323c0d339b86622c7224633d507ddf0f3637e9b0fc5e8f4a6f"
+   "sha256": "70e1908d9315fbdd72a0c65fd0df2241fa3c6cb404162c2ee7a5a5abe5478e14"
   },
   "piece:guitar-recorded": {
    "frames": 1118400,

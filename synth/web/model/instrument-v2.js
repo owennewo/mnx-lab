@@ -9,7 +9,7 @@ import {NEUTRAL_SETUP,validateInstrumentSetup,withInstrumentSetup} from './instr
 import {LATEST_NOTE_POLICY} from './note-ownership.js';
 import {PROTOTYPE_CONTROLS,PICKUP_CONTROLS,nextPluckControl} from './instrument-controls.js';
 
-export const GUITAR_ENGINE=Object.freeze({id:'guitar-lab',generation:4,sourceSha256:'ab0b5e9d82b7b2e9bb94aaea5191410863354fb0c03b85f68b686eef8356c995'});
+export const GUITAR_ENGINE=Object.freeze({id:'guitar-lab',generation:4,sourceSha256:'3d2c7427d889d91129e35ad5097ad584f399048a5bf32cf6a9d063c9aed295c3'});
 export const HARDNESS_V2={min:.025,max:40,normal:[.1,1],step:.001,log:true};
 const spec=(key,min,max,value,step=.001)=>({name:(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key])?.label||key,min,max,default:value,step,
  policy:nextPluckControl(key)?'next pluck':'smooth',...(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key]),unit:(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key])?.unit||''});

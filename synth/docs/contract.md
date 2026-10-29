@@ -106,7 +106,7 @@ Cross-note references point **backwards only** (to an earlier-onset note id).
 | `vibrato` | `depthCents`, `rateHz`, `start?` (fraction, 0), `delaySeconds?` (0), `fadeSeconds?` (0.2), `phase?` (radians, 0) | Sinusoidal pitch modulation, faded in linearly after `start·duration + delaySeconds`. |
 | `slide` | `direction: 'in' \| 'out'`, `cents?` (∓200), `span?` (fraction, 0.25), `fretted?` (false) | Slide in: glide from `cents` to 0 over the first `span`. Slide out: glide from 0 to `cents` over the last `span`. `fretted` steps in semitones. |
 | `legato` | `from: noteId`, `via: 'hammer' \| 'pull' \| 'slide'`, `glide?` (fraction, 0.1, slide only) | Continue the earlier note's string without a new pluck. For a slide, pitch glides from the previous pitch. |
-| `mute` | `kind: 'palm' \| 'dead'`, `amount?` (0–1, 0.5, palm only) | Palm: partial finger damping for the whole note. Dead: no pitched attack, immediate damping. |
+| `mute` | `kind: 'palm' \| 'dead'`, `amount?` (0–1, 0.5, palm only) | Palm: partial finger damping for the whole note. Dead: no pitched attack, immediate damping; a native renderer may sound the hit itself (the plucked guitar's strike: a fret crack and the body's thump, gone within 0.2 s). |
 | `harmonic` | `kind: 'natural' \| 'artificial' \| 'pinch' \| 'tap' \| 'semi' \| 'feedback'` | The sounding pitch is the target. Lowered on every kind this campaign (non-goal). |
 | `letRing` | — | Do not damp at note end. The string, key or piece rings until re-struck, choked or muted. |
 
@@ -305,7 +305,7 @@ keep them for labels.
     {kind: 'pitch', note: 'b1', curve: 'commanded', toleranceCents: 15, maxCents: 35},
     {kind: 'noNewAttack', note: 'h2'},
     {kind: 'decayRatio', note: 'pm1', reference: 'open1', max: 0.5},
-    {kind: 'silentWithin', note: 'x1', seconds: 0.08, belowDb: -40},
+    {kind: 'silentWithin', note: 'x1', seconds: 0.2, belowDb: -40},
     {kind: 'activeStrings', part: 'uke', count: 4},
     {kind: 'peakBelow', dbfs: -0.3},
     {kind: 'diagnostic', code: 'approximated', note: 'harm1'}
@@ -327,7 +327,10 @@ keep them for labels.
   measure within ±3 cents) before they are finalised:
   - pitch: median ≤ 15 cents, maximum ≤ 35 cents
   - palm mute: time to −40 dB ≤ 0.5× the same note unmuted
-  - dead note: below −40 dB within 80 ms
+  - dead note: below −40 dB within 200 ms on the fixture's design (80 ms until the strike, 29 October
+    2026). The string is silent within 80 ms; the body rings after the hit for as long as it does after
+    a knock, so on each factory design the level is read 80 ms plus its longest resonance's T60 after
+    the onset (0.24 s on most, 0.40 s on the metal-bodied bright-metallic).
   - legato: onset flux ≤ 0.25× a plucked onset of the same pitch
 - **Fixtures** (Phase 1):
   - plucked technique study
@@ -358,7 +361,11 @@ keep them for labels.
   Jumping the waveguide's delay length clicks: an instant jump gave 20× the high-band energy of a real pluck.
 - **Event grids.** Plain and vibrato notes keep the pre-host 200 Hz frequency grid (golden). Notes with bend,
   slide or slide-legato curves use 1 kHz.
-- **Dead notes** pluck with the string finger-muted from the start.
+- **Dead notes** pluck with the string finger-muted from the start, and strike: a burst of noise in
+  1.5–10 kHz (the string snapping against the frets) and a 1.5 ms half-sine through the design's body
+  modes (the thumb landing on the top; none on an electric, whose pickups hear only the strings),
+  both growing with velocity². Set by ear on a fingerstyle
+  recording's thumb slaps; nothing else in the plan or the DSP changes for any other note.
 - **String conflicts.** Two plucks on one string less than two samples apart cannot both sound. The later one is
   dropped with `retrigger-conflict`, an additive diagnostic code.
 - **Saved tunings.** A saved schema-2 sound whose open pitches are not ascending by string index now gets

@@ -129,6 +129,8 @@ export function planPlucked(entries,resolved,rate,state,from=-Infinity){
     position:excitationValue(exc.position,n.nuance?.excitation?.positionDelta??0,.04,.46,.01,.49),
     hardness,sustain,excite:1,trigger:1}))put(start,`s${s}-${key}`,value,owner);
    put(start+Math.round(.001*rate),`s${s}-trigger`,0,owner);
+   // A dead note strikes (the DSP latches it at the pluck); only a dead note's pluck carries it.
+   if(mute?.kind==='dead'){put(start,`s${s}-strike`,1,owner);put(start+Math.round(.001*rate),`s${s}-strike`,0,owner);}
    put(start+Math.round(excitationWindowSeconds(params,n.velocity,hardness)*rate),`s${s}-excite`,0,owner);
   } else put(start,`s${s}-sustain`,sustain,owner);
   if(ends&&!ring)put(stop,`s${s}-sustain`,0,owner);
