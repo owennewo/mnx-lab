@@ -461,6 +461,19 @@ the current instance, and its documents are the reference:
 - Whoever launches a session states its model and tool; the records carry it. Model choice
   follows *Conventions → Model choice* above.
 
+## The glow-up log: improving the owner's pieces
+
+[GLOWUP_LOG.md](GLOWUP_LOG.md) records which pieces in the owner's studio library have
+been through which treatment — a `/sync-recording` sync, the form fixed to what the
+recording plays, the notes checked against the recording, lyrics entered. **Any session
+that changes a library piece by one of these treatments updates it in the same session**:
+the piece's ledger row, and a dated entry in its Log (what was done, the numbers, the
+checkpoints left, what is still open). A sync run still records its numbers in
+`tools/recording-align/RUNS.md`; the log links the run rather than repeating it. The log
+is a tracked file, so its update goes through a worktree and the landing sequence like
+any other edit. "What should I glow up next" answers from the ledger: ▶ pieces first,
+then the fewest treatments.
+
 ## Roadmap-driven development
 
 Interpret roadmap-shaped requests against `roadmap/`: "add to the roadmap" → new doc in

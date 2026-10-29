@@ -212,6 +212,8 @@ After the owner has had a chance to listen, ask how it lines up (a sentence is e
    recording, the numbers from the report, which gates fired, **everything you had to do that
    this skill did not tell you to do** (each improvisation is a gap), the owner's verdict, and
    time spent.
+   When a sync was written, also update the piece's row and Log in
+   [GLOWUP_LOG.md](../../../GLOWUP_LOG.md), linking the run.
 2. **Turn each lesson into a change, by kind**:
    - a bug or a limit in the tools → fix it, with a `selftest` case when it is about the
      search (a synthetic performance that fails before the fix);
