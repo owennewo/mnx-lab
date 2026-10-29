@@ -108,7 +108,9 @@ try {
     check(Math.abs(player.playback.mediaTime-6)<.1&&player.playback.scorePosition?.ordinal===1,'Retained alignment does not follow recording');player.pause();
     // An operator import supplies timings; the panel only reads them.
     await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6,240],[2,11]]});
-    await page.refreshSnapshot();await edit(youtubeId);check(sheet().recordingId===youtubeId,'Edit did not open that recording');check(player.sourceId===audioId,'Editing changed what plays');await edit(audioId);
+    await page.refreshSnapshot();await openSource();
+    check(player.sourceId===audioId&&[...src().shadowRoot.querySelectorAll('[role=radiogroup] [data-edit]')].map(b=>b.dataset.edit).sort().join()===[audioId,youtubeId].sort().join(),'Not every listed recording has its edit, the playing one included');
+    await edit(youtubeId);check(sheet().recordingId===youtubeId,'Edit did not open that recording');check(player.sourceId===audioId,'Editing changed what plays');await edit(audioId);
     const stats=[...sheet().shadowRoot.querySelectorAll('dd')].map(el=>el.textContent);
     check(stats[0]==='3'&&stats[1].includes('Performed bar 1')&&stats[1].includes('1 s')&&stats[2].includes('Performed bar 3')&&stats[2].includes('11 s'),'Wrong sync statistics');
     await input('Recording name','Renamed take');button('Save changes').click();await delay(300);await saved(2);

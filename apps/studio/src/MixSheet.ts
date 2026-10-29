@@ -267,7 +267,7 @@ export class MixSheet extends LitElement {
             ${this.recordings.length > 1 ? html`<div role="radiogroup" aria-label="Which recording">${this.recordings.map(r => html`<div class="choice">
               <button class="pick" type="button" role="radio" aria-checked=${r.id === chosen.id} data-source=${r.id}
                 @click=${() => this.emit('recording-choose', { id: r.id })}><span class="dot"></span><span>${r.name ?? 'Unnamed recording'}</span></button>
-              ${r.id === chosen.id ? nothing : html`<button class="plain" type="button" data-edit=${r.id} aria-label=${`Edit ${r.name ?? 'recording'}`}
+              ${html`<button class="plain" type="button" data-edit=${r.id} aria-label=${`Edit ${r.name ?? 'recording'}`}
                 title="Edit the recording and its sync" @click=${() => this.emit('recording-edit', { id: r.id })}>${pencil}</button>`}
             </div>`)}</div>` : nothing}
             ${this.recordingRow(chosen, on)}
