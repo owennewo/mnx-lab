@@ -28,6 +28,8 @@ const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-g
 // One open segment from 1 s at 120 bpm: two seconds a bar. Its stored tuples stop at the third bar.
 const segments={version:1,beat:[1,4],cuts:[1],closed:false,segments:[{name:'Segment 1',beats:null,bpm:120}]};
 const staleTuples=[[0,1],[1,3],[2,5],[3,7]];
+// One segment a bar, as the sync tool writes it, made when bar 3 was half as long: it now plays too fast.
+const perBar={version:1,beat:[1,4],cuts:[1,3,5,6,8,10,12],closed:true,segments:[4,4,2,4,4,4].map((beats,i)=>({name:'Bar '+(i+1),beats,bpm:null}))};
 const importedTuples=[[0,0],[1,2],[2,4],[3,6],[4,8],[5,10],[6,12]];
 let ws;
 try {
@@ -46,6 +48,7 @@ try {
      {id:'studio-00000000-0000-4000-8000-000000000001',kind:'audio',name:'Studio take',syncpoints:${JSON.stringify(JSON.stringify(staleTuples))},provenance:JSON.stringify({format:'studio-sync-segments',raw:${JSON.stringify(segments)},...none})},
      {id:'studio-00000000-0000-4000-8000-000000000002',kind:'audio',name:'Imported, never opened',syncpoints:${JSON.stringify(JSON.stringify(importedTuples))},provenance:JSON.stringify({format:'soundslice-sync-array',raw:${JSON.stringify(importedTuples)},...none})},
      {id:'studio-00000000-0000-4000-8000-000000000003',kind:'audio',name:'Imported, other bars',syncpoints:${JSON.stringify(JSON.stringify(importedTuples))},provenance:JSON.stringify({format:'soundslice-sync-array',raw:${JSON.stringify(importedTuples)},...none,scoreShape:'4x1/1'})}];
+   rows.push({id:'studio-00000000-0000-4000-8000-000000000004',kind:'audio',name:'One segment a bar',syncpoints:${JSON.stringify(JSON.stringify([[0,1],[1,3],[2,5],[3,6],[4,8],[5,10],[6,12]]))},provenance:JSON.stringify({format:'studio-sync-segments',raw:${JSON.stringify(perBar)},...none})});
    let revision=0;const saves=[];
    const snapshot=()=>({piece:{id:'first',revision},tags:[],recordings:rows.map(r=>({...r}))});
    page.client={canonical:async()=>({bytes:new TextEncoder().encode(${JSON.stringify(JSON.stringify(score))}),filename:'fixture.mnx.json'}),piece:async()=>({snapshot:snapshot()}),opened:async()=>{},
@@ -77,14 +80,17 @@ try {
    check(player.sourceId===rows[0].id,'the echo re-cued the source');
    // The Mix panel's list of what plays says which imported sync to distrust.
    player.shadowRoot.querySelector('[data-mix-open]').click();
-   await until(()=>page.shadowRoot.querySelector('mnx-studio-mix')?.shadowRoot?.querySelectorAll('[data-source]').length===3,'no Mix panel');
+   await until(()=>page.shadowRoot.querySelector('mnx-studio-mix')?.shadowRoot?.querySelectorAll('[data-source]').length===4,'no Mix panel');
    const sheet=page.shadowRoot.querySelector('mnx-studio-mix').shadowRoot;
    // The list marks the recording whose sync to distrust, by its name; the others carry no mark.
    const mark=name=>[...sheet.querySelectorAll('[data-source]')].find(s=>s.textContent.includes(name))?.querySelector('[data-alarm]')?.dataset.alarm??'';
-   for(const [name,says] of [['Studio take',''],['Imported, never opened',''],['Imported, other bars','may be out of date']]){
+   for(const [name,says] of [['Studio take',''],['Imported, never opened',''],['Imported, other bars','may be out of date'],['One segment a bar','may be out of date']]){
      check(mark(name)===says,name+': '+JSON.stringify(mark(name)));}
    await player.selectSource(rows[2].id);
    await until(()=>!!sheet.querySelector('[data-out-of-date]'),'no out-of-date explanation for the playing recording');
+   // A bar that changed length under a one-segment-a-bar sync: the panel says which, when it plays.
+   await player.selectSource(rows[3].id);
+   await until(()=>sheet.querySelector('[data-stale-bars]')?.textContent.includes('bar 3 has changed length'),'no stale-bar warning: '+sheet.querySelector('[data-out-of-date]')?.textContent);
    player.pause();
    return {saves:saves.length,points:refreshed.change.rawSync.syncpoints.length};
  })()`);

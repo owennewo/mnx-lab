@@ -168,15 +168,12 @@ and why, and record both columns in the run entry.
 
 - **Key fit not at +0**: the recording's capo or tuning differs from the score's. **Stop and
   ask** — usually the score's capo needs changing (Step 2's capo against the video).
-- **Tuning beyond ±35 cents**: matches may slip a semitone, and near a quarter-tone most do —
-  the key fit then reads ±1 as well (run 9: a player at A=428, −48 cents). Retune the audio by
-  the measured amount and transcribe again: `ffmpeg -i $OUT/audio/source.wav -af
-  "rubberband=pitch=<2^(-cents/1200)>:transients=crisp:detector=percussive" $OUT/audio/retuned.wav`,
-  then `transcribe --audio` it (after any separation), and `check` should read near 0 cents.
-  Then, once the sync is written, give the recording its tuning so the synth following it matches it:
-  `$T tuning --cents <c> --write`, where `c` is how far the recording sounds from the SCORE's pitch —
-  run 9's open E♭ at A=428 against a score in open D is +52 (−48 from E♭: which one is the score's
-  naming, its key fit, not the audio's).
+- **Tuning beyond ±35 cents**: matches slip a semitone, and near a quarter-tone most do, so the key
+  fit reads ±1 as well (run 9: a player at A=428, −48 cents). Transcribe again with `--retune` (after
+  any separation, on its `--audio`): the recording is pitched onto the grid, its notes named in the
+  score's pitch, and `check` then says how far it sounds from the score. If that differs from its
+  stored tuning `check` flags it with the command to set it: `$T tuning --cents <c> --write`, once
+  the owner has seen it, so the synth following the recording matches it.
 - **Ambiguous key fit**: the recording may not be this piece. Say so before going on.
 
 ## Step 5 — which bar is played when: `$PY structure --out $OUT`
@@ -229,8 +226,14 @@ and say what it would write (segments, cuts, how many snapped). **Ask before wri
 ## Step 7 — write: `$T sync --out $OUT --write`
 
 Read the **whole** structure report before writing — every flag, not a filtered few lines (run 9
-wrote an 80-bar sync over a 111-bar one past an UNEXPLAINED flag; `sync` now refuses a replacement
-that reaches fewer bars, unless `--shorter`).
+wrote an 80-bar sync over a 111-bar one past an UNEXPLAINED flag).
+
+`sync` checks what it is about to write as the player would play it (`verifySync.ts`), and refuses
+to write when: the player's bars would leave the recording (`verify` FAILED; `--unverified` only when
+that is meant), bars do not fill their time signature (`--misfit`; fix the placeholders first), it
+reaches fewer bars than the sync it replaces (`--shorter`), or the score was saved since this run
+fetched it. It verifies again what was stored. `$T verify` checks a stored sync at any time, in
+seconds, given this run's notes.
 
 **A sync counts beats per bar, so it goes stale when a bar's length changes** — a copy into a
 placeholder bar, a time signature fixed. The player then runs those bars at the wrong speed (run 9:

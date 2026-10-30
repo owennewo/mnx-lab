@@ -10,6 +10,9 @@ paths — never from inside the directory holding downloaded audio:
                  reads audio/source.wav (else audio/mono.wav), or --audio <wav>;
                  --instruments g1,g2 tells MuScriptor what plays (default acoustic_guitar; add
                  voice for a singer) and --keep which of them to keep (default: all but voice);
+                 [--retune]: a recording well off concert pitch (over 35 cents) is pitched to the nearest
+                 semitone first, its notes then named in the score's own pitch, and how far it sounds
+                 from the score recorded for `check`;
                  [--half-speed]: transcribe a pitch-preserving half-speed stretch (Rubber Band,
                  crisp transients) and scale the times back — a Basic Pitch-era experiment, not
                  yet tried with MuScriptor; see RUNS.md before relying on it
@@ -49,9 +52,34 @@ HALF_SPEED_FILTER = 'rubberband=tempo=0.5:transients=crisp:detector=percussive'
 
 
 MODEL = 'medium'   # small drops half the notes of a separated stem (RUNS.md run 7); large needs > 6 GB
+OFF_PITCH = 35     # cents: past this, semitone matches slip (run 9: at -48, most round down a semitone)
+STORED_TUNING_MARGIN = 25   # cents: a recording this far from its stored tuning has the synth audibly off it
 
 
-def transcribe(out, half_speed=False, audio=None, instruments='acoustic_guitar', keep=None):
+def retune_cents(measured):
+    """What to pitch a recording by before transcribing it: nothing unless it is well off pitch."""
+    return -measured if abs(measured) > OFF_PITCH else 0.0
+
+
+def recording_cents(measured, semitones):
+    """How far a recording sounds from the score. One reading of the audio cannot say: -48 from E♭ and
+    +52 from D are the same strings. Pitched onto the grid, its key fit against the score names which."""
+    return measured + 100 * semitones
+
+
+def key_fits(heard, sounding):
+    """How well the heard pitch classes fit the score's, by semitone shift."""
+    ha, hs = np.zeros(12), np.zeros(12)
+    for n in heard:
+        ha[n['pitch'] % 12] += n['amp']
+    for s in sounding:
+        hs[s['midi'] % 12] += 1
+    ha /= np.linalg.norm(ha)
+    hs /= np.linalg.norm(hs)
+    return {k: float(ha @ np.roll(hs, k)) for k in range(-6, 6)}, ha, hs
+
+
+def transcribe(out, half_speed=False, audio=None, instruments='acoustic_guitar', keep=None, retune=False):
     """MuScriptor (Kyutai/Mirelo, CC-BY-NC weights: non-commercial use) from this environment. It is
     deterministic, gives no loudness (amp is 1) and ends every note at the next onset of any note, so
     a note's end is not its length. Tuning comes from the audio itself (librosa)."""
@@ -60,6 +88,16 @@ def transcribe(out, half_speed=False, audio=None, instruments='acoustic_guitar',
     import mido
     wav = audio or next(p for p in (os.path.join(out, 'audio', 'source.wav'), os.path.join(out, 'audio', 'mono.wav')) if os.path.exists(p))
     scale = 1.0
+    measured = pitched = 0.0
+    if retune:
+        y, sr = librosa.load(wav, sr=22050, mono=True)
+        measured = float(librosa.estimate_tuning(y=y, sr=sr)) * 100
+        pitched = retune_cents(measured)
+        if pitched:
+            os.makedirs(os.path.join(out, 'audio'), exist_ok=True)
+            retuned = os.path.join(out, 'audio', 'retuned.wav')
+            subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', wav, '-af', f'rubberband=pitch={2 ** (pitched / 1200)}:transients=crisp:detector=percussive', retuned], check=True)
+            wav = retuned
     if half_speed:
         # Same pitch, twice as long: a fast passage heard as a slow one.
         os.makedirs(os.path.join(out, 'audio'), exist_ok=True)
@@ -78,6 +116,17 @@ def transcribe(out, half_speed=False, audio=None, instruments='acoustic_guitar',
                      'pitch': int(starts[e['start_event_index']]['pitch']), 'amp': 1.0, 'bends': []}
                     for e in events if e['type'] == 'end' and e['start_event_index'] in starts
                     and starts[e['start_event_index']]['instrument'] in kept), key=lambda n: (n['start'], n['pitch']))
+    # On the grid now, a semitone from the score means the player's name for the tuning differs from the
+    # score's: the notes are named in the score's pitch, and the distance kept. Further off is a capo: `check` asks.
+    semitones = 0
+    score_path = os.path.join(out, 'score.json')
+    if pitched and heard and os.path.exists(score_path):
+        fits, _, _ = key_fits(heard, load(out, 'score.json')['sounding'])
+        best = max(fits, key=fits.get)
+        if abs(best) == 1:
+            semitones = best
+            for n in heard:
+                n['pitch'] -= semitones
     save(out, 'notes.json', heard)
     midi = mido.MidiFile(ticks_per_beat=480)
     track = mido.MidiTrack(); midi.tracks.append(track)
@@ -91,25 +140,34 @@ def transcribe(out, half_speed=False, audio=None, instruments='acoustic_guitar',
     cents = float(librosa.estimate_tuning(y=y, sr=sr)) * 100
     save(out, 'transcription.json', {'listener': 'muscriptor', 'model': MODEL, 'instruments': groups, 'kept': sorted(kept),
                                      'speed': scale, 'filter': HALF_SPEED_FILTER if half_speed else None,
-                                     'source': os.path.abspath(wav), 'tuningCents': round(cents, 1)})
+                                     'source': os.path.abspath(wav), 'tuningCents': round(cents, 1),
+                                     **({'retune': {'measuredCents': round(measured, 1), 'pitchedCents': round(pitched, 1), 'semitones': semitones,
+                                                    'recordingCents': round(recording_cents(measured, semitones), 1)}} if pitched else {})})
     print(f'{len(heard)} notes over {heard[0]["start"]:.1f}–{max(n["end"] for n in heard):.1f} s'
           f'{" (transcribed at half speed, times scaled back)" if half_speed else ""}; tuning {cents:+.0f} cents' if heard else 'no notes heard')
 
 
 # ---------------------------------------------------------------- check
 
+def stored_tuning(out):
+    """The recording's tuningCents as the library holds it (piece.json), or None."""
+    path = os.path.join(out, 'piece.json')
+    if not os.path.exists(path):
+        return None
+    provenance = (load(out, 'piece.json').get('recording') or {}).get('provenance')
+    try:
+        held = json.loads(provenance) if isinstance(provenance, str) else provenance
+    except ValueError:
+        return None
+    cents = held.get('tuningCents') if isinstance(held, dict) else None
+    return cents if isinstance(cents, (int, float)) else None
+
+
 def check(out):
     heard, score = load(out, 'notes.json'), load(out, 'score.json')
     if not heard:
         sys.exit('check: nothing was heard')
-    ha, hs = np.zeros(12), np.zeros(12)
-    for n in heard:
-        ha[n['pitch'] % 12] += n['amp']
-    for s in score['sounding']:
-        hs[s['midi'] % 12] += 1
-    ha /= np.linalg.norm(ha)
-    hs /= np.linalg.norm(hs)
-    fits = {k: float(ha @ np.roll(hs, k)) for k in range(-6, 6)}
+    fits, ha, hs = key_fits(heard, score['sounding'])
     best = max(fits, key=fits.get)
     runner = max(v for k, v in fits.items() if k != best)
     # Tuning as transcribe measured it from the audio; a Basic Pitch-era run carries bends instead.
@@ -131,8 +189,15 @@ def check(out):
     # a runner-up near 0.8 is normal; only a near tie says the key is in doubt.
     if fits[best] - runner < 0.05:
         flags.append(f'the key fit is ambiguous ({fits[best]:.2f} vs {runner:.2f})')
-    if abs(cents) > 35:
-        flags.append(f'the instrument is {cents:+.0f} cents off concert pitch: semitone matches may slip')
+    if abs(cents) > OFF_PITCH:
+        flags.append(f'the instrument is {cents:+.0f} cents off concert pitch: semitone matches may slip; transcribe again with --retune')
+    # How far the recording sounds from the score, against what the synth following it is told.
+    retuned = meta.get('retune')
+    sounds = retuned['recordingCents'] if retuned else cents
+    stored = stored_tuning(out)
+    result['recordingCents'], result['storedTuningCents'] = sounds, stored
+    if abs(sounds - (stored or 0)) > STORED_TUNING_MARGIN and best == 0:
+        flags.append(f"the recording sounds {sounds:+.0f} cents from the score, its stored tuning is {'unset' if stored is None else f'{stored:+.0f}'}: the synth following it will be off; $T tuning --cents {sounds:.0f} --write")
     result['flags'] = flags
     save(out, 'check.json', result)
     print(f'key fit {best:+d} semitones: {fits[best]:.2f} (next best {runner:.2f}); tuning {cents:+.0f} cents')
@@ -630,6 +695,15 @@ def perform(rng, written, played, whole, drift=0.0, held=None):
     return heard, truth, t
 
 
+def selftest_tuning():
+    """A recording off pitch: when to retune, and how far it sounds from a score named either way."""
+    cases = [(retune_cents(-48), 48), (retune_cents(3), 0), (retune_cents(-35), 0), (retune_cents(36), -36),
+             (recording_cents(-48, 0), -48), (recording_cents(-48, 1), 52), (recording_cents(52, -1), -48)]
+    bad = [(got, want) for got, want in cases if got != want]
+    print(f"{'FAIL' if bad else 'ok  '} tuning: {bad or 'A=428 is -48 from open E♭, +52 from open D'}")
+    return ['tuning'] if bad else []
+
+
 def selftest(_out):
     """Both searches against synthetic performances with known answers. The free search: drift, a
     cut, a jump. The fixed-order search: the same, lookalike and unwritten bars, the tighten of an
@@ -643,7 +717,7 @@ def selftest(_out):
     order = list(range(1, 9)) + list(range(1, 9)) + list(range(9, 13))   # a repeat of 1–8
     score = {'written': written, 'order': order, 'structuralStarts': [1, 9],
              'edges': [[order[i], order[i + 1]] for i in range(len(order) - 1)]}
-    failures = []
+    failures = selftest_tuning()
 
     def judge(name, rows, played, truth, flagged=None):
         got = [r[0] for r in rows]
@@ -709,6 +783,7 @@ if __name__ == '__main__':
     parser.add_argument('--instruments', default='acoustic_guitar',
                         help='transcribe: MuScriptor instrument groups playing (muscriptor list-instruments); add voice for a singer')
     parser.add_argument('--keep', help='transcribe: groups whose notes to keep (default: all of --instruments but voice)')
+    parser.add_argument('--retune', action='store_true', help='transcribe: pitch a recording well off concert pitch onto the grid first')
     parser.add_argument('--fixed-order', action='store_true',
                         help="structure: hold the search to the score's performed order instead of searching for it")
     parser.add_argument('--near-sync', nargs='?', type=float, const=0.3, metavar='SECONDS',
@@ -718,7 +793,7 @@ if __name__ == '__main__':
         parser.error('--near-sync tightens a sync in the score\'s order: it needs --fixed-order')
     out = os.path.abspath(a.out)
     if a.command == 'transcribe':
-        transcribe(out, a.half_speed, a.audio and os.path.abspath(a.audio), a.instruments, a.keep)
+        transcribe(out, a.half_speed, a.audio and os.path.abspath(a.audio), a.instruments, a.keep, a.retune)
     elif a.command == 'structure':
         structure(out, a.fixed_order, a.near_sync)
     else:

@@ -11,7 +11,7 @@ import { youtubeVideoId } from '../audio/youtubeUrl.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
 import { HostBackend, type HostLayers } from '../audio/hostBackend.ts';
 import { NativeHostPort } from '../audio/native/hostPort.ts';
-import { createRecordingSync } from '../audio/recordingSync.ts';
+import { createRecordingSync, performedBarBeats } from '../audio/recordingSync.ts';
 import { scorePositionAt } from '../audio/scorePosition.ts';
 import { linearizePasses } from '../model/passes.ts';
 import { restSpansOf, restsAt, type RestSpan } from '../model/restSpans.ts';
@@ -1919,9 +1919,7 @@ export class Player extends LitElement {
   }
   /** Each performed bar's length in the segments' beats. */
   private barBeats(segments: SyncSegments): number[] {
-    const durations = this.writtenBarDurations, unit = segments.beat[0] / segments.beat[1];
-    if (!this.performance || !durations) return [];
-    return this.performance.measures.map(m => { const d = durations[m.measureIndex]; return d ? Number(d.num) / Number(d.den) / unit : 0; });
+    return this.performance && this.writtenBarDurations ? performedBarBeats(this.performance, this.writtenBarDurations, segments) : [];
   }
   private setSyncMode(on: boolean) {
     if (on === this.syncMode) return;

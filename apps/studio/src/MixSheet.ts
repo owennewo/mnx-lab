@@ -25,7 +25,9 @@ import { linearizePasses } from '../../../src/model/passes.ts';
 import { compilePerformance } from '../../../src/audio/performance.ts';
 import { syncSummary, type SyncSummary } from './syncSummary.ts';
 import { playbackNotes } from './playbackNotes.ts';
-import { isImportedSync, storedScoreShape } from '../../../src/model/recordingAttachment.ts';
+import { isImportedSync, storedScoreShape, storedSyncSegments } from '../../../src/model/recordingAttachment.ts';
+import { performedBarBeats } from '../../../src/audio/recordingSync.ts';
+import { staleSegmentBars } from '../../../src/model/syncSegments.ts';
 
 export interface MixPart {
   /** The part's index in the document. */
@@ -233,6 +235,11 @@ export class MixSheet extends LitElement {
     const stamped = isImportedSync(row) ? storedScoreShape(row.provenance) : null;
     return !!stamped && !!this.scoreShape && stamped !== this.scoreShape;
   }
+  /** Bars a one-segment-a-bar sync no longer counts right: they play at the wrong speed. */
+  private staleBars(row: LibraryRecording): number[] {
+    const segments = storedSyncSegments(row.provenance), compiled = this.compiled;
+    return segments && compiled?.ok ? staleSegmentBars(segments, performedBarBeats(compiled.performance, compiled.writtenBarDurations, segments)) : [];
+  }
   /** How a recording follows this score. */
   private follows(summary: SyncSummary, active: boolean, outOfDate = false) {
     if (summary.warning || (active && this.syncWarning)) return 'sync warning';
@@ -295,7 +302,7 @@ export class MixSheet extends LitElement {
   }
   /** Why a recording's sync is not to be trusted — a mark by its name, its words in the title. */
   private alarm(row: LibraryRecording, active: boolean): string {
-    const follows = this.follows(syncSummary(row, this.compiled, this.passes), active, this.outOfDate(row));
+    const follows = this.follows(syncSummary(row, this.compiled, this.passes), active, this.outOfDate(row) || this.staleBars(row).length > 0);
     return follows === 'sync warning' || follows === 'may be out of date' ? follows : '';
   }
   private alarmMark(row: LibraryRecording, active: boolean) {
@@ -316,7 +323,7 @@ export class MixSheet extends LitElement {
   /** What the recording playing needs said: a sync gone stale, a sync warning, or none to follow by. */
   private recordingNotes(row: LibraryRecording, on: boolean) {
     const summary = syncSummary(row, this.compiled, this.passes);
-    const outOfDate = this.outOfDate(row);
+    const outOfDate = this.outOfDate(row), stale = this.staleBars(row);
     const points = summary.points.length;
     const warning = on && (this.syncWarning || summary.warning || summary.dropped);
     // The synth and the click follow the recording's sync: without one they have nothing to go by.
@@ -324,6 +331,9 @@ export class MixSheet extends LitElement {
     return html`
       ${outOfDate && on
         ? html`<div class="diagnostic" role="status" data-out-of-date><strong>May be out of date:</strong> the score's bars have changed since this sync was made. It counts bars by number, so everything after the change may now be early or late. Make a new sync in the sync bar to replace it.</div>`
+        : nothing}
+      ${stale.length && on
+        ? html`<div class="diagnostic" role="status" data-out-of-date data-stale-bars=${stale.length}><strong>May be out of date:</strong> ${stale.length === 1 ? `bar ${stale[0]! + 1} has` : `${stale.length} bars, from bar ${stale[0]! + 1}, have`} changed length since this sync was made, so ${stale.length === 1 ? 'it plays' : 'they play'} at the wrong speed and later bars drift. Make a new sync in the sync bar to replace it.</div>`
         : nothing}
       ${warning
         ? html`<div class="diagnostic" role="status"><strong>Sync warning:</strong> ${this.syncWarning || (summary.warning ? summary.message : `${summary.dropped} out-of-range sync ${summary.dropped === 1 ? 'point' : 'points'} dropped.`)} Score following and seeking may be unavailable.</div>`

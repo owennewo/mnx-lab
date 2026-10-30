@@ -243,6 +243,18 @@ export function syncpointsFromSegments(doc: SyncSegments, barBeats: readonly num
 }
 
 /**
+ * The performed bars (by index) a one-segment-a-bar sync no longer counts right. Such a sync — every
+ * segment named for its bar, as the recording-align tool writes it — says "this bar is N beats long";
+ * make the bar longer and the same seconds hold more beats, so it and everything after run at the
+ * wrong speed (run 9: copied bars of 12 eighths over segments of 8). Empty for any other sync, whose
+ * segments span bars by design and re-derive as they should.
+ */
+export function staleSegmentBars(doc: SyncSegments, barBeats: readonly number[]): number[] {
+  if (!barBeats.length || !doc.segments.length || !doc.segments.every(s => /^Bar \d+/.test(s.name))) return [];
+  return doc.segments.flatMap((s, i) => s.beats !== null && (i >= barBeats.length || Math.abs(s.beats - barBeats[i]!) > 1e-6) ? [i] : []);
+}
+
+/**
  * The tuples a recording PLAYS BY. A sync made in Studio is its segments — a
  * beat count over time — and the stored tuples beside them are a cache derived
  * from those segments and the bars the score had when the sync was last touched.

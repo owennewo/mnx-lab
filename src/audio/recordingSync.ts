@@ -65,6 +65,16 @@ function floorIndex<T>(values: readonly T[], target: Rational, key: (value: T) =
 }
 const numberOf = (value: Rational) => Number(value.num) / Number(value.den);
 
+/** Each performed bar's written length in a sync's beats: what its segments are read against. */
+export function performedBarBeats(
+  performance: { readonly measures: readonly { readonly measureIndex: number }[] },
+  writtenBarDurations: readonly Rational[],
+  segments: { readonly beat: readonly [number, number] },
+): number[] {
+  const unit = segments.beat[0] / segments.beat[1];
+  return performance.measures.map(m => { const d = writtenBarDurations[m.measureIndex]; return d ? numberOf(d) / unit : 0; });
+}
+
 /** Bind to the exact compilation and traversal. Partial visits are unsupported
  *  until Soundslice correspondence is known; full-bar jumps remain supported.
  *  Out-of-range anchors are excluded from the map, never removed from source evidence.

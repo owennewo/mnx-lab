@@ -34,6 +34,13 @@ to do — each is a gap to close.
   half-written score, where the free search wanders. Two of two Soundslice syncs measured were
   early (runs 6, 9); whether that is general is the next thing to measure.
 
+- **Score a sync as the player plays it, not as the search proposed it** (run 9): the report's numbers
+  looked fine while the player ran bar 80 onward 1.5× fast. `sync` and `verify` now replay the written
+  notes through the player's own sync (`verifySync.ts`). On the real runs: Jansch, Teen Spirit, Sun Did
+  Glide, the Quaker, Blackbird and Everybody Wants all pass (74–95% against 12–41%), and run 9's stale
+  sync, rebuilt, fails on bars 80–84 and 102–109 with the drift named. Threshold: four bars running
+  under 50%. No audio work: it reuses the run's notes, in seconds.
+
 ## Open questions
 
 - A recording that departs from the score's order: which of the three options do owners
@@ -403,3 +410,8 @@ to do — each is a gap to close.
   hand). The session's tools wait in `.scratchpad/glowup/` for a second piece to earn promotion.
 - **Time**: one long session — analysis, two tool changes landed (fixed-order search; stale-sync
   and shorter-sync guards), 20 named versions, five drafted sections.
+- **Afterwards, from what run 9 could not hear** (2026-10-30): `verify` above; `sync` refuses bars that
+  do not fill their time signature (`--misfit`) and a score saved since the fetch; the Mix panel warns
+  when bars changed length under a one-segment-a-bar sync (`staleSegmentBars`); `transcribe --retune`
+  does what was done by hand here and resolves −48 from +52 by the key fit, and `check` flags a recording
+  whose sound differs from its stored tuning by over 25 cents.
