@@ -16,6 +16,9 @@
 //                                             than the sync it replaces, each unless its flag says so
 //   verify                                    the recording's stored sync against the piece as it is now, with
 //                                             this run's notes.json: exit 2 if the player would play it wrong
+//   checkpoint --edited <file.mnx.json> --bars 1,5-8 --name <text> [--write] [--resize] [--settings]
+//                                             an edit of this run's score.mnx.json as a named version: checked
+//                                             that only those bars change, drawn; saved only with --write
 //   tuning --cents <c> | --clear [--write]    how far the recording sounds from the score's pitch (the synth
 //                                             following it plays that far off)
 //
@@ -40,6 +43,8 @@ import { segmentsFromBarStarts, syncpointsFromSegments, staleSegmentBars, decode
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
 import { storedSyncSegments, storedTuningCents } from '../../src/model/recordingAttachment.ts';
 import { verifySync, verdictLines } from './verifySync.ts';
+import { misfitBars, parseBars, syncRefusal } from './decisions.ts';
+import { barsAlone, checkpointBody, prepareCheckpoint } from './checkpoint.ts';
 import { createRecordingSync, performedBarBeats } from '../../src/audio/recordingSync.ts';
 import { ZERO } from '../../src/audio/time.ts';
 import { checkStorage } from '../../src/importers/storageCheckCore.ts';
@@ -219,35 +224,22 @@ async function sync() {
   if (!syncpoints || !decodeRecordingSync(syncpoints).ok) fail('the derived sync points do not decode');
   const payload = { format: SYNC_SEGMENTS_FORMAT, segments, syncpoints };
   writeJson('sync-payload.json', payload);
-  // Bars that do not fill their time signature (placeholder rests, a pickup a note over): the sync would count
-  // the wrong beats for them, and the bars go stale when they are put right (run 9). Fix the score first.
-  const misfits = Object.entries(s.written as Record<string, { duration: number; signature: number | null }>).filter(([, w]) => w.signature !== null && Math.abs(w.duration - w.signature) > 1e-9).map(([bar]) => bar);
-  const misfitRefusal = misfits.length && !flag('misfit') ? `bars ${misfits.join(' ')} hold more or less than their time signature, so their beats would be wrong: fix them first, or --misfit when they are meant` : null;
   const verdict = verifySync({ document: readJson('score.mnx.json'), sync: { syncpoints, syncSegments: segments }, heard });
   writeJson('verify.json', verdict);
   verdictLines(verdict).forEach(line => console.log(line));
-  const verifyRefusal = !verdict.ok && !flag('unverified') ? 'the player would not play this sync with the recording (above): read the report, or --unverified when that is meant' : null;
   const gaps = cuts.slice(1).map((c, i) => c - cuts[i]);
   console.log(`${segments.segments.length} segments over ordinals 0–${rows.length - 1} of ${s.order.length}; ${cuts.length} cuts (${snapped} snapped to a heard downbeat), ${cuts[0].toFixed(2)}–${cuts.at(-1)!.toFixed(2)} s; bars ${Math.min(...gaps).toFixed(2)}–${Math.max(...gaps).toFixed(2)} s; beat 1/${segments.beat[1]}`);
-  // A replacement that covers fewer bars than the sync it replaces loses the rest (run 9: a stale
-  // sync held the search to bar 80, and the 80-bar result went out unread).
-  // How far a sync reaches: the last performed bar line it places (the end of its last bar).
-  const reach = (syncpoints: string | null | undefined) => syncpoints ? Math.max(...(JSON.parse(syncpoints) as number[][]).map(p => p[0])) : 0;
-  const shorter = (before: number) => rows.length < before && !flag('shorter')
-    ? `this sync reaches the end of performed bar ${rows.length}, the one it would replace bar ${before}: read the report (a search that stopped early?); --shorter only when that is meant` : null;
+  // Decided against the library as it is now, dry run or not: the write would meet that.
+  const { pieceId, recording, canonical } = readJson('piece.json');
+  const live = await (await api(`/pieces/${encodeURIComponent(pieceId)}`)).json();
+  const row = live.snapshot.recordings.find((r: { id: string }) => r.id === recording.id) ?? fail('the recording is no longer on the piece');
+  const refusal = syncRefusal({ misfits: misfitBars(s.written), verified: verdict.ok, bars: rows.length, stored: row.syncpoints,
+    scoreMoved: live.snapshot.piece.canonical_rendition_id !== canonical,
+    allow: { misfit: flag('misfit'), unverified: flag('unverified'), replace: flag('replace'), shorter: flag('shorter') } });
   if (!flag('write')) {
-    const refusal = misfitRefusal ?? verifyRefusal ?? shorter(reach(readJson('piece.json').recording?.syncpoints));
     console.log(refusal ? `dry run; --write would REFUSE: ${refusal}` : 'dry run: nothing written (pass --write)');
     return;
   }
-  if (misfitRefusal) fail(misfitRefusal);
-  if (verifyRefusal) fail(verifyRefusal);
-  const { pieceId, recording, canonical } = readJson('piece.json');
-  const live = await (await api(`/pieces/${encodeURIComponent(pieceId)}`)).json();
-  if (live.snapshot.piece.canonical_rendition_id !== canonical) fail('the score was saved since this run fetched it, so this sync was checked against other bars: fetch, score and structure again');
-  const row = live.snapshot.recordings.find((r: { id: string }) => r.id === recording.id) ?? fail('the recording is no longer on the piece');
-  if (row.syncpoints && !flag('replace')) fail('the recording already has a sync; pass --replace only when the owner has said to replace it');
-  const refusal = shorter(reach(row.syncpoints));
   if (refusal) fail(refusal);
   const response = await api(`/pieces/${encodeURIComponent(pieceId)}/recordings/${encodeURIComponent(row.id)}`, { method: 'PUT',
     body: JSON.stringify({ expected_revision: live.snapshot.piece.revision, name: row.name || 'Recording', rawSync: payload }) });
@@ -301,16 +293,51 @@ function build() {
   initSmufl();
   const widthSp = Number(option('width', '200'));
   const system = computeBothSystem(document, widthSp) ?? fail('the score has no tab view to preview');
-  const svg = renderSvgToString({ ...system, pxPerSp: 10 });
+  const drawn = draw(system, 10, 'preview');
+  console.log(`→ score.gp, score.mnx.json, preview.png (${drawn})`);
+}
+
+/** A laid-out system as <name>.png in the run directory; its size. */
+function draw(system: NonNullable<ReturnType<typeof computeBothSystem>>, pxPerSp: number, name: string) {
+  const svg = renderSvgToString({ ...system, pxPerSp });
   const font = readFileSync(join(ROOT, 'public/smufl/Bravura.woff2')).toString('base64');
-  const html = join(out, 'preview.html');
+  const html = join(out, `${name}.html`);
   writeFileSync(html, `<!doctype html><meta charset="utf-8"><style>@font-face { font-family: 'Bravura'; src: url(data:font/woff2;base64,${font}) format('woff2'); }
 html,body { margin:0; background:#fff; } :root { --font-family-sans: Georgia, serif; } svg { display:block; margin:12px; }</style>${svg}`);
   const size = (attr: string) => Math.ceil(Number(new RegExp(`\\b${attr}="([\\d.]+)"`).exec(svg)?.[1] ?? 0)) + 24;
   execFileSync('google-chrome', ['--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars', '--default-background-color=ffffff',
-    `--window-size=${size('width')},${size('height')}`, `--screenshot=${join(out, 'preview.png')}`, html], { stdio: 'ignore' });
+    `--window-size=${size('width')},${size('height')}`, `--screenshot=${join(out, `${name}.png`)}`, html], { stdio: 'ignore' });
   unlinkSync(html);
-  console.log(`→ score.gp, score.mnx.json, preview.png (${size('width')}×${size('height')})`);
+  return `${size('width')}×${size('height')}`;
+}
+
+/** An edit of this run's score as a named version: only what it says it changes, or nothing is saved. */
+async function checkpoint() {
+  const editedPath = option('edited') ?? fail('--edited <file.mnx.json> is required');
+  const name = option('name') ?? fail('--name <text> is required');
+  const bars = parseBars(option('bars')) ?? fail('--bars takes bars like 1,5-8');
+  const { pieceId, canonical } = readJson('piece.json');
+  const { snapshot } = await (await api(`/pieces/${encodeURIComponent(pieceId)}`)).json();
+  if (snapshot.piece.canonical_rendition_id !== canonical) fail('the score was saved since this run fetched it: fetch, and make the edit again on what is there now');
+  const prepared = prepareCheckpoint({ before: readJson('score.mnx.json'), edited: JSON.parse(readFileSync(resolve(editedPath), 'utf8')), bars, name,
+    recordings: snapshot.recordings, allow: { resize: flag('resize'), settings: flag('settings') } });
+  writeFileSync(join(out, 'checkpoint.gp'), prepared.bytes);
+  console.log(`changed bars: ${prepared.changed.join(' ') || 'none'}; storage check: ${prepared.check.verdict}`);
+  prepared.problems.forEach(problem => console.log(`  ✗ ${problem}`));
+  for (const { recording, bars: off } of prepared.stale) console.log(`STALE SYNC: "${recording}": performed bars ${off.join(' ')} no longer match it; write it again when the edits are done`);
+  const shown = prepared.changed.length ? prepared.changed : bars;
+  initSmufl();
+  const system = computeBothSystem(barsAlone(prepared.document, shown.slice(0, 6)), 60 * Math.min(shown.length, 6));
+  if (system) console.log(`→ checkpoint.png (bars ${shown.slice(0, 6).join(' ')}; ${draw(system, 9, 'checkpoint')})`);
+  if (prepared.problems.length) fail('nothing saved: the checks above failed');
+  if (!flag('write')) { console.log('dry run: nothing written (pass --write)'); return; }
+  const filename = snapshot.renditions.find((r: { id: string }) => r.id === canonical)?.filename ?? 'score.gp';
+  const body = checkpointBody(prepared, { revision: snapshot.piece.revision, derivedFrom: canonical, filename, name, sha256: createHash('sha256').update(prepared.bytes).digest('hex') });
+  const response = await api(`/pieces/${encodeURIComponent(pieceId)}/renditions`, { method: 'POST', body: JSON.stringify(body) });
+  const saved = await response.json();
+  if (!response.ok) fail(`save refused (${response.status}): ${JSON.stringify(saved)}`);
+  // Not carried into this run's files: score.json and any structure were made from the old bars, so the next step starts from a fetch.
+  console.log(`saved "${name}": piece revision ${saved.snapshot.piece.revision}${saved.unchanged ? ' (unchanged)' : ''}. Fetch again before the next edit or sync.`);
 }
 
 /** The piece, made from build's score.gp exactly as studio's New piece page makes one. */
@@ -374,6 +401,6 @@ async function tuning() {
   console.log(`written: piece revision ${body.snapshot.piece.revision}; tuning ${storedTuningCents(saved.provenance) ?? 'unset'}`);
 }
 
-const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, verify, build, create, attach, tuning };
+const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, verify, checkpoint, build, create, attach, tuning };
 if (!commands[command]) fail(`unknown command ${command ?? '(none)'}; one of ${Object.keys(commands).join(', ')}`);
 await commands[command]();

@@ -26,6 +26,7 @@ Each command reads and writes files in `--out`:
 | `check.json` | `check` | key fit by shift, tuning, density, flags |
 | `structure.json`, `report.md` | `structure` | bar by bar: when, how fast, notes found; which search, bars placed by onsets only, weak runs, unexplained notes, how far the bar lines moved from the existing sync |
 | `sync-payload.json` | `sync` | the segments and sync points that would be written |
+| `checkpoint.gp`, `checkpoint.png` | `checkpoint` | the file a scripted edit would store, and its changed bars drawn |
 | `verify.json` | `sync`, `verify` | the sync as the player would play it, bar by bar: written notes heard, against chance; bars that went stale, bar lines it would miss, stretches that leave the recording |
 | `screen/pages.json`, `screen/page-NN*.png` | `screen.py pages` | the notation a video shows: when each page is on screen, each page and overlapping slices of it |
 | `score.gp`, `score.built.mnx.json`, `score.storage.json`, `score.mnx.json`, `preview.png` | `build` | from `score.tab.txt`: the `.gp` studio would store, the built document, its storage check, the document read back from the `.gp` (what `score` reads), a picture of it |

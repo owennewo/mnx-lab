@@ -415,3 +415,5 @@ to do — each is a gap to close.
   when bars changed length under a one-segment-a-bar sync (`staleSegmentBars`); `transcribe --retune`
   does what was done by hand here and resolves −48 from +52 by the key fit, and `check` flags a recording
   whose sound differs from its stored tuning by over 25 cents.
+  What `sync` will write is decided in `decisions.ts`, and `checkpoint` (the session's save script, on its
+  third use) in `checkpoint.ts`, so both are tested without a library or a run.

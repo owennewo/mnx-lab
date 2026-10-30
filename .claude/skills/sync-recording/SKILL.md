@@ -235,6 +235,13 @@ reaches fewer bars than the sync it replaces (`--shorter`), or the score was sav
 fetched it. It verifies again what was stored. `$T verify` checks a stored sync at any time, in
 seconds, given this run's notes.
 
+A scripted edit to the score goes through `$T checkpoint --edited <file.mnx.json> --bars 1,5-8 --name
+<text> [--write]`, never a hand-made save: it refuses a bar changed that it does not name, a bar named
+that did not change, a tuning or bar count that moves (`--settings`, `--resize`) and anything the export
+newly loses, and draws the bars (`checkpoint.png`). An edit that moves a bar's length says STALE SYNC and
+does not rewrite it: finish the edits, then fetch and write the sync once. Edit string and fret with the
+pitch: the string is the authority, so a pitch alone does not survive the export.
+
 **A sync counts beats per bar, so it goes stale when a bar's length changes** — a copy into a
 placeholder bar, a time signature fixed. The player then runs those bars at the wrong speed (run 9:
 copied bars of 12 eighths over segments of 8 played 1.5× fast). After any such edit, rerun `score`:
