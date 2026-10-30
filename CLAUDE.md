@@ -130,6 +130,14 @@ reaching for `--force`; `branch -d` refusing means the work is not on `main` yet
 **Removal comes *before* the roadmap doc moves to `complete/`** — an item is not complete
 while its worktree is still on disk.
 
+### Reflecting on the work
+
+After landing, name in your reply up to three things this work exposed that, if fixed,
+would likely improve future agent runs or the codebase: what cost time, nearly went
+wrong, or should have been caught. Each is specific: what happened, where, and the fix.
+If nothing qualifies, say so in a line. Reflecting changes nothing: the human decides
+what to act on, and a `proposed/` doc is still written only when asked for.
+
 Why outside the repo, why rebase, why goldens are regenerated rather than merged:
 [docs/worktrees.md](docs/worktrees.md).
 
