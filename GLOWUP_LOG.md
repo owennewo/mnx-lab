@@ -70,7 +70,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Eleanor Rigby | Beatles (fingerstyle book) | `243e798f04b5ff1f` |  | no recording |  |  |  |
 | Erwan | Meic Stevens | `2ba9acbdad27fe6b` |  | Soundslice |  |  |  |
 | Every Breath You Take | The Police | `05fa6b889b0481b6` |  | Soundslice |  |  |  |
-| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 | 🟡 10-29 much improved; strings to check | 🟡 10-29 (no repeats yet) | — |
+| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 | 🟡 10-29 much improved; strings to check | 🟡 10-30 (bars 2–4 folded; the rest not yet) | — |
 | Fast Car | Tracy Chapman | `10537b9c88cc5329` |  | Soundslice |  |  |  |
 | Fingerstyle Mastery: Travis Picking Part 2 | Mike Dawes | `8dee0f5649ee664d` |  | no recording |  |  |  |
 | Freight Train | Elizabeth Cotton | `b9cc081329df0d07` |  | Soundslice |  |  |  |
@@ -143,6 +143,19 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-10-30 — Everybody Wants To Rule The World · `2b156138db0c7716` — the owner's manual pass begins
+
+- Starts from revision 31 (*Tuning named as open D*); the owner's own edits follow it, the first to
+  bar 1 (revision 34).
+- **Form**: bars 2–4, the same bar written three times, folded at the owner's request into one bar
+  repeated ×3 (revision 35, *Bars 2–4: the same bar written three times, now one bar repeated ×3*).
+  108 written bars, still 110 performed. Checked on the stored file: every bar's position and every
+  sounding note unchanged, no other bar differs, storage check clean, and both recordings' bar lines
+  move by 0.
+- **Bar numbers**: every bar from the old 5 on is now 2 lower (the 11/8 bar is 3, Verse 12, Bridge 44,
+  Outro 100, the last bar 108). The entry below and run 9 use the old numbers, and the notes check's
+  findings use open E♭ pitch names as well, a semitone above today's.
 
 ### 2026-10-29 — Everybody Wants To Rule The World (Gabriella Quevedo's arrangement) · `2b156138db0c7716` — [run 9](tools/recording-align/RUNS.md#run-9--2026-10-29--everybody-wants-to-rule-the-world-gabriella-quevedo-the-fixed-order-search) · wrapped up
 
