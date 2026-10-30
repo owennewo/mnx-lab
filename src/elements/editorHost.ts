@@ -521,7 +521,12 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     }
   };
   const readOnly = () => options.readOnly?.() ?? false;
-  const dispatch = (intent: EditorIntent): boolean => {
+  /** A press landed the cursor: tell the player, before the seek, which bar it named. */
+  const pressedBar = () => {
+    const at = session.playStart;
+    if (at) playback?.pressed?.(at.ordinal);
+  };
+  const dispatch = (intent: EditorIntent, press = intent.type === 'goToPointer'): boolean => {
     if (disposed) return false;
     // Say WHY, rather than returning quietly. A read-only refusal used to leave
     // this function before anything could observe it, which is why typing a
@@ -536,6 +541,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       if (head) park(head);
       const moved = session.handleIntent(intent);
       const target = session.playStart;
+      if (moved && press) pressedBar();
       if (moved && target && (!head || target.ordinal !== head.ordinal || intent.type === 'goToPointer')) seekNow(target);
       if (session.passNotice) showLabel(noticeText(session.passNotice));
       draw();
@@ -544,6 +550,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     const before = NAVIGATION.has(intent.type) ? null : cursorNote();
     const handled = session.handleIntent(intent);
     cursorHidden = false;
+    if (handled && press) pressedBar();
     if (playback && session.passNotice) showLabel(noticeText(session.passNotice));
     // Delete is the one verb whose two presses mean different things, so it says which one this was — including
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
@@ -873,7 +880,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       toLevel('note');
     } else {
       if (press.measureIndex === undefined) return false;
-      moved = press.measureIndex === session.cursor.measureIndex || dispatch({ type: 'goToMeasure', measureIndex: press.measureIndex });
+      const here = press.measureIndex === session.cursor.measureIndex;
+      if (here) pressedBar();
+      moved = here || dispatch({ type: 'goToMeasure', measureIndex: press.measureIndex }, true);
       toLevel('measure');
     }
     if (!moved) { draw(); return false; }

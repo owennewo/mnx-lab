@@ -1,7 +1,7 @@
 // The loop (roadmap/inprogress/studio-player-practice.md) in the workbench's real browser:
 // a selection becomes the loop from the tray's Loop field, the score draws it, a count-in
-// counts on its chip, a handle dragged with the mouse moves its end, a seek out of it while
-// playing leaves it, and Clear takes it off the score.
+// counts on its chip, a handle dragged with the mouse moves its end, a press outside it moves
+// it to start there, a seek out of it while playing leaves it, and Clear takes it off the score.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -89,6 +89,38 @@ try {
     check(viewer.playbackState.loop?.label==='Loop 2–5','The score did not follow the drag');
     return 'bars 2–5';
   })()`));
+
+  // A real press on a bar of the score, outside the loop: the loop moves to start there, as long
+  // as it was — paused, playing, and on the rail. Inside the loop, nothing moves.
+  const pressBar = async ordinal => {
+    const p = await cdp.evaluate(`(()=>{
+      const player=${PLAYER},viewer=${VIEWER};
+      const key=player.performance.written.find(w=>w.ordinal===${ordinal})?.noteKey;
+      const ink=viewer.shadowRoot.querySelector('[data-source-id="'+key+'"]');
+      ink.scrollIntoView({block:'center'});
+      const r=ink.getBoundingClientRect();
+      return JSON.stringify({x:r.left+r.width/2,y:r.top+r.height/2});
+    })()`).then(JSON.parse);
+    await mouse('mouseMoved', p.x, p.y); await mouse('mousePressed', p.x, p.y); await mouse('mouseReleased', p.x, p.y);
+    await cdp.evaluate(`new Promise(r=>setTimeout(r,300))`);
+  };
+  const looped = () => cdp.evaluate(`JSON.stringify([${PLAYER}.loop?.first,${PLAYER}.loop?.last,${VIEWER}.playbackState.loop?.first,${PLAYER}.scorePosition?.ordinal,${PLAYER}.snapshot?.state])`).then(JSON.parse);
+  const expectLoop = (got, first, last, what) => {
+    if (got[0] !== first || got[1] !== last || got[2] !== first || got[3] !== first) throw new Error(`${what}: ${JSON.stringify(got)}, wanted the loop at ${first}–${last}, the playhead in its first bar`);
+  };
+  expectLoop(await pressBar(7).then(looped), 7, 10, 'A press outside the paused loop');
+  await pressBar(8);
+  { const got = await looped(); if (got[0] !== 7 || got[1] !== 10 || got[3] !== 8) throw new Error(`A press inside the loop moved it: ${JSON.stringify(got)}`); }
+  await cdp.evaluate(`${PLAYER}.play()`);
+  await cdp.evaluate(`new Promise(r=>setTimeout(r,300))`);
+  await pressBar(2);
+  { const got = await looped(); expectLoop(got, 2, 5, 'A press outside the loop while playing'); if (got[4] !== 'playing') throw new Error(`The press stopped the music: ${JSON.stringify(got)}`); }
+  await cdp.evaluate(`${PLAYER}.pause()`);
+  await cdp.evaluate(`[...${PLAYER}.shadowRoot.querySelectorAll('.lane')][8].click()`);
+  await cdp.evaluate(`new Promise(r=>setTimeout(r,300))`);
+  expectLoop(await looped(), 8, 11, 'A press on the rail outside the loop');
+  console.log('press', 'moved');
+  await cdp.evaluate(`${PLAYER}.setLoopBars({first:1,last:4})`);
 
   // Paused, the cursor may wander off and the loop stays; playing, a seek out of it leaves it.
   console.log('leave', await cdp.evaluate(`(async()=>{

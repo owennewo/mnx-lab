@@ -44,4 +44,7 @@ export interface CursorPlayback {
   /** The performed bars the selection covers, first and last — what the player's Loop button
    *  loops (roadmap/inprogress/studio-player-practice.md). Null when there is none. Optional. */
   range?(bars: { first: number; last: number } | null): void;
+  /** A press on the score landed the cursor on this performed bar: a loop it is outside moves to
+   *  start there. Comes before the seek the press makes; a key's move does not call it. Optional. */
+  pressed?(ordinal: number): void;
 }

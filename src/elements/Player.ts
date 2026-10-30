@@ -18,7 +18,7 @@ import { restSpansOf, restsAt, type RestSpan } from '../model/restSpans.ts';
 import type { PartMix } from '../audio/partMix.ts';
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
-import { DEFAULT_TRAINER, PLAIN_LOOP, documentMeter, practiceRegion, type LoopBars, type MeterOf, type PracticeOptions, type PracticeThen } from '../audio/practice.ts';
+import { DEFAULT_TRAINER, PLAIN_LOOP, documentMeter, loopMovedTo, practiceRegion, type LoopBars, type MeterOf, type PracticeOptions, type PracticeThen } from '../audio/practice.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackOccurrence, PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
@@ -1645,6 +1645,7 @@ export class Player extends LitElement {
     const measure = this.performance?.measures.find(m => m.ordinal === ordinal);
     if (!measure || !this.session) return false;
     // Playing, a seek out of the loop leaves it; paused, the loop stays and Play starts at it.
+    // A press moves the loop first (`moveLoopTo`), so its seek lands inside.
     const shown = this.shownBars;
     if (shown && this.playback?.wantsPlayback && (ordinal < shown.first || ordinal > shown.last)) this.setLoopBars(null);
     const within = metricOffset === undefined
@@ -1840,7 +1841,7 @@ export class Player extends LitElement {
               aria-label=${lane.tip}
               aria-current=${lane.ordinal === current ? 'true' : nothing}
               data-tip=${lane.tip}
-              @click=${() => this.seek(lane.ordinal)}
+              @click=${() => { this.moveLoopTo(lane.ordinal); this.seek(lane.ordinal); }}
             ></button>`,
           )}
         </div>`,
@@ -1869,7 +1870,7 @@ export class Player extends LitElement {
       aria-current=${now >= 0 ? 'true' : nothing}
       data-tip=${(now >= 0 ? lanes[now] : lanes[Math.min(played, lanes.length - 1)])?.tip ?? ''}
       @mousemove=${(event: MouseEvent) => (event.currentTarget as HTMLElement).setAttribute('data-tip', at(event).tip)}
-      @click=${(event: MouseEvent) => this.seek(at(event).ordinal)}
+      @click=${(event: MouseEvent) => { const { ordinal } = at(event); this.moveLoopTo(ordinal); this.seek(ordinal); }}
     >${now >= 0 ? html`<span class="mark"></span>` : nothing}</button>`;
   }
 
@@ -1997,6 +1998,12 @@ export class Player extends LitElement {
     if (!valid && this.openPop === 'loop') this.openPop = null;
     this.applyLoop();
     this.announceLoop();
+  }
+  /** A press on a bar (the score, the rail): outside the loop, the loop moves to start there.
+   *  Before the seek: a recording holds a seek to the loop it has. */
+  moveLoopTo(ordinal: number) {
+    const moved = this.shownBars && loopMovedTo(this.shownBars, ordinal, (this.performance?.measures.length ?? 0) - 1);
+    if (moved) this.setLoopBars(moved);
   }
   /** Change how the loop is practised; a loop playing starts its count of repeats again. */
   setPracticeOptions(options: PracticeOptions) {

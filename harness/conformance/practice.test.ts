@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { PLAIN_LOOP, practiceRegion, practiceTakes, takeAfter, trainerRate, type PracticeOptions } from '../../src/audio/practice.ts';
+import { PLAIN_LOOP, loopMovedTo, practiceRegion, practiceTakes, takeAfter, trainerRate, type PracticeOptions } from '../../src/audio/practice.ts';
 import { Transport, type Clock } from '../../src/audio/transport.ts';
 import type { Sink, SinkEvent } from '../../src/audio/sink.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
@@ -15,6 +15,19 @@ import type { MnxStructure } from '../../src/model/mnx.ts';
 import { loadCorpus } from '../verify/check-scenarios.mjs';
 
 const options = (o: Partial<PracticeOptions>): PracticeOptions => ({ ...PLAIN_LOOP, ...o });
+
+describe('a press on a bar', () => {
+  it('outside the loop moves it to start there, as long as it was, in either direction', () => {
+    expect(loopMovedTo({ first: 2, last: 4 }, 8, 11)).toEqual({ first: 8, last: 10 });
+    expect(loopMovedTo({ first: 5, last: 6 }, 0, 11)).toEqual({ first: 0, last: 1 });
+  });
+  it('still starts at the bar pressed near the end, the loop shorter where the piece runs out', () => {
+    expect(loopMovedTo({ first: 2, last: 4 }, 10, 11)).toEqual({ first: 10, last: 11 });
+  });
+  it('inside the loop moves nothing', () => {
+    for (const ordinal of [2, 3, 4]) expect(loopMovedTo({ first: 2, last: 4 }, ordinal, 11)).toBeNull();
+  });
+});
 
 describe('the takes', () => {
   it('repeats a set number of times, then stops', () => {

@@ -62,6 +62,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     // seeking to the barline instead reads as the scrubber ignoring a press
     // that was already inside the bar it is playing.
     if (ordinal !== null) {
+      player.moveLoopTo(ordinal);
       player.seek(ordinal, beatOfKey(player.performance, document?.mnxJson, key, ordinal) ?? undefined);
     }
   };
@@ -94,6 +95,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     const beat = detail.columnKey === undefined
       ? null
       : beatOfKey(player.performance, document?.mnxJson, detail.columnKey, ordinal);
+    player.moveLoopTo(ordinal);
     player.seek(ordinal, beat ?? undefined);
   };
   // The viewer must not know about the player: it reports a two-finger tap and
@@ -123,6 +125,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     audition: ({ noteKey, ordinal, edited }) => { player.audition(noteKey, ordinal, { edited }); },
     place: position => { player.cursorPlace = position && { ordinal: position.ordinal, metricOffset: position.offset }; },
     range: bars => { player.loopCandidate = bars; },
+    pressed: ordinal => { player.moveLoopTo(ordinal); },
     couple() {
       coupled++;
       let released = false;

@@ -44,6 +44,13 @@ export const DEFAULT_TRAINER: SpeedTrainer = Object.freeze({ start: 0.7, step: 0
 /** A loop's bars: performed ordinals, first and last inclusive. */
 export interface LoopBars { first: number; last: number }
 
+/** The loop after a press on a bar: outside it, the loop moves to start there, as long as it was
+ *  (shorter only where the piece ends first). Null inside it, where nothing moves. */
+export function loopMovedTo(loop: LoopBars, ordinal: number, lastOrdinal: number): LoopBars | null {
+  if (ordinal >= loop.first && ordinal <= loop.last) return null;
+  return { first: ordinal, last: Math.min(ordinal + loop.last - loop.first, lastOrdinal) };
+}
+
 /** One playing of the passage, or the run-out after it. */
 export interface Take {
   /** Its index in the whole practice, from 0. */

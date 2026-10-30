@@ -388,6 +388,7 @@ export class ScenarioPage extends LitElement {
       audition: ({ noteKey, ordinal, edited }) => { page.player?.audition(noteKey, ordinal, { edited }); },
       place: position => { if (page.player) page.player.cursorPlace = position && { ordinal: position.ordinal, metricOffset: position.offset }; },
       range: bars => { if (page.player) page.player.loopCandidate = bars; },
+      pressed: ordinal => { page.player?.moveLoopTo(ordinal); },
       subscribe(listener) {
         page.addEventListener('playback-state-changed', listener);
         return () => page.removeEventListener('playback-state-changed', listener);
