@@ -6,6 +6,9 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     include: ['harness/**/*.test.ts'],
+    // A timeout catches a hang; it does not measure speed. Cases that take under a second alone
+    // passed the default 5 s when the gate's lanes and other agents' gates shared the machine.
+    testTimeout: 20_000,
     // One temp directory per run, gone at teardown (harness/helpers/tempScope.ts).
     globalSetup: ['harness/helpers/tempScope.ts'],
     // Every file a test reads from disk must be one the landing gate would run it

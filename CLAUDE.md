@@ -84,7 +84,9 @@ build, test, and `git checkout <task>` back.
 ### Landing the work
 
 Self-merging to `main` is expected, not something to ask about — but it is the one moment
-when concurrent work collides, so it runs to a fixed order:
+when concurrent work collides, so it runs to a fixed order. **Run it with `npm run land`
+from the worktree**, which does steps 1–7 and stops at the first failure; a hand-typed chain
+once piped the gate through `tail`, lost its exit code and landed a red build.
 
 1. Commit everything in the worktree; the tree must be clean.
 2. `git fetch origin && git rebase origin/main` — **rebase, never merge**.
