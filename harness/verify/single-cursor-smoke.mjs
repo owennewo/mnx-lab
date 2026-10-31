@@ -81,6 +81,11 @@ try {
     check(player.scorePosition?.ordinal===1,'The playhead did not follow the cursor');
     near(video(),5,'The video did not follow the cursor');
 
+    // Parked on a note, its mask is lit and stretched to the release, opaque: the selection stays in front of it.
+    const parked=()=>{const svg=viewer.shadowRoot.querySelector('svg');return {mask:svg.querySelector('.fret-bg.playback-ink'),box:svg.querySelector(':scope > g.enclosure')};};
+    await until(()=>parked().mask&&parked().box,'a lit mask under the selection');
+    check(parked().mask.compareDocumentPosition(parked().box)&Node.DOCUMENT_POSITION_FOLLOWING,'The selection is painted behind the lit mask');
+
     // A press seeks at once, and while YouTube is still getting there the tray
     // keeps a score position — the rail must not blink out ("no score position").
     const probe=viewer.shadowRoot.querySelector('svg [data-source-id]');

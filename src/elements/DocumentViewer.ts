@@ -607,7 +607,9 @@ export class DocumentViewer extends LitElement {
 
       /* The selection-ladder enclosure (enclosure.ts): one vocabulary, fill
          fading and border firming as the level widens — cell → slice → beads
-         → panel → panel-wide → frame. Behind the ink, never clickable. */
+         → panel → panel-wide → frame. Over the ink, so the opaque mask a lit
+         note stretches to its release cannot hide it; a wash light enough to
+         read through, and never clickable. */
       #projection-container svg .enclosure {
         pointer-events: none;
       }

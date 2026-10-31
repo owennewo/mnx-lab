@@ -262,7 +262,7 @@ export function drawEnclosure(
         if (drawnLabels) { while (drawnLabels.firstChild) labels.appendChild(drawnLabels.firstChild); drawnLabels.remove(); }
       }
     });
-    if (combined.childElementCount) svg.insertBefore(combined, svg.firstChild);
+    if (combined.childElementCount) svg.appendChild(combined);
     if (labels.childElementCount) svg.insertBefore(labels, svg.firstChild);
     return;
   }
@@ -576,7 +576,7 @@ export function drawEnclosure(
 
     if (g.childElementCount > 0) {
       if (options.litLabels && !preview) drawLabelChips(svg, g, sp);
-      svg.insertBefore(g, svg.firstChild);
+      svg.appendChild(g);
     }
     return;
   }
@@ -725,7 +725,7 @@ export function drawEnclosure(
   }
 
   if (options.litLabels && !preview) drawLabelChips(svg, g, sp);
-  svg.insertBefore(g, svg.firstChild);
+  svg.appendChild(g);
 }
 
 /**
