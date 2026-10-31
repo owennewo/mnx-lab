@@ -10,7 +10,7 @@
 
 **Status: Phases 0–3 done and landed (`9e0bfd9d`), 2026-10-08; the deploy is waiting for the lead.** The synth's own history,
 its campaigns and their evidence logs (the instrument host campaign, the chain campaign that
-produced synth 0.2.0) stay in the guitar-faust repository (`~/dev/guitar-faust/plans/`), which
+produced synth 0.2.0) stay in the guitar-faust repository (`~/Work/guitar-faust/plans/`), which
 becomes the read-only record after the move (S1, S14).
 
 ## The lead's directions (8 October 2026)

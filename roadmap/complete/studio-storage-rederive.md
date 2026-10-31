@@ -27,8 +27,8 @@ with the fixed worktree recipe and append findings to the campaign after retirem
 
 ```bash
 npm run rederive:library -- --dry-run \
-  --token-file /home/williao/dev/mnx-lab/.secrets/library-write-token \
-  --access-token-file /home/williao/dev/mnx-lab/.secrets/library-access-service.json
+  --token-file /home/williao/Work/mnx-lab/.secrets/library-write-token \
+  --access-token-file /home/williao/Work/mnx-lab/.secrets/library-access-service.json
 # Remove --dry-run to apply; rerun to verify unchanged revisions.
 ```
 

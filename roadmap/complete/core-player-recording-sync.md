@@ -30,7 +30,7 @@ was checked 2026-09-13. A point is `[bar, seconds, offset?, hidePlayhead?]`:
 - The fourth value is 0 or 1 and controls hiding the playhead from that point.
 - Sparse bars are allowed. An anchor at ordinal N can mark the end of N played bars.
 
-The local `~/dev/soundslice-cli/gp/files/` inspection found 84 exports, 103 recordings,
+The local `~/Work/soundslice-cli/gp/files/` inspection found 84 exports, 103 recordings,
 9,375 two-value points, 15 three-value points and two four-value points. Romanza has
 five inner-bar anchors in performed bar 62, including fractional offsets; Jesse has
 an offset-360 anchor in each of two recordings. These are discovery evidence, not

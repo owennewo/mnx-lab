@@ -51,14 +51,14 @@ npm run deploy             # build + wrangler deploy (mnx-lab.totai.uk)
 ## Working in parallel: one worktree per agent
 
 **Assume other agents are working in this repo right now.** `main` in the primary checkout
-(`/home/williao/dev/mnx-lab`) is **shared integration space, not a workspace** — leave it
+(`/home/williao/Work/mnx-lab`) is **shared integration space, not a workspace** — leave it
 on `main` and clean. Every session that will change a tracked file takes its own worktree
 **first, before the first edit**, including for "small" changes. Read-only sessions
 (answering questions, reading the roadmap) stay where they are and change nothing.
 
 ```bash
-git -C ~/dev/mnx-lab worktree add ~/dev/mnx-labs-worktrees/<task> -b <task> main
-cd ~/dev/mnx-labs-worktrees/<task> && npm ci     # worktrees do NOT share node_modules
+git -C ~/Work/mnx-lab worktree add ~/Work/mnx-labs-worktrees/<task> -b <task> main
+cd ~/Work/mnx-labs-worktrees/<task> && npm ci     # worktrees do NOT share node_modules
 ln -s CLAUDE.md AGENTS.md                        # Codex + agy read AGENTS.md; gitignored
 ```
 
@@ -107,7 +107,7 @@ once piped the gate through `tail`, lost its exit code and landed a red build.
    include the complete scenario checks; `npm run check:scenarios` is the standalone
    diagnostic, not an additional gate. The rule, its evidence and how to extend it:
    [docs/gates.md](docs/gates.md).
-6. `git -C ~/dev/mnx-lab merge --ff-only <task>`. **Fast-forward only** — a refusal means
+6. `git -C ~/Work/mnx-lab merge --ff-only <task>`. **Fast-forward only** — a refusal means
    `main` moved while you were testing, so return to step 2 and run the whole sequence
    again. Never `--no-ff`, never force-push `main`, never rewrite a commit already on `main`.
 7. Push `main`.
@@ -121,7 +121,7 @@ agent their next rebase.
 it is abandoned, superseded, or turns out to be a no-op, whichever comes first.
 
 ```bash
-cd ~/dev/mnx-lab && npm run worktree:retire -- <task>
+cd ~/Work/mnx-lab && npm run worktree:retire -- <task>
 ```
 
 It first stops everything still running from the worktree (a dev server, a smoke's
@@ -362,7 +362,7 @@ doctools/`uv` setup: [docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
   (+ prose-drift tripwire in `spec/spec-prose.json`).
 - **`node spec/tools/push-proposal.mjs <topic>` (up)**: injects a topic's scenarios,
   our engravings and `coversDefs` joins into the proposal branch's fixture, byte-stable.
-  Proposal branches live in **git worktrees** (`~/dev/mnx-proposals/<branch>`).
+  Proposal branches live in **git worktrees** (`~/Work/mnx-proposals/<branch>`).
 - **On adoption**: move the pin, re-vendor, `sync:spec` mirrors the examples back down,
   the local scenarios retire, and `mnx-schema.proposed.json` + every
   `"schema": "proposed"` declaration are deleted.

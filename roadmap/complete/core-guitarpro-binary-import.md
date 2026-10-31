@@ -71,7 +71,7 @@ not the final state or an instruction to recreate the retired worktree.
 ### Restart point — 2026-09-08
 
 Resume branch `core-guitarpro-binary-import` in
-`/home/williao/dev/mnx-labs-worktrees/core-guitarpro-binary-import`, based on
+`/home/williao/Work/mnx-labs-worktrees/core-guitarpro-binary-import`, based on
 `2d013b4` (landed and pushed). The user authorized takeover of this existing worktree. Do not
 recreate it or discard its files: source edits, generated binary fixtures
 and tests belong to the task branch's expanded-reader checkpoint. The inherited prototype is preserved in stash

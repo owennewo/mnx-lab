@@ -576,7 +576,7 @@ at the step-5 checkpoint; 57/57 verifications stand). Deviations, per the handof
   branch): freezedb's layout round-trips byte-identically, verified before every write,
   so re-runs are no-ops and diffs stay record-level. `makesite` on the branch rendered
   all nine score-text examples with our engravings; the branch fixture was reconciled
-  and committed on `proposal-score-text` (worktree `~/dev/mnx-proposals/`).
+  and committed on `proposal-score-text` (worktree `~/Work/mnx-proposals/`).
 - **Status-honesty fix**: `update:primitives` now promotes `valid`→`rendered` on any
   successful snapshot write, not only the first — healing seven score-text scenarios
   whose goldens had been committed without the promotion.

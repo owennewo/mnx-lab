@@ -90,7 +90,7 @@ research log says is current.
 | Frozen baselines: the clock and `online-time-warp@8`, `@12`, `@14` | `bench/src/candidates/`, registered in `bench/src/ladder/candidates.ts` |
 | One file per experiment | `reports/NNN-slug.md`, registered in `reports/reports.json` |
 | History and state | `ledger.md`, `RESEARCH_LOG.md`, `runs/<run-id>/summary.json` |
-| Private audio, sets, records and cache, never in git | `/home/williao/dev/mnx-listening-data/`. The first series' sets are in `ladder-winner-v1/`; the real clip's frozen set is `real-evidence-01/proxy-winner-v1/`. Put new sets in a new folder beside them |
+| Private audio, sets, records and cache, never in git | `/home/williao/Work/mnx-listening-data/`. The first series' sets are in `ladder-winner-v1/`; the real clip's frozen set is `real-evidence-01/proxy-winner-v1/`. Put new sets in a new folder beside them |
 | The first series | [`archive/ladder-1/`](archive/ladder-1/README.md) |
 
 ## 3. Choose and design

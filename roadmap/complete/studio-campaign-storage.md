@@ -32,7 +32,7 @@ later campaign; this one lays the storage they all stand on.
 
 ## Baseline at campaign opening
 
-- **The source.** `~/dev/soundslice-cli` (a separate repo, Python) exports a Soundslice
+- **The source.** `~/Work/soundslice-cli` (a separate repo, Python) exports a Soundslice
   library into `gp/files/`, one bundle per slice named `Artist_Title_<sliceId>.*`: the
   Soundslice `.gp` re-export, the `.original.<ext>` upload when there was one, Soundslice's
   `.musicxml`, uploaded `.mp3`/`.mp4` recordings, `.sync.json` (recordings, YouTube ids,

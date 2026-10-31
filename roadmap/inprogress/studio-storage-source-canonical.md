@@ -27,7 +27,7 @@ a converter change touches the service not at all.
 | Term | Means |
 | --- | --- |
 | **soundslice service** | Soundslice itself. Only `soundslice-cli` talks to it. |
-| **soundslice cache** | the export on disk, `~/dev/soundslice-cli/gp/files`. Written by `soundslice-cli`, read by mnx-lab, never modified by it. |
+| **soundslice cache** | the export on disk, `~/Work/soundslice-cli/gp/files`. Written by `soundslice-cli`, read by mnx-lab, never modified by it. |
 | **mnx-lab service** | the Cloudflare data — D1 rows and R2 objects — behind the Worker. |
 | **ingest** | `npm run ingest:library`: copies the soundslice cache into the mnx-lab service. |
 | **validation mode** | a converter run whose output is a verdict and a fact sheet, never a stored file. |
@@ -184,7 +184,7 @@ with no files.
 **Still open — the owner's steps**, then this doc moves to `complete/`:
 
 - [ ] `npm run deploy` (the Worker no longer serves `/pieces/:id/mnx`; studio needs the
-      canonical route); then `npm run ingest:library -- ~/dev/soundslice-cli/gp/files` to
+      canonical route); then `npm run ingest:library -- ~/Work/soundslice-cli/gp/files` to
       refresh the projection — nine manifests, no bytes.
 - [ ] In deployed studio, the nine pieces open and play from their `.gp`.
 - [ ] A second ingest run reports nine `skipped`.

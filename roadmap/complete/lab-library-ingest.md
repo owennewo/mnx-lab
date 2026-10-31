@@ -27,9 +27,9 @@ source and stamps package version, last converter-source git commit and import f
 Unrelated repository commits therefore do not create false converter versions.
 
 ```bash
-npm run ingest:library -- ~/dev/soundslice-cli/gp/files --dry-run
-npm run ingest:library -- ~/dev/soundslice-cli/gp/files \
-  --token-file /home/williao/dev/mnx-lab/.secrets/library-write-token
+npm run ingest:library -- ~/Work/soundslice-cli/gp/files --dry-run
+npm run ingest:library -- ~/Work/soundslice-cli/gp/files \
+  --token-file /home/williao/Work/mnx-lab/.secrets/library-write-token
 ```
 
 Use `--endpoint http://localhost:8787` and a development-only `LIBRARY_WRITE_TOKEN`

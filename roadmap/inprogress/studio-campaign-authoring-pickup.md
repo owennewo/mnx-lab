@@ -113,7 +113,7 @@ Not designed. What is known:
 
 - **The converter backlog** is `harness/fixtures/roundtrip-register.json` →
   `lostOrChanged`, ranked by how many documents each shape bit. Silent ones owe a fix *or* a
-  warning. From the owner's private library (`ROUNDTRIP_DIR=~/dev/soundslice-cli/gp/files
+  warning. From the owner's private library (`ROUNDTRIP_DIR=~/Work/soundslice-cli/gp/files
   ROUNDTRIP_REPORT=<outside the repo> npx vitest run
   harness/conformance/roundtrip-register.test.ts`): chord symbols lost silently, lyric
   syllable `type` changing, part-measure `directions` changing homes, tie / hammer-on targets

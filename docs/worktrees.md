@@ -22,7 +22,7 @@ nothing and need no worktree.
 
 ## Why outside the repo
 
-Worktrees live at `~/dev/mnx-labs-worktrees/`, a sibling of the checkout rather than a
+Worktrees live at `~/Work/mnx-labs-worktrees/`, a sibling of the checkout rather than a
 directory inside it, so that **nothing in the tree ever has to know they exist**: not
 `.gitignore`, not the corpus police, not the boundary checker, not Vite's file watching,
 not a glob in a harness script. An in-tree worktree would need every one of those to
