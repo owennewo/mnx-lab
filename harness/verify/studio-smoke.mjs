@@ -3,6 +3,7 @@
 // (localLibrary.mjs); it needs only `npm run build`. In dev there is no Access
 // gate, so the signed-out page is what an unauthenticated visit reaches;
 // behind the gate it cannot.
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
@@ -31,7 +32,7 @@ const pieceId = (await stored.json()).snapshot.piece.id; assert.match(pieceId, /
 const rootResponse = await fetch(origin + '/', { redirect: 'manual' });
 assert.equal(rootResponse.status, 200); assert.match(await rootResponse.text(), /href="\/studio\/"/);
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-browser-`);
-const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome = spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');

@@ -1,4 +1,5 @@
 // Run after npm run build: node harness/verify/studio-export-smoke.mjs
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
@@ -9,7 +10,7 @@ import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs'
 const root=fileURLToPath(new URL('../../', import.meta.url)).replace(/\/$/, '');
 const server=await serveStatic(root+'/dist/client');
 const profile=fs.mkdtempSync(`${os.tmpdir()}/studio-export-chrome-`);
-const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--disable-popup-blocking','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome=spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-gpu','--disable-popup-blocking','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
  const port=await devtoolsPort(profile); ws=new WebSocket(await connect(port));await new Promise(r=>ws.addEventListener('open',r));const c=client(ws);

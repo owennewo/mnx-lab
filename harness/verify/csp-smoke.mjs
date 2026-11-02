@@ -1,3 +1,4 @@
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import { waitFor } from './browserHarness.mjs';
 // Does the built workbench actually run under the CSP we deploy?
@@ -213,7 +214,7 @@ try {
 
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-csp-smoke-`);
   chrome = spawn(
-    process.env.CHROME_BIN ?? 'google-chrome',
+    chromeBin(),
     ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox', `--user-data-dir=${profile}`, 'about:blank'],
     { stdio: 'ignore' }
   );

@@ -1,3 +1,4 @@
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The selection overlay, driven in a real browser — the first test this layer
@@ -199,7 +200,7 @@ try {
   site = await serve(DIST);
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-selection-smoke-`);
   chrome = spawn(
-    process.env.CHROME_BIN ?? 'google-chrome',
+    chromeBin(),
     ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
      `--user-data-dir=${profile}`, 'about:blank'],
     { stdio: 'ignore' }

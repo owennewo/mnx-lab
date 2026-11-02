@@ -6,6 +6,7 @@
 // the Worker, saving, phone width, storage failures) against /synth/. The flows fail on
 // any page error, and a CSP refusal is one, so this also proves the policy admits the
 // synth's WebAssembly, AudioWorklet and Worker. Needs Chrome and `npm run build:site`.
+import { chromeBin } from './chromeBin.mjs';
 import fs from 'node:fs';
 import http from 'node:http';
 import os from 'node:os';
@@ -45,9 +46,7 @@ function serve(headers) {
   return new Promise(resolve => server.listen(0, '127.0.0.1', () => resolve(server)));
 }
 
-const chrome = process.env.CHROME_BIN && path.isAbsolute(process.env.CHROME_BIN)
-  ? process.env.CHROME_BIN
-  : execFileSync('which', [process.env.CHROME_BIN ?? 'google-chrome'], { encoding: 'utf8' }).trim();
+const chrome = chromeBin();
 const playwright = createRequire(path.join(ROOT, 'synth/package.json')).resolve('playwright-core').replace(/index\.js$/, 'index.mjs');
 
 if (!fs.existsSync(path.join(DIST, 'synth/index.html'))) throw new Error('dist/client/synth/index.html missing — run `npm run build:site` first');

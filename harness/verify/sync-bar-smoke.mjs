@@ -3,6 +3,7 @@
 // without the source being re-cued, and the save carries segments plus one
 // point per bar (roadmap/complete/studio-sync-bar.md).
 // SYNC_BAR_SHOT=<path.png> also writes a screenshot of the zoomed bar.
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -25,7 +26,7 @@ const audio=http.createServer((req,res)=>{
 });
 await new Promise(r=>audio.listen(0,'127.0.0.1',r));
 const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync(`${os.tmpdir()}/sync-bar-`);
-const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome=spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
  ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r));const c=client(ws);

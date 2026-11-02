@@ -5,6 +5,7 @@
 // as they did on the old sink — pauses into silence; the multi-part blues plays without strain.
 //
 // Usage: npm run build:site && node harness/verify/synth-host-smoke.mjs
+import { chromeBin } from './chromeBin.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,7 +18,7 @@ const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mnx-synth-host-'));
 let chrome, ws, server;
 try {
   server = await serveStatic('dist/client');
-  chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome', ['--headless=new', '--remote-debugging-port=0', '--no-sandbox', '--disable-gpu',
+  chrome = spawn(chromeBin(), ['--headless=new', '--remote-debugging-port=0', '--no-sandbox', '--disable-gpu',
     '--autoplay-policy=no-user-gesture-required', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
   ws = new WebSocket(await connect(await devtoolsPort(profile)));
   await new Promise(r => ws.addEventListener('open', r, { once: true }));

@@ -154,7 +154,7 @@ spec/                the standard + our proposals. mnx-schema.json is a verbatim
 scenarios/           ONE corpus format, two axes (below); manifest.json, meta.schema.json
 harness/             every way the evidence is exercised — conformance/, verify/
                      (check-scenarios + verify-scenarios are the ONLY status writers),
-                     render/ (PNG engravings; needs google-chrome), helpers/
+                     render/ (PNG engravings; needs a Chrome-family browser), helpers/
 src/                 the apparatus — capability layers (order below)
   model/  engine/  audio/  edit/  corpus/  storage/  importers/  assist/  elements/  workbench/  entries/
 worker/              Hono. The assist DEMO for visitors with no key of their own; studio's

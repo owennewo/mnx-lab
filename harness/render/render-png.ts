@@ -9,6 +9,7 @@
 // Usage:
 //   npx tsx harness/render/render-png.ts <document.mnx.json> <out.png> [--px-per-sp N]
 //   npx tsx harness/render/render-png.ts --all <dir-of-scenarios> <out-dir>
+import { chromeBin } from '../verify/chromeBin.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -61,7 +62,7 @@ svg { display:block; }
   const tmpHtml = outPath.replace(/\.png$/, '.html');
   fs.writeFileSync(tmpHtml, html);
   execFileSync(
-    'google-chrome',
+    chromeBin(),
     [
       '--headless',
       '--disable-gpu',

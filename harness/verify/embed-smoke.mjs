@@ -16,6 +16,7 @@
 // demotions. Structural assertions only.
 //
 // Run: npm run smoke:embed  (builds the artifact first)
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -38,7 +39,7 @@ const fail = message => {
 };
 
 // ── The test ────────────────────────────────────────────────────────────────
-const chromeBin = process.env.CHROME_BIN ?? 'google-chrome';
+const browser = chromeBin();
 let chrome;
 let artifact;
 let host;
@@ -62,7 +63,7 @@ try {
 
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-embed-smoke-`);
   chrome = spawn(
-    chromeBin,
+    browser,
     [
       '--headless=new',
       '--remote-debugging-port=0', // 0 = let the OS pick; read it back below

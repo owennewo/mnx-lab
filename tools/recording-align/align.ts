@@ -30,6 +30,7 @@
 //   attach --video <url> [--write]            put a YouTube recording on that piece
 //
 // Every command reads and writes files in --out, so each step can be inspected and rerun.
+import { chromeBin } from '../../harness/verify/chromeBin.mjs';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -305,7 +306,7 @@ function draw(system: NonNullable<ReturnType<typeof computeBothSystem>>, pxPerSp
   writeFileSync(html, `<!doctype html><meta charset="utf-8"><style>@font-face { font-family: 'Bravura'; src: url(data:font/woff2;base64,${font}) format('woff2'); }
 html,body { margin:0; background:#fff; } :root { --font-family-sans: Georgia, serif; } svg { display:block; margin:12px; }</style>${svg}`);
   const size = (attr: string) => Math.ceil(Number(new RegExp(`\\b${attr}="([\\d.]+)"`).exec(svg)?.[1] ?? 0)) + 24;
-  execFileSync('google-chrome', ['--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars', '--default-background-color=ffffff',
+  execFileSync(chromeBin(), ['--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars', '--default-background-color=ffffff',
     `--window-size=${size('width')},${size('height')}`, `--screenshot=${join(out, `${name}.png`)}`, html], { stdio: 'ignore' });
   unlinkSync(html);
   return `${size('width')}×${size('height')}`;

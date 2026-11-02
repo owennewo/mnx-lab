@@ -8,6 +8,7 @@
 // ResizeObserver, and shadow-root chrome must actually disappear.
 //
 // Usage: npm run smoke:focus   (builds first)
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -212,7 +213,7 @@ try {
   site = await serve(DIST);
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-focus-smoke-`);
   chrome = spawn(
-    process.env.CHROME_BIN ?? 'google-chrome',
+    chromeBin(),
     [
       '--headless=new',
       '--remote-debugging-port=0',

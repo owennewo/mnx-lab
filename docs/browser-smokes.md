@@ -45,8 +45,9 @@ faces first or let the runner do it. Direct `node harness/verify/<name>-smoke.mj
 invocations also reuse the current build. The audio smoke uses its own Vite server
 and needs no production build.
 
-Browser smokes need `google-chrome` on PATH, or `CHROME_BIN`. Their file headers
-describe additional requirements.
+Browser smokes drive whichever Chrome-family browser is installed (`harness/verify/chromeBin.mjs`
+lists the search order), or `CHROME_BIN` if set. Their file headers describe additional
+requirements.
 
 Those using the library start their own with `startLocalLibrary()`
 (`harness/verify/localLibrary.mjs`): wrangler's dev server run **in-process** — the same

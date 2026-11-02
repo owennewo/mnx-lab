@@ -1,5 +1,6 @@
 // Production Studio + production Worker, real local D1/R2 and real HTTP streams.
 // Run after npm run build. No live account, upload or external media is used.
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -49,7 +50,7 @@ const proxy=http.createServer(async(req,res)=>{try {
 }catch(e){res.writeHead(500).end(String(e));}});
 await new Promise(r=>proxy.listen(0,'127.0.0.1',r));
 const profile=fs.mkdtempSync(`${os.tmpdir()}/recording-management-`);
-const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome=spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws,c;
 try {
   ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r));c=client(ws);await c.send('Page.enable');await c.send('Runtime.enable');

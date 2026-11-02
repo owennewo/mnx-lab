@@ -1,3 +1,4 @@
+import { chromeBin } from './chromeBin.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,7 +9,7 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'mnx-player-workbench-'));
 let chrome,ws,server,review;
 try{
   server=await serveStatic('dist/client');review=await serveStatic('dist/review');
-  chrome=spawn(process.env.CHROME_BIN??'google-chrome',['--headless=new','--remote-debugging-port=0','--no-sandbox','--disable-gpu',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+  chrome=spawn(chromeBin(),['--headless=new','--remote-debugging-port=0','--no-sandbox','--disable-gpu',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
   ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r,{once:true}));const cdp=client(ws);
   await cdp.send('Runtime.enable');await cdp.send('Page.enable');
   // A recording stand-in for navigator.wakeLock. Headless Chrome's own is not

@@ -14,6 +14,7 @@
 //
 // Usage: npm run smoke:workbench-editor   (after npm run build)
 // WORKBENCH_EDITOR_SHOT=<path.png> also writes a screenshot with the inspector open over the score.
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
@@ -44,7 +45,7 @@ const LIB = `
 
 const server = await serveStatic(root + 'dist/client');
 const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-workbench-editor-`);
-const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',
+const chrome = spawn(chromeBin(),
   ['--headless=new', '--no-sandbox', '--disable-gpu', '--window-size=1400,900', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'],
   { stdio: 'ignore' });
 let ws;

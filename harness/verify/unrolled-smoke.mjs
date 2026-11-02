@@ -1,3 +1,4 @@
+import { chromeBin } from './chromeBin.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -11,7 +12,7 @@ try {
   server = await serveStatic('dist/client');
   review = await serveStatic(process.env.UNROLLED_REVIEW_DIR ?? 'dist/review');
   chrome = spawn(
-    process.env.CHROME_BIN ?? 'google-chrome',
+    chromeBin(),
     [
       '--headless=new',
       '--remote-debugging-port=0',

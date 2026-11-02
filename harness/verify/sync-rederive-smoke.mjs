@@ -5,6 +5,7 @@
 // refreshed tuples are written back. An imported sync Studio has not seen is
 // stamped with the score's shape; one stamped for other bars says so
 // (roadmap/complete/studio-sync-rederive.md).
+import { chromeBin } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -24,7 +25,7 @@ const audio=http.createServer((req,res)=>{
 });
 await new Promise(r=>audio.listen(0,'127.0.0.1',r));
 const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync(`${os.tmpdir()}/sync-rederive-`);
-const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome=spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 // One open segment from 1 s at 120 bpm: two seconds a bar. Its stored tuples stop at the third bar.
 const segments={version:1,beat:[1,4],cuts:[1],closed:false,segments:[{name:'Segment 1',beats:null,bpm:120}]};
 const staleTuples=[[0,1],[1,3],[2,5],[3,7]];

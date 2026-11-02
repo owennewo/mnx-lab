@@ -8,6 +8,7 @@
 // uses it — it is already required for the browser smokes, so this adds no
 // dependency. One screenshot per size at device-scale-factor 1, so the output
 // is exactly the size the manifest claims.
+import { chromeBin } from '../harness/verify/chromeBin.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -41,7 +42,7 @@ svg { display:block; width:${size}px; height:${size}px; }
     const out = path.join(DIR, name);
     fs.writeFileSync(page, html);
     execFileSync(
-      process.env.CHROME_BIN ?? 'google-chrome',
+      chromeBin(),
       [
         '--headless=new',
         '--disable-gpu',
