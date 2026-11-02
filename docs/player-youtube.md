@@ -33,6 +33,12 @@ their own additional collection/sharing and deletion practices in their host pol
 Selecting YouTube cues at the mapped position and requires explicit Play, even when
 the previous source was playing. This is a deliberate stricter autoplay policy.
 
+A browser may refuse to let the page start the video until the video's own button has been
+pressed (`onAutoplayBlocked`; a phone's autoplay policy does this). That is not a failure: the
+pane says to press Play on the video and offers no Retry, which would replace the frame the
+press has to reach. Once the video plays, however it was started, the refusal is dropped, the
+score follows, and the tray's Play works from then on.
+
 A cued player renders no frame — only its poster — so a seek made before the video
 has ever played could move our clock but not the picture. The first seek therefore
 **primes** the player: one muted `playVideo`, paused the instant it reports playing,
@@ -68,6 +74,14 @@ minimum 200 × 200 viewport. Pointer dragging pauses playback and temporarily re
 the iframe pointer target, so crossing the video cannot swallow the drag. Releasing
 the divider restores native interaction; Play resumes from the same position. Very narrow hosts below 267 pixels cannot satisfy both
 limits; the 200-pixel minimum takes precedence, and visibility checks still apply.
+
+A narrow upright frame (720 pixels or less, taller than wide) **stacks**: the video across the
+top at 16:9, up to a third of the frame's height and never under 200 pixels; a strip of lyrics
+under it; the score below. There is no divider. Nothing lies over the video, because a
+covered video will not play: a side panel lies over the score alone, and the lyrics panel
+stays in the flow. The first-use notice scrolls in a short box there, so it cannot push the
+score away.
+
 Standalone players retain their inline video region. Focusing the score (the frame's mark
 takes the tray away) pauses video; a video coming up brings the strips back, and Play in
 the tray resumes. Standalone hosts must supply enough visible

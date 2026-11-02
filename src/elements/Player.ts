@@ -8,6 +8,7 @@ import { type RecordingSource, type PlaybackBackend, type ScorePosition, type Sc
 import { RecordingBackend, soundingAt, writtenByVisit, type WrittenByVisit } from '../audio/recordingBackend.ts';
 import { NativeYouTubePort } from '../audio/native/youtube.ts';
 import { youtubeVideoId } from '../audio/youtubeUrl.ts';
+import { YOUTUBE_NEEDS_ITS_OWN_PLAY } from '../audio/youtubePort.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
 import { HostBackend, type HostLayers } from '../audio/hostBackend.ts';
 import { NativeHostPort } from '../audio/native/hostPort.ts';
@@ -1108,6 +1109,99 @@ export class Player extends LitElement {
     p {
       margin: 8px 0 0;
       color: var(--ink-2);
+    }
+    /* A phone: two rows, the rail and everything else. The score needs the height,
+       so the labels go (each control keeps its aria-label and title), the beat goes (the bar is what a
+       reader navigates by), each value is its value alone, and the rail shares its
+       row with the rail/sync toggle rather than pushing it onto a third. */
+    @container (max-width: 560px) {
+      .controls {
+        gap: 4px 6px;
+      }
+      .controls .settings,
+      .controls.busy .settings {
+        gap: 4px;
+      }
+      .field .lab,
+      .field.beat {
+        display: none;
+      }
+      .field .box {
+        margin-left: 0;
+        padding: 0 4px;
+      }
+      button.primary {
+        width: 40px;
+        height: 40px;
+      }
+      button.stop {
+        width: 26px;
+      }
+      /* The readout takes what is left, and "no score position" cuts short rather than wraps. */
+      .controls .field.pos {
+        flex: 1 1 0;
+        min-width: 20px;
+      }
+      .controls .field.pos .box {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        line-height: var(--tray-line);
+      }
+      .controls .rail,
+      .controls mnx-sync-bar,
+      .controls.busy .rail,
+      .controls.busy mnx-sync-bar {
+        flex: 1 1 calc(100% - 72px);
+        min-width: 0;
+        padding: 0;
+      }
+      .bar-toggle {
+        order: -1;
+      }
+      .bar-toggle button {
+        width: 32px;
+        height: 28px;
+      }
+      .field.rate .box,
+      .controls .field.volume .box,
+      .controls.busy .field.volume .box {
+        min-width: 0;
+        gap: 2px;
+      }
+      .field.rate .box svg,
+      .field.volume .box svg {
+        display: none;
+      }
+      .field.loop:not(.on) .box {
+        min-width: 0;
+      }
+      .field.loop .box button.toggle {
+        padding: 0 6px;
+      }
+      .field.loop:not(.on) .box button.toggle span,
+      .field.loop:not(.on) .box button.more {
+        display: none;
+      }
+      .meter {
+        display: none;
+      }
+      .field.layers .box button[data-layer] {
+        width: 32px;
+      }
+    }
+    /* A small phone keeps the two rows by closing the Mix field up. */
+    @container (max-width: 380px) {
+      .field.layers .box button[data-layer] {
+        width: 28px;
+      }
+      .field.layers .box button.mix-open {
+        min-width: 0;
+        margin-left: 2px;
+        padding: 0 4px;
+        gap: 2px;
+      }
     }
     /* A phone's narrowest tray: the rate is its value alone, the play button
        drops to the tray's own 40px and the values close in, so the control
@@ -2467,6 +2561,7 @@ export class Player extends LitElement {
   /** The video's failure and its retry, for the inline panel or a host video pane. */
   renderYouTubeError() {
     const error = this.youtubeError;
+    if (error === YOUTUBE_NEEDS_ITS_OWN_PLAY) return html`<section class="youtube-error" role="status"><p>${error}</p></section>`;
     return error ? html`<section class="youtube-error" role="alert">
         <p>Playback unavailable: ${error}</p>
         ${this.status?.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : nothing}

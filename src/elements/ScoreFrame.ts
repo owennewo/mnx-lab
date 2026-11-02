@@ -68,6 +68,11 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  * Terms and Close video elsewhere (studio: the library page, the Mix toggle)
  * turns the row under the video off with `videoControls`.
  *
+ * On a narrow upright frame (`stacked`, a phone) the column becomes rows: the video
+ * across the top, a short strip of lyrics under it, the score below. A pane beside
+ * the score left it a sliver there. Nothing may cover the video, since a covered
+ * video refuses to play, so a side panel lies over the score only.
+ *
  * The progress line reads the slotted `<mnx-player>`: its
  * `playback-state-changed` frames bubble through the frame. The player is the
  * host's — the frame never creates one — so the binding the host already made
@@ -79,6 +84,11 @@ const VIEW_WORDS: Record<ViewMode, string> = { notation: 'Notation', tab: 'Tab',
 const NO_STRINGS = 'Needs known strings — declare strings[] in the document, or set an instrument override';
 
 type Pad = 'zoom' | 'settings' | null;
+
+/** The widest frame that stacks: a 320px pane and its divider leave the score about 390px here. */
+const STACK_WIDTH = 720;
+/** A stacked video gives way to the score past this share of the frame's height, down to YouTube's 200px. */
+const STACKED_VIDEO_SHARE = 0.34;
 
 /** The slotted content is ONE element in the flow, and it scrolls itself: absolutely
  *  placed overlays aside, nothing else is there for the pane to scroll. */
@@ -136,6 +146,8 @@ export class ScoreFrame extends LitElement {
   @property({ type: Number, attribute: 'video-divider-percent' }) videoDividerPercent: number | null = null;
   /** Terms and privacy and Close video, under the video — the host's to drop when it has them elsewhere. */
   @property({ type: Boolean, attribute: 'video-controls' }) videoControls = true;
+  /** The video and lyrics sit above the score, not beside it: the frame's own shape decides. */
+  @property({ type: Boolean, reflect: true }) stacked = false;
   @state() private videoOpen = false;
   /** Something is in the `lyrics` slot: the left column shows for it alone. */
   @state() private lyricsShown = false;
@@ -163,6 +175,16 @@ export class ScoreFrame extends LitElement {
     this.lyricsShown = (event.target as HTMLSlotElement).assignedElements().length > 0;
     if (this.lyricsShown) this.fitVideo();
   };
+  private fitShape() {
+    const width = this.clientWidth, height = this.clientHeight;
+    this.stacked = width > 0 && width <= STACK_WIDTH && height > width;
+  }
+  /** 16:9 where there is room, and never under the 200px YouTube requires. */
+  private get videoHeight() {
+    return Math.max(200, this.stacked
+      ? Math.min(this.clientWidth * 9 / 16, this.clientHeight * STACKED_VIDEO_SHARE)
+      : this.videoWidth * 9 / 16);
+  }
   private get videoMaximum() { return Math.max(200, this.clientWidth * 0.75); }
   private resizeVideo(width: number) { this.videoWidth = Math.max(200, Math.min(this.videoMaximum, width)); }
   /** A placed divider is a proportion, so the pane keeps its share of a window
@@ -251,7 +273,7 @@ export class ScoreFrame extends LitElement {
          scrolls inside, so the mark sits on the pane's corner rather than the
          document's. */
       .workspace { position: relative; display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
-      .video-pane { display: flex; flex-direction: column; flex: none; min-width: 200px; overflow: auto; }
+      .video-pane { display: flex; flex-direction: column; flex: none; width: var(--video-width); min-width: 200px; overflow: auto; }
       .video-surface { width: 100%; height: var(--video-height); flex: 0 1 var(--video-height); min-height: 200px; }
       .video-controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; flex: none; }
       .video-controls .btn { white-space: normal; }
@@ -265,11 +287,44 @@ export class ScoreFrame extends LitElement {
       /* Lyrics fill the column under the video, and scroll themselves. */
       ::slotted([slot='lyrics']) { flex: 1 1 0; min-height: 200px; }
       .video-pane[hidden], .video-divider[hidden], .video-surface[hidden], .video-controls[hidden] { display: none; }
+      /* The score and whichever side panel is up, side by side. */
+      .stage { display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; }
       .pane {
         min-width: 0;
         position: relative;
         flex: 1 1 auto;
         min-height: 0;
+      }
+
+      /* ── stacked: a phone held upright ──
+         Rows instead of columns. The video keeps YouTube's 200px and is never
+         scrolled away or covered, because it will not play if it is; the column
+         gives up its scrolling, and the terms under the video scroll themselves.
+         Lyrics are a strip of a few lines (the panel follows the bar being
+         played), or a larger one with no video to share with. A side panel lies
+         over the score: taking a row of its own would leave no score at all, and
+         lying over the whole workspace would stop the video. */
+      :host([stacked]) .workspace { flex-direction: column; }
+      :host([stacked]) .video-pane { width: 100%; min-width: 0; overflow: hidden; }
+      :host([stacked]) .video-surface { flex: none; }
+      :host([stacked]) .youtube-notice { max-height: 112px; overflow: auto; }
+      :host([stacked]) .video-divider { display: none; }
+      :host([stacked]) ::slotted([slot='lyrics']) {
+        flex: none;
+        height: 112px;
+        min-height: 0;
+        --lyrics-head: 36px;
+        --lyrics-inset: 4px;
+      }
+      :host([stacked]) .video-pane.lyrics-alone ::slotted([slot='lyrics']) { height: max(160px, 30vh); }
+      :host([stacked]) .stage { position: relative; flex: 1 1 0; }
+      :host([stacked]) ::slotted([slot='side']) {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        width: auto;
+        max-width: none;
+        height: auto;
       }
 
       .score {
@@ -529,16 +584,49 @@ export class ScoreFrame extends LitElement {
         }
       }
 
-      /* A phone: the title steps down a size, then the subheading goes and the
-         title keeps the line. A host's way back can drop its word at the same
-         width — the frame is the container its slotted link queries. */
-      @container (max-width: 480px) {
+      /* A phone: one row, because the score needs the height more than the title
+         needs the width. The way back, the title taking what is left and cut short
+         if it must, then the tools. The artist goes; a host's way back can drop its
+         word at the same width — the frame is the container its slotted link queries. */
+      @container (max-width: 560px) {
+        .strip.top {
+          flex-wrap: nowrap;
+          gap: 4px;
+          padding: 4px 8px;
+        }
+
+        .strip.bottom {
+          padding: 4px 8px;
+        }
+
+        .head-row {
+          flex: 1 1 0;
+          order: 0;
+          padding: 0;
+        }
+
+        .tools-row {
+          flex: none;
+          order: 0;
+          flex-wrap: nowrap;
+        }
+
+        .tools-row .spacer {
+          display: none;
+        }
+
+        ::slotted([slot='menu']) {
+          order: 0;
+        }
+
+        .head {
+          flex: 1 1 auto;
+        }
+
         .head h1 {
           font-size: 16px;
         }
-      }
 
-      @container (max-width: 360px) {
         .head .sub {
           display: none;
         }
@@ -789,7 +877,7 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('playback-position', this.onPosition);
     this.addEventListener('video-region-changed', this.onVideo);
     this.addEventListener('video-notice-changed', this.onVideoNotice);
-    this.videoObserver = new ResizeObserver(() => { this.fitVideo(); this.requestUpdate(); });
+    this.videoObserver = new ResizeObserver(() => { this.fitShape(); this.fitVideo(); this.requestUpdate(); });
     this.videoObserver.observe(this);
     this.scrollerObserver = new ResizeObserver(entries => {
       this.measureScrollbar(entries.map(entry => entry.target));
@@ -1045,8 +1133,8 @@ export class ScoreFrame extends LitElement {
     return html`
       ${this.focused ? nothing : this.topStrip()}
       <div class="workspace">
-        <aside class="video-pane" aria-label=${!this.lyricsShown ? 'YouTube video' : this.videoOpen ? 'Video and lyrics' : 'Lyrics'} ?hidden=${!this.videoOpen && !this.lyricsShown}
-          style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
+        <aside class=${this.videoOpen ? 'video-pane' : 'video-pane lyrics-alone'} aria-label=${!this.lyricsShown ? 'YouTube video' : this.videoOpen ? 'Video and lyrics' : 'Lyrics'} ?hidden=${!this.videoOpen && !this.lyricsShown}
+          style="--video-width: ${this.videoWidth}px; --video-height: ${this.videoHeight}px">
           <div class="video-surface" ?hidden=${this.player?.playback?.kind !== 'youtube'}></div>
           ${this.player?.renderYouTubeError() ?? nothing}
           <div class="video-controls" ?hidden=${!this.videoControls || this.player?.playback?.kind !== 'youtube'}>
@@ -1059,14 +1147,16 @@ export class ScoreFrame extends LitElement {
         <div class="video-divider" role="separator" tabindex="0" aria-label="Video pane width" aria-orientation="vertical"
           aria-valuemin="200" aria-valuemax=${Math.round(this.videoMaximum)} aria-valuenow=${Math.round(this.videoWidth)}
           ?hidden=${!this.videoOpen && !this.lyricsShown} @pointerdown=${this.dragVideo} @keydown=${this.resizeVideoKey}></div>
-      <div class="pane">
-        <div class="score"><slot @slotchange=${this.onScoreSlot}></slot></div>
-        ${this.focusMark()}
-        ${this.hasPerformance && this.focused
-          ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
-          : nothing}
-      </div>
-      <slot name="side"></slot>
+        <div class="stage">
+          <div class="pane">
+            <div class="score"><slot @slotchange=${this.onScoreSlot}></slot></div>
+            ${this.focusMark()}
+            ${this.hasPerformance && this.focused
+              ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
+              : nothing}
+          </div>
+          <slot name="side"></slot>
+        </div>
       </div>
       ${this.focused ? nothing : this.bottomStrip()}
       <!-- The player is the host's light-DOM child in both poses: unmounting

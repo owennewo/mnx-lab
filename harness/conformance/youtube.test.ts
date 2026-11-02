@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { youtubeVideoId } from '../../src/audio/youtubeUrl.ts';
-import { YouTubePort, type YouTubeEvents, type YouTubePlayerApi } from '../../src/audio/youtubePort.ts';
+import { YouTubePort, YOUTUBE_NEEDS_ITS_OWN_PLAY, type YouTubeEvents, type YouTubePlayerApi } from '../../src/audio/youtubePort.ts';
 import { RecordingBackend } from '../../src/audio/recordingBackend.ts';
 import { PlaybackSession } from '../../src/audio/playbackSession.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
@@ -28,6 +28,16 @@ function fixture() {
 }
 const flush=async()=>{for(let i=0;i<10;i++)await Promise.resolve();};
 describe('official IFrame API adapter',()=>{
+  it('takes a refused start back when the video plays from its own button',async()=>{
+    // A phone's browser may refuse the page's play until a press on the video itself: that press works.
+    const f=fixture();await f.port.prepare();f.api.onPlay='block';
+    const seen:string[]=[];f.port.subscribe(event=>seen.push(event));
+    const refused=expect(f.port.play()).rejects.toThrow(YOUTUBE_NEEDS_ITS_OWN_PLAY);await refused;
+    expect(f.port.error).toBe(YOUTUBE_NEEDS_ITS_OWN_PLAY);expect(f.api.destroyed).toBe(false);
+    f.state(1);
+    expect(f.port.error).toBeUndefined();expect(f.port.paused).toBe(false);expect(seen).toContain('playing');
+    f.api.onPlay='start';f.port.pause();await f.port.play();expect(f.port.paused).toBe(false);f.port.dispose();
+  });
   it('tolerates metadata not yet populated when onReady fires',async()=>{
     const f=fixture();f.api.rates=undefined as unknown as number[];f.api.volume=undefined as unknown as number;
     await f.port.prepare();expect(f.port.capabilities.rate.values).toEqual([1]);expect(f.port.volume).toBe(.7);f.port.dispose();

@@ -159,6 +159,13 @@ describe('source handoff ownership', () => {
     expect(session.snapshot.issue).toBe('Tap Play'); expect(session.snapshot.wantsPlayback).toBe(false);
     b.media.blocked=false; await session.play(); expect(b.media.plays).toBe(1); expect(a.media.disposed).toBe(true); session.dispose();
   });
+  it('drops a refused Play once the source is playing, whoever started it', async () => {
+    const {media,backend:b}=backend(); media.blocked=true;
+    const session=new PlaybackSession(b,()=>b,()=>{}); await session.play();
+    expect(session.snapshot.issue).toBe('Tap Play');
+    media.paused=false; media.emit('playing'); // the video's own button, say
+    expect(session.snapshot.issue).toBe(''); expect(session.snapshot.wantsPlayback).toBe(true); session.dispose();
+  });
 });
 describe('sync editing: media time, not score positions', () => {
   it('seeks and loops in media seconds with no sync at all', async () => {

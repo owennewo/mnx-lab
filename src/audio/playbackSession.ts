@@ -40,6 +40,8 @@ export class PlaybackSession {
   private notify() {
     if (this.closed) return;
     const state = this.active.snapshot;
+    // It is playing, whoever started it (the video's own button, say): a refused Play no longer stands.
+    if (state.state === 'playing') this.issue = '';
     if (state.state === 'paused' && !this.pendingPlay && !this.selecting) this.intent = false;
     if (state.error || (!this.pendingPlay && !this.selecting && state.state === 'stopped')) this.intent = false;
     this.changed();

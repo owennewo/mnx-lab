@@ -395,10 +395,15 @@ export class PiecePage extends LitElement {
         display: none;
       }
     }
-    /* The frame's narrowest header: the way back is its arrow alone, beside
-       the tools; aria-label keeps its name when the word is hidden. */
-    @container (max-width: 360px) {
-      a[slot='back'] .word {
+    /* A phone's one-row header: the way back is its arrow alone, and the save
+       chip its glyph and tone; aria-label keeps the way back's name when the
+       word is hidden, and the chip still opens the panel that words it. */
+    @container (max-width: 560px) {
+      a[slot='back'] {
+        padding: 0 4px;
+      }
+      a[slot='back'] .word,
+      button.save span {
         display: none;
       }
     }

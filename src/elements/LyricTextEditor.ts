@@ -139,9 +139,10 @@ export class LyricTextEditor extends LitElement {
         z-index: auto;
       }
       :host([slot='lyrics']) .card { border-left: 0; border-top: 1px solid var(--frame-line, var(--line)); }
-      /* A phone: the panel lies over the score and the video, above the tray, until it closes. */
+      /* A phone: as a side panel it lies over the score, above the tray, until it closes.
+         In the left column it stays in the flow: over the video, it would stop the video playing. */
       @media (max-width: 700px) {
-        :host([slot='side']), :host([slot='lyrics']) { position: absolute; inset: 0; width: auto; z-index: 5; }
+        :host([slot='side']) { position: absolute; inset: 0; width: auto; z-index: 5; }
       }
       .card {
         position: relative;
@@ -164,7 +165,7 @@ export class LyricTextEditor extends LitElement {
         display: flex;
         align-items: center;
         flex: none;
-        min-height: 44px;
+        min-height: var(--lyrics-head, 44px);
         gap: 8px;
         padding: 0 4px 0 16px;
         border-bottom: 1px solid var(--line);
@@ -327,7 +328,7 @@ export class LyricTextEditor extends LitElement {
       }
       .paint-inner {
         box-sizing: border-box;
-        padding: 12px 16px 12px 14px;
+        padding: var(--lyrics-inset, 12px) 16px var(--lyrics-inset, 12px) 14px;
         font: 13px/1.7 var(--mono);
         color: var(--ink);
         white-space: pre-wrap;
@@ -402,7 +403,7 @@ export class LyricTextEditor extends LitElement {
         background: transparent;
         border: 1px solid transparent;
         border-radius: 0;
-        padding: 12px 16px 12px 14px;
+        padding: var(--lyrics-inset, 12px) 16px var(--lyrics-inset, 12px) 14px;
         outline: none;
       }
       textarea::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }

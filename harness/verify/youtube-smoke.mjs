@@ -122,8 +122,28 @@ try{
  if(sought.ordinal!==0)throw new Error('YouTube score seek failed');
  await c.evaluate(`test.frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}))`);
  await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});await settle(c);
- const mobile=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect();return {width:b.width,height:b.height,bottom:b.bottom};})()`);
- if(mobile.width<200||mobile.width>270||mobile.height<200||mobile.bottom>800)throw new Error('Invalid narrow viewport '+JSON.stringify(mobile));
+ // A phone held upright: the video across the top, a strip of lyrics under it, a side panel over the
+ // score alone. Each is where it is so that the video stays uncovered and plays, and the score keeps real room.
+ const phone=`(()=>{const r=test.frame.shadowRoot,box=e=>e.getBoundingClientRect(),b=box(r.querySelector('iframe')),score=box(r.querySelector('.pane')),lyrics=document.getElementById('lyrics');return {stacked:test.frame.stacked,width:b.width,height:b.height,top:b.top,bottom:b.bottom,scoreTop:score.top,scoreHeight:score.height,scoreWidth:score.width,divider:box(r.querySelector('.video-divider')).width,lyricsTop:lyrics?box(lyrics).top:null,lyricsHeight:lyrics?box(lyrics).height:null};})()`;
+ const mobile=await c.evaluate(phone);
+ if(!mobile.stacked||mobile.width!==360||mobile.height<200||mobile.bottom>mobile.scoreTop||mobile.scoreWidth!==360||mobile.divider!==0||mobile.scoreHeight<150)throw new Error('Video is not above the score on a phone '+JSON.stringify(mobile));
+ await c.evaluate(`const add=(id,slot)=>{const e=document.createElement('div');e.id=id;e.slot=slot;e.style.background='white';test.frame.append(e);};add('lyrics','lyrics');add('side','side')`);await settle(c);
+ const crowded=await c.evaluate(phone);
+ if(crowded.lyricsTop<crowded.bottom||crowded.lyricsHeight>120||crowded.lyricsTop+crowded.lyricsHeight>crowded.scoreTop||crowded.scoreHeight<100)throw new Error('Lyrics are not a strip above the score '+JSON.stringify(crowded));
+ const side=await c.evaluate(`(()=>{const s=document.getElementById('side').getBoundingClientRect(),p=test.frame.shadowRoot.querySelector('.pane').getBoundingClientRect();return s.top===p.top&&s.height===p.height&&s.width===p.width;})()`);
+ if(!side)throw new Error('A side panel does not lie over the score');
+ await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);await c.evaluate(`test.player.pause();document.getElementById('lyrics').remove();document.getElementById('side').remove()`);await settle(c);
+ if(!live){
+  // A browser that refuses the page's Play until a press on the video itself: words saying so, nothing that
+  // reloads the video, and the press works. The stand-in can't be pressed, so it reports what the press reports.
+  await c.evaluate(`{const p=__ytInstances.at(-1);window.ytPlay=p.playVideo;p.playVideo=function(){queueMicrotask(()=>this.events.onAutoplayBlocked());};test.player.play();}`);
+  await wait(`test.frame.shadowRoot.querySelector('.youtube-error')?.textContent.includes('Press Play on the video itself')`);
+  const blocked=await c.evaluate(`test.frame.shadowRoot.querySelector('.youtube-error').textContent`);
+  if(blocked.includes('Playback unavailable')||blocked.includes('Retry'))throw new Error('A refused start reads as a failure: '+blocked);
+  await c.evaluate(`{const p=__ytInstances.at(-1);p.playVideo=window.ytPlay;p.state=1;p.last=performance.now();p.events.onStateChange({data:1});}`);
+  await wait(`test.player.playback.state==='playing'&&!test.frame.shadowRoot.querySelector('.youtube-error')`);
+  await c.evaluate(`test.player.pause()`);
+ }
  await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);
  // Focusing the score takes the tray away and pauses the video; the mark brings the tray back and Play resumes.
  await c.evaluate(`test.frame.shadowRoot.querySelector('.focus-mark').click()`);await wait(`test.frame.focused && !test.frame.shadowRoot.querySelector('.strip.bottom') && !test.player.playback.wantsPlayback`);

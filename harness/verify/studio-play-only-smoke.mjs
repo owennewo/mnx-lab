@@ -102,6 +102,32 @@ try {
   assert.match(await c.evaluate(`${details}.textContent`), /Open the piece on a computer with a keyboard/, 'the Details sheet does not say why it cannot be edited');
   assert.equal(await c.evaluate(`[...${details}.querySelectorAll('input')].every(i => i.disabled || i.readOnly)`), true, 'the Details sheet offers live fields on a play-only device');
 
+  // ── a phone: the height is the score's ────────────────────────────────────
+  // One row of header, two of tray, however little of either fits by default.
+  await c.evaluate(`${details}.host.dispatchEvent(new CustomEvent('close'))`);
+  await c.send('Emulation.setDeviceMetricsOverride',{width:412,height:780,deviceScaleFactor:2,mobile:true});
+  await wait(`${piece}.querySelector('mnx-score-frame').shadowRoot.querySelector('.strip.top').getBoundingClientRect().width === 412`);
+  const phone = JSON.parse(await c.evaluate(`(() => {
+    const frame = ${piece}.querySelector('mnx-score-frame'), player = ${piece}.querySelector('mnx-player').shadowRoot;
+    const middle = e => { const b = e.getBoundingClientRect(); return b.top + b.height / 2; };
+    const shown = root => [...root.querySelectorAll('button.primary, .rail, .field.pos, .field.rate, .field.loop, .field.layers, .field.volume')].filter(e => e.getClientRects().length);
+    const rows = shown(player).map(e => Math.round(middle(e)));
+    return JSON.stringify({
+      top: frame.shadowRoot.querySelector('.strip.top').getBoundingClientRect().height,
+      title: Math.round(middle(frame.shadowRoot.querySelector('.head h1'))),
+      back: Math.round(middle(${piece}.querySelector('a[slot=back]'))),
+      tool: Math.round(middle(frame.shadowRoot.querySelector('.tools-row .btn.tool'))),
+      tray: frame.shadowRoot.querySelector('.strip.bottom').getBoundingClientRect().height,
+      rail: Math.round(middle(player.querySelector('.rail'))),
+      controls: rows.filter(y => y !== Math.round(middle(player.querySelector('.rail')))),
+      overflow: document.documentElement.scrollWidth > innerWidth });
+  })()`));
+  assert.ok(phone.top <= 56, `the header is not one row on a phone: ${JSON.stringify(phone)}`);
+  assert.ok(Math.abs(phone.title - phone.back) <= 4 && Math.abs(phone.title - phone.tool) <= 4, `the way back, title and tools do not share a row: ${JSON.stringify(phone)}`);
+  assert.ok(phone.tray <= 104, `the tray is not two rows on a phone: ${JSON.stringify(phone)}`);
+  assert.ok(Math.max(...phone.controls) - Math.min(...phone.controls) <= 6, `the tray's controls do not share a row: ${JSON.stringify(phone)}`);
+  assert.equal(phone.overflow, false, 'the page overflows a phone sideways');
+
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-play-only.png',Buffer.from(shot.result.data,'base64'));
   console.log(`Studio play-only smoke passed: ${pieceId} — a coarse pointer, a piece made from the form, score and player rendered, no editor bound and its chunk never fetched, a tap leaving no cursor, no Keys sheet, and the chip and the Details sheet saying why.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));

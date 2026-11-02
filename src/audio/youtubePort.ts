@@ -10,6 +10,10 @@ export interface YouTubePlayerApi {
   mute(): void; unMute(): void; isMuted(): boolean;
   destroy(): void;
 }
+/** A browser may refuse to let the page start a video (a phone, usually), until a first
+ *  press on the video's own button. Not a failure: that press works, and our Play does
+ *  from then on, so the words say what to do and nothing offers to reload the video. */
+export const YOUTUBE_NEEDS_ITS_OWN_PLAY = 'YouTube blocked this start. Press Play on the video itself; the Play button here works after that.';
 export interface YouTubeEvents {
   onReady(): void; onStateChange(event: { data: number }): void;
   onPlaybackRateChange(): void; onError(event: { data: number }): void; onAutoplayBlocked(): void;
@@ -126,7 +130,7 @@ export class YouTubePort implements MediaPort {
         },
         onPlaybackRateChange: () => { if (this.closed) return; const rate=this.apiReady ? this.api!.getPlaybackRate() : 1; if(Number.isFinite(rate) && rate>0)this.acceptedRate=rate; this.emit('rate'); },
         onError: ({data}) => { const message=errors[data] ?? `YouTube playback failed (${data}).`; finish(new Error(message)); if (!this.closed) this.fail(message); },
-        onAutoplayBlocked: () => { if (this.closed) return; if (this.priming) { this.primeFinish?.(false); return; } this.fail('YouTube playback was blocked. Press Play in the visible YouTube player.'); },
+        onAutoplayBlocked: () => { if (this.closed) return; if (this.priming) { this.primeFinish?.(false); return; } this.fail(YOUTUBE_NEEDS_ITS_OWN_PLAY); },
       }).then(api => { if (this.closed || failed) { api.destroy(); return; } this.api=api; ready(); }, error => finish(error instanceof Error?error:new Error(String(error))));
     });
   }
