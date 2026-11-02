@@ -21,17 +21,25 @@
 // `volta=1` (every bar of the ending; `volta=1,2` for shared), `segno` `coda` `tocoda`
 // `ds` `ds-al-coda` `ds-al-fine` `dc` `dc-al-coda` `dc-al-fine` `fine` `final`
 // `double` `section="Verse 1"` `time=3/4` `key=2` `tempo=100`.
+//
+//   v1: 8:5/3 t3(16:2/1+3/0p 16:3/2p 16:3/0) 8:4/2s q:4/4 g:3/0p q:3/2   the slurs a player reads
+//
+// `t3(…)` is a triplet: three of one value in the time of two. `g:` is an eighth-note grace
+// note, taking no time, before the event that follows it. Two more note suffixes, both landing
+// on the same string's next note in the voice (a different fret, or it is a mistake): `p` a
+// hammer-on or pull-off, `s` a slide.
 import { buildNewDocument } from '../../src/edit/newDocument.ts';
 import { spellPitch } from '../../src/edit/staffSpace.ts';
 import { midiOfPitch } from '../../src/edit/tabStrings.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
-import type { MnxGlobalMeasure, MnxNote, MnxPitch, MnxStructure, MnxTuningEntry } from '../../src/model/mnx.ts';
+import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxPitch, MnxSequenceItem, MnxStructure, MnxTuningEntry } from '../../src/model/mnx.ts';
 
 type Base = 'whole' | 'half' | 'quarter' | 'eighth' | '16th' | '32nd';
 const BASES: Record<string, [Base, number]> = { w: ['whole', 1], h: ['half', 1 / 2], q: ['quarter', 1 / 4], '8': ['eighth', 1 / 8], '16': ['16th', 1 / 16], '32': ['32nd', 1 / 32] };
 
-interface TextNote { string: number; fret: number; tie: boolean; harmonic: boolean; dead: boolean }
-interface TextEvent { base: Base; dots: number; length: number; notes: TextNote[] | null }
+interface TextNote { string: number; fret: number; tie: boolean; harmonic: boolean; dead: boolean; legato: boolean; slide: boolean }
+/** `grace` takes no time; events sharing a `triplet` number are one triplet. */
+interface TextEvent { base: Base; dots: number; length: number; notes: TextNote[] | null; grace?: boolean; triplet?: number }
 interface TextBar { number: number; line: number; markers: string[]; voices: Map<string, TextEvent[]>; copyOf?: number }
 
 export interface TabTextPiece {
@@ -85,18 +93,51 @@ function header(lines: [number, string][]): TabTextPiece {
 }
 
 function event(token: string, line: number): TextEvent {
+  const grace = /^g:(.+)$/.exec(token);
+  if (grace) {
+    const parsed = event(`8:${grace[1]}`, line);
+    if (!parsed.notes) fail(line, `"${token}": a grace note cannot be a rest`);
+    return { ...parsed, length: 0, grace: true };
+  }
   const m = /^(w|h|q|8|16|32)(\.*):(.+)$/.exec(token) ?? fail(line, `"${token}" is not an event like q:3/0 or 8:r`);
   const [base, value] = BASES[m[1]];
   const dots = m[2].length;
   const length = value * (2 - 2 ** -dots);
   if (m[3] === 'r') return { base, dots, length, notes: null };
   const notes = m[3].split('+').map(part => {
-    const n = /^(\d+)\/(\d+)([~hx]*)$/.exec(part) ?? fail(line, `"${part}" in "${token}" is not a note like 3/0, 1/12h or 2/3~`);
-    return { string: Number(n[1]), fret: Number(n[2]), tie: n[3].includes('~'), harmonic: n[3].includes('h'), dead: n[3].includes('x') };
+    const n = /^(\d+)\/(\d+)([~hxps]*)$/.exec(part) ?? fail(line, `"${part}" in "${token}" is not a note like 3/0, 1/12h or 2/3~`);
+    return { string: Number(n[1]), fret: Number(n[2]), tie: n[3].includes('~'), harmonic: n[3].includes('h'), dead: n[3].includes('x'), legato: n[3].includes('p'), slide: n[3].includes('s') };
   });
   const strings = notes.map(n => n.string);
   if (new Set(strings).size !== strings.length) fail(line, `"${token}" puts two notes on one string`);
   return { base, dots, length, notes };
+}
+
+/** A voice's tokens, in order: `t3(` and `)` wrap a triplet's events, grace notes stand alone. */
+function voiceEvents(text: string, line: number, nextTriplet: () => number): TextEvent[] {
+  const events: TextEvent[] = [];
+  let open: TextEvent[] | null = null;
+  for (const raw of text.split(/\s+/).filter(Boolean)) {
+    const opens = raw.startsWith('t3(');
+    const closes = raw.endsWith(')');
+    if (opens && open) fail(line, `"${raw}": a triplet inside a triplet`);
+    if (closes && !open && !opens) fail(line, `"${raw}" closes a triplet that was not opened`);
+    if (opens) open = [];
+    const token = raw.slice(opens ? 3 : 0, closes ? -1 : undefined);
+    const parsed = event(token, line);
+    (open ?? events).push(parsed);
+    if (closes) {
+      const group: TextEvent[] = open!;
+      open = null;
+      const timed = group.filter(e => !e.grace);
+      if (timed.length !== 3 || timed.some(e => e.base !== timed[0].base || e.dots)) fail(line, `"${raw}" ends a triplet that is not three undotted events of one value`);
+      const number = nextTriplet();
+      for (const e of group) { e.triplet = number; e.length = e.length * 2 / 3; }
+      events.push(...group);
+    }
+  }
+  if (open) fail(line, 'a triplet is not closed');
+  return events;
 }
 
 export function parseTabText(text: string): { piece: TabTextPiece; bars: TextBar[] } {
@@ -104,6 +145,7 @@ export function parseTabText(text: string): { piece: TabTextPiece; bars: TextBar
   const first = lines.findIndex(([, t]) => t.startsWith('bar '));
   const piece = header(first < 0 ? lines : lines.slice(0, first));
   const bars: TextBar[] = [];
+  let triplets = 0;
   for (const [n, t] of first < 0 ? [] : lines.slice(first)) {
     if (t.startsWith('bar ')) {
       const m = /^bar\s+(\d+)(?:\s*=\s*(\d+))?\s*(.*)$/.exec(t) ?? fail(n, `"${t}" is not a bar line like "bar 3" or "bar 3 = 1"`);
@@ -119,7 +161,7 @@ export function parseTabText(text: string): { piece: TabTextPiece; bars: TextBar
     const m = /^(v\d+):\s*(.*)$/.exec(t) ?? fail(n, `"${t}" is not a voice line like "v1: q:3/0 …"`);
     if (bar.copyOf !== undefined) fail(n, `bar ${bar.number} copies bar ${bar.copyOf}; it cannot also have voices of its own`);
     if (bar.voices.has(m[1])) fail(n, `bar ${bar.number} has voice ${m[1]} twice`);
-    bar.voices.set(m[1], m[2].split(/\s+/).filter(Boolean).map(token => event(token, n)));
+    bar.voices.set(m[1], voiceEvents(m[2], n, () => ++triplets));
   }
   for (const bar of bars) if (bar.copyOf !== undefined) bar.voices = bars[bar.copyOf - 1].voices;
   return { piece, bars };
@@ -194,7 +236,7 @@ export function buildTabText(text: string): { document: MnxStructure; warnings: 
       const total = events.reduce((sum, e) => sum + e.length, 0);
       if (Math.abs(total - measureLength(time)) > 1e-9) fail(bar.line, `bar ${bar.number} ${voice} holds ${total * time.unit} beats of ${time.count}`);
       const run = placed.get(voice) ?? placed.set(voice, []).get(voice)!;
-      const content = events.map((e, k) => {
+      const placedEvents = events.map((e, k): MnxEvent => {
         const duration = { base: e.base, ...(e.dots ? { dots: e.dots } : {}) };
         if (!e.notes) return { duration, rest: {} };
         const notes = e.notes.map(text => {
@@ -206,6 +248,21 @@ export function buildTabText(text: string): { document: MnxStructure; warnings: 
         run.push({ bar: bar.number, line: bar.line, event: k, notes });
         return { duration, notes: notes.map(n => n.mnx) };
       });
+      // Grace notes and triplets are containers in MNX; here they were marks on a flat list.
+      const content: MnxSequenceItem[] = [];
+      let tuplet: { number: number; items: MnxSequenceItem[] } | undefined;
+      for (const [k, e] of events.entries()) {
+        if (e.grace && !events[k + 1]) fail(bar.line, `bar ${bar.number} ${voice}: a grace note with nothing after it`);
+        const item: MnxSequenceItem = e.grace ? { type: 'grace', content: [placedEvents[k]] } : placedEvents[k];
+        if (e.triplet === undefined) { content.push(item); continue; }
+        if (tuplet?.number !== e.triplet) {
+          tuplet = { number: e.triplet, items: [] };
+          const of = events.find(x => x.triplet === e.triplet && !x.grace)!;
+          const duration = { base: of.base };
+          content.push({ type: 'tuplet', content: tuplet.items, inner: { duration, multiple: 3 }, outer: { duration, multiple: 2 } });
+        }
+        tuplet.items.push(item);
+      }
       return { voice, content };
     });
     part.measures[i] = { ...(i === 0 ? { clefs: [{ clef: { sign: 'G', staffPosition: -2 } }] } : {}), sequences } as typeof part.measures[number];
@@ -213,9 +270,19 @@ export function buildTabText(text: string): { document: MnxStructure; warnings: 
   for (const { first, count } of endings) document.global.measures[first].ending!.duration = count;
 
   // A tie lands on the same string's next note in the voice: same pitch, or it is a mistake.
+  // A hammer, pull or slide lands there too, on a different fret.
   for (const [voice, run] of placed) {
     for (const [k, here] of run.entries()) {
       for (const { text, mnx } of here.notes) {
+        if (text.legato || text.slide) {
+          const landing = run.slice(k + 1).find(e => e.notes.some(n => n.text.string === text.string))?.notes.find(n => n.text.string === text.string);
+          const what = text.slide ? 'slide' : 'hammer or pull';
+          if (!landing) fail(here.line, `bar ${here.bar} ${voice}: the ${what} on string ${text.string} has no later note on that string`);
+          if (landing!.text.fret === text.fret) fail(here.line, `bar ${here.bar} ${voice}: the ${what} on string ${text.string} lands on the fret it left`);
+          const technique = ((mnx._x!.mnxLab!.tab ??= {}).technique ??= {});
+          if (text.legato) technique.hammerPull = { target: landing!.mnx.id! };
+          if (text.slide) technique.slide = { type: 'legato', target: landing!.mnx.id! };
+        }
         if (!text.tie) continue;
         const next = run.slice(k + 1).find(e => e.notes.some(n => n.text.string === text.string));
         const target = next?.notes.find(n => n.text.string === text.string);

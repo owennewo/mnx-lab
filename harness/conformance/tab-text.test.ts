@@ -45,7 +45,28 @@ bar 2
     expect(document.global.measures.map(m => m.ending)).toEqual([undefined, { numbers: [1], duration: 2 }, undefined, { numbers: [2], duration: 1 }]);
   });
 
+  it('writes triplets and grace notes as containers, and the slurs to the next note on the string', () => {
+    const { document } = bars(`bar 1
+  v1: 8:5/3 t3(16:2/1+3/0p 16:3/2p 16:3/0) g:4/0p q:4/2s q.:4/4 8:r
+`);
+    const content = document.parts[0].measures[0].sequences[0].content as unknown as Record<string, any>[];
+    expect(content.map(item => item.type ?? 'event')).toEqual(['event', 'tuplet', 'grace', 'event', 'event', 'event']);
+    expect([content[1].inner, content[1].outer]).toEqual([{ duration: { base: '16th' }, multiple: 3 }, { duration: { base: '16th' }, multiple: 2 }]);
+    const [first, second, third] = content[1].content;
+    const open = first.notes.find((n: any) => n._x.mnxLab.string === 3);
+    expect(open._x.mnxLab.tab.technique.hammerPull).toEqual({ target: second.notes[0].id });
+    expect(second.notes[0]._x.mnxLab.tab.technique.hammerPull).toEqual({ target: third.notes[0].id });
+    expect(content[2].content[0].notes[0]._x.mnxLab.tab.technique.hammerPull).toEqual({ target: content[3].notes[0].id });
+    expect(content[3].notes[0]._x.mnxLab.tab.technique.slide).toEqual({ type: 'legato', target: content[4].notes[0].id });
+    expect(checkStorage(document).check.verdict).not.toBe('differs');
+  });
+
   it('refuses a misread bar, naming its line', () => {
+    expect(() => bars('bar 1\n  v1: t3(8:3/0 8:3/1) h. :3/0\n')).toThrow(/not three undotted events/);
+    expect(() => bars('bar 1\n  v1: t3(q:3/0 q:3/1 q:3/2 h:3/0\n')).toThrow(/not closed/);
+    expect(() => bars('bar 1\n  v1: w:3/0 g:3/1\n')).toThrow(/grace note with nothing after it/);
+    expect(() => bars('bar 1\n  v1: h:3/0p h:3/0\n')).toThrow(/lands on the fret it left/);
+    expect(() => bars('bar 1\n  v1: h:3/0s h:2/0\n')).toThrow(/slide on string 3 has no later note/);
     expect(() => bars('bar 1\n  v1: q:3/0 q:3/0 q:3/0\n')).toThrow(/line 5: bar 1 v1 holds 3 beats of 4/);
     expect(() => bars('bar 1\n  v1: h:3/0~ h:2/1\n')).toThrow(/line 5: .*tie on string 3 has no later note/);
     expect(() => bars('bar 1\n  v1: h:3/0~ h:3/2\n')).toThrow(/lands on a different pitch/);

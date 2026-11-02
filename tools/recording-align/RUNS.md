@@ -417,3 +417,27 @@ to do — each is a gap to close.
   whose sound differs from its stored tuning by over 25 cents.
   What `sync` will write is decided in `decisions.ts`, and `checkpoint` (the session's save script, on its
   third use) in `checkpoint.ts`, so both are tested without a library or a run.
+
+## Run 10 — 2026-11-02 — Fields of Gold (Dominic Miller, Serge Kottelat's transcription): a piece from the screen, no audio check
+
+- **Recording** YouTube `DcYB98RRvWw`, 175 s, Miller alone on classical guitar, standard tuning, capo 3, with
+  Kottelat's notation + tab on screen for all 79 bars (0–165 s) and a cursor. No piece existed: the owner asked for one.
+- **Piece** `18b7fb82180507ec` r1 on the local dev library: 79 bars, 79 performed (no repeats printed), 688 notes,
+  Intro / Interlude / Verse 1–4 / Bridge / Coda, recording attached, **no sync**.
+- **Method**: page turns from `ffmpeg`'s scene detection on the chord-name row (the cursor never reaches it), each page
+  stitched cursor-free from a late frame's left half and an early frame's right half (`screen.py` needs numpy, and the
+  environment could not be installed, below). Read in one pass into tab text; the stored score drawn page by page with
+  `barsAlone` and compared by eye on 9 of 20 pages.
+- **Not done, and it is the skill's own gate**: Steps 2–5 never judged the reading against the audio. `~/.venvs/muscriptor`
+  does not exist on this machine (nor `~/.venvs`, nor Hugging Face credentials); installing it was refused by Claude Code's
+  auto-mode classifier, so it waits for the owner. The arranger's free PDF, the natural oracle, was refused the same way.
+  So this reading is unchecked by ear or PDF, and the piece was made at the owner's direct request regardless.
+- **Fixed on the way**: tab text had no triplets (`t3(…)`), grace notes (`g:`), hammers/pulls (`p`) or slides (`s`); bars 8,
+  12, 41, 51 and the bridge cannot be written without them. A slide's `direction` does not survive a `.gp`, so it is not written.
+- **Traps**: `double` marks a bar's *closing* line, so it goes on the bar before a new section. An explicit `final` is lost by
+  the export (verdict `differs`) and adds nothing on the last bar. `barsAlone` keeps the first tempo only: slices all print
+  158, while the document has 158/116/120/110. `google-chrome` is `google-chrome-stable` here, which `align.ts draw` misses.
+- **Unmetered intro**: bars 1–12 print no time signature ("freely", dashed bar lines); written as what each bar holds (2/8, 3/4,
+  5/8, 2/4 …), so the score shows signatures the arranger did not print.
+- **Not carried**: chord names and diagrams, let ring, fingerings, arpeggio signs, fermatas, ral. Tab text has no way to say them.
+- **Owner**: not yet heard.
