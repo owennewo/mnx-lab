@@ -8,7 +8,7 @@ import {validateRig} from '../web/host/rig.js';
 const specifier=process.env.PLAYWRIGHT_MODULE?pathToFileURL(process.env.PLAYWRIGHT_MODULE).href:'playwright';
 const {chromium}=await import(specifier);
 const out=process.env.APP_TEST_OUTPUT||'build/browser-ui',base=(process.env.STUDIO_URL||'http://localhost:8080').replace(/\/$/,'');fs.mkdirSync(out,{recursive:true});
-const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),args:['--autoplay-policy=no-user-gesture-required']});
+const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),args:['--disable-audio-output','--autoplay-policy=no-user-gesture-required']});
 const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
 const page=await context.newPage(),errors=[];
 page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});

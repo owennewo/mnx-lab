@@ -1,5 +1,5 @@
 // Original MusicXML → title prompt → editable Studio → measured GP checkpoint.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -33,7 +33,7 @@ const get = async url => { const r = await fetch(origin+'/api/library'+url, { he
 const snapshot = async () => (await (await get('/pieces/'+pieceId)).json()).snapshot;
 const report = { fixture, sourceSha256: hash(bytes), applicationCommit: execFileSync('git', ['rev-parse','HEAD'], { cwd: root, encoding: 'utf8' }).trim(), captureScriptSha256: hash(await fs.readFile(fileURLToPath(import.meta.url))), shell: 'studio', pieceId };
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-title-browser-`);
-const chrome = spawn(chromeBin(), ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'], { stdio: 'ignore' });
+const chrome = spawn(chromeBin(), [...TEST_BROWSER_FLAGS, '--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'], { stdio: 'ignore' });
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws, 'open'); const c = client(ws);

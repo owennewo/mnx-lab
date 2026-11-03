@@ -4,7 +4,7 @@
 //
 // The form → ops → .gp → POST /api/library/pieces → the piece page reading that
 // .gp back: the whole priority flow up to the moment a recording is added.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
@@ -17,7 +17,7 @@ const library = await startLocalLibrary();
 const { origin, session } = library;
 const title = `Smoke piece ${Date.now()}`;
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-piece-create-browser-`);
-const chrome = spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome = spawn(chromeBin(),[...TEST_BROWSER_FLAGS, '--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');

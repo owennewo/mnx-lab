@@ -1,4 +1,4 @@
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,7 +13,7 @@ try {
   review = await serveStatic(process.env.UNROLLED_REVIEW_DIR ?? 'dist/review');
   chrome = spawn(
     chromeBin(),
-    [
+    [...TEST_BROWSER_FLAGS,
       '--headless=new',
       '--remote-debugging-port=0',
       '--no-sandbox',

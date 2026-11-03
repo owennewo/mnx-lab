@@ -16,7 +16,7 @@
 // demotions. Structural assertions only.
 //
 // Run: npm run smoke:embed  (builds the artifact first)
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -64,7 +64,7 @@ try {
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-embed-smoke-`);
   chrome = spawn(
     browser,
-    [
+    [...TEST_BROWSER_FLAGS,
       '--headless=new',
       '--remote-debugging-port=0', // 0 = let the OS pick; read it back below
       '--disable-gpu',

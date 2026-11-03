@@ -6,7 +6,7 @@
 // Light plays the synth at 32 kHz and stays on the device across a reload.
 //
 // Its own private library, like studio-smoke.mjs. Usage: npm run build:site && node harness/verify/studio-instruments-smoke.mjs
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -20,7 +20,7 @@ const { origin, session } = library;
 const title = `Instruments smoke ${Date.now()}`;
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-instruments-browser-`);
 const files = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-instruments-files-`);
-const chrome = spawn(chromeBin(), ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--window-size=1280,900',
+const chrome = spawn(chromeBin(), [...TEST_BROWSER_FLAGS, '--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--window-size=1280,900',
   '--autoplay-policy=no-user-gesture-required', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
 try {

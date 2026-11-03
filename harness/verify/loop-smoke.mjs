@@ -2,7 +2,7 @@
 // a selection becomes the loop from the tray's Loop field, the score draws it, a count-in
 // counts on its chip, a handle dragged with the mouse moves its end, a press outside it moves
 // it to start there, a seek out of it while playing leaves it, and Clear takes it off the score.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,7 +17,7 @@ const PLAYER = `${PAGE}.shadowRoot.querySelector('mnx-player')`;
 const VIEWER = `${PAGE}.shadowRoot.querySelector('mnx-document-viewer')`;
 try {
   server = await serveStatic('dist/client');
-  chrome = spawn(chromeBin(), ['--headless=new', '--remote-debugging-port=0', '--no-sandbox', '--disable-gpu',
+  chrome = spawn(chromeBin(), [...TEST_BROWSER_FLAGS, '--headless=new', '--remote-debugging-port=0', '--no-sandbox', '--disable-gpu',
     '--autoplay-policy=no-user-gesture-required', '--window-size=1400,900', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
   ws = new WebSocket(await connect(await devtoolsPort(profile)));
   await new Promise(r => ws.addEventListener('open', r, { once: true }));

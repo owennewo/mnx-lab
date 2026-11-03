@@ -28,3 +28,11 @@ export function chromeBin(env = process.env) {
   if (app) return app;
   throw new Error(`No Chrome-family browser found: looked for ${ON_PATH.join(', ')} on PATH. Install one, or set CHROME_BIN.`);
 }
+
+/** Flags every test browser launches with, ahead of its own. A fresh profile otherwise installs
+ *  the machine's externally registered extensions (/usr/share/google-chrome/extensions/), and one
+ *  that opens a sign-in tab on first run takes the foreground: the page under test turns hidden and
+ *  Chrome hands it about one animation frame a second (Playwright disables extensions by default
+ *  too). Audio renders to a fake device on its own clock: four smokes sharing the desktop's sound
+ *  server dropped notes, and a smoke asserts what the synth sounded, not what a speaker heard. */
+export const TEST_BROWSER_FLAGS = ['--disable-extensions', '--no-first-run', '--no-default-browser-check', '--disable-audio-output'];

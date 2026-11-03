@@ -1,5 +1,5 @@
 // A bounded authoring probe, not a corpus-wide support claim.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -15,7 +15,7 @@ const root=fileURLToPath(new URL('../../',import.meta.url));
 const out=process.env.MUSICXML_WRITE_DIR??'/tmp/mnx-musicxml-write-probe';await fs.mkdir(out,{recursive:true});
 const site=await serveStatic(path.join(root,'dist/client'));
 const profile=await fs.mkdtemp(`${os.tmpdir()}/mnx-write-browser-`);
-const chrome=spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome=spawn(chromeBin(),[...TEST_BROWSER_FLAGS, '--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 const report={fixture:'21a-Chord-Basic',shell:'workbench',applicationCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),scope:'Selected note of imported two-note chord: semitone change, remove, create; keyboard undo/redo; JSON clipboard/MNX reopen; MusicXML export unassessed',actions:[]};
 try{

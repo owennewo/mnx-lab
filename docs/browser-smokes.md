@@ -46,8 +46,12 @@ invocations also reuse the current build. The audio smoke uses its own Vite serv
 and needs no production build.
 
 Browser smokes drive whichever Chrome-family browser is installed (`harness/verify/chromeBin.mjs`
-lists the search order), or `CHROME_BIN` if set. Their file headers describe additional
-requirements.
+lists the search order), or `CHROME_BIN` if set, and launch it with `TEST_BROWSER_FLAGS` from the
+same file ahead of their own. Those keep the machine out of the test: no extensions (a fresh
+profile otherwise installs the system-registered ones, and one that opens a sign-in tab takes the
+foreground, leaving the page under test hidden and starved to about one frame a second), and
+audio rendered to a fake device rather than the desktop's sound server (four smokes sharing it
+dropped notes). Their file headers describe additional requirements.
 
 Those using the library start their own with `startLocalLibrary()`
 (`harness/verify/localLibrary.mjs`): wrangler's dev server run **in-process** — the same

@@ -1,4 +1,4 @@
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The rung inspector, driven in a real browser
@@ -166,7 +166,7 @@ try {
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-inspector-smoke-`);
   chrome = spawn(
     chromeBin(),
-    ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
+    [...TEST_BROWSER_FLAGS, '--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
      '--window-size=1400,900', `--user-data-dir=${profile}`, 'about:blank'],
     { stdio: 'ignore' }
   );

@@ -5,7 +5,7 @@
 // Versions listed from the saves the service kept; an older one looked at
 // without anything changing; made current by a pointer move; the piece deleted,
 // brought back by the library's undo, deleted again and restored from #/deleted.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
@@ -18,7 +18,7 @@ const { origin, session } = library;
 const api = async (path, init = {}) => fetch(`${origin}/api/library${path}`, { ...init, headers: { 'Cf-Access-Jwt-Assertion': session.browser, ...(init.headers ?? {}) } });
 const title = `Life smoke ${Date.now()}`;
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-piece-lifecycle-browser-`);
-const chrome = spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1280,900','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome = spawn(chromeBin(),[...TEST_BROWSER_FLAGS, '--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1280,900','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');

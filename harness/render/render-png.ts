@@ -9,7 +9,7 @@
 // Usage:
 //   npx tsx harness/render/render-png.ts <document.mnx.json> <out.png> [--px-per-sp N]
 //   npx tsx harness/render/render-png.ts --all <dir-of-scenarios> <out-dir>
-import { chromeBin } from '../verify/chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from '../verify/chromeBin.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -64,6 +64,7 @@ svg { display:block; }
   execFileSync(
     chromeBin(),
     [
+      ...TEST_BROWSER_FLAGS,
       '--headless',
       '--disable-gpu',
       '--no-sandbox',

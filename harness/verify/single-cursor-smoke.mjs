@@ -10,7 +10,7 @@
 // Playing, the lyric panel stays open read-only, a fret is refused with Pause to edit, and ←/→ presses are counted
 // into ONE seek of whole bars. A pause parks the cursor on the playhead without
 // seeking, and the next move seeks again.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
@@ -35,7 +35,7 @@ const fake = `window.__ytInstances=[];window.YT={Player:class{
 }};window.onYouTubeIframeAPIReady?.();`;
 
 const server = await serveStatic(root + 'dist/client'), profile = fs.mkdtempSync(`${os.tmpdir()}/single-cursor-`);
-const chrome = spawn(chromeBin(), ['--headless=new', '--no-sandbox', '--disable-gpu', '--autoplay-policy=no-user-gesture-required', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
+const chrome = spawn(chromeBin(), [...TEST_BROWSER_FLAGS, '--headless=new', '--no-sandbox', '--disable-gpu', '--autoplay-policy=no-user-gesture-required', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await new Promise(r => ws.addEventListener('open', r));

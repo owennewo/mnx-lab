@@ -6,7 +6,7 @@
 // chip, the IndexedDB recovery record surviving a reload ("the crash"), the
 // storage check running in its worker, the edit lock, and a conflict with
 // another device settled by keeping a copy.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
@@ -19,7 +19,7 @@ const { origin, session } = library;
 const api = async (path, init = {}) => fetch(`${origin}/api/library${path}`, { ...init, headers: { 'Cf-Access-Jwt-Assertion': session.browser, ...(init.headers ?? {}) } });
 const stamp = Date.now(); const title = `Save smoke ${stamp}`;
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-save-pipeline-browser-`);
-const chrome = spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome = spawn(chromeBin(),[...TEST_BROWSER_FLAGS, '--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');
