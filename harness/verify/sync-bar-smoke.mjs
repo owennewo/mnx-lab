@@ -3,7 +3,7 @@
 // without the source being re-cued, and the save carries segments plus one
 // point per bar (roadmap/complete/studio-sync-bar.md).
 // SYNC_BAR_SHOT=<path.png> also writes a screenshot of the zoomed bar.
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -26,7 +26,7 @@ const audio=http.createServer((req,res)=>{
 });
 await new Promise(r=>audio.listen(0,'127.0.0.1',r));
 const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync(`${os.tmpdir()}/sync-bar-`);
-const chrome=spawn(chromeBin(),['--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const chrome=spawn(chromeBin(),[...TEST_BROWSER_FLAGS, '--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {
  ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r));const c=client(ws);
@@ -62,7 +62,10 @@ try {
    check(bar.getBoundingClientRect().height<=44,'Sync bar is taller than the rail slot: '+bar.getBoundingClientRect().height);
    check(sr.querySelectorAll('.cut.parked').length===2&&sr.querySelector('.lab').textContent==='Unsynced','Handles not parked on an unsynced bar');
    check(root.querySelector('output').textContent.trim().startsWith('0:0'),'Readout did not switch to recording time');
-   const seekTo=async s=>{const t=sr.querySelector('.track').getBoundingClientRect();sr.querySelector('.track').dispatchEvent(new MouseEvent('click',{clientX:t.left+t.width*s/bar.duration,bubbles:true,composed:true}));await until(()=>Math.abs(player.playback.mediaTime-s)<.05,'media seek to '+s);await player.updateComplete;await bar.updateComplete;await until(()=>Math.abs(bar.time-s)<.05,'bar time '+s);};
+   // A synthetic event's clientX is a whole pixel; the track's left edge need not be. Aim at the nearest pixel
+   // and expect the time that pixel stands for (within half a pixel, ~0.03 s, of the one asked for).
+   const aim=s=>{const t=sr.querySelector('.track').getBoundingClientRect(),v=bar.view,x=Math.round(t.left+t.width*(s-v.from)/(v.to-v.from));return {x,time:v.from+(x-t.left)/t.width*(v.to-v.from)};};
+   const seekTo=async s=>{const {x,time}=aim(s);sr.querySelector('.track').dispatchEvent(new MouseEvent('click',{clientX:x,bubbles:true,composed:true}));await until(()=>Math.abs(player.playback.mediaTime-time)<.01,'media seek to '+s+' (pixel time '+time+')');s=time;await player.updateComplete;await bar.updateComplete;await until(()=>Math.abs(bar.time-s)<.05,'bar time '+s);};
    const press=async label=>{const b=[...sr.querySelectorAll('.pop button')].find(x=>x.textContent.trim().startsWith(label)||x.getAttribute('aria-label')===label);check(b,'No '+label+' control');b.click();await bar.updateComplete;};
    // Start handle at 1 s: the left is unsynced. End handle at 25 s: the right is unsynced.
    await seekTo(1);sr.querySelector('.cut.parked').click();await bar.updateComplete;await press('To playhead');
@@ -81,9 +84,9 @@ try {
    check(bar.segments.segments[0].beats===22,'Count did not step to 22');
    // Ticks draw un-zoomed when they fit: 22 beats is 21 inner ticks. A mouse over the track names the beat.
    check(!sr.querySelector('.mini')&&sr.querySelectorAll('.tick').length===21,'Un-zoomed ticks: '+sr.querySelectorAll('.tick').length);
-   const hover=async s=>{const t=sr.querySelector('.track').getBoundingClientRect(),v=bar.view;t.width;sr.querySelector('.track').dispatchEvent(new PointerEvent('pointermove',{clientX:t.left+t.width*(s-v.from)/(v.to-v.from),bubbles:true,composed:true,pointerType:'mouse'}));await bar.updateComplete;return sr.querySelector('.tip')?.textContent??null;};
+   const hover=async s=>{sr.querySelector('.track').dispatchEvent(new PointerEvent('pointermove',{clientX:aim(s).x,bubbles:true,composed:true,pointerType:'mouse'}));await bar.updateComplete;return sr.querySelector('.tip')?.textContent??null;};
    const tip=await hover(a+6.5*(z-a)/22);check(tip&&tip.startsWith('beat 7 of 22 · ')&&tip.endsWith(' bpm'),'Hover card: '+tip);
-   check((await hover(0.5))==='Pre-roll · 0:00.50','Pre-roll hover: '+await hover(0.5));
+   {const pre=await hover(0.5),m=/^Pre-roll · 0:00[.]([0-9][0-9])$/.exec(pre??'');check(m&&Math.abs(Number(m[1])/100-aim(0.5).time)<=.011,'Pre-roll hover: '+pre);}
    sr.querySelector('.track').dispatchEvent(new PointerEvent('pointerleave',{bubbles:true,composed:true}));await bar.updateComplete;check(!sr.querySelector('.tip'),'Hover card stayed');
    // The score follows the new sync in place.
    await seekTo(15);await until(()=>player.playback.scorePosition,'Score did not follow the authored sync');
@@ -107,8 +110,8 @@ try {
    const before=bar.segments.cuts[1];await press('Nudge 25 milliseconds');
    check(Math.abs(bar.segments.cuts[1]-before-.025)<1e-6&&bar.segments.segments.map(s=>s.beats).join()==='11,11','Nudge');
    // A split made in the zoomed window (S, with the cut still selected) keeps it.
-   player.pause();const s2=bar.segments.cuts[1]+3*(z-a)/22,v=bar.view,t2=sr.querySelector('.track').getBoundingClientRect();
-   sr.querySelector('.track').dispatchEvent(new MouseEvent('click',{clientX:t2.left+t2.width*(s2-v.from)/(v.to-v.from),bubbles:true,composed:true}));
+   player.pause();const s2=bar.segments.cuts[1]+3*(z-a)/22;
+   sr.querySelector('.track').dispatchEvent(new MouseEvent('click',{clientX:aim(s2).x,bubbles:true,composed:true}));
    await until(()=>Math.abs(bar.time-s2)<.05,'zoomed seek');sr.querySelector('.bar').focus();
    sr.querySelector('.bar').dispatchEvent(new KeyboardEvent('keydown',{key:'s',bubbles:true,composed:true,cancelable:true}));await bar.updateComplete;
    check(bar.segments.cuts.length===4&&sr.querySelector('.mini')&&sr.querySelectorAll('.tick').length>10,'Split zoomed out');
