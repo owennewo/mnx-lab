@@ -17,14 +17,14 @@ describe('YouTube source parsing',()=>{
   });
 });
 function fixture() {
-  let events!:YouTubeEvents, visible=true;
+  let events!:YouTubeEvents, visible: boolean | string=true;
   const api={time:0,duration:20,state:5,rate:1,volume:70,destroyed:false,plays:0,cues:[] as number[],rates:[.5,1,1.5,2],requestedRate:1,muted:false,onPlay:'idle' as 'idle'|'start'|'block',
     playVideo(){this.plays++;if(this.onPlay==='start'){this.state=1;queueMicrotask(()=>events.onStateChange({data:1}));}else if(this.onPlay==='block')queueMicrotask(()=>events.onAutoplayBlocked());},pauseVideo(){this.state=2;},seekTo(time:number){this.time=time;},cueVideoById({startSeconds}:{startSeconds:number}){this.cues.push(startSeconds);this.time=startSeconds;this.state=5;events.onStateChange({data:5});},
     getCurrentTime(){return this.time;},getDuration(){return this.duration;},getPlayerState(){return this.state;},getPlaybackRate(){return this.rate;},getAvailablePlaybackRates(){return this.rates;},setPlaybackRate(rate:number){this.requestedRate=rate;},getVolume(){return this.volume;},setVolume(volume:number){this.volume=volume;},mute(){this.muted=true;},unMute(){this.muted=false;},isMuted(){return this.muted;},destroy(){this.destroyed=true;},
   };
   const clock={now:0};
   const port=new YouTubePort(id,async next=>{events=next;queueMicrotask(()=>events.onReady());return api;},()=>visible,()=>false,()=>clock.now);
-  return {api,port,clock,get events(){return events;},hide(){visible=false;},show(){visible=true;},state(data:number){api.state=data;events.onStateChange({data});}};
+  return {api,port,clock,get events(){return events;},hide(){visible=false;},hideBecause(why:string){visible=why;},show(){visible=true;},state(data:number){api.state=data;events.onStateChange({data});}};
 }
 const flush=async()=>{for(let i=0;i<10;i++)await Promise.resolve();};
 describe('official IFrame API adapter',()=>{
@@ -119,6 +119,9 @@ describe('official IFrame API adapter',()=>{
   it('pauses when hidden and never resumes merely on becoming visible',async()=>{
     const f=fixture();await f.port.prepare();f.state(1);f.hide();f.port.sample();expect(f.port.paused).toBe(true);
     f.show();f.port.sample();expect(f.api.plays).toBe(0);f.hide();await expect(f.port.play()).rejects.toThrow('Show');f.port.dispose();
+    // A reason the check gives is the reason the person reads: a hidden player is otherwise a guess.
+    const g=fixture();await g.port.prepare();g.hideBecause('the video is 360px × 198px, and YouTube needs 200px × 200px');
+    await expect(g.port.play()).rejects.toThrow('Show the YouTube player before pressing Play: the video is 360px × 198px, and YouTube needs 200px × 200px.');g.port.dispose();
   });
   it('rejects blocked playback and supports retry through native controls',async()=>{
     const f=fixture();await f.port.prepare();const play=f.port.play();await flush();const rejected=expect(play).rejects.toThrow('blocked');f.events.onAutoplayBlocked();await rejected;

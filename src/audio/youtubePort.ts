@@ -63,8 +63,13 @@ export class YouTubePort implements MediaPort {
    *  the frames a load waits on. Time spent hidden is not counted against readiness. `monotonic`
    *  (seconds) carries the clock forward between the samples the adapter takes. */
   constructor(private readonly videoId: string, private readonly factory: YouTubeFactory,
-    private readonly visible: () => boolean, private readonly pageHidden: () => boolean = () => false,
+    private readonly visible: () => boolean | string, private readonly pageHidden: () => boolean = () => false,
     private readonly monotonic: () => number = () => performance.now() / 1000) {}
+  /** Why the player cannot be seen, or null when it can: `visible` answers true, or says why not. */
+  private hiddenBecause(): string | null {
+    const seen = this.visible();
+    return seen === true ? null : typeof seen === 'string' ? seen : 'it is not on screen';
+  }
   get capabilities(): PlaybackCapabilities {
     const reported = this.apiReady ? this.api!.getAvailablePlaybackRates() : [1];
     const values = [...new Set((Array.isArray(reported) ? reported : [1]).filter(r => Number.isFinite(r) && r > 0))].sort((a,b)=>a-b);
@@ -121,7 +126,8 @@ export class YouTubePort implements MediaPort {
           this.state=data;
           if (data===0) this.hasPlayed=false;
           if (data===1 || data===3) {
-            if (!this.visible()) { this.rejectPlay('Show the YouTube player before pressing Play.'); this.pause(); return; }
+            const hidden = this.hiddenBecause();
+            if (hidden) { this.rejectPlay(`Show the YouTube player before pressing Play: ${hidden}.`); this.pause(); return; }
           }
           if (data===1) { this.fault=undefined; this.hasPlayed=true; clearTimeout(this.playTimer); this.playRequest?.resolve(); this.playRequest=undefined; }
           if(data===5 && !this.hasPlayed && this.seekRequest){this.setRate(this.requestedRate);clearTimeout(this.seekTimer);this.seekingNow=false;this.seekRequest.resolve();this.seekRequest=undefined;this.emit('seeked');}
@@ -137,7 +143,7 @@ export class YouTubePort implements MediaPort {
   /** Called by the browser adapter. Only the reported content clock drives sync. */
   sample() {
     if (this.closed || !this.apiReady || !this.api) return;
-    if (!this.visible()) { this.primeFinish?.(false); if (!this.paused || this.playRequest) this.pause(); return; }
+    if (this.hiddenBecause()) { this.primeFinish?.(false); if (!this.paused || this.playRequest) this.pause(); return; }
     if (this.priming) return;
     const duration=this.api.getDuration();
     if (this.hasPlayed && duration>0) {
@@ -161,7 +167,8 @@ export class YouTubePort implements MediaPort {
     await this.prepare();
     await this.seekDone;
     if (this.closed || generation!==this.generation) return;
-    if (!this.visible()) throw new Error('Show the YouTube player before pressing Play.');
+    const hidden = this.hiddenBecause();
+    if (hidden) throw new Error(`Show the YouTube player before pressing Play: ${hidden}.`);
     if (this.state===1) return;
     this.fault=undefined;
     this.rejectPlay('Playback superseded.');
@@ -188,7 +195,7 @@ export class YouTubePort implements MediaPort {
     // A moment that cannot be primed is not an answer about autoplay: only a
     // real attempt is remembered, so a click made with the video away does not
     // cost the next one its picture.
-    if (this.closed || !this.apiReady || this.state===0 || !this.visible()) return Promise.resolve(false);
+    if (this.closed || !this.apiReady || this.state===0 || this.hiddenBecause()) return Promise.resolve(false);
     return this.primed = new Promise<boolean>(resolve => {
       const wasMuted=this.api!.isMuted();
       this.priming=true;
