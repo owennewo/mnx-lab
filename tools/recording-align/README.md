@@ -44,10 +44,16 @@ weights are gated: log in to Hugging Face once and accept the licence on the
 ```bash
 git clone https://github.com/muscriptor/muscriptor ~/src/muscriptor && git -C ~/src/muscriptor checkout 8a1ef88   # 0.4.0
 uv venv --python 3.12 ~/.venvs/muscriptor
-VIRTUAL_ENV=~/.venvs/muscriptor uv pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu126   # cu126 still runs a GTX 10-series (sm_61)
 VIRTUAL_ENV=~/.venvs/muscriptor uv pip install ~/src/muscriptor librosa
+VIRTUAL_ENV=~/.venvs/muscriptor uv pip install --reinstall-package torch torch==2.14.1 --index-url https://download.pytorch.org/whl/cu126   # last: cu126 still runs a GTX 10-series (sm_61)
+~/.venvs/muscriptor/bin/python -c "import torch; print(torch.__version__, torch.zeros(1, device='cuda').normal_().device)"   # 2.14.1+cu126 cuda:0
 uvx --from huggingface_hub hf auth login
 ```
+
+Torch goes last: installed first, it was replaced by `2.15.0+cu132` on 2026-11-03, which has no kernels
+for the GTX 1060. `torch.cuda.is_available()` still says True and the selftest still passes, because
+neither runs anything on the GPU; only the check above, or a transcription, fails
+("no kernel image is available").
 
 What to know about its output, all measured (RUNS.md runs 6–7): it is deterministic (two runs,
 byte-identical); it gives no loudness, so `amp` is 1; and **a note's end is the next onset of any

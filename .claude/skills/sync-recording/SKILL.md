@@ -197,6 +197,14 @@ weak bars in a row) and **unexplained** notes before its first bar or after its 
 one: run the free search and compare before believing the fixed one. Where both run, they
 should agree (the Jansch run: identical bar lines).
 
+**A passage played freely** (an intro, a ritardando, a fermata) is outside the search's tempo model, and
+both searches show it the same way: weak runs, a stray bar 1 or 2 standing in for a late bar line, a bar
+that scores 0/6 while its copies elsewhere score 6/6. That is the bar lines, not the notes, until shown
+otherwise: list the heard notes for the stretch and read them against the written ones. If they follow in
+order, put the bar lines on the heard downbeats by editing `start` and `end` in a copy of `structure.json`
+in a sibling directory, and run `sync` there, where `verify` judges the result. Say in the report which
+bars were placed so. (Runs 5, 6, 9 and 10 each placed bars this way; run 10's error was up to 0.93 s.)
+
 Then read `$OUT/report.md`. Judge, in this order:
 
 1. **Notes found against chance.** Found by pitch class should be well above chance (the

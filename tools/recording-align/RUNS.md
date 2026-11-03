@@ -418,26 +418,40 @@ to do — each is a gap to close.
   What `sync` will write is decided in `decisions.ts`, and `checkpoint` (the session's save script, on its
   third use) in `checkpoint.ts`, so both are tested without a library or a run.
 
-## Run 10 — 2026-11-02 — Fields of Gold (Dominic Miller, Serge Kottelat's transcription): a piece from the screen, no audio check
+## Run 10 — 2026-11-02 — Fields of Gold (Dominic Miller, Serge Kottelat's transcription): a piece from the screen, a freely played intro
 
 - **Recording** YouTube `DcYB98RRvWw`, 175 s, Miller alone on classical guitar, standard tuning, capo 3, with
   Kottelat's notation + tab on screen for all 79 bars (0–165 s) and a cursor. No piece existed: the owner asked for one.
-- **Piece** `18b7fb82180507ec` r1 on the local dev library: 79 bars, 79 performed (no repeats printed), 688 notes,
-  Intro / Interlude / Verse 1–4 / Bridge / Coda, recording attached, **no sync**.
+- **Piece** `18b7fb82180507ec` r2 on the local dev library: 79 bars, 79 performed (no repeats printed),
+  Intro / Interlude / Verse 1–4 / Bridge / Coda, recording attached and synced.
 - **Method**: page turns from `ffmpeg`'s scene detection on the chord-name row (the cursor never reaches it), each page
-  stitched cursor-free from a late frame's left half and an early frame's right half (`screen.py` needs numpy, and the
-  environment could not be installed, below). Read in one pass into tab text; the stored score drawn page by page with
-  `barsAlone` and compared by eye on 9 of 20 pages.
-- **Not done, and it is the skill's own gate**: Steps 2–5 never judged the reading against the audio. `~/.venvs/muscriptor`
-  does not exist on this machine (nor `~/.venvs`, nor Hugging Face credentials); installing it was refused by Claude Code's
-  auto-mode classifier, so it waits for the owner. The arranger's free PDF, the natural oracle, was refused the same way.
-  So this reading is unchecked by ear or PDF, and the piece was made at the owner's direct request regardless.
+  stitched cursor-free from a late frame's left half and an early frame's right half (`screen.py` could not run yet; the
+  environment was missing). Read in one pass into tab text; the stored score drawn page by page with `barsAlone` and
+  compared by eye on 9 of 20 pages. The piece was made before any audio check, at the owner's direct request, because the
+  environment could not be installed then (Claude Code's auto-mode classifier refused it; the owner installed it the next day).
+- **Found**: key fit +0 (1.00 against 0.80), tuning +25 cents. Free search 82% / 81% against 10% chance, downbeats median
+  10 ms, 90th percentile 40 ms, 106–126 bpm, with four departures. Fixed order 79% / 78%, downbeats median 10 / 30 ms, with
+  weak runs at bars 3–5, 10–12 and 76–79.
+- **Gates**: the departures and weak runs fired, and none was a departure. Heard note by note, bars 1–12 and 76–79 follow the
+  score in order: he plays freely, past what the tempo model allows (bars 3–5 up to 0.93 s out), and a stray bar 1 stood in
+  for the breath after bar 12 and the a tempo at bar 53.
+- **Written**: at the owner's word, from a copy of `structure.json` with 18 bars placed on heard downbeats (1–13, 53, 76–79;
+  bar 77 opens on a tie, so its line is an estimate from the tempo): 79 segments, 80 cuts (64 snapped), 0.16–161.83 s,
+  revision 2. `verify`, on what was stored: OK, 84% of 556 written notes against 6% chance (80% before the placing).
+- **A finding about the print**: bar 8 reads frets 4, 2, 1 on string 4 and the zoom confirms it; full and half speed both hear
+  2, 1, 0 (G3, F♯3, F3). Kept as printed at the owner's word, for the owner's ear. Bars 14 and 33's sixteenths sound about
+  150 ms ahead of the print; left alone.
 - **Fixed on the way**: tab text had no triplets (`t3(…)`), grace notes (`g:`), hammers/pulls (`p`) or slides (`s`); bars 8,
-  12, 41, 51 and the bridge cannot be written without them. A slide's `direction` does not survive a `.gp`, so it is not written.
+  12, 41, 51 and the bridge cannot be written without them. A slide's `direction` does not survive a `.gp`, so it is not
+  written. The README's install order let torch be replaced by a build with no kernels for the GPU, past the selftest.
 - **Traps**: `double` marks a bar's *closing* line, so it goes on the bar before a new section. An explicit `final` is lost by
   the export (verdict `differs`) and adds nothing on the last bar. `barsAlone` keeps the first tempo only: slices all print
-  158, while the document has 158/116/120/110. `google-chrome` is `google-chrome-stable` here, which `align.ts draw` misses.
+  158, while the document has 158/116/120/110. A grace note reads in `score.json` as the end of the bar before it, so bar 18
+  answers for bar 19's grace.
 - **Unmetered intro**: bars 1–12 print no time signature ("freely", dashed bar lines); written as what each bar holds (2/8, 3/4,
   5/8, 2/4 …), so the score shows signatures the arranger did not print.
 - **Not carried**: chord names and diagrams, let ring, fingerings, arpeggio signs, fermatas, ral. Tab text has no way to say them.
-- **Owner**: not yet heard.
+- **Improvised** (gaps): placing bar lines by hand, in a copied `structure.json`: Step 5 now says how, and a fourth run doing it
+  earns a command; per-bar misses and extras, heard against written, were a one-off script, and they are what told misplaced
+  bars from misread ones, so the report should carry them.
+- **Owner**: chose the sync with placed bars and to keep bar 8 as printed for now; the sync and bar 8 not yet heard.

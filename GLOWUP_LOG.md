@@ -72,6 +72,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Every Breath You Take | The Police | `05fa6b889b0481b6` |  | Soundslice |  |  |  |
 | Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 | 🟡 10-29 much improved; strings to check | 🟡 10-30 (bars 2–4 folded; the rest not yet) | — |
 | Fast Car | Tracy Chapman | `10537b9c88cc5329` |  | Soundslice |  |  |  |
+| Fields of Gold | Sting (Dominic Miller, trans. Serge Kottelat) | `18b7fb82180507ec` |  | **bar search**, 18 bars placed by hand, 11-03 | 🟡 | 🟡 |  |
 | Fingerstyle Mastery: Travis Picking Part 2 | Mike Dawes | `8dee0f5649ee664d` |  | no recording |  |  |  |
 | Freight Train | Elizabeth Cotton | `b9cc081329df0d07` |  | Soundslice |  |  |  |
 | Fresh as a sweet sunday morning | Bert Jansch (Chris Brain) | `1525621010d30a38` |  | Soundslice |  |  |  |
@@ -143,6 +144,14 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-03 — Fields of Gold (Dominic Miller, trans. Serge Kottelat) · `18b7fb82180507ec` — [run 10](tools/recording-align/RUNS.md#run-10--2026-11-02--fields-of-gold-dominic-miller-serge-kottelats-transcription-a-piece-from-the-screen-a-freely-played-intro)
+
+A new piece, read off the score in Kottelat's video, 79 bars, no checkpoints beyond its first save. Synced (revision 2):
+84% of written notes heard against 6% chance as the player plays it; 18 bars (1–13, 53, 76–79) placed on heard downbeats
+because he plays them freely. Sync done but not yet watched. **Form** is 🟡 by the letter: the score's order is what he plays,
+heard note by note, but the free search still reports departures in the free passages. **Notes** is 🟡: not yet checked by
+the disagreements method. Open for the owner's ear: bar 8 (7.7–10.2 s), printed frets 4, 2, 1, heard 2, 1, 0; kept as printed.
 
 ### 2026-10-30 — Everybody Wants To Rule The World · `2b156138db0c7716` — the owner's manual pass begins
 
