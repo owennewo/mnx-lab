@@ -40,7 +40,9 @@ export function youtubeHidden(frame: HTMLIFrameElement): string|null {
   // its own viewport, inside the frame, in whole pixels.
   const box=frame.getBoundingClientRect(),px=(n: number)=>`${Math.round(n*100)/100}px`,least=199.5;
   if(box.width<least || box.height<least)return `the video is ${px(box.width)} × ${px(box.height)}, and YouTube needs 200px × 200px`;
-  if(box.left<0 || box.top<0 || box.right>innerWidth || box.bottom>innerHeight)
+  // A pixel of slack at the edges: innerWidth and innerHeight are whole numbers, rounded down from a
+  // viewport that need not be (an iPhone at page zoom reported 354 for a video filling 354.71).
+  if(box.left< -1 || box.top< -1 || box.right>innerWidth+1 || box.bottom>innerHeight+1)
     return `the video runs past the edge of the screen (${px(box.left)}, ${px(box.top)} to ${px(box.right)}, ${px(box.bottom)} in ${innerWidth} × ${innerHeight})`;
   const name=(e: Element)=>e.localName+(typeof e.className==='string'&&e.className?'.'+e.className.trim().split(/\s+/)[0]:'');
   let node: Element|null=frame;
