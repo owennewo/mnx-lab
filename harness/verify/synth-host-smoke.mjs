@@ -78,7 +78,9 @@ try {
   // machine's, not the synth's.
   const SCENARIO_PERF = 'lab/document/twelve-bar-blues';
   await cdp.send('Page.navigate', { url: `http://127.0.0.1:${server.port}/workbench/#/scenario/${SCENARIO_PERF}` });
-  for (let i = 0; i < 150 && !(await cdp.evaluate(`!!document.querySelector('mnx-workbench')?.shadowRoot?.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-player')?.performance`)); i++) await new Promise(r => setTimeout(r, 100));
+  // The hash changes in the same document, so the previous scenario's player answers at once: wait for
+  // this scenario's, with its session up, or the read below races the page replacing it.
+  for (let i = 0; i < 150 && !(await cdp.evaluate(`(p => !!p?.performance && p.documentId === ${JSON.stringify(SCENARIO_PERF)} && !!p.session?.backend)(document.querySelector('mnx-workbench')?.shadowRoot?.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-player'))`)); i++) await new Promise(r => setTimeout(r, 100));
   const perf = JSON.parse(await cdp.evaluate(`(async()=>{
     const p=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page').shadowRoot.querySelector('mnx-player'),b=p.session.backend,delay=ms=>new Promise(r=>setTimeout(r,ms));
     await p.play();const loads=[];const off=b.port.host.on('load',l=>loads.push(l.busy));
