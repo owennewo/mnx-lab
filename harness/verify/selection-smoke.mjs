@@ -1,4 +1,4 @@
-import { chromeBin } from './chromeBin.mjs';
+import { chromeBin, TEST_BROWSER_FLAGS } from './chromeBin.mjs';
 import os from 'node:os';
 import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The selection overlay, driven in a real browser — the first test this layer
@@ -201,7 +201,7 @@ try {
   const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-selection-smoke-`);
   chrome = spawn(
     chromeBin(),
-    ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
+    [...TEST_BROWSER_FLAGS, '--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
      `--user-data-dir=${profile}`, 'about:blank'],
     { stdio: 'ignore' }
   );
@@ -445,7 +445,9 @@ try {
   console.log('a revealed system brings its verses');
   // Every load so far was pinned to the both view (above); this one is the tab view.
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: "localStorage.setItem('mnx-lab.view','tab');" });
-  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 900, height: 640, deviceScaleFactor: 1, mobile: false });
+  // Short enough that the score overflows the viewer, or the case tests nothing: the workbench leaves
+  // the score a narrow upright column here, which stacks (score-frame `stacked`) and fits the four bars in 640px.
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 900, height: 520, deviceScaleFactor: 1, mobile: false });
   await cdp.send('Page.navigate', { url: 'about:blank' });
   await new Promise(r => setTimeout(r, 300));
   await cdp.send('Page.navigate', { url: `http://127.0.0.1:${site.port}/workbench/#/scenario/lab/lyrics/tab-verses` });
