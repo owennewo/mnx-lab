@@ -35,8 +35,11 @@ export function youtubeHidden(frame: HTMLIFrameElement): string|null {
   let fullscreen=document.fullscreenElement;
   while(fullscreen?.shadowRoot?.fullscreenElement)fullscreen=fullscreen.shadowRoot.fullscreenElement;
   if(fullscreen===frame)return null;
-  const box=frame.getBoundingClientRect(),px=(n: number)=>`${Math.round(n*10)/10}px`;
-  if(box.width<200 || box.height<200)return `the video is ${px(box.width)} × ${px(box.height)}, and YouTube needs 200px × 200px`;
+  // Half a pixel of slack: layout lands a box laid out at exactly 200px a hair short on some screens
+  // (an iPhone refused a video it reported, to one decimal, as 354.7 × 200), and YouTube measures
+  // its own viewport, inside the frame, in whole pixels.
+  const box=frame.getBoundingClientRect(),px=(n: number)=>`${Math.round(n*100)/100}px`,least=199.5;
+  if(box.width<least || box.height<least)return `the video is ${px(box.width)} × ${px(box.height)}, and YouTube needs 200px × 200px`;
   if(box.left<0 || box.top<0 || box.right>innerWidth || box.bottom>innerHeight)
     return `the video runs past the edge of the screen (${px(box.left)}, ${px(box.top)} to ${px(box.right)}, ${px(box.bottom)} in ${innerWidth} × ${innerHeight})`;
   const name=(e: Element)=>e.localName+(typeof e.className==='string'&&e.className?'.'+e.className.trim().split(/\s+/)[0]:'');
