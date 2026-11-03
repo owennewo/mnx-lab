@@ -87,6 +87,10 @@ type Pad = 'zoom' | 'settings' | null;
 
 /** The widest frame that stacks: a 320px pane and its divider leave the score about 390px here. */
 const STACK_WIDTH = 720;
+/** How much taller than wide a frame must be to stack. A phone held upright is 1.5 and more;
+ *  a desktop window with the workbench rail and panel beside the score leaves it about square
+ *  (710 × 711 in a 1400 × 900 window), and stacking that put the lyric panel over the score. */
+const STACK_ASPECT = 1.25;
 /** A stacked video gives way to the score past this share of the frame's height, down to YouTube's 200px. */
 const STACKED_VIDEO_SHARE = 0.34;
 
@@ -177,7 +181,7 @@ export class ScoreFrame extends LitElement {
   };
   private fitShape() {
     const width = this.clientWidth, height = this.clientHeight;
-    this.stacked = width > 0 && width <= STACK_WIDTH && height > width;
+    this.stacked = width > 0 && width <= STACK_WIDTH && height >= width * STACK_ASPECT;
   }
   /** 16:9 where there is room, and never under the 200px YouTube requires. */
   private get videoHeight() {
