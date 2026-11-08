@@ -153,6 +153,10 @@ export type MutationIntent =
   | { type: 'longerDuration' }
   /** Tie the cursor's note to the same pitch in the next event; toggles. */
   | { type: 'toggleTie' }
+  /** Shift+T. Inside one tuplet — everything selected belongs to it — take it
+   *  away (the notes stay, at their written values); otherwise make a 3:2 of
+   *  the selected run, or three of the cursor's value from there. Toggles. */
+  | { type: 'toggleTriplet' }
   /** On a note: re-pitch by semitones. On a REST: nudge `staffPosition` by
    *  the sign — the §8.11 polymorphic verb (one key, per-type meaning). */
   | { type: 'transpose'; semitones: number }

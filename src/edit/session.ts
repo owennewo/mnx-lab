@@ -711,6 +711,11 @@ export class EditorSession {
           this.selectedNoteKeys.map(noteId => ({ type: 'respellNote', noteId }))
         );
       }
+      case 'toggleTriplet': {
+        const inside = this.enclosingTuplet();
+        if (inside) return this.handleIntent({ type: 'removeContainer', ...inside });
+        return this.handleIntent({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } });
+      }
       case 'toggleTie': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
@@ -3149,6 +3154,28 @@ export class EditorSession {
   }
 
   /** The voice-0 timed event starting exactly at the cursor's onset. */
+  /** The one tuplet everything selected sits inside — every member a child of
+   *  the same top-level tuplet of one voice of one bar — or null. What
+   *  Shift+T takes away. */
+  private enclosingTuplet(): { sequenceIndex: number; eventIndex: number } | null {
+    const level = this.selectionState.level;
+    if (level !== 'note' && level !== 'event') return null;
+    const members = this.resolvedSelection.members;
+    const first = members[0];
+    if (!first || (first.kind !== 'note' && first.kind !== 'event')) return null;
+    for (const member of members) {
+      if ((member.kind !== 'note' && member.kind !== 'event') || member.containerIndex === undefined) return null;
+      if (member.partIndex !== first.partIndex || member.measureIndex !== first.measureIndex || member.staffIndex !== first.staffIndex
+        || member.voiceIndex !== first.voiceIndex || member.eventIndex !== first.eventIndex) return null;
+    }
+    const onStaff = (this.doc.parts?.[first.partIndex]?.measures?.[first.measureIndex]?.sequences ?? [])
+      .map((sequence, index) => ({ sequence, index }))
+      .filter(entry => (entry.sequence.staff ?? 1) === first.staffIndex);
+    const chosen = onStaff[first.voiceIndex];
+    const item = chosen?.sequence.content[first.eventIndex] as { type?: string } | undefined;
+    return chosen && item?.type === 'tuplet' ? { sequenceIndex: chosen.index, eventIndex: first.eventIndex } : null;
+  }
+
   /** The selection as a run of top-level events in one voice of one bar —
    *  two or more of them, contiguous — or null. What a typed tuplet wraps. */
   private selectedTopLevelRun(): {

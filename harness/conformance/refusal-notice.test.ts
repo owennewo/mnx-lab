@@ -106,13 +106,46 @@ describe('Shift+T and the session’s misfit', () => {
   const TRIPLET = resolveIntent({ code: 'KeyT', shift: true }, [EDIT_LAYER])!;
 
   it('Shift+T is a 3:2 over the selected run', () => {
-    expect(TRIPLET).toEqual({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } });
+    expect(TRIPLET).toEqual({ type: 'toggleTriplet' });
     const session = new EditorSession(run(['quarter', 'quarter', 'quarter', 'quarter', 'eighth']));
     session.handleIntent({ type: 'goToLevel', level: 'event' });
     for (let i = 0; i < 3; i++) session.handleIntent({ type: 'nextPosition' });
     session.handleIntent({ type: 'extendSelection', direction: 'next' });
     expect(session.handleIntent(TRIPLET)).toBe(true);
     expect(session.doc.parts![0]!.measures![0]!.sequences![0]!.content[3]).toMatchObject({ type: 'tuplet', inner: { duration: { base: 'eighth' } } });
+  });
+
+  // The owner, 2026-11-08: a triplet selected, Shift+T, and it said "nothing
+  // here it can do that to" — T toggles the tie, so Shift+T toggles the triplet.
+  it('inside a triplet, Shift+T takes it away — from one of its notes, or the whole group', () => {
+    const doc = (): MnxStructure => ({
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [{ id: 'p', measures: [{ sequences: [{ content: [
+        { duration: { base: 'quarter' }, notes: [{ pitch: { step: 'A', octave: 3 } }] },
+        { type: 'tuplet', inner: { duration: { base: 'eighth' }, multiple: 3 }, outer: { duration: { base: 'eighth' }, multiple: 2 },
+          content: [0, 1, 2].map(() => ({ duration: { base: 'eighth' }, notes: [{ pitch: { step: 'C', octave: 4 } }] })) },
+        { duration: { base: 'half' }, notes: [{ pitch: { step: 'A', octave: 3 } }] }
+      ] }] }] }]
+    } as MnxStructure);
+    const content = (s: EditorSession) => s.doc.parts![0]!.measures![0]!.sequences![0]!.content;
+    // One note of it, at the note rung.
+    const one = new EditorSession(doc());
+    one.handleIntent({ type: 'nextPosition' });
+    expect(one.handleIntent(TRIPLET)).toBe(true);
+    expect(content(one).some(item => (item as { type?: string }).type === 'tuplet')).toBe(false);
+    expect(content(one)).toHaveLength(5);
+    // The whole group, at the event rung; undo puts it back exactly.
+    const all = new EditorSession(doc());
+    const before = JSON.stringify(all.doc);
+    all.handleIntent({ type: 'goToLevel', level: 'event' });
+    all.handleIntent({ type: 'nextPosition' });
+    all.handleIntent({ type: 'extendSelection', direction: 'next' });
+    all.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(all.handleIntent(TRIPLET)).toBe(true);
+    expect(content(all)).toHaveLength(5);
+    expect(all.handleIntent({ type: 'undo' })).toBe(true);
+    expect(JSON.stringify(all.doc)).toBe(before);
   });
 
   it('a run that does not split refuses as wrap-misfit, measured in beats', () => {

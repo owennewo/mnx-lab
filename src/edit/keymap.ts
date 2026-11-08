@@ -153,9 +153,9 @@ export const EDIT_LAYER: KeymapLayer = {
     { code: 'KeyV', alt: true, intent: { type: 'cycleSlot' } },
     { code: 'KeyT', intent: { type: 'toggleTie' } },
     // Shift+T: a triplet (3:2) — the tuplet a guitarist reaches for, without
-    // typing `3:2` in the inspector. The selected run when there is one (its
-    // unit from its total), else three of the cursor's value from here.
-    { code: 'KeyT', shift: true, intent: { type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } } },
+    // typing `3:2` in the inspector — and, inside one, its removal: a toggle,
+    // as T is for the tie (the owner, 2026-11-08).
+    { code: 'KeyT', shift: true, intent: { type: 'toggleTriplet' } },
     // Respell (campaign item 6): `J`, the spelling key MuseScore and Dorico
     // both use. Cycles, because "the other spelling" has no single answer.
     { code: 'KeyJ', intent: { type: 'respellNote' } },

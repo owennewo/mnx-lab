@@ -314,8 +314,8 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyT', shift: true }],
     group: 'editing',
     meaning: {
-      note: 'make a triplet (3:2) from three of this note’s value, starting here',
-      event: 'make a triplet (3:2) of the selected events — or three of this one’s value'
+      note: 'triplet on/off — inside one, remove it; else make a 3:2 from three of this note’s value',
+      event: 'triplet on/off — inside one, remove it; else make a 3:2 of the selected events'
     }
   },
   {

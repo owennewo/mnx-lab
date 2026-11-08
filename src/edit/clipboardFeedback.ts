@@ -273,7 +273,8 @@ export function refusalNotice(intent: EditorIntent, reason: RefusalReason, conte
   if (reason === 'inside-event')
     return { ok: false, message: 'A note can\u2019t start inside another note or rest yet \u2014 only where one begins.' };
   if (reason === 'wrap-misfit') {
-    const spec = intent.type === 'wrapInContainer' && intent.spec.type === 'tuplet' ? intent.spec : null;
+    const spec = intent.type === 'wrapInContainer' && intent.spec.type === 'tuplet' ? intent.spec
+      : intent.type === 'toggleTriplet' ? { inner: { multiple: 3 }, outer: { multiple: 2 } } : null;
     const ratio = spec ? `${spec.inner.multiple}:${spec.outer.multiple}` : 'A tuplet';
     const parts = spec ? `${spec.inner.multiple} equal note values` : 'equal note values';
     const have = context?.selectedBeats ? ` \u2014 the selection adds up to ${context.selectedBeats}` : '';
