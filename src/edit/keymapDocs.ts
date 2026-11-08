@@ -310,6 +310,15 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
+    keys: 'Shift+T',
+    strokes: [{ code: 'KeyT', shift: true }],
+    group: 'editing',
+    meaning: {
+      note: 'make a triplet (3:2) from three of this note’s value, starting here',
+      event: 'make a triplet (3:2) of the selected events — or three of this one’s value'
+    }
+  },
+  {
     keys: '.',
     strokes: [{ code: 'Period' }, { code: 'NumpadDecimal' }],
     group: 'editing',

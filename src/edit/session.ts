@@ -35,6 +35,8 @@ import {
 import { spannersUnderSelection } from './spannerCoincidence.ts';
 import { lyricPlanOps } from './lyricText.ts';
 import {
+  addOnsets,
+  itemSpan,
   buildGrid,
   clampCursor,
   coincidentSlots,
@@ -62,6 +64,7 @@ import {
   type PositionGrid,
   type Projection
 } from './cursor.ts';
+import { beatsText, timeAt } from './inspector.ts';
 import { syntheticEventKey } from '../model/noteKeys.ts';
 import { eventAddressesUnderSelection, eventHoldsInk } from './selectionEvents.ts';
 import { capoOf, defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
@@ -112,8 +115,9 @@ const DURATION_LADDER: MnxNoteValueBase[] = [
  * `removed` is press 2, and `refused` is the case that used to be silence.
  */
 /** A refusal the session can explain: `inside-event` — a fret typed where no note or rest begins,
- *  inside one the editor cannot split yet. */
-export type SessionRefusal = 'inside-event';
+ *  inside one the editor cannot split yet; `wrap-misfit` — a tuplet asked of a selection that does
+ *  not split into its count of one note value (`lastRefusalBeats` says what it does add up to). */
+export type SessionRefusal = 'inside-event' | 'wrap-misfit';
 
 export type DeleteOutcome =
   | { kind: 'cleared'; level: SelectionLevel; notes: number; thenRemoves: boolean }
@@ -155,6 +159,7 @@ export class EditorSession {
    *  editor a player has used. */
   private lastDeleteOutcome: DeleteOutcome | null = null;
   private lastRefusalReason: SessionRefusal | null = null;
+  private lastRefusalBeatsText: string | null = null;
   /** The armed end of a spanner-in-progress (campaign item 10): a note key, or
    *  null. The keyboard names two places in two presses because the ladder
    *  cannot yet extend laterally; when it can, "slur the selected run" becomes
@@ -337,6 +342,11 @@ export class EditorSession {
 
   /** Why the last intent was declined, when the session can say more than "not here" — so a
    *  fret typed into the middle of a note or rest names the reason instead of vanishing. */
+  /** The selection's length when a tuplet did not fit it, in beats (`1 3/4 beats`). */
+  get lastRefusalBeats(): string | null {
+    return this.lastRefusalBeatsText;
+  }
+
   get lastRefusal(): SessionRefusal | null {
     return this.lastRefusalReason;
   }
@@ -614,6 +624,7 @@ export class EditorSession {
     // Delete's outcome describes ONE keystroke, so anything else discards it.
     // A notice that outlived its keystroke would report the previous press.
     if (intent.type !== 'delete') this.lastDeleteOutcome = null;
+    this.lastRefusalBeatsText = null;
     this.lastRefusalReason = null;
     if (isNavigationIntent(intent)) return this.navigate(intent);
     // Provenance for the op queue: apply() stamps the intent being handled
@@ -1591,7 +1602,15 @@ export class EditorSession {
           const run = this.selectedTopLevelRun();
           if (run && intent.spec.type === 'tuplet' && intent.count === undefined) {
             const spec = rangeTupletSpec(run.seq, run.from, run.to, intent.spec);
-            if (!spec) return false;
+            if (!spec) {
+              // Say what the run DOES add up to, in the inspector's beats.
+              let total = { num: 0, den: 1 };
+              for (let i = run.from; i <= run.to; i++) total = addOnsets(total, itemSpan(run.seq.content[i]!));
+              const unit = timeAt(this.doc, run.measureIndex)?.unit ?? 4;
+              this.lastRefusalReason = 'wrap-misfit';
+              this.lastRefusalBeatsText = beatsText(addOnsets({ num: 0, den: 1 }, { num: total.num * unit, den: total.den }));
+              return false;
+            }
             this.apply({
               type: 'wrapInContainer',
               partIndex: run.partIndex,
@@ -1606,7 +1625,10 @@ export class EditorSession {
           const spec = completeContainerSpec(site.seq, site.index, intent.spec);
           if (!spec) return false;
           const extent = wrapExtent(site.seq, site.index, spec, intent.count);
-          if (extent === null) return false;
+          if (extent === null) {
+            if (spec.type === 'tuplet') this.lastRefusalReason = 'wrap-misfit';
+            return false;
+          }
           this.apply({
             type: 'wrapInContainer',
             partIndex: site.partIndex,

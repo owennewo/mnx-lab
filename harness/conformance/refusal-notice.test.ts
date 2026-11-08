@@ -12,6 +12,9 @@
 import { describe, it, expect } from 'vitest';
 import { refusalNotice } from '../../src/edit/clipboardFeedback.ts';
 import type { EditorIntent } from '../../src/edit/intents.ts';
+import type { MnxStructure } from '../../src/model/mnx.ts';
+import { EditorSession } from '../../src/edit/session.ts';
+import { EDIT_LAYER, resolveIntent } from '../../src/edit/keymap.ts';
 
 const FRET: EditorIntent = { type: 'enterFret', fret: 2 };
 const NEXT: EditorIntent = { type: 'nextPosition' };
@@ -59,5 +62,71 @@ describe('refusalNotice', () => {
   // document could have given.
   it('still explains navigation blocked by the document being elsewhere', () => {
     expect(refusalNotice(NEXT, 'suspended')).not.toBeNull();
+  });
+});
+
+// The owner, 2026-11-08: two events selected, T pressed, and the only answer
+// was "That can't be done here" — nothing said T ties ONE note. A refusal now
+// says what the key does and what it needs, against what is selected; and a
+// tuplet that does not fit says what the selection adds up to.
+describe('a refusal says why', () => {
+  const TIE: EditorIntent = { type: 'toggleTie' };
+  const TRIPLET: EditorIntent = { type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } };
+
+  it('names the key, what it does, the rung it works at, and what is selected', () => {
+    const message = refusalNotice(TIE, 'unavailable', { level: 'event', members: 2 })!.message;
+    expect(message).toMatch(/^T — tie to the same pitch in the next event/);
+    expect(message).toMatch(/it works on a note/);
+    expect(message).toMatch(/2 events are selected/);
+  });
+
+  it('at a rung where the key does work, says there was nothing to act on', () => {
+    expect(refusalNotice(TIE, 'unavailable', { level: 'note', members: 1 })!.message).toMatch(/^T — tie .*: nothing here it can do that to\.$/);
+  });
+
+  it('a tuplet that does not fit says what the selection adds up to', () => {
+    const message = refusalNotice(TRIPLET, 'wrap-misfit', { level: 'event', members: 3, selectedBeats: '1 3/4 beats' })!.message;
+    expect(message).toMatch(/^3:2 needs notes that split into 3 equal note values/);
+    expect(message).toMatch(/adds up to 1 3\/4 beats/);
+  });
+
+  it('without a context, or for an intent no key carries, it still speaks', () => {
+    expect(refusalNotice(TIE, 'unavailable')!.message).toBe('That can’t be done here.');
+    expect(refusalNotice({ type: 'setEventDuration', base: 'quarter' }, 'unavailable', { level: 'note', members: 1 })!.message)
+      .toBe('That can’t be done here.');
+  });
+});
+
+describe('Shift+T and the session’s misfit', () => {
+  const run = (bases: ('quarter' | 'eighth')[]): MnxStructure => ({
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [{ id: 'p', measures: [{ sequences: [{ content: bases.map(base => ({ duration: { base }, notes: [{ pitch: { step: 'A', octave: 3 } }] })) }] }] }]
+  } as MnxStructure);
+  const TRIPLET = resolveIntent({ code: 'KeyT', shift: true }, [EDIT_LAYER])!;
+
+  it('Shift+T is a 3:2 over the selected run', () => {
+    expect(TRIPLET).toEqual({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } });
+    const session = new EditorSession(run(['quarter', 'quarter', 'quarter', 'quarter', 'eighth']));
+    session.handleIntent({ type: 'goToLevel', level: 'event' });
+    for (let i = 0; i < 3; i++) session.handleIntent({ type: 'nextPosition' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(session.handleIntent(TRIPLET)).toBe(true);
+    expect(session.doc.parts![0]!.measures![0]!.sequences![0]!.content[3]).toMatchObject({ type: 'tuplet', inner: { duration: { base: 'eighth' } } });
+  });
+
+  it('a run that does not split refuses as wrap-misfit, measured in beats', () => {
+    const session = new EditorSession(run(['quarter', 'quarter', 'eighth', 'eighth']));
+    session.handleIntent({ type: 'goToLevel', level: 'event' });
+    session.handleIntent({ type: 'nextPosition' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(session.handleIntent(TRIPLET)).toBe(false);
+    expect(session.lastRefusal).toBe('wrap-misfit');
+    expect(session.lastRefusalBeats).toBe('2 beats');
+    // The next intent forgets it.
+    session.handleIntent({ type: 'prevPosition' });
+    expect(session.lastRefusal).toBeNull();
+    expect(session.lastRefusalBeats).toBeNull();
   });
 });

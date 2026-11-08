@@ -49,7 +49,7 @@ import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
 import { PieceSaveContext, projectPieceTags, acquirePieceLock } from '../../../src/storage/pieceSaveContext.ts';
 import type { WorkChange } from '../../../src/edit/ops.ts';
 import type { EditorIntent } from '../../../src/edit/intents.ts';
-import { refusalNotice, type RefusalReason } from '../../../src/edit/clipboardFeedback.ts';
+import { refusalNotice, type RefusalContext, type RefusalReason } from '../../../src/edit/clipboardFeedback.ts';
 import type { EditorBinding } from '../../../src/elements/editorHost.ts';
 import { MemorySelectionClipboardStore } from '../../../src/edit/selectionClipboard.ts';
 import './KeysSheet.ts';
@@ -716,7 +716,7 @@ export class PiecePage extends LitElement {
         if (this.keysOpen || this.editOpen) this.requestUpdate();
         this.editorLyrics = !!this.editor?.lyricsOpen;
       },
-      onRefused: (intent, reason) => this.sayRefused(intent, reason),
+      onRefused: (intent, reason, context) => this.sayRefused(intent, reason, context),
       readOnly: () => this.readOnly, suspended: () => !!this.viewing,
       // One cursor (core-single-cursor.md): the edit cursor is the playhead.
       playback: this.binding?.cursor
@@ -768,8 +768,8 @@ export class PiecePage extends LitElement {
    * a notice on every press of the last bar would be noise. Everything that
    * means *you cannot do that* speaks.
    */
-  private sayRefused(intent: EditorIntent, reason: RefusalReason) {
-    const notice = refusalNotice(intent, reason);
+  private sayRefused(intent: EditorIntent, reason: RefusalReason, context?: RefusalContext) {
+    const notice = refusalNotice(intent, reason, context);
     if (notice) this.showNotice(notice.message);
   }
 

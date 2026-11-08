@@ -14,6 +14,8 @@
 import { isNavigationIntent, type EditorIntent } from './intents.ts';
 import type { SelectionClip } from './selectionClip.ts';
 import type { SelectionLevel } from './selection.ts';
+import { KEY_DOCS, type KeyDoc } from './keymapDocs.ts';
+import { EDIT_LAYER, NAVIGATION_LAYER } from './keymap.ts';
 import type { DeleteOutcome } from './session.ts';
 import type {
   CopySelectionResult,
@@ -182,8 +184,69 @@ export function deleteSelectionNotice(outcome: DeleteOutcome): ClipboardNotice {
  *  - `playing` — nothing is edited while the music plays (core-single-cursor.md).
  *  - `inside-event` — a note typed inside another note or rest, which the editor
  *    cannot split yet; it may only go where one begins.
+ *  - `wrap-misfit` — a tuplet asked of a selection that does not split into its
+ *    count of one note value (3:2 over a quarter and two eighths).
  */
-export type RefusalReason = 'read-only' | 'suspended' | 'unavailable' | 'playing' | 'inside-event';
+export type RefusalReason = 'read-only' | 'suspended' | 'unavailable' | 'playing' | 'inside-event' | 'wrap-misfit';
+
+/**
+ * Where the refused command was pressed — so the sentence can say WHY, not just
+ * that it could not (the owner, 2026-11-08: T on two selected events answered
+ * "That can't be done here", with no hint that T ties ONE note).
+ */
+export interface RefusalContext {
+  level: SelectionLevel;
+  /** How many things the selection holds at that rung. */
+  members: number;
+  /** What the session measured when it declined: the selection's length, in
+   *  beats as the inspector reads them (`1 3/4 beats`). */
+  selectedBeats?: string;
+}
+
+const RUNG_ONE: Record<SelectionLevel, string> = {
+  note: 'a note', event: 'an event', voiceMeasure: 'one voice of a bar',
+  partMeasure: 'one part of a bar', measure: 'a bar', document: 'the whole score'
+};
+const RUNG_MANY: Record<SelectionLevel, string> = {
+  note: 'notes', event: 'events', voiceMeasure: 'voice-bars',
+  partMeasure: 'part-bars', measure: 'bars', document: 'scores'
+};
+
+function selectionWords(context: RefusalContext): string {
+  if (context.level === 'document') return 'the whole score is selected';
+  return context.members > 1
+    ? `${context.members} ${RUNG_MANY[context.level]} are selected`
+    : `${RUNG_ONE[context.level]} is selected`;
+}
+
+/** The cheatsheet row a refused intent was pressed through: its key, and what
+ *  it does at each rung (an absent rung is one where it does nothing). */
+function keyDocFor(intent: EditorIntent): KeyDoc | null {
+  const wanted = JSON.stringify(intent);
+  for (const layer of [EDIT_LAYER, NAVIGATION_LAYER]) {
+    for (const binding of layer.bindings) {
+      if (JSON.stringify(binding.intent) !== wanted) continue;
+      const doc = KEY_DOCS.find(row => row.strokes.some(stroke =>
+        stroke.code === binding.code && !!stroke.shift === !!binding.shift && !!stroke.alt === !!binding.alt
+        && !!stroke.ctrl === !!binding.ctrl && !!stroke.meta === !!binding.meta));
+      if (doc) return doc;
+    }
+  }
+  return null;
+}
+
+/** Why the session declined, from what the key does and where it was pressed. */
+function unavailableWhy(intent: EditorIntent, context: RefusalContext): string | null {
+  const doc = keyDocFor(intent);
+  if (!doc) return null;
+  const meaning = doc.meaning.all ?? doc.meaning[context.level];
+  if (meaning) return `${doc.keys} \u2014 ${meaning}: nothing here it can do that to.`;
+  const rungs = (Object.keys(doc.meaning) as SelectionLevel[]).filter(level => level in RUNG_ONE);
+  if (rungs.length === 0) return null;
+  const first = doc.meaning[rungs[0]!]!;
+  const works = rungs.length === 1 ? RUNG_ONE[rungs[0]!] : rungs.map(level => RUNG_ONE[level]).join(' or ');
+  return `${doc.keys} \u2014 ${first}: it works on ${works}, and ${selectionWords(context)}.`;
+}
 
 /**
  * One sentence for a refusal, or NOTHING where silence is the honest answer.
@@ -199,7 +262,7 @@ export type RefusalReason = 'read-only' | 'suspended' | 'unavailable' | 'playing
  * here rather than in a shell so that both the rule and its words are pinned by
  * the same conformance test.
  */
-export function refusalNotice(intent: EditorIntent, reason: RefusalReason): ClipboardNotice | null {
+export function refusalNotice(intent: EditorIntent, reason: RefusalReason, context?: RefusalContext): ClipboardNotice | null {
   if (reason === 'unavailable' && isNavigationIntent(intent)) return null;
   // The binding already says *Pause to edit* beside the cursor; a second sentence elsewhere would be noise.
   if (reason === 'playing') return null;
@@ -209,5 +272,13 @@ export function refusalNotice(intent: EditorIntent, reason: RefusalReason): Clip
     return { ok: false, message: 'This piece is open in another tab, so it is read only here. Close the other tab and reload to edit.' };
   if (reason === 'inside-event')
     return { ok: false, message: 'A note can\u2019t start inside another note or rest yet \u2014 only where one begins.' };
-  return { ok: false, message: 'That can\u2019t be done here.' };
+  if (reason === 'wrap-misfit') {
+    const spec = intent.type === 'wrapInContainer' && intent.spec.type === 'tuplet' ? intent.spec : null;
+    const ratio = spec ? `${spec.inner.multiple}:${spec.outer.multiple}` : 'A tuplet';
+    const parts = spec ? `${spec.inner.multiple} equal note values` : 'equal note values';
+    const have = context?.selectedBeats ? ` \u2014 the selection adds up to ${context.selectedBeats}` : '';
+    return { ok: false, message: `${ratio} needs notes that split into ${parts}${have}. Select the run it should hold (a quarter and an eighth make a triplet of eighths).` };
+  }
+  const why = context ? unavailableWhy(intent, context) : null;
+  return { ok: false, message: why ?? 'That can\u2019t be done here.' };
 }

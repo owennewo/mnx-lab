@@ -501,7 +501,7 @@ function beatPositionText(onset: Fraction, unit: number): string {
 }
 
 /** `1/2 beat`, `1 beat`, `1 1/2 beats` — how long, as played. */
-function beatsText(beats: Fraction): string {
+export function beatsText(beats: Fraction): string {
   return `${mixedText(beats)} ${beats.num <= beats.den ? 'beat' : 'beats'}`;
 }
 

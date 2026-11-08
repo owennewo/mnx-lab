@@ -51,7 +51,7 @@ import { lyricPlanOps, lyricVoiceOf, lyricVoices } from '../edit/lyricText.ts';
 import { applyOp } from '../edit/ops.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import { copySelectionToStore, cutSelectionToStore, pasteSelectionFromStore } from '../edit/selectionClipboardActions.ts';
-import { copySelectionNotice, cutSelectionNotice, deleteSelectionNotice, pasteSelectionNotice, type ClipboardNotice, type RefusalReason } from '../edit/clipboardFeedback.ts';
+import { copySelectionNotice, cutSelectionNotice, deleteSelectionNotice, pasteSelectionNotice, type ClipboardNotice, type RefusalContext, type RefusalReason } from '../edit/clipboardFeedback.ts';
 import { neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
@@ -182,7 +182,8 @@ export interface EditorBindingOptions {
    * is an edge rather than a refusal — walking off the end of the score should
    * not nag.
    */
-  onRefused?(intent: EditorIntent, reason: RefusalReason): void;
+  /** `context` says where it was pressed, so the host's sentence can say why (refusalNotice). */
+  onRefused?(intent: EditorIntent, reason: RefusalReason, context?: RefusalContext): void;
   /**
    * This editor is the only thing on the page a keystroke could be meant for,
    * so keys typed while NOTHING is focused (the page on load, a click on dead
@@ -556,7 +557,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
     const deleted = intent.type === 'delete' ? session.lastDelete : null;
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
-    if (!handled) options.onRefused?.(intent, session.lastRefusal ?? 'unavailable');
+    if (!handled) options.onRefused?.(intent, session.lastRefusal ?? 'unavailable', {
+      level: session.selectionLevel,
+      members: session.resolvedSelection.members.length,
+      ...(session.lastRefusalBeats ? { selectedBeats: session.lastRefusalBeats } : {})
+    });
     settle(intent.type === 'goToPointer');
     if (handled && AUDITION_MOVES.has(intent.type)) audition(intent.type === 'goToPointer');
     else if (handled && !NAVIGATION.has(intent.type)) auditionEdit(before);
