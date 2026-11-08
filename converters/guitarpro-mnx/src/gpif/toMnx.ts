@@ -799,15 +799,32 @@ interface TupletGroup {
 /**
  * GPIF flags each beat's rhythm with `num:den` and groups nothing; a group is
  * re-derived by filling with written duration, so six flagged eighths are two
- * triplets and not one six-note tuplet: a group closes when its beats sum to
- * `num` × the written duration of its first beat. Grace beats are un-timed and
- * pass through without joining or breaking a group.
+ * triplets and not one six-note tuplet.
+ *
+ * A group closes at the first beat where it is WHOLE: at least `num` × its
+ * first beat's written value, and exactly `num` of one plain note value — the
+ * unit an MNX tuplet can name. The first beat alone does not set the unit: a
+ * triplet of eighths that opens with a hammered pair of sixteenths
+ * (16th 16th 8th 8th = three eighths) closed after its third beat when the
+ * target was `num` × the first beat, two sixteenths over, and the run — no
+ * longer a whole group — was written out of its tuplet, a third of a beat too
+ * long (Strolling Down the Highway, bars 14–15, 2026-11-08: every save read
+ * back a bar half a beat over, as the original import's "overfull" bars were).
+ *
+ * Grace beats are un-timed and pass through without joining or breaking a
+ * group.
  */
 function groupTuplets(doc: GpifDocument, beats: GpifBeat[]): Map<number, TupletGroup> {
   const groups = new Map<number, TupletGroup>();
   let current: TupletGroup | null = null;
   let target = 0;
   let filled = 0;
+  let whole = false;
+  /** `wholes` is `num` of one plain note value (a power of two, breve down). */
+  const plainTimes = (wholes: number, num: number) => {
+    const unit = Math.log2(wholes / num);
+    return Math.abs(unit - Math.round(unit)) < 1e-9 && unit <= 1;
+  };
 
   for (const [index, beat] of beats.entries()) {
     if (beat.graceKind !== null) continue;
@@ -825,7 +842,7 @@ function groupTuplets(doc: GpifDocument, beats: GpifBeat[]): Map<number, TupletG
       !current ||
       current.numerator !== rhythm.tupletNumerator ||
       current.denominator !== rhythm.tupletDenominator ||
-      filled >= target
+      whole
     ) {
       current = { numerator: rhythm.tupletNumerator, denominator: rhythm.tupletDenominator };
       target = rhythm.tupletNumerator * mnxDurationToWholes(rhythm.base!, rhythm.dots);
@@ -834,6 +851,7 @@ function groupTuplets(doc: GpifDocument, beats: GpifBeat[]): Map<number, TupletG
 
     groups.set(index, current);
     filled += mnxDurationToWholes(rhythm.base!, rhythm.dots);
+    whole = filled >= target - 1e-9 && plainTimes(filled, current.numerator);
   }
 
   return groups;
