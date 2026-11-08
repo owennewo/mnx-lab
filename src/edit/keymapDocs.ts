@@ -67,7 +67,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'ArrowLeft' }, { code: 'ArrowRight' }],
     group: 'navigation',
     meaning: {
-      note: 'walk positions (notation: this voice’s ink, nearest pitch)',
+      note: 'walk this voice’s positions (tab: on this string; notation: nearest pitch)',
       event: 'walk this voice’s events (rests included)',
       voiceMeasure: 'walk bars',
       partMeasure: 'walk bars',

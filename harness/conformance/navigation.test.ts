@@ -15,6 +15,7 @@ import {
   DEFAULT_CLEF
 } from '../../src/edit/staffSpace.ts';
 import type { MnxEvent, MnxStructure } from '../../src/model/mnx.ts';
+import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 import type { SelectionLevel } from '../../src/edit/selection.ts';
 import {
   neighbourSystemMeasure,
@@ -299,6 +300,67 @@ describe('note-level navigation (tab projection)', () => {
     const string = session.cursor.line;
     session.handleIntent({ type: 'nextPosition' });
     expect(session.cursor.line).toBe(string); // string-sticky
+  });
+
+  // Strolling Down the Highway, bar 14's shape (2026-11-08): voice 1 an
+  // alternating bass in quarters, voice 2 eighths on the off-beats — two
+  // voices whose onsets interleave on different strings. The grid walk used
+  // to stop at every column, so → from a voice-2 note stepped onto voice 1's
+  // onsets and the owner could not tell which voice they were on.
+  const interleaved = (): MnxStructure => {
+    const n = (base: 'quarter' | 'eighth', step: 'A' | 'C' | 'E', octave: number, string: number) =>
+      ({ duration: { base }, notes: [{ pitch: { step, octave }, _x: { mnxLab: { string } } }] });
+    const r = () => ({ duration: { base: 'eighth' as const }, rest: {} });
+    return {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [{ id: 'g', _x: { mnxLab: { strings: STANDARD_GUITAR_STRINGS.map(s => ({ ...s, pitch: { ...s.pitch } })) } },
+        measures: [{ sequences: [
+          { voice: 'v1', content: [n('quarter', 'A', 2, 6), n('quarter', 'A', 2, 6), n('quarter', 'A', 2, 6), n('quarter', 'A', 2, 6)] },
+          { voice: 'v2', content: [r(), n('eighth', 'C', 4, 3), r(), n('eighth', 'E', 4, 2), r(), n('eighth', 'C', 4, 3), r(), n('eighth', 'E', 4, 2)] }
+        ] }] }]
+    } as MnxStructure;
+  };
+
+  it('←→ holds the cursor’s voice, as notation does: interleaved voices are walked one at a time', () => {
+    const session = new EditorSession(interleaved());
+    expect(session.projection).toBe('tab');
+    session.handleIntent({ type: 'jumpDown' }); // the voice step: voice 2's rest at the bar start
+    while (session.cursor.line > 3) session.handleIntent({ type: 'lineUp' }); // up to string 3, still voice 2
+    expect(session.cursor.voiceIndex).toBe(1);
+    expect(session.cursor.line).toBe(3);
+    session.handleIntent({ type: 'nextPosition' }); // voice 2's first C, at 1/8
+    const onsets = [`${session.cursor.onset.num}/${session.cursor.onset.den}`];
+    for (let i = 0; i < 6; i++) {
+      session.handleIntent({ type: 'nextPosition' });
+      onsets.push(`${session.cursor.onset.num}/${session.cursor.onset.den}`);
+      expect(session.cursor.voiceIndex).toBe(1);
+      expect(session.cursor.line).toBe(3); // still string-sticky
+    }
+    // Every eighth voice 2 holds, rests included.
+    expect(onsets).toEqual(['1/8', '1/4', '3/8', '1/2', '5/8', '3/4', '7/8']);
+    for (let i = 0; i < 6; i++) session.handleIntent({ type: 'prevPosition' });
+    expect(session.cursor.onset).toEqual({ num: 1, den: 8 });
+    expect(session.cursor.voiceIndex).toBe(1);
+  });
+
+  it('Delete on a rest at the note rung removes the rest’s event', () => {
+    // A rest has no notehead to select, so the note rung's Delete used to
+    // refuse; it is the event rung's second press now (owner, 2026-11-08).
+    const session = new EditorSession(interleaved());
+    while (session.cursor.line < 3) session.handleIntent({ type: 'lineDown' });
+    session.handleIntent({ type: 'jumpDown' });
+    session.handleIntent({ type: 'nextPosition' });
+    session.handleIntent({ type: 'nextPosition' }); // voice 2's rest at 1/4
+    expect(session.cursor.onset).toEqual({ num: 1, den: 4 });
+    expect(session.selectionLevel).toBe('note');
+    expect(session.selectedNoteKeys).toEqual([]);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    const v2 = session.doc.parts![0]!.measures![0]!.sequences![1]!.content!;
+    expect(v2).toHaveLength(7);
+    expect(v2.filter(e => (e as MnxEvent).rest)).toHaveLength(3);
+    expect(session.handleIntent({ type: 'undo' })).toBe(true);
+    expect(session.doc.parts![0]!.measures![0]!.sequences![1]!.content!).toHaveLength(8);
   });
 
   it('Ctrl ←→ is the bar jump in tab too (note-level review verdict)', () => {

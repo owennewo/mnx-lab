@@ -147,6 +147,14 @@ export interface SelectionContext {
   primaryProjection?: RenderedProjection | null;
   /** Enclosure drawn around the selection footprint; absent/null = none. */
   enclosure?: EnclosureKind | null;
+  /**
+   * The playback colour slot (1-based, `playbackVoiceSlot`) the enclosure
+   * takes, so the box says which VOICE the cursor walks — the same blue,
+   * green… a sounding note of that voice lights in. Null keeps the accent:
+   * the host sets it only at the note and event rungs, and only where the
+   * bar has more than one voice, so single-voice editing looks as it did.
+   */
+  voiceColour?: number | null;
   /** Structural coverage, including rests and empty measure copies that have
    *  no note id and therefore cannot be recovered from selected SVG ink. */
   span?: SelectionSpan | null;

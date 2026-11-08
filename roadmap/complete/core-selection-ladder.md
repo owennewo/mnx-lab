@@ -569,13 +569,27 @@ arrows never mutate (survey §3.2), at every level.
 
 | Level | ← → notation | ← → tab | ↑ ↓ notation | ↑ ↓ tab |
 |---|---|---|---|---|
-| note | prev/next position in this voice, snapping to its nearest-pitch ink | prev/next grid column, ghosts included, staying on the string — **space** | prev/next **staff position** (line/space), occupied or not — **space** | neighbouring string, occupied or not — **space** |
+| note | prev/next position in this voice, snapping to its nearest-pitch ink | prev/next position **in this voice**, ghosts included, staying on the string — **space** *(revised 2026-11-08, below)* | prev/next **staff position** (line/space), occupied or not — **space** | neighbouring string, occupied or not — **space** |
 | event | prev/next event in this voice (rests included) | same | same instant, neighbouring **voice**'s event | same |
 | voice-measure | same voice, prev/next bar | same | neighbouring **voice** in this bar | same |
 | part-measure | prev/next bar, same part | same | neighbouring **part/staff** | same |
 | measure | prev/next bar column | same | nearest bar in the neighbouring **system** (text-editor line navigation over the bar-wrap grid) | same |
 | section | prev/next section | same | *(unbound)* | same |
 | score | *(unbound)* | same | **escalates to the host**: currently the workbench mount navigates the rail; the promoted element will emit the public event | same |
+
+> **Revised 2026-11-08 — tab's note-level ←→ holds the voice.** The grid walk
+> stopped at every column; the review below judged it in single-voice music,
+> where the grid IS the voice's events plus the ghost. In two interleaved
+> voices (Strolling Down the Highway, bar 14: an alternating bass in voice 1,
+> off-beat eighths in voice 2) it stepped onto the other voice's onsets, and
+> the owner asked: *"when I select a note I want left/right key presses to be
+> locked into the voice I'm on."* Tab now walks `movePositionInk` with the
+> string held, as notation walks it with the nearest pitch, and Guitar Pro's
+> cursor is per-voice for the same reason. In single-voice music nothing
+> changes. Two companions landed with it: the enclosure takes the cursor's
+> voice colour at the note and event rungs where a bar has more than one
+> voice, and Delete on a rest at the note rung removes the rest's event (the
+> event rung's second press — a rest has no notehead to clear).
 
 Why the rows are what they are:
 

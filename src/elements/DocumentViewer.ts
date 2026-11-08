@@ -619,6 +619,17 @@ export class DocumentViewer extends LitElement {
         stroke: var(--accent);
       }
 
+      /* Which voice the cursor walks, where a bar has more than one: the box
+         takes the colour that voice's sounding notes light in
+         (SelectionContext.voiceColour). */
+      #projection-container svg .enclosure[data-voice] rect {
+        fill: var(--playback-voice);
+        stroke: var(--playback-voice);
+      }
+      #projection-container svg .enclosure[data-voice="2"] { --playback-voice: var(--playback-2); }
+      #projection-container svg .enclosure[data-voice="3"] { --playback-voice: var(--playback-3); }
+      #projection-container svg .enclosure[data-voice="4"] { --playback-voice: var(--playback-4); }
+
       /* The section rung's label chip (workbench-rung-legibility.md). Bar and
          section share the panel-wide shape, and the bar's slot already covers
          the strip the label sits in, so extent cannot separate them — in a
@@ -1295,6 +1306,9 @@ export class DocumentViewer extends LitElement {
         primaryProjection,
         litLabels: this.selection?.litLabels === true
       });
+      const voiceColour = this.selection?.voiceColour;
+      const drawn = svg.querySelector(':scope > g.enclosure');
+      if (drawn && voiceColour) drawn.setAttribute('data-voice', String(voiceColour));
       let cancellation: (() => void) | null = null;
       cancellation = tweenEnclosure(svg, previousEnclosure, () => {
         if (this.cancelEnclosureTween === cancellation) this.cancelEnclosureTween = null;

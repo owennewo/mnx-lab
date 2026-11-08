@@ -206,10 +206,13 @@ describe('resolved enterFret session intents', () => {
     expect(session.appliedOps).toHaveLength(1);
   });
 
-  it('refuses, with a reason, a fret typed inside a rest it cannot split', () => {
+  it('never stands inside another voice’s rest, so a fret cannot be typed into one', () => {
     // Cormorant bar 7's shape: voice 1 one long rest, voice 2 four thumb quarters on string 4.
-    // Reading voice 1 at beat 2, the cursor stands inside that rest. The fret used to report
-    // success and vanish (2026-10-27); it is refused now, and says why.
+    // Walking voice 1 used to stop at voice 2's beat 2 — inside voice 1's rest — where a fret
+    // reported success and vanished (2026-10-27), then was refused as `inside-event`. The note
+    // rung's ←→ now holds the voice (2026-11-08), so that dead end is gone: → leaves the rest
+    // for the next place voice 1 can take a note, ← comes back to where it begins, and the
+    // fret typed there is taken. (The `inside-event` guard stays in enterFret as a backstop.)
     const initial = entryDoc();
     const quarter = { duration: { base: 'quarter' }, notes: [{ pitch: { step: 'D', octave: 3 }, _x: { mnxLab: { string: 4, fret: 0 } } }] };
     initial.parts[0].measures[0].sequences.push({ voice: 'v2', content: [quarter, quarter, quarter, quarter] } as never);
@@ -217,14 +220,11 @@ describe('resolved enterFret session intents', () => {
     expect(session.handleIntent({ type: 'jumpUp' })).toBe(true);
     expect(session.cursor.voiceIndex ?? 0).toBe(0);
     expect(session.handleIntent({ type: 'nextPosition' })).toBe(true);
-    expect(session.cursor.onset).toEqual({ num: 1, den: 4 });
-    expect(session.handleIntent({ type: 'enterFret', fret: 3 })).toBe(false);
-    expect(session.lastRefusal).toBe('inside-event');
-    expect(session.doc).toEqual(initial);
-    expect(session.appliedOps).toEqual([]);
-    // Where the rest begins, the same fret is taken — and the reason does not linger.
+    expect(session.cursor.measureIndex).toBe(1);
+    expect(session.pastEnd).toBe(true);
     expect(session.handleIntent({ type: 'prevPosition' })).toBe(true);
-    expect(session.cursor.onset).toEqual({ num: 0, den: 1 });
+    expect(session.cursor).toMatchObject({ measureIndex: 0, onset: { num: 0, den: 1 } });
+    expect(session.cursor.voiceIndex ?? 0).toBe(0);
     expect(session.handleIntent({ type: 'enterFret', fret: 3 })).toBe(true);
     expect(session.lastRefusal).toBeNull();
   });

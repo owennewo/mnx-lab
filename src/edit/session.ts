@@ -43,7 +43,6 @@ import {
   isPastEnd,
   moveLine,
   moveMeasure,
-  movePosition,
   movePositionInk,
   moveToMeasure,
   moveToPointer,
@@ -764,7 +763,18 @@ export class EditorSession {
         // destroy ink AND structure in one press. `Cut` remains the deliberate
         // one-press ink-destroyer, and it pays a clipboard for the privilege.
         // roadmap/complete/core-delete-clears-then-removes.md.
-        const level = this.selectionState.level;
+        let level = this.selectionState.level;
+
+        // A REST AT THE NOTE RUNG IS ITS EVENT. A rest has no notehead to
+        // select, so the note rung's delete had nothing to take and refused —
+        // the owner (2026-11-08): "pressing delete on an event with just a
+        // rest should delete the event". There is no ink to clear first, so
+        // this is the event rung's press 2: the rest goes, and the voice is
+        // that much shorter (the badge reports an under-full bar).
+        if (level === 'note' && this.selectedNoteKeys.length === 0 && this.eventUnderCursor()?.rest) {
+          this.setSelectionLevel('event');
+          level = 'event';
+        }
 
         // The bottom rung IS ink — there is no structure beneath a note for a
         // second press to remove.
@@ -2366,12 +2376,25 @@ export class EditorSession {
   private moveHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
     switch (this.selectionState.level) {
       case 'note':
-        // The note row of the navigation map: tab walks the full grid (space,
-        // string-sticky); notation walks this voice's ink, landing on the
-        // nearest-pitch member (snap-to-ink, the working default).
-        return this.activeProjection === 'tab' && this.grid.mode === 'string'
-          ? movePosition(this.grid, before, delta, 'tab')
-          : movePositionInk(this.grid, before, delta, 'nearest', this.activeProjection);
+        // The note row of the navigation map: BOTH projections walk this
+        // voice's positions — rests and its entry ghost included, other
+        // voices' onsets skipped. Tab holds the string (the box cursor still
+        // stands on empty strings and types frets there); notation lands on
+        // the nearest-pitch member (snap-to-ink, the working default).
+        //
+        // Tab used to walk every grid column. The 2026-08-10 review judged
+        // that in single-voice music, where the grid IS the voice's events
+        // plus the ghost — and in two interleaved voices it stepped onto the
+        // other voice's onsets, so → from a voice-2 note could not reach that
+        // voice's next event without passing through voice 1's (the owner,
+        // 2026-11-08, editing Strolling Down the Highway: "when I select a
+        // note I want left/right key presses to be locked into the voice I'm
+        // on"). Guitar Pro's cursor is per-voice for the same reason.
+        return movePositionInk(
+          this.grid, before, delta,
+          this.activeProjection === 'tab' && this.grid.mode === 'string' ? 'keep' : 'nearest',
+          this.activeProjection
+        );
       case 'event':
         // "Prev/next event IN THIS VOICE, rests included" — the same walk in
         // both projections. Walking every column instead (which is what this

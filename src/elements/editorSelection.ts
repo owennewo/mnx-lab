@@ -17,6 +17,7 @@ import type { SelectionLevel, SelectionMember } from '../edit/selection.ts';
 import { measureSpans } from '../edit/cursor.ts';
 import { eventAtAddress } from '../edit/ops.ts';
 import { syntheticEventKey } from '../model/noteKeys.ts';
+import { playbackVoiceSlot } from '../engine/render/playbackInk.ts';
 
 /** Ladder level → enclosure shape (roadmap/complete/core-selection-ladder.md).
  *  The mapping lives HERE, in the one module that knows both vocabularies, so the
@@ -225,10 +226,26 @@ export function selectionContextFor(session: EditorSession, view: EditorSelectio
         ? ENCLOSURE_BY_LEVEL.note
         : ENCLOSURE_BY_LEVEL[session.selectionLevel],
     litLabels: !view.cursorHidden && LIT_LABEL_LEVELS.has(session.selectionLevel),
+    voiceColour: view.cursorHidden ? null : voiceColourOf(session),
     span: view.cursorHidden || pendingEmptyCell
       ? null
       : presentationSpan(session.doc, session.selectionLevel, session.resolvedSelection.members),
     cursor: view.cursorHidden ? null : cursorGhost,
     preview: view.preview ?? null
   };
+}
+
+/**
+ * Which voice's colour the enclosure takes: the cursor's, at the rungs whose
+ * ←→ walk one voice (note, event) — and only in a bar where the cursor's
+ * staff holds more than one, so a single voice keeps the accent (the owner,
+ * 2026-11-08: "it's hard to know which voice I'm on").
+ */
+function voiceColourOf(session: EditorSession): number | null {
+  const level = session.selectionLevel;
+  if (level !== 'note' && level !== 'event') return null;
+  const cursor = session.cursor;
+  const voices = (session.doc.parts?.[cursor.partIndex ?? 0]?.measures?.[cursor.measureIndex]?.sequences ?? [])
+    .filter(sequence => (sequence.staff ?? 1) === (cursor.staffIndex ?? 1));
+  return voices.length > 1 ? playbackVoiceSlot((cursor.voiceIndex ?? 0) + 1) : null;
 }
