@@ -120,7 +120,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Smells Like Teen Spirit | Nirvana (arr. Nikola Milovanovic) | `ccef043db55deb0d` |  | **bar search** 10-22 (run 5) | ✅ 10-22 (PDF) | ✅ 10-22 |  |
 | Steady Away | Chris Brain | `e863b804cc7fe4e1` |  | Soundslice |  |  |  |
 | Street Spirit | Radiohead | `9218b1b6c813558e` |  | Soundslice |  |  |  |
-| Strolling Down the highway | Bert Jansch | `4cc190c6b61e55f2` |  | Soundslice |  |  |  |
+| Strolling Down the highway | Bert Jansch | `4cc190c6b61e55f2` |  | **bar search** 11-08 (run 11) |  | 🟡 11-08 (endings; heard, not yet watched) | 🟡 verse 1 only |
 | Sun did glide | Chris Brain | `dcbc40c2dcd33f45` |  | **bar search** 10-27 (run 6) | ✅ 10-27 | ✅ 10-27 |  |
 | Suzanne | Leonard Cohen | `3a6e7d1ae0e9b4dd` |  | Soundslice |  |  |  |
 | Sweet Child O Mine |  | `f4d2a15b7dfa926d` |  | Soundslice |  |  |  |
@@ -144,6 +144,20 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-08 — Strolling Down the Highway (Bert Jansch) · `4cc190c6b61e55f2` — [run 11](tools/recording-align/RUNS.md#run-11--2026-11-08--strolling-down-the-highway-bert-jansch-a-singer-and-the-readers-own-bug-under-the-overfull-bars)
+
+- **Sync**: voice separated (INSTV7N), bar search, first and last bar lines on heard downbeats. Rewritten after the
+  endings changed: revision 149, 98 bars, 74% of written notes heard against 21% chance, 94 of 99 bar lines on heard
+  downbeats, 124–138 bpm. Not yet watched.
+- **Form**: the owner's alternative endings — passes 1 and 5 end on bars 14–15, passes 2, 3, 4 and 6 on 16–17, pass 7 on
+  bar 18 (3/4). Each matched against the recording; the "1. 5." ending moved to start at bar 14 and bar 15 given
+  `repeat end 7` (revision 148), at the owner's word.
+- **Found on the way**: the "overfull" bars 9, 14 and 15 of the import were the Guitar Pro reader dropping triplets that
+  open with sixteenths, not the transcription — fixed (62a59d40, 2cc4b811). The provisional checkpoint of the morning
+  (*Provisional: bars 9, 14, 15 fit 4/4*) treated the symptom; bars 14–15 have since been re-entered by the owner.
+- **Open**: bar 9 still carries the morning's provisional change — the original reads `3[A B A G]` then G "can you";
+  restoring it is the owner's call. Notes check not done (weakest: bars 9–11 and 17 in pass 3). Lyrics: verse 1 only.
 
 ### 2026-11-03 — Fields of Gold (Dominic Miller, trans. Serge Kottelat) · `18b7fb82180507ec` — [run 10](tools/recording-align/RUNS.md#run-10--2026-11-02--fields-of-gold-dominic-miller-serge-kottelats-transcription-a-piece-from-the-screen-a-freely-played-intro)
 

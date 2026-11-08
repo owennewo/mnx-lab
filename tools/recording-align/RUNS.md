@@ -455,3 +455,30 @@ to do — each is a gap to close.
   earns a command; per-bar misses and extras, heard against written, were a one-off script, and they are what told misplaced
   bars from misread ones, so the report should carry them.
 - **Owner**: chose the sync with placed bars and to keep bar 8 as printed for now; the sync and bar 8 not yet heard.
+
+## Run 11 — 2026-11-08 — Strolling Down the Highway (Bert Jansch): a singer, and the reader's own bug under the "overfull" bars
+
+- **Recording** the piece's attached audio (`9423a33a…`), 182 s, Jansch singing and playing, capo 5, A=440 within −14 cents.
+  **Piece** `4cc190c6b61e55f2` on the local dev library, a Soundslice import.
+- **Method**: voice separated with Gabox INSTV7N (the `~/.venvs/separation` environment had to be built first: `uv venv
+  --python 3.11`, `audio-separator[gpu]==0.47.1`, torch 2.14.1+cu126 — the README names the versions, not the commands);
+  MuScriptor on the instrumental; fixed-order search; first and last bar lines placed on heard downbeats by hand.
+- **First sync** (revision 5): 98 segments, 99 cuts (94 snapped), 74% of 1276 written notes against 21% chance; 124–136 bpm.
+  Before it, bars 9, 14 and 15 read as a half beat **overfull** and were "fixed" provisionally (grace notes, a sixteenth
+  triplet). That was wrong: **the Guitar Pro reader dropped any triplet that opened with sixteenths** (and, the same evening,
+  swallowed the triplet after a long-short one) — 62a59d40, 2cc4b811. Read with the fixed reader, the original Soundslice
+  file has every bar at 4 beats; the owner has since re-entered bars 14–15.
+- **Form**: the owner wrote alternative endings (bars 14–18). Tested against the recording on copies before any change:
+  "1. 5." on bar 15 alone, followed by 16–17 for passes 2, 3, 4, 6, needs 103 bars where the recording holds ~98 (58% found,
+  tempo forced to 162 bpm); the ending **starting at bar 14** fits — 74% / 71% against 20%, 95 downbeats (90% within 20 ms),
+  124–138 bpm. The free search picks each pass's ending as written except pass 6 (bars 14, 16 and 18 open alike); swapping
+  any single pass's ending lowers the fit, pass 6 included. Bar 18 as 3/4 fits the last pass (≈126 bpm; as 4/4 it was
+  squeezed to 216).
+- **Written** (at the owner's word): endings fixed in the owner's own tab (revision 148: bar 14 `ending 1,5 for 2`, bar 15
+  `repeat end 7`), then the sync (revision 149): 98 segments, 99 cuts (94 snapped), 0–179.7 s; `verify` OK, 74% of 1266
+  written notes against 21% chance.
+- **Weak**: bars 9–11 in pass 3 (≈66–71 s); bar 17 in pass 3 (8 of 14, ≈76.2 s). Notes questions, not timing ones.
+- **Improvised** (gaps): testing ending layouts meant hand-editing copies of `score.mnx.json` and running `score` with
+  `--local`; a "which ending does each pass play" report — the per-pass swap — would be one command. The skill should say to
+  **re-read the source with the current reader** before trusting an "overfull" bar.
+- **Owner**: chose the ending fix and the rewrite; the sync not yet watched.
