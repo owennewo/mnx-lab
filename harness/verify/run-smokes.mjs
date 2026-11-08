@@ -47,6 +47,8 @@ const SMOKES = {
   'play-only': one('studio-play-only-smoke.mjs', STUDIO_LIBRARY), // 11
   'studio-export': one('studio-export-smoke.mjs', STUDIO), // 11
   'recording-management': one('recording-management-smoke.mjs', STUDIO_LIBRARY), // 11
+  // A press near the end of a reloaded score stays there (the owner, 2026-11-08).
+  'reload-click': one('studio-reload-click-smoke.mjs', STUDIO_LIBRARY), // ~10
   'piece-create': one('piece-create-smoke.mjs', STUDIO_LIBRARY), // 11
   'embed': { build: 'build:embed', covers: ['embed'], jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] }, // 10 each
   'selection': one('selection-smoke.mjs', WORKBENCH), // 10

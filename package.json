@@ -45,6 +45,7 @@
     "smoke:save-pipeline": "node harness/verify/run-smokes.mjs save-pipeline",
     "smoke:piece-lifecycle": "node harness/verify/run-smokes.mjs piece-lifecycle",
     "smoke:studio-editor": "node harness/verify/run-smokes.mjs studio-editor",
+    "smoke:reload-click": "node harness/verify/run-smokes.mjs reload-click",
     "smoke:play-only": "node harness/verify/run-smokes.mjs play-only",
     "smoke:workbench-editor": "node harness/verify/run-smokes.mjs workbench-editor",
     "dev:embed-app": "npm run build:embed && node harness/verify/serve-embed-app.mjs",

@@ -845,11 +845,27 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const onUnclaimedKey = (event: KeyboardEvent) => { if (focusUnclaimed()) onKeyDown(event); };
   /** A click in the combined score chooses which rendering owns subsequent spatial input. Membership is model
    *  state and does not fork: switching projection remaps the selection in place. Not a reason to show a cursor. */
+  /** Pointer placements so far — a press that switched projection waits to see if one follows. */
+  let placements = 0;
+  /**
+   * A press on the OTHER projection's ink switches the dialect. It does not
+   * draw: the same press's placement (`onPositionSelected`, the viewer's next
+   * handler for that pointerdown) moves the cursor and draws it there. Drawing
+   * here showed — and REVEALED — the cursor where it had been, so a press near
+   * the end of a just-reloaded score (cursor still on bar 1, projection not
+   * yet the view's) started a smooth scroll back to bar 1 that the placement's
+   * own reveal, finding its note still on screen, never cancelled (the owner,
+   * 2026-11-08; reproduced by studio-reload-click-smoke). With no placement —
+   * a host without pointer placement — it draws on the next frame instead.
+   */
   const onNoteSelected = (event: Event) => {
     const projection = (event as CustomEvent<{ projection?: 'notation' | 'tab' }>).detail.projection;
     if (disposed || suspended() || !projection || projection === session.projection) return;
     tabDigits.flush();
-    if (session.handleIntent({ type: 'setProjection', projection })) settle();
+    if (!session.handleIntent({ type: 'setProjection', projection })) return;
+    const seen = placements;
+    const later = win?.requestAnimationFrame?.bind(win) ?? ((fn: () => void) => setTimeout(fn, 0));
+    later(() => { if (!disposed && placements === seen) settle(); });
   };
   /**
    * A press SELECTED an element (core-editor-click-targets.md): the cursor
@@ -946,6 +962,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (disposed) return;
     const detail = (event as CustomEvent<PointerPlacement>).detail;
     if (!detail) return;
+    placements++;
     tabDigits.flush();
     // Even a refused placement un-hides the cursor: the reader pointed at the
     // score, so showing them where they already are beats showing nothing.
