@@ -7,6 +7,7 @@
 // already get.
 import type { EditorSession } from '../edit/session.ts';
 import {
+  crumbCount,
   crumbSiblings,
   pillsFor,
   rungNote,
@@ -70,27 +71,7 @@ export function buildInspectorView(
   };
   // How many siblings the rung has — said on the CURRENT row only
   // (`note 1 of 4`), so the faded rows stay plain names.
-  const partIndex = cursor.partIndex ?? 0;
-  const partMeasure = doc.parts?.[partIndex]?.measures?.[cursor.measureIndex];
-  const sequence = partMeasure?.sequences?.[cursor.voiceIndex ?? 0];
-  const countOf = (key: string): number => {
-    switch (key) {
-      case 'bar':
-        return doc.global.measures.length;
-      case 'part':
-        return doc.parts?.length ?? 0;
-      case 'voice':
-        return partMeasure?.sequences?.length ?? 0;
-      case 'event':
-        return sequence?.content?.length ?? 0;
-      case 'note': {
-        const event = first && 'eventIndex' in first ? sequence?.content?.[first.eventIndex] : undefined;
-        return (event as { notes?: unknown[] } | undefined)?.notes?.length ?? 0;
-      }
-      default:
-        return 0;
-    }
-  };
+  const countOf = (key: string): number => crumbCount(doc, key, cursor, first);
   const crumbs: InspectorCrumb[] = rows.map(row => {
     const rowLevel = LEVEL_BY_ROW[row.key];
     const index = indexOf(row.key);

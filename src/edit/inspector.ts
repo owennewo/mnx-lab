@@ -282,6 +282,34 @@ function valueOf(attribute: MeasureAttribute): string {
 }
 
 
+/**
+ * How many siblings a crumb's rung has — the "of N" in `event 7 of 8`. Read
+ * where the crumb's INDEX is read: event and note numbers come from the first
+ * selected member, which, once a range has crossed a bar line, is not in the
+ * cursor's bar — counting the cursor's bar printed "event 7 of 6". Voices are
+ * counted on the staff, as `voiceIndex` numbers them.
+ */
+export function crumbCount(
+  doc: MnxStructure,
+  rowKey: string,
+  cursor: { measureIndex: number; partIndex?: number; staffIndex?: number; voiceIndex?: number },
+  first: SelectionMember | undefined
+): number {
+  if (rowKey === 'bar') return doc.global.measures.length;
+  if (rowKey === 'part') return doc.parts?.length ?? 0;
+  const at = first && 'eventIndex' in first
+    ? first
+    : { partIndex: cursor.partIndex ?? 0, measureIndex: cursor.measureIndex, staffIndex: cursor.staffIndex ?? 1, voiceIndex: cursor.voiceIndex ?? 0 };
+  const sequences = (doc.parts?.[at.partIndex]?.measures?.[at.measureIndex]?.sequences ?? [])
+    .filter(sequence => (sequence.staff ?? 1) === (at.staffIndex ?? 1));
+  if (rowKey === 'voice') return sequences.length;
+  const content = sequences[at.voiceIndex ?? 0]?.content;
+  if (rowKey === 'event') return content?.length ?? 0;
+  if (rowKey === 'note' && first && 'eventIndex' in first)
+    return (content?.[first.eventIndex] as { notes?: unknown[] } | undefined)?.notes?.length ?? 0;
+  return 0;
+}
+
 /** The siblings a crumb can go to: bars and parts. Null where the score's
  *  own ←/→ is the only way (voice, container, event, note). */
 export function crumbSiblings(

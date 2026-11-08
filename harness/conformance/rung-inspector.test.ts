@@ -13,6 +13,7 @@ import { findNoteAddress } from '../../src/model/noteWalk.ts';
 import {
   attributeText,
   BAR_WORDS,
+  crumbCount,
   beatContextOf,
   crumbSiblings,
   fingerboardOf,
@@ -1019,5 +1020,35 @@ describe('beats: where an event starts and how long it lasts', () => {
     expect(parsed).toEqual({ intent: { type: 'setEventDuration', base: 'quarter' } });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
     expect(timing(session)).toEqual(['duration: 1 beat [floor]', 'at: beat 2 1/2 [derived]']);
+  });
+});
+
+describe('the crumb counts', () => {
+  // Two voices; bar 1's voice 2 has eight eighths, bar 2's has two halves —
+  // a range from the end of bar 1 into bar 2 is the bug's shape (Strolling
+  // Down the Highway, bar 14 → 15: "event 7 of 6").
+  const q = (id: string) => ({ duration: { base: 'quarter' as const }, notes: [{ id, pitch: { step: 'A' as const, octave: 2 } }] });
+  const e = (id: string) => ({ duration: { base: 'eighth' as const }, notes: [{ id, pitch: { step: 'C' as const, octave: 4 } }, { id: `${id}b`, pitch: { step: 'E' as const, octave: 4 } }] });
+  const h = (id: string) => ({ duration: { base: 'half' as const }, notes: [{ id, pitch: { step: 'C' as const, octave: 4 } }] });
+  const doc: MnxStructure = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }, {}] },
+    parts: [{ id: 'p1', name: 'Guitar', measures: [
+      { sequences: [{ voice: 'v1', content: ['a', 'b', 'c', 'd'].map(q) }, { voice: 'v2', content: [1, 2, 3, 4, 5, 6, 7, 8].map(i => e(`e${i}`)) }] },
+      { sequences: [{ voice: 'v1', content: ['f', 'g', 'h', 'i'].map(q) }, { voice: 'v2', content: [h('x'), h('y')] }] }
+    ] }]
+  };
+  const first = { kind: 'event' as const, partIndex: 0, staffIndex: 1, measureIndex: 0, voiceIndex: 1, eventIndex: 6, onset: { num: 3, den: 4 } };
+  const cursorInBar2 = { measureIndex: 1, partIndex: 0, staffIndex: 1, voiceIndex: 1 };
+
+  it('count where the index is read: the first member’s bar, not the cursor’s', () => {
+    expect(crumbCount(doc, 'event', cursorInBar2, first)).toBe(8);
+    expect(crumbCount(doc, 'note', cursorInBar2, { ...first, kind: 'note', noteKey: 'e7', noteIndex: 0 } as never)).toBe(2);
+    expect(crumbCount(doc, 'voice', cursorInBar2, first)).toBe(2);
+  });
+
+  it('with no member, the cursor’s own bar', () => {
+    expect(crumbCount(doc, 'event', cursorInBar2, undefined)).toBe(2);
+    expect(crumbCount(doc, 'bar', cursorInBar2, undefined)).toBe(2);
   });
 });
