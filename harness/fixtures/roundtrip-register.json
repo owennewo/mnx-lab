@@ -62,16 +62,16 @@
       "count": 10
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]",
-      "kind": "lost",
-      "documents": 4,
-      "count": 16
-    },
-    {
       "path": "parts/[]/measures/[]/sequences/[]/staff",
       "kind": "lost",
       "documents": 4,
       "count": 14
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+      "kind": "lost",
+      "documents": 4,
+      "count": 12
     },
     {
       "path": "parts/[]/measures/[]/clefs/[]",
@@ -528,8 +528,8 @@
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
       "kind": "gained",
-      "documents": 102,
-      "count": 866
+      "documents": 103,
+      "count": 868
     },
     {
       "path": "parts/[]/_x",
@@ -553,7 +553,7 @@
       "path": "parts/[]/measures/[]/sequences/[]/content/[]",
       "kind": "gained",
       "documents": 11,
-      "count": 32
+      "count": 29
     },
     {
       "path": "global/measures/[]/time",
@@ -570,8 +570,8 @@
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
       "kind": "gained",
-      "documents": 5,
-      "count": 15
+      "documents": 6,
+      "count": 20
     },
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
@@ -3025,12 +3025,22 @@
           {
             "path": "parts/[]/measures/[]/sequences/[]/content/[]",
             "kind": "gained",
-            "count": 5
+            "count": 2
           },
           {
             "path": "parts/[]/measures/[]/sequences/[]/content/[]",
             "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
             "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
           },
           {
             "path": "parts/[]/measures/[]/sequences/[]/voice",
