@@ -1479,6 +1479,7 @@ export class PiecePage extends LitElement {
           ? html`<mnx-studio-save slot="side"
               .save=${this.save}
               .losses=${this.losses}
+              .document=${this.doc?.mnxJson ?? null}
               .conversionNotes=${this.conversionNotes}
               .now=${this.now}
               .readOnly=${this.readOnly}

@@ -37,7 +37,8 @@ export function saveChip(state: SaveState, now: number): { text: string; tone: S
       return { text: `${count(state.edits, 'edit')} unsaved${age ? ` · last saved ${age}` : ''}`, tone: 'risk' };
     case 'clean': {
       const lost = unkept(state);
-      if (lost) return { text: `Saved · ${count(lost, 'item')} won’t persist`, tone: 'warn' };
+      // Says WHY, not only that: the store is Guitar Pro (the owner, 2026-11-08).
+      if (lost) return { text: `Saved · ${count(lost, 'item')} Guitar Pro can’t store`, tone: 'warn' };
       return { text: age ? `Saved · ${age}` : 'Saved', tone: 'quiet' };
     }
   }

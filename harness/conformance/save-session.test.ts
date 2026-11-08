@@ -250,7 +250,7 @@ describe('the chip leads with the risk, then the freshness', () => {
     [{ status: 'saving', edits: 3 }, 'Saving…', 'quiet'],
     [{ status: 'failed', edits: 31 }, 'Not saved · 31 edits on this device only · retrying', 'warn'],
     [{ status: 'conflict', edits: 2 }, 'Saved on another device · 2 edits here', 'warn'],
-    [{ savedAt: at, check: { verdict: 'differs', warnings: [], differences: [{ path: 'a', kind: 'lost', count: 1 }, { path: 'b', kind: 'changed', count: 1 }, { path: 'c', kind: 'gained', count: 40 }] } }, 'Saved · 2 items won’t persist', 'warn'],
+    [{ savedAt: at, check: { verdict: 'differs', warnings: [], differences: [{ path: 'a', kind: 'lost', count: 1 }, { path: 'b', kind: 'changed', count: 1 }, { path: 'c', kind: 'gained', count: 40 }] } }, 'Saved · 2 items Guitar Pro can’t store', 'warn'],
     [{ savedAt: at, check: { verdict: 'gains', warnings: [], differences: [{ path: 'c', kind: 'gained', count: 40 }] } }, 'Saved · just now', 'quiet']
   ] as [Partial<SaveState>, string, string][])('%j', (state, text, tone) => {
     expect(saveChip({ ...base, ...state }, at)).toEqual({ text, tone });

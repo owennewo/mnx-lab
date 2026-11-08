@@ -9,6 +9,8 @@ import type { SaveState } from '../../../src/storage/saveSession.ts';
 import { saveChip, savedAge, unkept } from '../../../src/storage/saveChip.ts';
 import type { StorageLoss } from '../../../src/importers/storageCheck.ts';
 import type { PieceVersion } from '../../../src/storage/versions.ts';
+import type { MnxStructure } from '../../../src/model/mnx.ts';
+import { describeLoss } from '../../../src/importers/lossWords.ts';
 
 const cross = html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>`;
 
@@ -17,6 +19,8 @@ export class SaveSheet extends LitElement {
   @property({ attribute: false }) save: SaveState | null = null;
   /** The last checkpoint's losses in full; the state carries only their shapes. */
   @property({ attribute: false }) losses: readonly StorageLoss[] = [];
+  /** The score the losses were measured on — it names their voices and parts. */
+  @property({ attribute: false }) document: MnxStructure | null = null;
   /** What the importer said when this piece was opened. Shown, never stored. */
   @property({ attribute: false }) conversionNotes: readonly string[] = [];
   @property({ type: Number }) now = Date.now();
@@ -85,6 +89,14 @@ export class SaveSheet extends LitElement {
                   ${save.recovered !== null ? html`<button type="button" ?disabled=${busy} @click=${() => this.emit('discard-mine')}>Discard them</button>` : nothing}
                 </div>`}
       </section>
+      ${lost ? html`<section class="losses">
+        <div class="label">Not kept · ${lost}</div>
+        <p>Studio stores the score as a Guitar Pro file. Each save writes that file and reads it back, and ${lost === 1 ? 'this' : 'these'} came back different: Guitar Pro has no way to hold ${lost === 1 ? 'it' : 'them'} as written. Everything else is saved. ${lost === 1 ? 'It stays' : 'They stay'} on screen until you close the piece, and will be gone when it opens again — saving a version will not keep ${lost === 1 ? 'it' : 'them'}. To keep the music, write it another way Guitar Pro can store.</p>
+        <ul>${this.losses.map(l => { const words = describeLoss(l, this.document); return html`<li><b>${words.where}</b> — ${words.what}, ${words.how}
+          <details><summary>Details</summary><code>${l.path}</code><span class="was">${l.was}</span></details></li>`; })}</ul>
+        ${lost > this.losses.length ? html`<p>…and ${lost - this.losses.length} more.</p>` : nothing}
+        ${save.check?.warnings.length ? html`<div class="label">What the writer said</div><ul>${save.check.warnings.map(w => html`<li>${w}</li>`)}</ul>` : nothing}
+      </section>` : nothing}
       ${!this.readOnly && save.status !== 'conflict' ? html`<section>
         <div class="label">Save a version</div>
         <p>Every save is kept. A name makes this one easy to find again.</p>
@@ -104,12 +116,6 @@ export class SaveSheet extends LitElement {
             : v.current && !this.viewingId ? nothing
             : html`<button type="button" ?disabled=${busy || (save.status !== 'clean' && !this.viewingId)} @click=${() => this.emit(v.current ? 'version-close' : 'version-view', { id: v.id })}>View</button>`}
         </li>`; })}</ul>
-      </section>` : nothing}
-      ${lost ? html`<section>
-        <div class="label">Won’t persist · ${lost}</div>
-        <p>The score is stored as Guitar Pro. These were in what you saved and not in what came back; they stay on screen until you close the piece.</p>
-        <ul>${this.losses.map(l => html`<li><code>${l.path}</code> ${l.kind}<span class="was">${l.was}</span></li>`)}</ul>
-        ${save.check?.warnings.length ? html`<div class="label">What the writer said</div><ul>${save.check.warnings.map(w => html`<li>${w}</li>`)}</ul>` : nothing}
       </section>` : nothing}
       ${this.conversionNotes.length ? html`<section>
         <div class="label">Conversion notes · ${this.conversionNotes.length}</div>
