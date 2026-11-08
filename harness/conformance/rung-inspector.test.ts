@@ -13,6 +13,7 @@ import { findNoteAddress } from '../../src/model/noteWalk.ts';
 import {
   attributeText,
   BAR_WORDS,
+  beatContextOf,
   crumbSiblings,
   fingerboardOf,
   keyAt,
@@ -380,15 +381,14 @@ const pillText = (session: EditorSession) =>
 describe('event pills', () => {
   it('read the duration as a floor, and each marking, positioned attribute and syllable as removable', () => {
     const session = at('event');
-    expect(pillText(session)).toEqual(['duration: quarter [floor]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(session)).toEqual(['duration: 1 beat [floor]', 'at: beat 1 [derived]']);
     for (const text of ['staccato', 'breath comma', 'dynamic mf', 'text below cantabile', '8va 2', 'lyric sleep-']) {
       const parsed = parseInspectorLine('event', null, text);
       expect(parsed, text).toHaveProperty('intent');
       expect(edit(session, (parsed as { intent: never }).intent), text).toBe(true);
     }
     expect(pillText(session)).toEqual([
-      'duration: quarter [floor]',
-      'at: 0 → 1/4 [derived]',
+      'duration: 1 beat [floor]', 'at: beat 1 [derived]',
       'staccato:  [annotation]',
       'breath: comma [annotation]',
       'dynamic: mf [annotation]',
@@ -409,7 +409,7 @@ describe('event pills', () => {
     expect(parseInspectorLine('event', 'duration', 'quarter')).toEqual({ intent: { type: 'setEventDuration', base: 'quarter' } });
     expect(session.handleIntent({ type: 'setEventDuration', base: 'quarter' })).toBe(false);
     expect(edit(session, { type: 'setEventDuration', base: 'eighth', dots: 1 })).toBe(true);
-    expect(pillText(session)[0]).toBe('duration: eighth. [floor]');
+    expect(pillText(session)[0]).toBe('duration: 3/4 beat [floor]');
     expect(parseInspectorLine('event', 'duration', 'banana')).toHaveProperty('error');
   });
 
@@ -454,7 +454,7 @@ describe('note pills', () => {
     const session = at('note');
     // The fixture's capo 2 puts an open E4 below string 1's open — the fret is
     // honestly unplayable, and the pill says so rather than clamping.
-    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]', 'fret: — [derived]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]', 'fret: — [derived]', 'duration: 1 beat [floor]', 'at: beat 1 [derived]']);
     for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend 1/2>full>0', 'staccato']) {
       const parsed = parseInspectorLine('note', null, text);
       expect(parsed, text).toHaveProperty('intent');
@@ -468,7 +468,7 @@ describe('note pills', () => {
       'fingering: left 3 [annotation]',
       'bend: 1/2>full>0 [annotation]',
       'vibrato:  [annotation]',
-      'at: 0 → 1/4 [derived]',
+      'duration: 1 beat [floor]', 'at: beat 1 [derived]',
       'staccato:  [annotation]'
     ]);
   });
@@ -591,8 +591,8 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
 
   it('a bare note reads a DERIVED string and fret; a chosen one reads the string as an annotation', () => {
     const session = at('note', fretDoc());
-    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]', 'at: 0 → 1/4 [derived]']);
-    expect(pillText(at('note', fretDoc(true)))).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]', 'duration: 1 beat [floor]', 'at: beat 1 [derived]']);
+    expect(pillText(at('note', fretDoc(true)))).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]', 'duration: 1 beat [floor]', 'at: beat 1 [derived]']);
   });
 
   it('a part with no strings has no fingerboard pills, and the words are refused with a reason', () => {
@@ -607,7 +607,7 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     const parsed = parseInspectorLine('note', 'string', '2', ctx(session));
     expect(parsed).toHaveProperty('intent', { type: 'setStringAnnotation', string: 2 });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]', 'duration: 1 beat [floor]', 'at: beat 1 [derived]']);
     const note = findNoteAddress(session.doc, session.selectedNoteKeys[0]!)!.note;
     expect(note.pitch).toEqual({ step: 'G', octave: 4 });
     expect(note._x?.mnxLab).toEqual({ string: 2 });
@@ -633,7 +633,7 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     const parsed = parseInspectorLine('note', 'fret', '5', ctx(session));
     expect(parsed).toHaveProperty('intent', { type: 'enterFret', fret: 5 });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)).toEqual(['pitch: A4 [floor]', 'string: 1 [annotation]', 'fret: 5 [derived]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: A4 [floor]', 'string: 1 [annotation]', 'fret: 5 [derived]', 'duration: 1 beat [floor]', 'at: beat 1 [derived]']);
   });
 
   it('`fret N` from the NOTATION projection frets the note’s own string, not the staff position', () => {
@@ -649,7 +649,7 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     const session = at('note', fretDoc(true));
     const pill = pillsFor(scope(session)).find(p => p.key === 'string')!;
     expect(edit(session, pill.remove!)).toBe(true);
-    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]', 'duration: 1 beat [floor]', 'at: beat 1 [derived]']);
   });
 });
 
@@ -671,11 +671,11 @@ describe('the wider rungs', () => {
   it('voice-bar: full-measure rest and measure repeat', () => {
     const session = at('voiceMeasure');
     // The fill reading (one-surface item 8): the voice's clock vs the meter.
-    expect(pillText(session)).toEqual(['fill: 1 of 4/4 [derived]']);
+    expect(pillText(session)).toEqual(['fill: 4 of 4 beats [derived]']);
     const parsed = parseInspectorLine('voiceMeasure', null, 'measure repeat 2');
     expect(parsed).toEqual({ intent: { type: 'setMeasureRepeat', number: 2 } });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)).toEqual(['fill: 1 of 4/4 [derived]', 'measure repeat: 2 [annotation]']);
+    expect(pillText(session)).toEqual(['fill: 4 of 4 beats [derived]', 'measure repeat: 2 [annotation]']);
     expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
   });
 
@@ -938,5 +938,86 @@ describe('ranges', () => {
     const pills = pillsFor(scope(session));
     expect(pills.find(p => p.key === 'section')?.partial).toBe(true);
     expect(pills.find(p => p.key === 'barline')?.partial).toBeUndefined();
+  });
+});
+
+describe('beats: where an event starts and how long it lasts', () => {
+  // q. E4 · e G4 · a triplet of eighths · q rest — the G4 starts 3/8 of a whole
+  // note in: a player counts that as "the and of 2".
+  const beatDoc = (time: { count: number; unit: number } = { count: 4, unit: 4 }): MnxStructure => {
+    const n = (id: string, base: 'quarter' | 'eighth', dots = 0) => ({
+      duration: { base, ...(dots ? { dots } : {}) }, notes: [{ id, pitch: { step: 'G' as const, octave: 4 } }]
+    });
+    return {
+      mnx: { version: 1 },
+      global: { measures: [{ time }] },
+      parts: [{ id: 'p1', name: 'Guitar', measures: [{ sequences: [{ content: [
+        n('a', 'quarter', 1),
+        n('b', 'eighth'),
+        { type: 'tuplet', inner: { duration: { base: 'eighth' }, multiple: 3 }, outer: { duration: { base: 'eighth' }, multiple: 2 },
+          content: [n('t1', 'eighth'), n('t2', 'eighth'), n('t3', 'eighth')] } as never,
+        { duration: { base: 'quarter' }, rest: {} }
+      ] }] }] }]
+    };
+  };
+  // What the page's typed line reads against (inspectorMount.ts passes the same context).
+  const typedAt = (session: EditorSession, text: string) => {
+    const member = session.resolvedSelection.members[0] as Parameters<typeof beatContextOf>[1];
+    return parseInspectorLine(session.selectionLevel, 'duration', text, { beat: beatContextOf(session.doc, member) });
+  };
+  const timing = (session: EditorSession) =>
+    pillText(session).filter(t => t.startsWith('duration:') || t.startsWith('at:'));
+
+  it('reads at the note rung, counted from beat 1, in played beats', () => {
+    const session = at('note', beatDoc());
+    expect(timing(session)).toEqual(['duration: 1 1/2 beats [floor]', 'at: beat 1 [derived]']);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(timing(session)).toEqual(['duration: 1/2 beat [floor]', 'at: beat 2 1/2 [derived]']);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(timing(session)).toEqual(['duration: 1/3 beat [floor]', 'at: beat 3 [derived]']);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(timing(session)).toEqual(['duration: 1/3 beat [floor]', 'at: beat 3 1/3 [derived]']);
+  });
+
+  it('a beat is the time signature’s unit: in 6/8 an eighth is one beat', () => {
+    const session = at('note', beatDoc({ count: 6, unit: 8 }));
+    expect(timing(session)).toEqual(['duration: 3 beats [floor]', 'at: beat 1 [derived]']);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(timing(session)).toEqual(['duration: 1 beat [floor]', 'at: beat 4 [derived]']);
+    expect(typedAt(session, '2')).toEqual({ intent: { type: 'setEventDuration', base: 'quarter' } });
+  });
+
+  it('duration is typed in beats or by name; a length no single note has says so', () => {
+    const typed = (text: string) => parseInspectorLine('note', 'duration', text);
+    expect(typed('1/2')).toEqual({ intent: { type: 'setEventDuration', base: 'eighth' } });
+    expect(typed('1/2 beat')).toEqual({ intent: { type: 'setEventDuration', base: 'eighth' } });
+    expect(typed('0.5')).toEqual({ intent: { type: 'setEventDuration', base: 'eighth' } });
+    expect(typed('3/4 beat')).toEqual({ intent: { type: 'setEventDuration', base: 'eighth', dots: 1 } });
+    expect(typed('1 1/2 beats')).toEqual({ intent: { type: 'setEventDuration', base: 'quarter', dots: 1 } });
+    expect(typed('4')).toEqual({ intent: { type: 'setEventDuration', base: 'whole' } });
+    expect(typed('quarter.')).toEqual({ intent: { type: 'setEventDuration', base: 'quarter', dots: 1 } });
+    expect(typed('5/7')).toMatchObject({ error: expect.stringContaining('no single note lasts 5/7 beat') });
+    expect(typed('0')).toHaveProperty('error');
+    expect(typed('banana')).toHaveProperty('error');
+  });
+
+  it('inside a triplet the typed beats are played time: 1/3 is an eighth, 2/3 a quarter, 1/2 a dotted eighth', () => {
+    const session = at('note', beatDoc());
+    session.handleIntent({ type: 'nextPosition' });
+    session.handleIntent({ type: 'nextPosition' });
+    expect(typedAt(session, '1/3')).toEqual({ intent: { type: 'setEventDuration', base: 'eighth' } });
+    expect(typedAt(session, '2/3')).toEqual({ intent: { type: 'setEventDuration', base: 'quarter' } });
+    // A dotted eighth in a triplet lasts exactly half a beat.
+    expect(typedAt(session, '1/2')).toEqual({ intent: { type: 'setEventDuration', base: 'eighth', dots: 1 } });
+    expect(typedAt(session, '2/5')).toMatchObject({ error: expect.stringContaining('2/5 beat') });
+  });
+
+  it('the note rung amends the duration, and the pill reads the new length back', () => {
+    const session = at('note', beatDoc());
+    session.handleIntent({ type: 'nextPosition' });
+    const parsed = typedAt(session, '1');
+    expect(parsed).toEqual({ intent: { type: 'setEventDuration', base: 'quarter' } });
+    expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
+    expect(timing(session)).toEqual(['duration: 1 beat [floor]', 'at: beat 2 1/2 [derived]']);
   });
 });

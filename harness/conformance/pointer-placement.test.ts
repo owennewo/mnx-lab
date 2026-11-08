@@ -409,12 +409,14 @@ describe('a rest in tab is a place you can stand on and click', () => {
     expect(Number(spans[0]!.duration.num) / Number(spans[0]!.duration.den)).toBeCloseTo(1 / 12, 9);
   });
 
-  it('reads its time in the inspector as played: a triplet eighth ends a twelfth later', () => {
-    const at = (eventIndex: number, containerIndex: number | undefined, onset: { num: number; den: number }) =>
-      eventPills(doc, { kind: 'event', partIndex: 0, staffIndex: 1, measureIndex: 0, voiceIndex: 0, eventIndex, onset,
-        ...(containerIndex === undefined ? {} : { containerIndex }) }).find(p => p.key === 'at')?.value;
-    expect(at(1, 0, { num: 1, den: 4 })).toBe('1/4 → 1/3');
-    expect(at(1, 2, { num: 5, den: 12 })).toBe('5/12 → 1/2');
-    expect(at(0, undefined, { num: 0, den: 1 })).toBe('0 → 1/4');
+  it('reads its time in the inspector as played: a triplet eighth lasts a third of a beat', () => {
+    const read = (eventIndex: number, containerIndex: number | undefined, onset: { num: number; den: number }) => {
+      const pills = eventPills(doc, { kind: 'event', partIndex: 0, staffIndex: 1, measureIndex: 0, voiceIndex: 0, eventIndex, onset,
+        ...(containerIndex === undefined ? {} : { containerIndex }) });
+      return ['duration', 'at'].map(key => pills.find(p => p.key === key)?.value).join(' · ');
+    };
+    expect(read(1, 0, { num: 1, den: 4 })).toBe('1/3 beat · beat 2');
+    expect(read(1, 2, { num: 5, den: 12 })).toBe('1/3 beat · beat 2 2/3');
+    expect(read(0, undefined, { num: 0, den: 1 })).toBe('1 beat · beat 1');
   });
 });

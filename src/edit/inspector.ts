@@ -426,13 +426,77 @@ export interface InspectorScope {
 const DURATION_WORDS: MnxNoteValueBase[] = ['whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th'];
 const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic', 'dead'];
 
-/** A bar-relative fraction, whole-note units — `0`, `1/4`, `3/8`. */
-function fractionText(onset: { num: number; den: number }): string {
-  return onset.num === 0 ? '0' : onset.den === 1 ? `${onset.num}` : `${onset.num}/${onset.den}`;
-}
-
 function durationText(duration: { base: MnxNoteValueBase; dots?: number }): string {
   return `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;
+}
+
+type Fraction = { num: number; den: number };
+
+/** A count as a musician writes it: `1/2`, `1`, `2 1/2`, `2/3`. */
+function mixedText(value: Fraction): string {
+  const whole = Math.floor(value.num / value.den);
+  const rest = value.num - whole * value.den;
+  if (rest === 0) return `${whole}`;
+  return whole === 0 ? `${rest}/${value.den}` : `${whole} ${rest}/${value.den}`;
+}
+
+function times(a: Fraction, b: Fraction): Fraction {
+  return addOnsets({ num: 0, den: 1 }, { num: a.num * b.num, den: a.den * b.den });
+}
+
+/**
+ * What a beat is where an event stands, and how its written value becomes the
+ * time it takes. The inspector speaks in BEATS — the bar's time-signature unit
+ * (a quarter in 4/4, an eighth in 6/8; a quarter when no time is declared) —
+ * because whole-note fractions (`3/8`) are not how a player counts. `scale` is
+ * played ÷ written: 2/3 for a triplet member, 1 outside a tuplet.
+ */
+export interface BeatContext {
+  unit: number;
+  scale: Fraction;
+}
+
+export function beatContextOf(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'event' | 'note' }>): BeatContext {
+  const unit = timeAt(doc, member.measureIndex)?.unit ?? 4;
+  const event = eventAtAddress(doc, member);
+  const item = (doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]?.sequences ?? [])
+    .filter(sequence => (sequence.staff ?? 1) === member.staffIndex)[member.voiceIndex]?.content?.[member.eventIndex];
+  const written = event?.duration ? durationSpan(event.duration) : null;
+  if (!item || !written || written.num === 0) return { unit, scale: { num: 1, den: 1 } };
+  const played = playedSpan(item, member.containerIndex);
+  return { unit, scale: addOnsets({ num: 0, den: 1 }, { num: played.num * written.den, den: played.den * written.num }) };
+}
+
+/** `beat 2 1/2` — where in the bar, counted from 1 as a player counts. */
+function beatPositionText(onset: Fraction, unit: number): string {
+  return `beat ${mixedText(addOnsets({ num: 1, den: 1 }, times(onset, { num: unit, den: 1 })))}`;
+}
+
+/** `1/2 beat`, `1 beat`, `1 1/2 beats` — how long, as played. */
+function beatsText(beats: Fraction): string {
+  return `${mixedText(beats)} ${beats.num <= beats.den ? 'beat' : 'beats'}`;
+}
+
+/** Typed beats → a written value: `1/2`, `3/4 beat`, `1 1/2 beats`, `0.5`.
+ *  Played time, so inside a triplet `1/3` is an eighth. Null when the text is
+ *  not a count; an error when no note value (up to 3 dots) lasts that long. */
+function parseBeats(text: string, beat: BeatContext): { base: MnxNoteValueBase; dots?: number } | { error: string } | null {
+  const m = /^(?:(\d+)\s+)?(\d+)(?:\/(\d+)|\.(\d+))?\s*(?:beats?)?$/i.exec(text.trim());
+  if (!m) return null;
+  let beats: Fraction = m[4] !== undefined
+    ? { num: Number(`${m[2]}${m[4]}`), den: 10 ** m[4].length }
+    : { num: Number(m[2]), den: m[3] ? Number(m[3]) : 1 };
+  if (beats.den === 0 || beats.num === 0) return { error: 'a duration takes some time — 1/2 · 1 · 1 1/2' };
+  beats = addOnsets({ num: m[1] ? Number(m[1]) : 0, den: 1 }, beats);
+  // Whole-note time as played, then back through any tuplet to the written value.
+  const written = times(times(beats, { num: 1, den: beat.unit }), { num: beat.scale.den, den: beat.scale.num });
+  for (const base of DURATION_WORDS) {
+    for (let dots = 0; dots <= 3; dots++) {
+      const span = durationSpan({ base, dots });
+      if (span.num === written.num && span.den === written.den) return { base, ...(dots ? { dots } : {}) };
+    }
+  }
+  return { error: `no single note lasts ${beatsText(beats)} here — 1/4 · 1/2 · 3/4 · 1 · 1 1/2 · 2` };
 }
 
 /** A positioned attribute's typed value — what `parseAdornment` takes back. */
@@ -539,14 +603,15 @@ export function eventPills(doc: MnxStructure, member: Extract<SelectionMember, {
   if (!event) return [];
   const pills: InspectorPill[] = [];
   if (event.duration) {
-    pills.push({ key: 'duration', word: 'duration', value: durationText(event.duration), pillClass: 'floor', remove: null });
-    // Where the event sits in its bar (whole-note fractions) — a reading, so
-    // over/underfull bars can be audited event by event (one-surface item 8).
-    // As played: an event in a triplet ends a twelfth later, not an eighth.
-    const item = (doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]?.sequences ?? [])
-      .filter(sequence => (sequence.staff ?? 1) === member.staffIndex)[member.voiceIndex]?.content?.[member.eventIndex];
-    const ends = addOnsets(member.onset, item ? playedSpan(item, member.containerIndex) : durationSpan(event.duration));
-    pills.push(derived('at', 'at', `${fractionText(member.onset)} → ${fractionText(ends)}`));
+    // How long, in beats as played (a triplet eighth in 4/4 is 1/3 beat), and
+    // where it starts, counted from beat 1 — readings a player can check
+    // against the count, so over/underfull bars can be audited event by event
+    // (one-surface item 8). The duration is the floor, amended by beats or by
+    // name; the note rung shows it too, since that is where you stand.
+    const beat = beatContextOf(doc, member);
+    const beats = times(times(durationSpan(event.duration), beat.scale), { num: beat.unit, den: 1 });
+    pills.push({ key: 'duration', word: 'duration', value: beatsText(beats), pillClass: 'floor', remove: null });
+    pills.push(derived('at', 'at', beatPositionText(member.onset, beat.unit)));
   }
   for (const [name, attrs] of Object.entries(event.markings ?? {})) {
     const detail = attrs && typeof attrs === 'object' ? Object.values(attrs as Record<string, unknown>).join(' ') : '';
@@ -606,7 +671,7 @@ export function notePills(doc: MnxStructure, member: Extract<SelectionMember, { 
     pills.push(annotation('fingering', 'fingering', `${x.fingering.hand} ${x.fingering.finger}`, { type: 'removeFingering' }));
   for (const technique of readTechniques(note))
     pills.push(annotation(`technique:${technique.kind}`, technique.kind, techniqueText(technique), { type: 'toggleTechnique', kind: technique.kind }));
-  return [...pills, ...eventPills(doc, member).filter(p => p.key !== 'duration')];
+  return [...pills, ...eventPills(doc, member)];
 }
 
 function voiceMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'voiceMeasure' }>): InspectorPill[] {
@@ -623,7 +688,8 @@ function voiceMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, {
     // container children don't double-count and grace content reads 0.
     const total = (sequence.content ?? []).reduce((sum, item) => addOnsets(sum, itemSpan(item)), { num: 0, den: 1 });
     const time = timeAt(doc, member.measureIndex);
-    if (time) pills.push(derived('fill', 'fill', `${fractionText(total)} of ${time.count}/${time.unit}`));
+    // In beats, as the event pills count: `4 1/2 of 4 beats` is a bar that overfills.
+    if (time) pills.push(derived('fill', 'fill', `${mixedText(times(total, { num: time.unit, den: 1 }))} of ${time.count} ${time.count === 1 ? 'beat' : 'beats'}`));
   }
   if (measure?.measureRepeat) {
     const mr = measure.measureRepeat as { number: number; counter?: { count: number; orient?: string } };
@@ -782,7 +848,7 @@ export function pillsFor(scope: InspectorScope): InspectorPill[] {
 }
 
 const EVENT_WORDS: InspectorWord[] = [
-  { word: 'duration', hint: DURATION_WORDS.join(' · '), values: [...DURATION_WORDS] },
+  { word: 'duration', hint: 'beats: 1/2 · 1 · 1 1/2 — or eighth · quarter.', values: [...DURATION_WORDS] },
   { word: 'tuplet', hint: '3:2 · 3 eighth in 1 quarter, no number' },
   { word: 'grace', hint: 'grace · grace 2 · appoggiatura · acciaccatura' },
   { word: 'tremolo', hint: '2 · 3 in 2 half' },
@@ -815,7 +881,7 @@ const NOTE_WORDS: InspectorWord[] = [
   { word: 'finger', hint: '3 · left 2 · right p' },
   { word: 'bend', hint: '0>full · 1/2>0 · 0>full>1/2 · 0>1/2>1/2>0' },
   ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({ word, hint: word === 'slide' ? 'shift · legato — bare = legato' : '' })),
-  ...EVENT_WORDS.filter(w => w.word !== 'duration')
+  ...EVENT_WORDS
 ];
 
 const VOICE_WORDS: InspectorWord[] = [
@@ -924,6 +990,9 @@ export function parseInspectorLine(
     pitch?: { step: string; octave: number; alter?: number };
     /** The note's place on its part's strings, when the part has any. */
     fingerboard?: Fingerboard | null;
+    /** The beat where the cursor's event stands — `duration` typed in beats
+     *  reads against it. Absent: a quarter beat, outside any tuplet. */
+    beat?: BeatContext;
     key?: string;
     tempoCount?: number;
     harmonyCount?: number;
@@ -964,8 +1033,11 @@ export function parseInspectorLine(
     if (head === 'duration') {
       const m = /^([a-z0-9]+)(\.*)$/i.exec(rest);
       const base = m && (DURATION_WORDS as string[]).includes(m[1]!) ? (m[1] as MnxNoteValueBase) : null;
-      if (!base) return { error: `not a duration — ${DURATION_WORDS.join(' · ')}` };
-      return { intent: { type: 'setEventDuration', base, ...(m![2] ? { dots: m![2].length } : {}) } };
+      if (base) return { intent: { type: 'setEventDuration', base, ...(m![2] ? { dots: m![2].length } : {}) } };
+      const beats = parseBeats(rest, context?.beat ?? { unit: 4, scale: { num: 1, den: 1 } });
+      if (!beats) return { error: `not a duration — beats (1/2 · 1 · 1 1/2) or ${DURATION_WORDS.join(' · ')}` };
+      if ('error' in beats) return beats;
+      return { intent: { type: 'setEventDuration', ...beats } };
     }
     if (head === 'lyric' || /^lyric$/i.test(word ?? '') || /^lyric \d+$/i.test(word ?? '')) {
       const lineId = /^lyric (\d+)$/i.exec(word ?? '')?.[1];

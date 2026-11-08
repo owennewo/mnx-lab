@@ -7,7 +7,7 @@
  */
 import type { EditorSession } from '../edit/session.ts';
 import type { EditorIntent } from '../edit/intents.ts';
-import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
+import { beatContextOf, fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 import { OVERLAY_EDGE_GAP, OVERLAY_MIRROR_MARGIN, OVERLAY_WIDTH, type OverlayAnchor } from './overlayPlacement.ts';
 
@@ -16,9 +16,12 @@ export function inspectorLineIntent(session: EditorSession, word: string | null,
   const noteKey = session.selectedNoteKeys[0];
   const pitch = noteKey ? findNoteAddress(session.doc, noteKey)?.note.pitch : undefined;
   const bar = session.doc.global?.measures?.[session.cursor.measureIndex];
+  const member = session.resolvedSelection.members[0];
+  const timed = member && (member.kind === 'event' || member.kind === 'note') ? member : null;
   return parseInspectorLine(session.selectionLevel, word, text, {
     ...(pitch ? { pitch } : {}),
     fingerboard: noteKey ? fingerboardOf(session.doc, noteKey) : null,
+    ...(timed ? { beat: beatContextOf(session.doc, timed) } : {}),
     ...(key ? { key } : {}),
     tempoCount: bar?.tempos?.length ?? 0,
     harmonyCount: bar?._x?.mnxLab?.harmonies?.length ?? 0,
