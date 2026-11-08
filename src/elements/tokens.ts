@@ -49,6 +49,10 @@ export const notationTokens = css`
     --playback-3: var(--mnx-playback-3, light-dark(oklch(0.55 0.13 80), oklch(0.82 0.13 85)));
     --playback-4: var(--mnx-playback-4, light-dark(oklch(0.5 0.16 330), oklch(0.8 0.13 330)));
     --playback-voice: var(--playback);
+    /* The colour selection-lit ink takes beyond the notes themselves (a tab
+       tuplet bracket): the accent, or the cursor's voice where its bar has
+       more than one — the viewer sets it with the enclosure. */
+    --selection-voice: var(--accent);
     --paper-ink: var(--mnx-paper-ink, light-dark(oklch(0.237 0.004 60), oklch(0.92 0.008 85)));
     --paper-line: var(
       --mnx-paper-line,

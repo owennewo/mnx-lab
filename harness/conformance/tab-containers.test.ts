@@ -6,6 +6,7 @@ import { computePrimitives, computeBoth, initSmufl } from '../helpers/corpusPrim
 import { ROOT } from '../verify/check-scenarios.mjs';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import type { Primitive } from '../../src/engine/primitives.ts';
+import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { validateDocument } from '../../src/engine/layout/validate.ts';
 
 /**
@@ -156,5 +157,66 @@ describe('unplayable notes inside a container', () => {
       .map(issue => issue.message);
     expect(messages.some(m => /E1 is not playable/.test(m))).toBe(true);
     expect(messages.some(m => /outside 0–/.test(m))).toBe(true);
+  });
+});
+
+// Strolling Down the Highway, bar 14 (2026-11-08): the bass (voice 1) holds a
+// triplet under the melody (voice 2), and with every bracket above the staff
+// the owner could not tell whose triplet it was. The lower voice's brackets
+// now hang below; and a bracket lights, as the enclosure does, while a note
+// it holds is selected.
+describe('tab tuplet brackets in a bar of two voices', () => {
+  const n = (id: string, base: 'quarter' | 'eighth', step: 'A' | 'E' | 'C', octave: number, string: number) =>
+    ({ duration: { base }, notes: [{ id, pitch: { step, octave }, _x: { mnxLab: { string } } }] });
+  const bar = (bassTriplet: boolean, melodyTriplet: boolean, melody = true): MnxStructure => ({
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [{ id: 'g', _x: { mnxLab: { strings: [
+      { string: 1, pitch: { step: 'E', octave: 4 } }, { string: 2, pitch: { step: 'B', octave: 3 } },
+      { string: 3, pitch: { step: 'G', octave: 3 } }, { string: 4, pitch: { step: 'D', octave: 3 } },
+      { string: 5, pitch: { step: 'A', octave: 2 } }, { string: 6, pitch: { step: 'E', octave: 2 } }
+    ], tab: { staffKind: 'tab' } } }, measures: [{ sequences: [
+      { voice: 'v1', content: [n('b1', 'quarter', 'A', 2, 5), n('b2', 'quarter', 'A', 2, 5), n('b3', 'quarter', 'A', 2, 5),
+        ...(bassTriplet
+          ? [{ type: 'tuplet', inner: { duration: { base: 'eighth' }, multiple: 3 }, outer: { duration: { base: 'eighth' }, multiple: 2 },
+              content: [n('b4', 'quarter', 'A', 2, 5), n('b5', 'eighth', 'E', 3, 5)] }]
+          : [n('b4', 'quarter', 'A', 2, 5)])] },
+      ...(melody ? [{ voice: 'v2', content: [
+        ...(melodyTriplet
+          ? [{ type: 'tuplet', inner: { duration: { base: 'eighth' }, multiple: 3 }, outer: { duration: { base: 'eighth' }, multiple: 2 },
+              content: [n('m1', 'eighth', 'C', 4, 2), n('m2', 'eighth', 'C', 4, 2), n('m3', 'eighth', 'C', 4, 2)] }]
+          : [n('m1', 'quarter', 'C', 4, 2)]),
+        n('m4', 'quarter', 'C', 4, 2), n('m5', 'quarter', 'C', 4, 2), n('m6', 'quarter', 'C', 4, 2)] }] : [])
+    ] }] }]
+  } as never);
+  const staff = (tab: Primitive[]) => {
+    const lines = tab.filter(p => p.kind === 'line' && /tab-line|string-line|staff-line/.test(p.className ?? '')) as Extract<Primitive, { kind: 'line' }>[];
+    expect(lines.length).toBeGreaterThanOrEqual(6); // the staff was found — no vacuous pass
+    return { top: Math.min(...lines.map(l => l.y1)), bottom: Math.max(...lines.map(l => l.y1)) };
+  };
+  const brackets = (tab: Primitive[]) => tab.filter(p => p.kind === 'line' && /tuplet-bracket/.test(p.className ?? '')) as Extract<Primitive, { kind: 'line' }>[];
+
+  it('the lower voice’s bracket hangs below the staff, the upper voice’s stays above', () => {
+    const tab = computePrimitives(bar(true, true)).tab!.primitives;
+    const { top, bottom } = staff(tab);
+    const ys = brackets(tab).map(b => Math.min(b.y1, b.y2));
+    expect(ys.some(y => y > bottom)).toBe(true);  // the bass's
+    expect(ys.some(y => y < top)).toBe(true);     // the melody's
+  });
+
+  it('one voice in the bar keeps its bracket above, whatever its register', () => {
+    const tab = computePrimitives(bar(true, false, false)).tab!.primitives;
+    const { top } = staff(tab);
+    expect(brackets(tab).length).toBeGreaterThan(0);
+    expect(brackets(tab).every(b => Math.max(b.y1, b.y2) < top)).toBe(true);
+  });
+
+  it('a bracket is lit while a note it holds is selected, and only then', () => {
+    initSmufl();
+    const lit = (selected: string[]) => layoutTab({ mnx: bar(true, false), widthSp: 120, selectedNoteIds: selected }).primitives
+      .filter(p => /tuplet-(bracket|number)/.test(p.className ?? ''))
+      .every(p => /\bselected\b/.test(p.className ?? ''));
+    expect(lit(['b5'])).toBe(true);
+    expect(lit(['b3'])).toBe(false);
   });
 });

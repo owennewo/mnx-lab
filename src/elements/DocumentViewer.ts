@@ -111,6 +111,11 @@ import type { HideableFeature } from '../engine/layout/notation.ts';
 /** The hover asks `noteTargetAt` about every note on the page; a press asks the plan's index. */
 const EVERY_KEY: ReadonlyMap<string, unknown> = { has: () => true } as unknown as ReadonlyMap<string, unknown>;
 
+/** A voice's colour slot (`playbackVoiceSlot`) → its playback ink token, spelt out so the token check can read them. */
+const VOICE_INK: Record<number, string> = {
+  1: 'var(--playback)', 2: 'var(--playback-2)', 3: 'var(--playback-3)', 4: 'var(--playback-4)'
+};
+
 @customElement('mnx-document-viewer')
 export class DocumentViewer extends LitElement {
   @property({ type: Boolean }) unrolled = false;
@@ -594,6 +599,17 @@ export class DocumentViewer extends LitElement {
       #projection-container svg .fret-number.selected,
       #projection-container svg .fret-number.active {
         fill: var(--accent) !important;
+      }
+
+      /* A tab tuplet bracket lights while the cursor is inside it, in the
+         enclosure's colour — the voice's, in a bar with more than one
+         (--selection-voice, set with the enclosure) — so the box and the
+         bracket say together whose triplet it is. */
+      #projection-container svg .tuplet-bracket.selected {
+        stroke: var(--selection-voice) !important;
+      }
+      #projection-container svg .tuplet-number.selected {
+        fill: var(--selection-voice) !important;
       }
 
       /* Both view: one model selection, two renderings. The projection that
@@ -1309,6 +1325,9 @@ export class DocumentViewer extends LitElement {
       const voiceColour = this.selection?.voiceColour;
       const drawn = svg.querySelector(':scope > g.enclosure');
       if (drawn && voiceColour) drawn.setAttribute('data-voice', String(voiceColour));
+      // The same colour for the ink the selection lights that is not a note's own (a tuplet bracket).
+      if (voiceColour) svg.style.setProperty('--selection-voice', VOICE_INK[voiceColour] ?? 'var(--accent)');
+      else svg.style.removeProperty('--selection-voice');
       let cancellation: (() => void) | null = null;
       cancellation = tweenEnclosure(svg, previousEnclosure, () => {
         if (this.cancelEnclosureTween === cancellation) this.cancelEnclosureTween = null;

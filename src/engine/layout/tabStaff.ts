@@ -569,10 +569,20 @@ function emitTabTupletBracket(
   firstX: number,
   lastX: number,
   staffTop: number,
-  primitives: Primitive[]
+  primitives: Primitive[],
+  side: 'above' | 'below' = 'above',
+  lit?: { selects?: string; selected: boolean }
 ): void {
-  const y = staffTop - TAB_TUPLET_RISE_SP;
+  // Below the staff, the bracket mirrors: the same distance under the bottom
+  // string, its hooks pointing UP at the notes it covers.
+  const y = side === 'above' ? staffTop - TAB_TUPLET_RISE_SP : staffTop + TAB_STAFF_HEIGHT_SP + TAB_TUPLET_RISE_SP;
+  const hook = side === 'above' ? TAB_TUPLET_HOOK_SP : -TAB_TUPLET_HOOK_SP;
   const number = tuplet.showNumber === 'noNumber' ? null : String(tuplet.inner.multiple);
+  // Lit while the cursor is inside it (the selection paint, selectionHooks.ts):
+  // the class is the whole of it, and the viewer colours a `.selected` bracket
+  // as it colours the enclosure — so the bracket says whose triplet it is.
+  const litClass = lit?.selected ? ' selected' : lit?.selects ? SELECTED_CLASS_MARK : '';
+  const hooked = lit?.selects ? { selects: lit.selects } : {};
 
   if (number !== null) {
     primitives.push({
@@ -584,7 +594,8 @@ function emitTabTupletBracket(
       size: TAB_TUPLET_NUMBER_SIZE_SP,
       anchor: 'middle',
       baseline: 'central',
-      className: 'tuplet-number'
+      className: 'tuplet-number' + litClass,
+      ...hooked
     });
   }
 
@@ -603,17 +614,45 @@ function emitTabTupletBracket(
       kind: 'line',
       x1, y1: y, x2, y2: y,
       thickness: TAB_TUPLET_BRACKET_THICKNESS_SP,
-      className: 'tuplet-bracket'
+      className: 'tuplet-bracket' + litClass,
+      ...hooked
     });
   }
   for (const x of [firstX, lastX]) {
     primitives.push({
       kind: 'line',
-      x1: x, y1: y, x2: x, y2: y + TAB_TUPLET_HOOK_SP,
+      x1: x, y1: y, x2: x, y2: y + hook,
       thickness: TAB_TUPLET_BRACKET_THICKNESS_SP,
-      className: 'tuplet-bracket'
+      className: 'tuplet-bracket' + litClass,
+      ...hooked
     });
   }
+}
+
+/**
+ * Which voice's tuplet brackets hang BELOW the tab staff: in a bar with more
+ * than one sounding voice, the one lowest in register — the engraver's rule
+ * for two voices on one staff, the same that sends a lower voice's stems down
+ * (the owner, 2026-11-08: a bass-voice triplet bracketed above the staff read
+ * as belonging to the melody). By sound, not by number: in a fingerstyle
+ * arrangement voice 1 is as often the bass as the tune. Null in a one-voice
+ * bar, where every bracket stays above.
+ */
+function lowestTabVoice(voices: readonly MnxSequence[]): number | null {
+  const means: { voiceIndex: number; mean: number }[] = [];
+  voices.forEach((sequence, voiceIndex) => {
+    const pitches: number[] = [];
+    const visit = (items: readonly unknown[]) => {
+      for (const item of items) {
+        if (isTuplet(item as never) || isGrace(item as never)) visit((item as { content: unknown[] }).content);
+        else for (const note of (item as MnxEvent).notes ?? []) pitches.push(midiOfMnxPitch(note.pitch));
+      }
+    };
+    visit(sequence.content);
+    if (pitches.length) means.push({ voiceIndex, mean: pitches.reduce((a, b) => a + b, 0) / pitches.length });
+  });
+  if (means.length < 2) return null;
+  return means.reduce((low, v) => (v.mean < low.mean ? v : low)).voiceIndex;
 }
 
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
@@ -876,6 +915,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
     }
   };
 
+  const belowVoice = lowestTabVoice(voices);
   voices.forEach((sequence, voiceIndex) => {
     sequence.content.forEach((item, eventIndex) => {
       const slot = slots[voiceIndex]?.[eventIndex];
@@ -917,12 +957,22 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           }
         });
         if (isTuplet(item) && showTupletBrackets && inner.length > 0) {
+          // The notes it holds, keyed as their digits are: any one selected lights it.
+          const keys = inner.flatMap(({ event }, containerIndex) => (event.notes ?? []).map((n, idx) =>
+            synthesizeKeys
+              ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx, containerIndex, args.keyPartIndex, args.keyStaffIndex)
+              : n.id).filter((id): id is string => id !== undefined));
           emitTabTupletBracket(
             item,
             inner[0].x,
             inner[inner.length - 1].x,
             staffTop,
-            primitives
+            primitives,
+            voiceIndex === belowVoice ? 'below' : 'above',
+            {
+              selected: keys.some(key => selectedNoteIds.includes(key)),
+              ...(selectionHooked(selectedNoteIds) ? { selects: selectionMark('n', keys) } : {})
+            }
           );
         }
         return;
