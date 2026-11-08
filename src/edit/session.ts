@@ -1,4 +1,5 @@
 import { sameContainerIndex } from '../model/noteKeys.ts';
+import { noteKeyAt } from '../model/noteWalk.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
 // This is stage 2 of the input layer (roadmap/complete/core-editor-input-layer.md)
@@ -713,7 +714,25 @@ export class EditorSession {
       }
       case 'toggleTriplet': {
         const inside = this.enclosingTuplet();
-        if (inside) return this.handleIntent({ type: 'removeContainer', ...inside });
+        if (inside) {
+          const ordinal = this.performedOrdinal ?? 0;
+          if (!this.handleIntent({ type: 'removeContainer', sequenceIndex: inside.sequenceIndex, eventIndex: inside.eventIndex })) return false;
+          // Land on the first of the freed notes (the owner, 2026-11-08: it "jumps
+          // to a note after the triplet") — a press on it, as a lyric's press lands
+          // on its note; a freed rest is its event's.
+          const first = this.doc.parts?.[inside.partIndex]?.measures?.[inside.measureIndex]?.sequences?.[inside.sequenceIndex]?.content[inside.eventIndex] as MnxEvent | undefined;
+          const note = first?.notes?.[0];
+          if (note) {
+            this.handleIntent({
+              type: 'goToPointer', measureIndex: inside.measureIndex, partIndex: inside.partIndex, staffIndex: inside.staffIndex,
+              line: 0, projection: this.activeProjection, fraction: 0, ordinal,
+              noteKey: noteKeyAt(note, inside.measureIndex, inside.voiceIndex, inside.eventIndex, 0, undefined, inside.partIndex, inside.staffIndex)
+            });
+          } else {
+            this.handleIntent({ type: 'goToPerformed', ordinal, onset: [inside.onset.num, inside.onset.den], level: 'event' });
+          }
+          return true;
+        }
         return this.handleIntent({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } });
       }
       case 'toggleTie': {
@@ -3157,7 +3176,10 @@ export class EditorSession {
   /** The one tuplet everything selected sits inside — every member a child of
    *  the same top-level tuplet of one voice of one bar — or null. What
    *  Shift+T takes away. */
-  private enclosingTuplet(): { sequenceIndex: number; eventIndex: number } | null {
+  private enclosingTuplet(): {
+    partIndex: number; measureIndex: number; staffIndex: number; voiceIndex: number;
+    sequenceIndex: number; eventIndex: number; onset: Onset;
+  } | null {
     const level = this.selectionState.level;
     if (level !== 'note' && level !== 'event') return null;
     const members = this.resolvedSelection.members;
@@ -3173,7 +3195,13 @@ export class EditorSession {
       .filter(entry => (entry.sequence.staff ?? 1) === first.staffIndex);
     const chosen = onStaff[first.voiceIndex];
     const item = chosen?.sequence.content[first.eventIndex] as { type?: string } | undefined;
-    return chosen && item?.type === 'tuplet' ? { sequenceIndex: chosen.index, eventIndex: first.eventIndex } : null;
+    if (!chosen || item?.type !== 'tuplet') return null;
+    let onset: Onset = { num: 0, den: 1 };
+    for (let i = 0; i < first.eventIndex; i++) onset = addOnsets(onset, itemSpan(chosen.sequence.content[i]!));
+    return {
+      partIndex: first.partIndex, measureIndex: first.measureIndex, staffIndex: first.staffIndex, voiceIndex: first.voiceIndex,
+      sequenceIndex: chosen.index, eventIndex: first.eventIndex, onset
+    };
   }
 
   /** The selection as a run of top-level events in one voice of one bar —

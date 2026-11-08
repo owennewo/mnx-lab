@@ -129,12 +129,17 @@ describe('Shift+T and the session’s misfit', () => {
       ] }] }] }]
     } as MnxStructure);
     const content = (s: EditorSession) => s.doc.parts![0]!.measures![0]!.sequences![0]!.content;
-    // One note of it, at the note rung.
+    // One note of it — its LAST — at the note rung; the cursor lands on the
+    // first of the freed notes, not past them (the owner, 2026-11-08).
     const one = new EditorSession(doc());
-    one.handleIntent({ type: 'nextPosition' });
+    for (let i = 0; i < 3; i++) one.handleIntent({ type: 'nextPosition' });
+    expect(one.cursor.onset).toEqual({ num: 5, den: 12 }); // the triplet's last note
     expect(one.handleIntent(TRIPLET)).toBe(true);
     expect(content(one).some(item => (item as { type?: string }).type === 'tuplet')).toBe(false);
     expect(content(one)).toHaveLength(5);
+    expect(one.cursor.onset).toEqual({ num: 1, den: 4 });
+    expect(one.selectionLevel).toBe('note');
+    expect(one.selectedNoteKeys).toEqual(['@m0.v0.e1.n0']);
     // The whole group, at the event rung; undo puts it back exactly.
     const all = new EditorSession(doc());
     const before = JSON.stringify(all.doc);
