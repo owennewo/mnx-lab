@@ -111,7 +111,30 @@ try {
   
   const jumped = results.filter(r => r.scrollTop < r.before / 2);
   assert.equal(jumped.length, 0, `${jumped.length} of ${results.length} presses scrolled the score back towards bar 1`);
-  console.log('\nReload-click smoke passed: a press near the end of a reloaded score, straight away and once the editor has bound, stays where it was pressed.');
+
+  // Escape lets go of the rung (the owner, 2026-11-08): a bar selected, Escape,
+  // then a press on a note selects the NOTE — it used to select the bar again.
+  const key = async (code, keyCode, shift = false) => {
+    const base = { code, key: code, windowsVirtualKeyCode: keyCode, modifiers: shift ? 8 : 0 };
+    await c.send('Input.dispatchKeyEvent', { type: 'rawKeyDown', ...base });
+    await c.send('Input.dispatchKeyEvent', { type: 'keyUp', ...base });
+  };
+  const level = () => c.evaluate(`${page}.editor.session.selectionLevel`);
+  await c.evaluate(`${viewer}.focus(); 0`);
+  for (let i = 0; i < 4 && (await level()) !== 'measure'; i++) await key('ArrowUp', 38, true);
+  assert.equal(await level(), 'measure', 'Shift+↑ reached the bar rung');
+  await key('Escape', 27);
+  await wait(`${page}.editor.session.selectionLevel === 'note'`);
+  const fret = JSON.parse(await c.evaluate(`JSON.stringify((() => { const v = ${viewer}, box = v.getBoundingClientRect();
+    const r = [...v.shadowRoot.querySelectorAll('.fret-number')].map(f => f.getBoundingClientRect()).find(r => r.top > box.top && r.bottom < box.bottom);
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })())`));
+  await c.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: fret.x, y: fret.y, button: 'left', clickCount: 1 });
+  await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: fret.x, y: fret.y, button: 'left', clickCount: 1 });
+  await new Promise(r => setTimeout(r, 500));
+  assert.equal(await level(), 'note', 'after Escape, a press on a note selects the note, not the bar');
+  assert.equal(await c.evaluate(`${page}.editor.session.selectedNoteKeys.length`), 1, 'the pressed note is selected');
+  console.log('after Escape, a press on a note selects the note');
+  console.log('\nReload-click smoke passed: a press near the end of a reloaded score, straight away and once the editor has bound, stays where it was pressed; and after Escape a press selects the note.');
 } finally {
   ws?.close();
   await stopChrome(chrome);

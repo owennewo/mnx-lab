@@ -784,7 +784,14 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // Escape and Enter walk the pending list: a half-typed fret first, then — Escape only — the cursor itself.
     if (shell === 'abandonPending' || shell === 'commitPending') {
       if (tabDigits.pending !== null) { event.preventDefault(); if (shell === 'commitPending') tabDigits.flush(); else { tabDigits.cancel(); pendingFret = null; draw(); } return; }
-      if (shell === 'abandonPending' && !cursorHidden) { event.preventDefault(); cursorHidden = true; draw(); }
+      // Escape puts the selection away AND lets go of its rung: what comes next — a press on a note,
+      // an arrow — starts again at the note, not back at the bar it left (the owner, 2026-11-08: "if
+      // a bar is selected and I press esc … then click a note it selects the bar").
+      if (shell === 'abandonPending' && !cursorHidden) {
+        event.preventDefault();
+        if (session.selectionLevel !== 'note') session.handleIntent({ type: 'goToLevel', level: 'note' });
+        cursorHidden = true; draw();
+      }
       // Enter with nothing pending is the inspector's door — last in the walk, so a half-typed fret never opens one.
       // A pressed element is opened for editing instead (core-editor-click-targets.md).
       else if (shell === 'commitPending' && surfaces && !cursorHidden) { event.preventDefault(); if (focused) activateElement(focused.press); else openInspector(); }
