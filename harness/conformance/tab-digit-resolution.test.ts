@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MnxStructure } from '../../src/model/mnx.ts';
+import { eventStartingAt } from '../../src/edit/ops.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 import { EditorSession, replayIntents } from '../../src/edit/session.ts';
 import {
@@ -236,5 +237,52 @@ describe('resolved enterFret session intents', () => {
     expect(session.handleIntent({ type: 'enterFret', fret: -1 })).toBe(false);
     expect(session.handleIntent({ type: 'enterFret', fret: 25 })).toBe(false);
     expect(session.appliedOps).toEqual([]);
+  });
+});
+
+// The owner, 2026-11-08 (Strolling Down the Highway, bar 16): a 0 typed on the
+// top string over the 2-2 chord that ends a triplet — meaning to add it to that
+// chord — was refused as "inside another note". The chord is inside a tuplet,
+// and the insert only looked for events at the top of the bar.
+describe('a fret added to a chord inside a triplet', () => {
+  const n = (step: 'A' | 'C' | 'E', octave: number, string: number) => ({ pitch: { step, octave }, _x: { mnxLab: { string } } });
+  const ev = (base: 'half' | 'quarter' | 'eighth' | '16th', ...notes: ReturnType<typeof n>[]) => ({ duration: { base }, notes });
+  const doc = (): MnxStructure => {
+    const base = entryDoc();
+    base.parts![0]!.measures![0]!.sequences = [
+      { voice: 'v1', content: [ev('quarter', n('A', 2, 5)), ev('quarter', n('A', 2, 5)), ev('quarter', n('A', 2, 5)), ev('quarter', n('A', 2, 5))] },
+      { voice: 'v2', content: [
+        { type: 'tuplet', inner: { multiple: 3, duration: { base: 'eighth' } }, outer: { multiple: 2, duration: { base: 'eighth' } },
+          content: [ev('16th', n('C', 4, 3)), ev('16th', n('C', 4, 3)), ev('eighth', n('C', 4, 3)), ev('eighth', n('E', 3, 5), n('A', 3, 4))] },
+        ev('quarter', n('C', 4, 3)), ev('half', n('C', 4, 3))
+      ] }
+    ] as never;
+    return base;
+  };
+
+  it('joins the chord at its onset, and changes no timing', () => {
+    const session = new EditorSession(doc(), 'tab-entry');
+    session.handleIntent({ type: 'goToPerformed', ordinal: 0, onset: [1, 6] });
+    while (session.cursor.line > 1) session.handleIntent({ type: 'lineUp' });
+    expect(session.cursor.voiceIndex).toBe(1);
+    expect(session.handleIntent({ type: 'enterFret', fret: 0 })).toBe(true);
+    expect(session.lastRefusal).toBeNull();
+    const voice2 = session.doc.parts![0]!.measures![0]!.sequences![1]!.content;
+    expect(voice2).toHaveLength(3);
+    const chord = (voice2[0] as { content: { notes: { _x: { mnxLab: { string: number; fret?: number } } }[] }[] }).content[3]!.notes;
+    expect(chord.map(note => note._x.mnxLab.string)).toEqual([5, 4, 1]);
+    expect(chord[2]!._x.mnxLab.fret).toBe(0);
+  });
+
+  it('finds a triplet’s events only where one begins', () => {
+    const voice2 = doc().parts![0]!.measures![0]!.sequences![1]!;
+    const at = (num: number, den: number) => eventStartingAt(voice2, { num, den });
+    // The triplet's 16th, 16th, 8th, 8th begin at 0, 1/24, 1/12 and 1/6 of the bar.
+    expect(at(0, 1)?.duration.base).toBe('16th');
+    expect(at(1, 24)?.duration.base).toBe('16th');
+    expect(at(1, 12)?.duration.base).toBe('eighth');
+    expect(at(1, 6)?.notes).toHaveLength(2);
+    expect(at(1, 8)).toBeUndefined();   // inside the third note
+    expect(at(1, 4)?.duration.base).toBe('quarter'); // the next top-level event
   });
 });

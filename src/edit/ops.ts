@@ -34,7 +34,7 @@ import type { SelectionState } from './selection.ts';
 import type { SelectionClipEnvelope } from './selectionClip.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import { syntheticNoteKey } from '../model/noteKeys.ts';
-import { isTimedEvent } from '../model/mnx.ts';
+import { isTimedEvent, isTuplet } from '../model/mnx.ts';
 import { parseChordSymbol, renderChordSymbol } from '../model/harmony.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
 import { enharmonicSpellings, keyFifthsAt, midiOfSpelling, spellPitch } from './staffSpace.ts';
@@ -44,6 +44,7 @@ import {
   itemSpan,
   onsetLess,
   onsetsEqual,
+  playedSpan,
   type Onset
 } from './cursor.ts';
 import { capoOf, defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
@@ -1431,8 +1432,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
 
       const target: Onset = { num: op.onset[0], den: op.onset[1] };
       const found = eventAtOnset(seq, target);
-      if (found?.event) {
-        const event = found.event;
+      // A tuplet's event is the chord a fret adds to as readily as any other
+      // (the owner, 2026-11-08: a 0 typed on the 2-2 chord ending a triplet was
+      // refused as "inside" the triplet). Adding to it changes no timing.
+      const starting = found?.event ?? (found ? undefined : eventStartingAt(seq, target));
+      if (starting) {
+        const event = starting;
         if (event.rest) {
           // A REST IS A NOTE WITHOUT A PITCH (2026-09-19, reversing campaign item
           // 11b's "a rest is absence"): typing a fret gives it one, and its
@@ -1471,8 +1476,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const note: MnxNote = { pitch: { ...op.pitch } };
       const target: Onset = { num: op.onset[0], den: op.onset[1] };
       const found = eventAtOnset(seq, target);
-      if (found?.event) {
-        const event = found.event;
+      // A tuplet's event is the chord a fret adds to as readily as any other
+      // (the owner, 2026-11-08: a 0 typed on the 2-2 chord ending a triplet was
+      // refused as "inside" the triplet). Adding to it changes no timing.
+      const starting = found?.event ?? (found ? undefined : eventStartingAt(seq, target));
+      if (starting) {
+        const event = starting;
         if (event.rest) {
           // Same rule as `insertNote` above: the rest is a note without a
           // pitch, and keeps its duration.
@@ -3587,6 +3596,32 @@ function newSequence(staffIndex: number): MnxSequence {
 /** The timed event starting exactly at `target`, or (event: undefined) with
  *  the content index where a new event at `target` belongs. Returns undefined
  *  when `target` falls INSIDE an item's span — phase 2 does not split events. */
+/**
+ * The timed event that BEGINS at `target`, looking inside tuplets as well as
+ * at the top level: what a note may be added to, as a chord member. Undefined
+ * where nothing begins exactly there. Unlike `eventAtOnset` it returns no
+ * insertion index — an event cannot be inserted inside a tuplet here.
+ */
+export function eventStartingAt(seq: MnxSequence, target: Onset): MnxEvent | undefined {
+  const top = eventAtOnset(seq, target);
+  if (top?.event) return top.event;
+  let onset: Onset = { num: 0, den: 1 };
+  for (const item of seq.content) {
+    const end = addOnsets(onset, itemSpan(item));
+    if (isTuplet(item) && !onsetLess(target, onset) && onsetLess(target, end)) {
+      let at = onset;
+      for (const [c, child] of item.content.entries()) {
+        if (onsetsEqual(at, target)) return isTimedEvent(child) ? (child as MnxEvent) : undefined;
+        at = addOnsets(at, playedSpan(item, c));
+        if (onsetLess(target, at)) return undefined;
+      }
+      return undefined;
+    }
+    onset = end;
+  }
+  return undefined;
+}
+
 function eventAtOnset(
   seq: MnxSequence,
   target: Onset
