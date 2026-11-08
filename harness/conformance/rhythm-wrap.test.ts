@@ -284,3 +284,54 @@ describe('what a wrap refuses', () => {
     expect(JSON.stringify(session.doc)).toBe(before);
   });
 });
+
+describe('a typed tuplet over a SELECTED run', () => {
+  // Strolling Down the Highway, bar 14 (2026-11-08): the owner selected a
+  // quarter and an eighth — Shift+→ leaves the cursor on the eighth — and
+  // typed 3:2. It was refused twice over: the wrap started at the cursor, and
+  // took its unit from that one event. The run is the content now, and its
+  // total names the unit: a quarter and an eighth are three eighths.
+  const runDoc = (): MnxStructure => {
+    const n = (base: 'quarter' | 'eighth', step: 'A' | 'E', octave: number) =>
+      ({ duration: { base }, notes: [{ pitch: { step, octave } }] });
+    return {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [{ id: 'p', measures: [{ sequences: [{ content: [
+        n('quarter', 'A', 2), n('quarter', 'A', 2), n('quarter', 'A', 2), n('quarter', 'A', 2), n('eighth', 'E', 3)
+      ] }] }] }]
+    } as MnxStructure;
+  };
+  const selectLastTwo = (session: EditorSession) => {
+    session.handleIntent({ type: 'goToLevel', level: 'event' });
+    for (let i = 0; i < 3; i++) session.handleIntent({ type: 'nextPosition' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(session.resolvedSelection.members).toHaveLength(2);
+  };
+  const content = (session: EditorSession) => session.doc.parts![0]!.measures![0]!.sequences![0]!.content;
+
+  it('3:2 wraps exactly the selection, in the unit its total implies', () => {
+    const session = new EditorSession(runDoc());
+    selectLastTwo(session);
+    expect(session.handleIntent({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } })).toBe(true);
+    const items = content(session);
+    expect(items).toHaveLength(4);
+    expect(items[3]).toMatchObject({
+      type: 'tuplet',
+      inner: { multiple: 3, duration: { base: 'eighth' } },
+      outer: { multiple: 2, duration: { base: 'eighth' } },
+      content: [{ duration: { base: 'quarter' } }, { duration: { base: 'eighth' } }]
+    });
+  });
+
+  it('a stated unit must fit the run, and a run no note value divides is refused', () => {
+    const session = new EditorSession(runDoc());
+    selectLastTwo(session);
+    const before = JSON.stringify(session.doc);
+    // 3 quarters is not a quarter and an eighth.
+    expect(session.handleIntent({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3, duration: { base: 'quarter' } }, outer: { multiple: 2 } } })).toBe(false);
+    // 5 into three eighths names no note value.
+    expect(session.handleIntent({ type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 5 }, outer: { multiple: 4 } } })).toBe(false);
+    expect(JSON.stringify(session.doc)).toBe(before);
+  });
+});

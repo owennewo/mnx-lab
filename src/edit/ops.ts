@@ -3242,6 +3242,43 @@ export interface ContainerPropertyPatch {
   marks?: number;
 }
 
+/**
+ * A typed tuplet over a SELECTED run of events (`from`…`to`, top-level items
+ * of one sequence): the run is the tuplet's content, so an unqualified `3:2`
+ * takes its unit from the run's total — a quarter and an eighth are three
+ * eighths, so 3:2 in eighths — rather than from the first event, which would
+ * ask for three quarters. A stated unit must fit the run exactly. Null when
+ * the run is not all timed events or no plain note value divides it.
+ */
+export function rangeTupletSpec(
+  seq: MnxSequence,
+  from: number,
+  to: number,
+  partial: Extract<PartialContainerSpec, { type: 'tuplet' }>
+): ContainerSpec | null {
+  let total: Onset = { num: 0, den: 1 };
+  for (let i = from; i <= to; i++) {
+    const item = seq.content[i];
+    if (!item || !isTimedEvent(item)) return null;
+    total = addOnsets(total, itemSpan(item));
+  }
+  const stated = partial.inner.duration;
+  const unit = stated ?? (() => {
+    const base = noteValueForSpan(divideSpan(total, partial.inner.multiple));
+    return base ? { base } : null;
+  })();
+  if (!unit) return null;
+  const inner = durationSpan(unit);
+  if (!onsetsEqual({ num: inner.num * partial.inner.multiple, den: inner.den }, total)) return null;
+  return {
+    type: 'tuplet',
+    inner: { multiple: partial.inner.multiple, duration: unit },
+    outer: { multiple: partial.outer.multiple, duration: partial.outer.duration ?? unit },
+    ...(partial.bracket ? { bracket: partial.bracket } : {}),
+    ...(partial.showNumber ? { showNumber: partial.showNumber } : {})
+  };
+}
+
 export function wrapExtent(
   seq: MnxSequence,
   eventIndex: number,

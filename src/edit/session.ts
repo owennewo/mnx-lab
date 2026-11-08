@@ -5,7 +5,7 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 // — DOM-free on purpose, so the workbench mount and the harness replay test
 // drive the exact same object. The session records every intent it handles;
 // that log IS the trace fixture ("recording is the same stream as undo").
-import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
+import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxNoteValueBase, MnxSequence, MnxStructure } from '../model/mnx.ts';
 import type { EditorIntent, NavigationIntent } from './intents.ts';
 import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
 import { hasRepeatStructure, linearizePasses, type PassModel } from '../model/passes.ts';
@@ -19,6 +19,7 @@ import {
   beamEndingAt,
   beamStartingAt,
   completeContainerSpec,
+  rangeTupletSpec,
   entryContentAt,
   eventAtAddress,
   wrapExtent,
@@ -1582,6 +1583,26 @@ export class EditorSession {
             duration: intent.duration
           });
         } else {
+          // A SELECTED RUN is what a typed tuplet wraps (the owner, 2026-11-08:
+          // a quarter and an eighth selected, `3:2` refused). Two things went
+          // wrong without this: the wrap started at the cursor, which a
+          // Shift+→ range leaves on its LAST event, and the unit came from
+          // that one event rather than the run — so the run never fit.
+          const run = this.selectedTopLevelRun();
+          if (run && intent.spec.type === 'tuplet' && intent.count === undefined) {
+            const spec = rangeTupletSpec(run.seq, run.from, run.to, intent.spec);
+            if (!spec) return false;
+            this.apply({
+              type: 'wrapInContainer',
+              partIndex: run.partIndex,
+              measureIndex: run.measureIndex,
+              sequenceIndex: run.sequenceIndex,
+              from: run.from,
+              to: run.to,
+              spec
+            });
+            return JSON.stringify(this.doc) !== before;
+          }
           const spec = completeContainerSpec(site.seq, site.index, intent.spec);
           if (!spec) return false;
           const extent = wrapExtent(site.seq, site.index, spec, intent.count);
@@ -3106,6 +3127,40 @@ export class EditorSession {
   }
 
   /** The voice-0 timed event starting exactly at the cursor's onset. */
+  /** The selection as a run of top-level events in one voice of one bar —
+   *  two or more of them, contiguous — or null. What a typed tuplet wraps. */
+  private selectedTopLevelRun(): {
+    partIndex: number; measureIndex: number; sequenceIndex: number; seq: MnxSequence; from: number; to: number;
+  } | null {
+    if (this.selectionState.level !== 'event') return null;
+    const members = this.resolvedSelection.members;
+    if (members.length < 2) return null;
+    const first = members[0];
+    if (!first || first.kind !== 'event') return null;
+    const indices: number[] = [];
+    for (const member of members) {
+      if (member.kind !== 'event' || member.containerIndex !== undefined) return null;
+      if (member.partIndex !== first.partIndex || member.measureIndex !== first.measureIndex
+        || member.staffIndex !== first.staffIndex || member.voiceIndex !== first.voiceIndex) return null;
+      indices.push(member.eventIndex);
+    }
+    indices.sort((a, b) => a - b);
+    if (indices.some((index, i) => i > 0 && index !== indices[i - 1]! + 1)) return null;
+    const onStaff = (this.doc.parts?.[first.partIndex]?.measures?.[first.measureIndex]?.sequences ?? [])
+      .map((sequence, index) => ({ sequence, index }))
+      .filter(entry => (entry.sequence.staff ?? 1) === first.staffIndex);
+    const chosen = onStaff[first.voiceIndex];
+    if (!chosen) return null;
+    return {
+      partIndex: first.partIndex,
+      measureIndex: first.measureIndex,
+      sequenceIndex: chosen.index,
+      seq: chosen.sequence,
+      from: indices[0]!,
+      to: indices[indices.length - 1]!
+    };
+  }
+
   private eventUnderCursor(): MnxEvent | undefined {
     return eventAtCursor(this.doc, this.grid, this.cursorState, this.activeProjection);
   }
