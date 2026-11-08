@@ -159,7 +159,9 @@ export interface InspectorSibling {
  * The removal class decides whether a pill has a floor (the roadmap's rule):
  * - `annotation` — × removes it; Backspace clears the value first.
  * - `floor` — ▾: Backspace reverts to the floor value, and that is the end.
- * - `inherited` — a reading from an earlier bar; nothing here to remove.
+ * - `inherited` — a reading from an earlier bar; nothing here to remove, but
+ *   OPENABLE: typing a value declares it at this bar (a time signature changed
+ *   from here on). Unchanged, it writes nothing.
  * - `derived` — a value the document did not say and the renderer worked out
  *   (the string the ladder chose, the fret that string implies). Drawn
  *   dotted like a reading, but OPENABLE: typing a different value is the

@@ -32,7 +32,7 @@ export function checkStorage(document: MnxStructure): StorageCheckResult {
   const warnings: string[] = [];
   type Exportable = Parameters<typeof exportGuitarProGpif>[0];
   const bytes = exportGuitarProGpif(document as unknown as Exportable, { ...STORAGE_EXPORT_OPTIONS, onWarning: message => warnings.push(message) });
-  const differences = compareDocuments(document, importGuitarProCleanRoom(bytes));
+  const differences = compareDocuments(mergeEndingRuns(document), importGuitarProCleanRoom(bytes));
   const costly = differences.filter(d => d.kind !== 'gained');
   return {
     bytes,
@@ -44,4 +44,35 @@ export function checkStorage(document: MnxStructure): StorageCheckResult {
     },
     losses: costly.slice(0, MAX_LOSSES).map(d => ({ path: d.path.join('/'), kind: d.kind as 'lost' | 'changed', was: brief(d.before) }))
   };
+}
+
+/**
+ * Back-to-back bars that each carry the same ending are ONE ending, as long as
+ * them all — the player walks them the same (`linearizePasses`), and Guitar
+ * Pro, which marks endings bar by bar, hands them back merged. Compared as
+ * written, the merge read as a loss: "Bar 16 — duration, changed; Bar 17 —
+ * ending, dropped" (Strolling Down the Highway, 2026-11-08, endings 2,3,4,6 on
+ * bars 16 and 17). Only what is compared is merged; the document is not.
+ */
+export function mergeEndingRuns(document: MnxStructure): MnxStructure {
+  const measures = document.global?.measures;
+  if (!measures?.some(m => m.ending)) return document;
+  const copy = structuredClone(document);
+  const bars = copy.global.measures;
+  const same = (a: readonly number[] = [], b: readonly number[] = []) =>
+    a.length === b.length && a.every((n, i) => n === b[i]);
+  for (let i = 0; i < bars.length; i++) {
+    const ending = bars[i]!.ending as { numbers?: number[]; duration?: number; open?: boolean } | undefined;
+    if (!ending) continue;
+    let next = i + (ending.duration ?? 1);
+    for (;;) {
+      const following = bars[next]?.ending as { numbers?: number[]; duration?: number; open?: boolean } | undefined;
+      if (!following || !same(ending.numbers, following.numbers) || ending.open) break;
+      ending.duration = (ending.duration ?? 1) + (following.duration ?? 1);
+      if (following.open) ending.open = true;
+      delete bars[next]!.ending;
+      next = i + ending.duration;
+    }
+  }
+  return copy;
 }

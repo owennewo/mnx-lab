@@ -170,6 +170,21 @@ describe('the pills at the bar rung', () => {
     expect(keyAt(doc, 2)).toEqual({ fifths: -2, declaredAt: 0 });
     expect(timeAt(doc, 2)).toEqual({ count: 4, unit: 4 });
   });
+
+  // The owner, 2026-11-08: "time 4/4 seems uneditable" — the pill on bar 18
+  // read the bar-1 signature and would not open. Amended, it declares the value
+  // at THIS bar, from here on; the bars before keep theirs.
+  it('an inherited reading, amended, declares its value at this bar', () => {
+    const session = atBar(2);
+    const time = measurePills(session.doc, 2).find(p => p.key === 'time')!;
+    expect(time.pillClass).toBe('inherited');
+    const parsed = parseInspectorLine('measure', time.word, '3/4');
+    expect(parsed).toHaveProperty('intent');
+    expect(session.handleIntent((parsed as { intent: never }).intent)).toBe(true);
+    expect(session.doc.global.measures[2]!.time).toEqual({ count: 3, unit: 4 });
+    expect(timeAt(session.doc, 1)).toEqual({ count: 4, unit: 4 });
+    expect(measurePills(session.doc, 2).find(p => p.key === 'time')!.pillClass).toBe('floor');
+  });
 });
 
 describe('the typeahead is derived from the union', () => {

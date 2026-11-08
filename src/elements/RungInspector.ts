@@ -689,7 +689,10 @@ export class RungInspector extends LitElement {
       this.menuIndex = Math.max(0, crumb.siblings.findIndex(s => s.current));
     } else if (item.kind === 'pill') {
       const pill = this.pills[item.index];
-      if (!pill || pill.pillClass === 'inherited') return;
+      // An inherited pill opens too: amending it declares the value HERE, from this bar on — the
+      // time signature carried from bar 1 changed at bar 18 (the owner, 2026-11-08: "time 4/4
+      // seems uneditable"). Committed unchanged it writes nothing, as every pill.
+      if (!pill) return;
       this.open = { kind: 'pill', index: item.index, cleared: false };
       this.text = pill.value;
     } else {
