@@ -1792,10 +1792,10 @@ function assembleSegment(
         const from = primitives.length;
         // `display: common/cut` → a single symbol glyph centred on the middle
         // line, instead of the count/unit numerals.
-        if (m.timeSig.display === 'common' || m.timeSig.display === 'cut') {
+        if (m.timeSigShown.display === 'common' || m.timeSigShown.display === 'cut') {
           primitives.push({
             kind: 'glyph',
-            glyph: m.timeSig.display === 'cut' ? 'timeSigCutCommon' : 'timeSigCommon',
+            glyph: m.timeSigShown.display === 'cut' ? 'timeSigCutCommon' : 'timeSigCommon',
             x: m.timeSigCentreX,
             y: top + STAFF_MIDDLE_Y,
             anchor: 'middle',
@@ -1808,23 +1808,23 @@ function assembleSegment(
         const denY = top + 3; // visual centre of lower half
         // Multi-digit figures (12/8) lay their digits side by side; a single
         // digit sits exactly where it always did.
-        for (const [k, digit] of [...String(m.timeSig.count)].entries()) {
+        for (const [k, digit] of [...String(m.timeSigShown.count)].entries()) {
           primitives.push({
             kind: 'glyph', glyph: 'timeSig' + digit,
             x: m.timeSigCentreX,
-            ...(timeSigDigitDx(k, String(m.timeSig.count).length) !== undefined
-              ? { dx: timeSigDigitDx(k, String(m.timeSig.count).length) }
+            ...(timeSigDigitDx(k, String(m.timeSigShown.count).length) !== undefined
+              ? { dx: timeSigDigitDx(k, String(m.timeSigShown.count).length) }
               : {}),
             y: numY, anchor: 'middle',
             className: 'time-sig-num'
           });
         }
-        for (const [k, digit] of [...String(m.timeSig.unit)].entries()) {
+        for (const [k, digit] of [...String(m.timeSigShown.unit)].entries()) {
           primitives.push({
             kind: 'glyph', glyph: 'timeSig' + digit,
             x: m.timeSigCentreX,
-            ...(timeSigDigitDx(k, String(m.timeSig.unit).length) !== undefined
-              ? { dx: timeSigDigitDx(k, String(m.timeSig.unit).length) }
+            ...(timeSigDigitDx(k, String(m.timeSigShown.unit).length) !== undefined
+              ? { dx: timeSigDigitDx(k, String(m.timeSigShown.unit).length) }
               : {}),
             y: denY, anchor: 'middle',
             className: 'time-sig-den'
@@ -2093,7 +2093,7 @@ function assembleSegment(
       // bar only — same emission as the standalone tab view.
       if (i === 0) emitTabSystemHeader(td.ctx, tabTop, primitives, measureHeadingX(m));
       if (m.firstInSystem && display.clefs !== 'hide') emitTabClef(m.clefX, tabTop, primitives);
-      if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
+      if (m.showTimeSig) emitTabTimeSig(m.timeSigShown, m.timeSigCentreX, tabTop, primitives);
       {
         const tabMark = (td.part.measures?.[writtenIndex(plan, i)] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
         if (tabMark) {

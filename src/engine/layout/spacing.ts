@@ -21,6 +21,11 @@ import {
   type MnxPartMeasure
 } from '../../model/mnx.ts';
 import { durationValue } from '../../model/durations.ts';
+import { completesPickup, pickupSignature } from '../../model/pickup.ts';
+
+type ShownSignature = { count: number; unit: number; display?: 'common' | 'cut' };
+const sameSignature = (a: ShownSignature, b: ShownSignature) =>
+  a.count === b.count && a.unit === b.unit && a.display === b.display;
 import { containerContent } from '../../model/noteWalk.ts';
 import { writtenOctaves } from '../../model/transposition.ts';
 import { dynamicWidthSp } from './dynamics.ts';
@@ -1191,6 +1196,10 @@ export interface MeasurePlan {
   clef: ActiveClef;
   showClef: boolean;
   timeSig: { count: number; unit: number; display?: 'common' | 'cut' };
+  /** The signature DRAWN where `showTimeSig` — `timeSig` except at a pickup,
+   *  which shows the next bar's (src/model/pickup.ts). Beaming and lengths
+   *  read `timeSig`, the bar's true length. */
+  timeSigShown: { count: number; unit: number; display?: 'common' | 'cut' };
   showTimeSig: boolean;
   keyFifths: number;
   cancelledKeyFifths: number;
@@ -1461,6 +1470,10 @@ interface MeasureMetrics {
   clefChanged: boolean;
   timeSig: { count: number; unit: number; display?: 'common' | 'cut' };
   timeSigShow: boolean;
+  /** What is drawn when `timeSigShow`: `timeSig`, or at a pickup the next bar's. */
+  timeSigShown: { count: number; unit: number; display?: 'common' | 'cut' };
+  /** The last bar completing a pickup: no signature is drawn on it, ever. */
+  timeSigCompletes: boolean;
   keyFifths: number;
   cancelledKeyFifths: number;
   keyChanged: boolean;
@@ -1927,6 +1940,7 @@ export function planHorizontal(
   });
   let timeSig: { count: number; unit: number; display?: 'common' | 'cut' } = { count: 4, unit: 4 };
   let timeDeclared = false;
+  const pickup = pickupSignature(mnx.global.measures);
   let keyFifths = 0;
   const writtenMetrics: MeasureMetrics[] = Array.from({ length: numMeasures }, (_, i) => {
     const globalMeasure = mnx.global.measures[i] ?? {};
@@ -2001,6 +2015,7 @@ export function planHorizontal(
     // first declaration and on changes) — an undeclared meter is not 4/4
     // visually, it is unmarked (e.g. spec/system-layouts encodes none).
     let timeSigChanged = false;
+    const before = timeSig;
     if (globalMeasure.time) {
       const { count, unit, display } = globalMeasure.time;
       if (!timeDeclared || count !== timeSig.count || unit !== timeSig.unit || display !== timeSig.display) {
@@ -2009,7 +2024,12 @@ export function planHorizontal(
       }
       timeDeclared = true;
     }
-    const timeSigShow = (i === 0 && !!globalMeasure.time) || timeSigChanged;
+    // A pickup draws the NEXT bar's signature, so that bar draws none of its
+    // own; a last bar that completes the pickup draws none either.
+    const timeSigShown = i === 0 && pickup ? pickup : timeSig;
+    const timeSigCompletes = timeSigChanged && completesPickup(mnx.global.measures, i, before);
+    const timeSigShow = ((i === 0 && !!globalMeasure.time) || timeSigChanged) && !timeSigCompletes &&
+      !(i === 1 && pickup && sameSignature(timeSig, pickup));
 
     let keyChanged = false;
     let cancelledKeyFifths = 0;
@@ -2260,7 +2280,7 @@ export function planHorizontal(
       Math.max(0, ...allVoices.map(v => v.find(e => !e.graceCount)?.spring ?? 0));
 
     return {
-      clef: clefTimelines[0][0].clef, clefChanged, timeSig, timeSigShow,
+      clef: clefTimelines[0][0].clef, clefChanged, timeSig, timeSigShow, timeSigShown, timeSigCompletes,
       keyFifths, cancelledKeyFifths, keyChanged,
       staves, rigid, spring, columnAir, leadingSpring, clefTimelines,
       hasRepeatStart: !!globalMeasure.repeatStart,
@@ -2281,8 +2301,8 @@ export function planHorizontal(
     const previous = index ? writtenMetrics[options.entries![index - 1].measureIndex] : undefined;
     m.clefChanged = !!previous && m.clefTimelines.some((timeline, staff) =>
       JSON.stringify(timeline[0].clef) !== JSON.stringify(previous.clefTimelines[staff].at(-1)?.clef));
-    m.timeSigShow = previous ? JSON.stringify(m.timeSig) !== JSON.stringify(previous.timeSig)
-      : mnx.global.measures.slice(0, entry.measureIndex + 1).some(gm => !!gm.time);
+    m.timeSigShow = !m.timeSigCompletes && (previous ? !sameSignature(m.timeSigShown, previous.timeSigShown)
+      : mnx.global.measures.slice(0, entry.measureIndex + 1).some(gm => !!gm.time));
     m.keyChanged = !!previous && m.keyFifths !== previous.keyFifths;
     m.cancelledKeyFifths = m.keyChanged ? previous!.keyFifths : 0;
     m.hasRepeatStart = false;
@@ -2644,6 +2664,7 @@ export function planHorizontal(
         clef: m.clef,
         showClef,
         timeSig: m.timeSig,
+        timeSigShown: m.timeSigShown,
         showTimeSig,
         keyFifths: m.keyFifths,
         cancelledKeyFifths: m.cancelledKeyFifths,
@@ -2686,6 +2707,7 @@ export function planHorizontal(
       clef: metrics[i].clefTimelines[0][0].clef,
       showClef: false,
       timeSig: metrics[i].timeSig,
+      timeSigShown: metrics[i].timeSigShown,
       showTimeSig: false,
       keyFifths: metrics[i].keyFifths,
       cancelledKeyFifths: 0,

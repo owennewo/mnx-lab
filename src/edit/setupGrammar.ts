@@ -306,6 +306,7 @@ const ATTRIBUTE_WORDS: Record<string, MeasureAttributeKind> = {
   fine: 'fine',
   fermata: 'fermata',
   number: 'number',
+  pickup: 'number',
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
@@ -416,6 +417,11 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     const text = (located ? located[1] : words.slice(1).join(' ')).trim();
     return text === '' ? null : { set: { kind: 'harmony', text, ...(at ? { at } : {}) } };
   }
+
+  // `pickup` — the first bar, shorter than the next, is an anacrusis: numbered
+  // 0, engraved with the next bar's signature (src/model/pickup.ts).
+  // `no pickup` removes the number again.
+  if (head === 'pickup' && words.length === 1) return { set: { kind: 'number', value: 0 } };
 
   // `number 12` — the bar's displayed number.
   if (head === 'number') {

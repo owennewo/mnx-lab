@@ -19,6 +19,7 @@ import { splitPart, hasTabContent } from './splitter.js';
 import { flattenSequences, FlatXmlNode } from './flattener.js';
 import { divisionsFor, getXmlNoteType, stripIdSuffix } from '../common/utils.js';
 import { dynamicToXml, type XmlDynamicOut } from '../common/dynamics.js';
+import { pickupSignature } from '../common/pickup.js';
 
 // Chromatic semitone offsets for each diatonic step (C=0)
 const STEP_SEMITONES_EXP: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -447,12 +448,17 @@ export function exportMusicXML(
       : new Map<number, DynamicDirection[]>();
 
     const numMeasures = part.measures.length;
+    const pickup = pickupSignature(mnxJson.global.measures ?? []);
 
     for (let m = 0; m < numMeasures; m++) {
       const measure = part.measures[m];
-      const globalM = mnxJson.global.measures[m] || {};
+      // A pickup is MusicXML's implicit measure 0, written with the piece's
+      // signature (the next bar's): its notes say how long it is.
+      const shown = m === 0 && pickup ? { ...mnxJson.global.measures[0], time: pickup } : undefined;
+      const globalM = shown ?? mnxJson.global.measures[m] ?? {};
       const measureEl = doc.createElement('measure');
-      measureEl.setAttribute('number', `${m + 1}`);
+      measureEl.setAttribute('number', `${pickup ? m : m + 1}`);
+      if (shown) measureEl.setAttribute('implicit', 'yes');
 
       // Check for attribute updates
       const attributesEl = doc.createElement('attributes');

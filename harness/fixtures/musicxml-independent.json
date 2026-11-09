@@ -60769,6 +60769,393 @@
       }
     },
     {
+      "id": "scenario/lab/11-rhythm/06-pickup-bar",
+      "exported": {
+        "sha256": "276a5c31127c01ceef8a2c66177c74921b04d447bd8d7b8b2dd2461d57dc8d98",
+        "semantic": {
+          "status": "ok",
+          "table": {
+            "parts": 2,
+            "measures": [
+              4,
+              4
+            ],
+            "rows": [
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "0/1",
+                "duration": "1/2",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/2",
+                "duration": "1/2",
+                "pitch": "65/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "0/1",
+                "duration": "1/1",
+                "pitch": "67/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "1/1",
+                "duration": "1/1",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "2/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "3/1",
+                "duration": "1/1",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "0/1",
+                "duration": "1/2",
+                "pitch": "62/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "1/2",
+                "duration": "1/2",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "1/1",
+                "duration": "1/2",
+                "pitch": "65/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "3/2",
+                "duration": "1/2",
+                "pitch": "62/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "2/1",
+                "duration": "2/1",
+                "pitch": "59/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "0/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "1/1",
+                "duration": "1/1",
+                "pitch": "55/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "2/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "0/1",
+                "duration": "1/2",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/2",
+                "duration": "1/2",
+                "pitch": "65/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "0/1",
+                "duration": "1/1",
+                "pitch": "67/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "1/1",
+                "duration": "1/1",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "2/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "3/1",
+                "duration": "1/1",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "0/1",
+                "duration": "1/2",
+                "pitch": "62/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "1/2",
+                "duration": "1/2",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "1/1",
+                "duration": "1/2",
+                "pitch": "65/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "3/2",
+                "duration": "1/2",
+                "pitch": "62/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 2,
+                "onset": "2/1",
+                "duration": "2/1",
+                "pitch": "59/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "0/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "1/1",
+                "duration": "1/1",
+                "pitch": "55/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "2/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              }
+            ]
+          },
+          "warnings": []
+        },
+        "xsd": {
+          "valid": true,
+          "errors": []
+        }
+      }
+    },
+    {
       "id": "scenario/lab/20-tab-part/01-standard-tuning-both",
       "exported": {
         "sha256": "686f98f94d5ca7bc0c77bbe836d5e6a86d2388909e64e34051c5320bde59a377",
@@ -86181,7 +86568,7 @@
         }
       },
       "exported": {
-        "sha256": "a4665095477441a067f865ed8e0e589d1cf83435c3359457416467dbb225ba60",
+        "sha256": "9e8f6de38181eec8b41673a533586ded9f3f89a2dc636e25da45cf2436ae95e2",
         "semantic": {
           "status": "ok",
           "table": {
@@ -139676,7 +140063,7 @@
         }
       },
       "exported": {
-        "sha256": "2a0ba9ab9a2a1b37e31dbb27adbd5db36f57394d98e52aad8191047353b7a282",
+        "sha256": "1a1344ada4416c0f817d658f37fcbc565ca9207f17f2bdf35c33a76ac424f461",
         "semantic": {
           "status": "ok",
           "table": {
@@ -141131,7 +141518,7 @@
         }
       },
       "exported": {
-        "sha256": "4db44748a4dd512dd6d351ff9c601788256d2fbce3e5ad768bb7e622d2585461",
+        "sha256": "8d70c3608b9f7c7461d6ca4255eddfed9c3232d775c5c8e9c05d00317b809c17",
         "semantic": {
           "status": "ok",
           "table": {
@@ -141892,7 +142279,7 @@
         }
       },
       "exported": {
-        "sha256": "2cbfcab98bcb9bea692c73b39ccc998be504c57d8ae7cb2b4b512a143d717162",
+        "sha256": "dce9995bebb7e91e4190169dcfb0a3bbabd75d2182b1177ab14a80e597f47b92",
         "semantic": {
           "status": "ok",
           "table": {

@@ -188,9 +188,9 @@ describe('the pills at the bar rung', () => {
 });
 
 describe('the typeahead is derived from the union', () => {
-  it('names every attribute kind, plus the two signatures', () => {
+  it('names every attribute kind, plus the two signatures and `pickup`', () => {
     const kinds = Object.keys(MEASURE_ATTRIBUTE_FIELDS) as MeasureAttributeKind[];
-    expect(BAR_WORDS.length).toBe(kinds.length + 2);
+    expect(BAR_WORDS.length).toBe(kinds.length + 3);
     for (const attribute of ONE_OF_EACH) {
       const text = attributeText(attribute);
       expect(BAR_WORDS.some(w => text.startsWith(w.word)), text).toBe(true);

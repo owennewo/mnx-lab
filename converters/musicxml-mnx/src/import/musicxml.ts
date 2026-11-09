@@ -1,5 +1,6 @@
 import { parseXML, type Element } from '../common/xml.js';
 import { MnxStructure, MnxGlobalMeasure, MnxPart } from '../common/types.js';
+import { reduceFraction } from '../common/utils.js';
 import { walkSequenceEvents } from '../common/utils.js';
 import { Aligner } from './aligner.js';
 import { readWork, rootExtension } from '../common/scoreMetadata.js';
@@ -105,6 +106,8 @@ export function importMusicXML(
     parts.push(mnxPart);
   }
 
+  markPickup(partEls, globalMeasures);
+
   // 4. Merge Treble & TAB parts if requested
   let finalParts = parts;
   if (mergeNotationAndTab && parts.length >= 2) {
@@ -175,4 +178,48 @@ export function importMusicXML(
     parts: finalParts,
     _x: rootExtension(work, options.encodingDate)
   };
+}
+
+/**
+ * MusicXML's pickup: the first measure marked `implicit="yes"` (conventionally
+ * `number="0"`), carrying the piece's signature and only the pickup's notes.
+ * The lab stores a bar's TRUE length as its signature, so the measure becomes
+ * that length in the signature's own unit, marked `number: 0`, and the bar
+ * after it states the piece's signature (roadmap/proposed/core-anacrusis.md).
+ * The length is the furthest any part's notes reach, in whole notes.
+ */
+function markPickup(partEls: ArrayLike<Element>, globalMeasures: MnxGlobalMeasure[]): void {
+  const first = globalMeasures[0];
+  if (!first?.time || globalMeasures.length < 2) return;
+  let longest: [number, number] = [0, 1];
+  for (let p = 0; p < partEls.length; p++) {
+    const measureEl = findDirectChildren(partEls[p]!, 'measure')[0];
+    if (!measureEl || measureEl.getAttribute('implicit') !== 'yes') continue;
+    let divisions = 1, position = 0, furthest = 0;
+    for (const node of measureEl.childNodes) {
+      if (node.nodeType !== 1) continue;
+      const child = node as Element;
+      if (child.tagName === 'attributes') {
+        const divs = Number(getChildText(child, 'divisions'));
+        if (divs > 0) divisions = divs;
+        continue;
+      }
+      const duration = Number(getChildText(child, 'duration') ?? 0) || 0;
+      if (child.tagName === 'backup') position -= duration;
+      else if (child.tagName === 'forward') position += duration;
+      else if (child.tagName === 'note' && !findDirectChild(child, 'chord') && !findDirectChild(child, 'grace')) position += duration;
+      furthest = Math.max(furthest, position);
+    }
+    const length = reduceFraction(furthest, divisions * 4);
+    if (length[0] * longest[1] > longest[0] * length[1]) longest = length;
+  }
+  const time = first.time;
+  // Empty, or not short: an ordinary first bar that happens to be implicit.
+  if (longest[0] === 0 || longest[0] * time.unit >= time.count * longest[1]) return;
+  let unit = time.unit;
+  while ((longest[0] * unit) % longest[1] !== 0 && unit < 128) unit *= 2;
+  if ((longest[0] * unit) % longest[1] !== 0) return;
+  globalMeasures[1]!.time ??= { ...time };
+  first.time = { count: (longest[0] * unit) / longest[1], unit };
+  first.number = 0;
 }

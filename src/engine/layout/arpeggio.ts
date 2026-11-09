@@ -166,6 +166,9 @@ export function emitMeasureNumber(
   if (mode && opening) return;
   const number = mode ? displayedNumber ?? gm.number : gm.number;
   if (number === undefined) return;
+  // A pickup's 0 marks it (src/model/pickup.ts); books, like alphaTab, print
+  // no number on it — the count starts at the first full bar.
+  if (opening && number === 0) return;
   const overPrefix = m.firstInSystem && (m.showClef || m.showTimeSig);
   const text: Primitive = {
     kind: 'text',

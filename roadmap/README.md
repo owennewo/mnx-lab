@@ -45,7 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-anacrusis.md](proposed/core-anacrusis.md)** — a pickup bar marked by `number: 0`: the first bar keeps its true length while engraving and the Guitar Pro (`<Anacrusis/>`) and MusicXML (`implicit`) edges steal the next bar's signature; numbering from 0, the complementary last bar unmarked. Raised on *Strolling Down the Highway*.
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
@@ -530,6 +529,11 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-anacrusis.md](complete/core-anacrusis.md)** — **complete 2026-11-09**: a pickup
+  is the first bar, numbered 0, shorter than the next. Stored at its true length; engraving
+  draws the next bar's signature once and none on the bar completing it, and numbers from the
+  first full bar. Guitar Pro `<Anacrusis />` and MusicXML `implicit="yes"` read and write it;
+  `pickup` in the bar inspector marks one. Open: how Guitar Pro itself treats the last bar.
 - **[core-ink-provenance.md](complete/core-ink-provenance.md)** — **complete 2026-10-28**:
   every primitive carries what it was drawn for — `origin` (row, display staff, written
   measure, visit) and a `role` — and the engine and overlays read it instead of reconstructing

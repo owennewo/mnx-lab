@@ -3,15 +3,15 @@
   "verdicts": {
     "clean": 7,
     "gains": 30,
-    "differs": 101,
+    "differs": 102,
     "error": 0
   },
   "lostOrChanged": [
     {
       "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
       "kind": "lost",
-      "documents": 26,
-      "count": 26
+      "documents": 27,
+      "count": 27
     },
     {
       "path": "global/measures/[]/barline",
@@ -510,26 +510,26 @@
     {
       "path": "parts/[]/transposition",
       "kind": "gained",
-      "documents": 128,
-      "count": 154
+      "documents": 129,
+      "count": 155
     },
     {
       "path": "parts/[]/measures/[]/sequences/[]/voice",
       "kind": "gained",
-      "documents": 127,
-      "count": 368
+      "documents": 128,
+      "count": 372
     },
     {
       "path": "global/measures/[]/key",
       "kind": "gained",
-      "documents": 123,
-      "count": 123
+      "documents": 124,
+      "count": 124
     },
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
       "kind": "gained",
-      "documents": 103,
-      "count": 868
+      "documents": 104,
+      "count": 882
     },
     {
       "path": "parts/[]/_x",
@@ -3643,6 +3643,36 @@
             "path": "global/measures/[]/key",
             "kind": "gained",
             "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/rhythm/pickup-bar": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 14
           },
           {
             "path": "parts/[]/measures/[]/sequences/[]/voice",

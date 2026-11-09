@@ -118,8 +118,9 @@ interface ImportState {
   report: (label: string, measureIndex: number) => void;
 }
 
-export function gpifToMnx(doc: GpifDocument, options: GpifImportOptions = {}): MnxStructure {
+export function gpifToMnx(source: GpifDocument, options: GpifImportOptions = {}): MnxStructure {
   const warn = options.onWarning ?? (() => {});
+  const doc = withPickupLength(source);
 
   // Everything met but not represented, reported once per kind at the end — a
   // file with 40 let-rings wants one line, not 40.
@@ -132,6 +133,7 @@ export function gpifToMnx(doc: GpifDocument, options: GpifImportOptions = {}): M
 
   const fifthsByMeasure = resolveFifths(doc);
   const globalMeasures = buildGlobalMeasures(doc, fifthsByMeasure, report);
+  if (doc !== source) globalMeasures[0]!.number = 0;
   applyHarmonies(doc, globalMeasures);
 
   const state: ImportState = { nextNoteId: 0, nextEventId: 0, report };
@@ -377,6 +379,38 @@ function collapseAlternateEndings(doc: GpifDocument, measures: MnxGlobalMeasure[
 }
 
 /** Preserve triplet/quintuplet positions exactly, without a dyadic tick grid. */
+/**
+ * A file marked `Anacrusis` keeps the piece's signature on its first bar and
+ * lets the notes say how long it is (alphaTab's `calculateDuration` reads it
+ * the same way: the longest voice across every track). The lab stores a bar's
+ * TRUE length as its signature, so the pickup becomes that length in the
+ * signature's own unit — one beat of 4/4 is 1/4 — and `number: 0` marks it
+ * (roadmap/proposed/core-anacrusis.md). Returns `doc` itself when nothing changes.
+ */
+function withPickupLength(doc: GpifDocument): GpifDocument {
+  const first = doc.masterBars[0];
+  if (!doc.anacrusis || !first || doc.masterBars.length < 2) return doc;
+  let longest: [number, number] = [0, 1];
+  for (const barId of first.barIds) {
+    for (const voiceId of doc.bars.get(barId)?.voiceIds ?? []) {
+      let onset: [number, number] = [0, 1];
+      for (const beatId of doc.voices.get(voiceId)?.beatIds ?? []) {
+        const beat = doc.beats.get(beatId);
+        const rhythm = beat ? doc.rhythms.get(beat.rhythmRef) : undefined;
+        if (beat && rhythm?.base && beat.graceKind === null) onset = advance(onset, rhythm);
+      }
+      if (onset[0] * longest[1] > longest[0] * onset[1]) longest = onset;
+    }
+  }
+  // Empty, or not short: an ordinary first bar that happens to carry the flag.
+  if (longest[0] === 0 || longest[0] * first.timeDenominator >= first.timeNumerator * longest[1]) return doc;
+  let unit = first.timeDenominator;
+  while ((longest[0] * unit) % longest[1] !== 0 && unit < 128) unit *= 2;
+  if ((longest[0] * unit) % longest[1] !== 0) return doc;
+  const pickup = { ...first, timeNumerator: (longest[0] * unit) / longest[1], timeDenominator: unit };
+  return { ...doc, masterBars: [pickup, ...doc.masterBars.slice(1)] };
+}
+
 function reduceFraction(numerator: number, denominator: number): [number, number] {
   let a = Math.abs(numerator), b = denominator;
   while (b) [a, b] = [b, a % b];

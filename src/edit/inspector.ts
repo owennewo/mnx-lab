@@ -13,6 +13,7 @@ import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './ta
 import type { EditorIntent } from './intents.ts';
 import { addOnsets, durationSpan, itemSpan, playedSpan } from './cursor.ts';
 import { containerCoincidence, sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
+import { pickupSignature } from '../model/pickup.ts';
 import {
   beamStartingAt,
   eventAtAddress,
@@ -267,7 +268,10 @@ export const BAR_WORDS: InspectorWord[] = [
     word: WORD_OF[kind],
     hint: HINT_OF[kind],
     ...(kind === 'barline' ? { values: [...BARLINE_TYPES] } : {})
-  }))
+  })),
+  // `number 0` by its musical name: the first bar, shorter than the next, as
+  // an anacrusis (src/model/pickup.ts).
+  { word: 'pickup', hint: 'a short first bar, numbered 0' }
 ];
 
 const KEY_NAMES = ['Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
@@ -389,10 +393,12 @@ export function measurePills(doc: MnxStructure, measureIndex: number): Inspector
   for (const attribute of declared) {
     if (attribute.kind === 'barline') continue;
     const index = attribute.kind === 'tempo' || attribute.kind === 'harmony' ? (counters[attribute.kind] = (counters[attribute.kind] ?? 0) + 1) - 1 : undefined;
+    // A first bar numbered 0 and shorter than the next is a pickup, and says so.
+    const pickup = attribute.kind === 'number' && measureIndex === 0 && pickupSignature(doc.global.measures) !== null;
     pills.push({
       key: index === undefined ? attribute.kind : `${attribute.kind}#${index}`,
-      word: WORD_OF[attribute.kind],
-      value: valueOf(attribute),
+      word: pickup ? 'pickup' : WORD_OF[attribute.kind],
+      value: pickup ? '' : valueOf(attribute),
       pillClass: 'annotation',
       remove: {
         type: 'removeMeasureAttribute',

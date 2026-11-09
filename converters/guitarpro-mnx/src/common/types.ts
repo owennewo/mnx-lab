@@ -399,6 +399,8 @@ export interface MnxPart {
 
 export interface MnxGlobalMeasure {
   id?: string;
+  /** The displayed bar number; `0` on a short first bar marks a pickup (common/pickup.ts). */
+  number?: number;
   key?: { fifths: number };
   time?: { count: number; unit: number; display?: 'common' | 'cut' };
   barline?: { type?: string };

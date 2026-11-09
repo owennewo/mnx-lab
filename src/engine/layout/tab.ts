@@ -361,7 +361,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
 
     // Time signature (digits centred in upper and lower halves of the staff)
     if (m.showTimeSig) {
-      emitTabTimeSig(m.timeSig, m.timeSigCentreX, staffTop, primitives);
+      emitTabTimeSig(m.timeSigShown, m.timeSigCentreX, staffTop, primitives);
     }
 
     // A measure repeat: the sign on the tab staff, labels included — this

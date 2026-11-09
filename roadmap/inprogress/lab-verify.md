@@ -1756,3 +1756,20 @@ engraving goldens did not move.
 the return 1 (from beat 2), 2, 1, 3, stopping at the Fine three beats into that last
 bar 3 — the return takes ending 1 and the repeat before ending 2. `notes.md` states the
 order by hand.
+
+## Pickup bars — 2026-11-09
+
+Owner: [core-anacrusis](../complete/core-anacrusis.md). A first bar numbered 0 and shorter
+than the next is a pickup: it draws the next bar's signature, the bar after it draws
+none, a last bar completing it draws none, and it prints no number. No existing golden
+moved (no scenario declared `number: 0`).
+
+One new scenario, unverified: `lab/11-rhythm/06-pickup-bar` (`expected.svg`,
+`expected.tab.svg`, `expected.both.svg`, `expected.primitives.json`,
+`expected.performance.json`, `expected.midi.json`).
+
+**What a reviewer should look for.** One 4/4, at the pickup, in all three views — not
+1/4, and nothing at the next bar. The last bar has no 3/4. No number over the pickup.
+The pickup's two eighths beam together and sit as one beat's worth of bar, not a
+stretched 4/4 bar. The performance plays the pickup as one beat: bar 1's downbeat at a
+quarter in.

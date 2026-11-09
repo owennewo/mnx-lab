@@ -33,6 +33,9 @@ export interface GpifDocument {
    *  the format cannot tell "unmarked" from this value; `toMnx` treats it as
    *  unmarked until the music departs from it. Absent ⇒ `MF`. */
   unmarkedDynamic?: string;
+  /** `MasterTrack/Anacrusis` — the first bar is a pickup. Guitar Pro keeps the
+   *  piece's signature on it and lets its notes say how long it is. */
+  anacrusis?: boolean;
 }
 
 /**
@@ -229,7 +232,8 @@ export function parseGpif(xml: string): GpifDocument {
     beats: pool(root, 'Beats', 'Beat', parseBeat),
     notes: pool(root, 'Notes', 'Note', parseNote),
     rhythms: pool(root, 'Rhythms', 'Rhythm', parseRhythm),
-    tempoAutomations: parseTempoAutomations(root)
+    tempoAutomations: parseTempoAutomations(root),
+    ...(child(child(root, 'MasterTrack'), 'Anacrusis') ? { anacrusis: true } : {})
   };
 }
 

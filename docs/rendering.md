@@ -210,6 +210,22 @@ an unrolled id) instead of measuring the SVG. Provenance never reaches a golden 
 `harness/conformance/ink-origin.test.ts` fails on unstamped ink. Why:
 [roadmap/complete/core-ink-provenance.md](../roadmap/complete/core-ink-provenance.md).
 
+## The pickup bar
+
+A **pickup** (anacrusis) is the first bar, numbered 0 (`number: 0`, published MNX), whose
+signature is shorter than the next bar's — `pickupSignature` in `src/model/pickup.ts`.
+It is stored at its **true length** (one beat of 4/4 is `1/4`), so beaming, spacing,
+playback, sync and entry all read a short bar and none of them knows about pickups.
+Only what *shows* a signature steals the next bar's: `planHorizontal` gives each bar a
+`timeSigShown` beside `timeSig`, the emitters draw `timeSigShown`, and the pickup draws
+the next bar's signature while that bar draws none. A last bar that completes the
+pickup (3/4 after 4/4, behind a 1/4 pickup — `completesPickup`) draws no signature
+either, and the pickup prints no bar number. The unrolled view compares shown
+signatures, so the same holds there. Guitar Pro (`<Anacrusis />`) and MusicXML
+(`implicit="yes"`) carry the same steal on the way out and back
+(`converters/*/src/common/pickup.ts`, standalone copies of the rule). Pinned by
+`lab/11-rhythm/06-pickup-bar`; why: [roadmap/complete/core-anacrusis.md](../roadmap/complete/core-anacrusis.md).
+
 ## The swing marking
 
 `emitSwingMark` in `src/engine/layout/scoreText.ts` draws `_x.mnxLab.swing` in

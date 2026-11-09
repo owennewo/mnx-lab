@@ -1,0 +1,36 @@
+{
+  "title": "Pickup bar — an anacrusis and the bar that completes it",
+  "description": "A one-beat pickup into 4/4, and a 3/4 last bar that completes it. The pickup is stored at its true length (`time` 1/4) and marked by `number: 0` on the first global measure — published MNX, no extension — so playback, swing, sync and entry all see a one-beat bar. Engraving shows what a printed copy does: 4/4 drawn once, at the pickup (the next bar's signature, \"stolen\"), nothing at bar 1, and no 3/4 on the short final bar; the bars number from the first full bar. Guitar Pro and MusicXML carry the same steal on the way out (roadmap/proposed/core-anacrusis.md). Pins the three views and the one-beat performance.",
+  "bars": 4,
+  "tags": [
+    "rhythm",
+    "pickup",
+    "anacrusis",
+    "tab",
+    "performance"
+  ],
+  "coversDefs": [
+    "event",
+    "global",
+    "measure-global",
+    "note",
+    "note-value",
+    "pitch",
+    "sequence",
+    "tempo",
+    "time",
+    "measure-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "draft",
+  "performance": true
+}

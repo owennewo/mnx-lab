@@ -941,7 +941,7 @@
       "id": "02e-Rests-NoType",
       "testClass": "feature",
       "import": {
-        "sha256": "a52649c01fd8b4f3557589da325c71247850b0994d003e01c85cb29df9902efe",
+        "sha256": "7468a0c524009ee9c506578feea4b4603c53aad00c60c46df2682a70e5f80927",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -962,6 +962,7 @@
           "id",
           "key",
           "measure-global",
+          "measure-number",
           "measures-global",
           "mnx",
           "note",
@@ -999,11 +1000,11 @@
         "measures": 2
       },
       "export": {
-        "sha256": "a4665095477441a067f865ed8e0e589d1cf83435c3359457416467dbb225ba60",
+        "sha256": "9e8f6de38181eec8b41673a533586ded9f3f89a2dc636e25da45cf2436ae95e2",
         "warnings": []
       },
       "reimport": {
-        "sha256": "a52649c01fd8b4f3557589da325c71247850b0994d003e01c85cb29df9902efe",
+        "sha256": "7468a0c524009ee9c506578feea4b4603c53aad00c60c46df2682a70e5f80927",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -10835,7 +10836,7 @@
       "id": "45h-Repeats-Partial",
       "testClass": "feature",
       "import": {
-        "sha256": "6c42b7482f408f3987796432e3244fe33e8b325097aeb0032f5adfdda4d23a0f",
+        "sha256": "ea74ba911ca2e3ce65f029317d2fc11c27e84aa73d888752a5ec1ff86e6afe84",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -10854,6 +10855,7 @@
           "id",
           "key",
           "measure-global",
+          "measure-number",
           "measures-global",
           "mnx",
           "note",
@@ -10890,11 +10892,11 @@
         "measures": 5
       },
       "export": {
-        "sha256": "2a0ba9ab9a2a1b37e31dbb27adbd5db36f57394d98e52aad8191047353b7a282",
+        "sha256": "1a1344ada4416c0f817d658f37fcbc565ca9207f17f2bdf35c33a76ac424f461",
         "warnings": []
       },
       "reimport": {
-        "sha256": "6c42b7482f408f3987796432e3244fe33e8b325097aeb0032f5adfdda4d23a0f",
+        "sha256": "ea74ba911ca2e3ce65f029317d2fc11c27e84aa73d888752a5ec1ff86e6afe84",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -11357,7 +11359,7 @@
       "id": "46d-PickupMeasure-ImplicitMeasures",
       "testClass": "feature",
       "import": {
-        "sha256": "2775f0f7ba3be8478a6a5f423760618271df97453cc795c93f6332be240b8946",
+        "sha256": "664f6872f731a43948b6ead8e12beb53d5e18e8e4e1662fe3c1c43e8b57f0e51",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -11378,6 +11380,7 @@
           "id",
           "key",
           "measure-global",
+          "measure-number",
           "measures-global",
           "mnx",
           "note",
@@ -11413,11 +11416,11 @@
         "measures": 4
       },
       "export": {
-        "sha256": "4db44748a4dd512dd6d351ff9c601788256d2fbce3e5ad768bb7e622d2585461",
+        "sha256": "8d70c3608b9f7c7461d6ca4255eddfed9c3232d775c5c8e9c05d00317b809c17",
         "warnings": []
       },
       "reimport": {
-        "sha256": "2775f0f7ba3be8478a6a5f423760618271df97453cc795c93f6332be240b8946",
+        "sha256": "664f6872f731a43948b6ead8e12beb53d5e18e8e4e1662fe3c1c43e8b57f0e51",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -11566,7 +11569,7 @@
       "id": "46g-PickupMeasure-Chordnames-FiguredBass",
       "testClass": "feature",
       "import": {
-        "sha256": "c1b1d9e529b237d9e7b9412136da9fd1e9570c504aa7678c3d025da8265a28a7",
+        "sha256": "68d1965ffce7960fad5b767eaac9f040ff98b6a841f81be4e6b35bd8036e14b5",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -11584,6 +11587,7 @@
           "id",
           "key",
           "measure-global",
+          "measure-number",
           "measures-global",
           "mnx",
           "note",
@@ -11614,11 +11618,11 @@
         "measures": 2
       },
       "export": {
-        "sha256": "2cbfcab98bcb9bea692c73b39ccc998be504c57d8ae7cb2b4b512a143d717162",
+        "sha256": "dce9995bebb7e91e4190169dcfb0a3bbabd75d2182b1177ab14a80e597f47b92",
         "warnings": []
       },
       "reimport": {
-        "sha256": "c1b1d9e529b237d9e7b9412136da9fd1e9570c504aa7678c3d025da8265a28a7",
+        "sha256": "68d1965ffce7960fad5b767eaac9f040ff98b6a841f81be4e6b35bd8036e14b5",
         "warnings": [],
         "validity": {
           "standard": true,

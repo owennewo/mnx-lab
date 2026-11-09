@@ -387,6 +387,8 @@ export interface MnxRhythmicPosition {
 export interface MnxGlobalMeasure {
   /** Minted only when something references this measure (an ottava end). */
   id?: string;
+  /** The displayed bar number; `0` on a short first bar marks a pickup (common/pickup.ts). */
+  number?: number;
   /** The sign a D.S. returns to. */
   segno?: { location: MnxRhythmicPosition };
   /** Where an al-Fine jump stops. */

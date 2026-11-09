@@ -60,15 +60,15 @@
       "xsdValid": 4
     },
     "scenario": {
-      "cases": 130,
+      "cases": 131,
       "import": {},
       "export": {
         "match": 83,
-        "adapter-limited": 33,
+        "adapter-limited": 34,
         "different": 13,
         "oracle-limited": 1
       },
-      "xsdValid": 127
+      "xsdValid": 128
     },
     "w3c": {
       "cases": 27,
@@ -655,6 +655,18 @@
     },
     {
       "id": "scenario/lab/11-rhythm/05-swing-feel",
+      "group": "scenario",
+      "export": {
+        "status": "adapter-limited",
+        "reason": "Default notation/TAB display duplication requires part correspondence; not a semantic loss verdict"
+      },
+      "xsd": {
+        "valid": true,
+        "errors": []
+      }
+    },
+    {
+      "id": "scenario/lab/11-rhythm/06-pickup-bar",
       "group": "scenario",
       "export": {
         "status": "adapter-limited",

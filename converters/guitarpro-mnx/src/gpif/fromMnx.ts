@@ -27,6 +27,7 @@ import { mnxTranspositionToGp } from '../common/transposition.js';
 import { describeSwing, tripletFeelFromSwing, type GpTripletFeel } from '../common/swing.js';
 import { writeGpContainer } from './container.js';
 import { documentWork, workToGpScoreInfo } from '../common/scoreMetadata.js';
+import { pickupSignature } from '../common/pickup.js';
 
 /**
  * MNX → GPIF (`.gp`), clean-room.
@@ -277,11 +278,19 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
   const tempoAutomations: { bar: number; bpm: number; reference: number }[] = [];
   const navigationTargets = gpifNavigationTargets(globalMeasures);
 
+  // A pickup is stored at its true length; Guitar Pro wants the piece's
+  // signature on it and `<Anacrusis />` to say its notes set its length.
+  const pickup = pickupSignature(globalMeasures);
+
   for (let index = 0; index < measureCount; index++) {
     const global = globalMeasures[index] ?? {};
     if (global.time) {
       numerator = global.time.count;
       denominator = global.time.unit;
+    }
+    if (index === 0 && pickup) {
+      numerator = pickup.count;
+      denominator = pickup.unit;
     }
     if (global.key) fifths = global.key.fifths;
 
@@ -378,7 +387,7 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
     }
   }
 
-  return serialize(masterBars, tracks, tempoAutomations, pools, scoreInfoXml(mnx, warn));
+  return serialize(masterBars, tracks, tempoAutomations, pools, scoreInfoXml(mnx, warn), pickup !== null);
 }
 
 function gpifNavigationTargets(measures: readonly MnxGlobalMeasure[]): Map<string, string> {
@@ -1111,7 +1120,8 @@ function serialize(
   tracks: WriterTrack[],
   tempoAutomations: { bar: number; bpm: number; reference: number }[],
   pools: Pools,
-  scoreXml: string
+  scoreXml: string,
+  anacrusis: boolean
 ): string {
   const lines: string[] = [];
   const push = (text: string) => lines.push(text);
@@ -1125,6 +1135,8 @@ function serialize(
 
   // MasterTrack
   push('<MasterTrack>');
+  // Where Guitar Pro 7 itself writes it: first, before `<Tracks>`.
+  if (anacrusis) push('<Anacrusis />');
   push(`<Tracks>${tracks.map((_, index) => index).join(' ')}</Tracks>`);
   push('<Automations>');
   for (const automation of tempoAutomations) {

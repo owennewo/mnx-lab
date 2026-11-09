@@ -1,8 +1,9 @@
 # Anacrusis: a pickup bar that reads, numbers and saves as one
 
-> **Status: proposed, 2026-11-09.** Serves the implementation loop, with a spec-loop
+> **Status: complete, 2026-11-09.** Serves the implementation loop, with a spec-loop
 > note at the end. Raised by the owner while glowing up *Strolling Down the Highway*
-> (library `4cc190c6b61e55f2`).
+> (library `4cc190c6b61e55f2`). Decisions 1 and 2 were taken as recommended; decision 3
+> stays open (see *Record*).
 
 ## Why
 
@@ -19,7 +20,7 @@ pickup exists, so the piece fakes it:
   `converters/` never reads or writes it.
 - **MusicXML marks its pickups** `number="0" implicit="yes"`. Import drops that today,
   and the viewer then badges the deliberate pickup as an underfilled 4/4 bar
-  ([chord-fidelity P1](core-musicxml-chord-fidelity.md), fixture `21e`).
+  ([chord-fidelity P1](../proposed/core-musicxml-chord-fidelity.md), fixture `21e`).
 
 The owner's questions that set the direction (2026-11-09):
 
@@ -137,6 +138,52 @@ MNX has no pickup concept. `number` is only a display label, and nothing says a 
 first bar is an anacrusis. This item's encoding (true-length signature, `number: 0`,
 signature stolen for display) is a lab convention. Whether MNX should state it, or
 carry an explicit pickup, is the `pickup-measure-state` question that
-[core-musicxml-chord-fidelity](core-musicxml-chord-fidelity.md) already names. The
+[core-musicxml-chord-fidelity](../proposed/core-musicxml-chord-fidelity.md) already names. The
 scenario above is the evidence a proposal would start from. Making that proposal is out
 of scope here.
+
+## Record — 2026-11-09
+
+**The owner's decisions.** On decision 1, *"Sure - by "turn on" you mean set first bar to
+0"* — `number: 0` is the marker. Decision 2 was taken as recommended: nothing is converted
+on read without a flag, so *Strolling Down the Highway* is marked by hand. Lyrics on that
+piece are parked until this landed: *"lets park the lyrics until the pickup bar converter
+and renderer changes have been implemented"*.
+
+**What the probes found.**
+- *Three Ultimate Guitar downloads* (Happy Birthday `.gpx`, Greensleeves `.gp5`, Danny Boy
+  `.gp`) carry no flag: each author wrote the pickup as a FULL bar padded with leading
+  rests, and Ultimate Guitar's renderer draws what is in the file. A padded bar cannot
+  safely be read as a pickup (a bar that opens with rests is ordinary music), so it is
+  left alone; an editor action that strips the rests and shortens the bar is a possible
+  follow-up, not built.
+- *alphaTab's `test-data/guitarpro7/anacrusis.gp`*, written by Guitar Pro 7 itself
+  (revision 12024): `<Anacrusis />` first in `<MasterTrack>`, `<Time>4/4</Time>` on a bar
+  of two quarters. It confirmed the steal; it is two bars long, so it cannot say whether
+  Guitar Pro shortens the LAST bar. **Decision 3 stays open**: the last bar is written as
+  stored (3/4), which is always valid — at worst Guitar Pro shows a signature change there.
+- alphaTab leaves the pickup unnumbered and counts from the first full bar; the lab does
+  the same (the 0 is stored, not printed).
+
+**What was built.**
+- `src/model/pickup.ts` — the rule (`pickupSignature`, `completesPickup`); standalone
+  copies in `converters/guitarpro-mnx/src/common/pickup.ts` and
+  `converters/musicxml-mnx/src/common/pickup.ts`.
+- Engraving: `timeSigShown` beside `timeSig` in `spacing.ts`'s plan; the emitters draw it.
+  No existing golden moved. New scenario `lab/11-rhythm/06-pickup-bar`, registered in
+  [lab-verify](../inprogress/lab-verify.md).
+- Guitar Pro: the reader turns `<Anacrusis />` into the notes' length (alphaTab's rule),
+  numbered 0; the writer steals the next bar's `<Time>` and writes the flag. `.gpx` shares
+  the GPIF reader, so it is covered; the gp3–5 binaries have no such flag.
+- MusicXML: an `implicit="yes"` first measure with a DECLARED meter becomes a pickup;
+  export writes `number="0" implicit="yes"` with the stolen signature and numbers on from 1.
+  Four files in the pinned suite (`02e`, `45h`, `46d` — a 3/8 pickup in 4/4 — and `46g`)
+  now import as pickups. **`21e` does not**: it declares no meter, and making it a pickup
+  would draw a 4/4 the source never shows — its underfill badge stays with
+  [core-musicxml-chord-fidelity](../proposed/core-musicxml-chord-fidelity.md).
+- Editor: typing `pickup` on the bar rung sets `number: 0` (`no pickup` removes it), and
+  the chip reads `pickup` when the first bar is one.
+
+**Not done, and worth knowing.** Studio's own bar labels (the crumb's `bar 1 of 18`, the
+lyric margin's `26 (10.3)`, the sync bar's names) count written bars from 1 and do not
+follow the printed numbering; nothing stored depends on them.
