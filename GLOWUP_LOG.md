@@ -120,7 +120,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Smells Like Teen Spirit | Nirvana (arr. Nikola Milovanovic) | `ccef043db55deb0d` |  | **bar search** 10-22 (run 5) | ✅ 10-22 (PDF) | ✅ 10-22 |  |
 | Steady Away | Chris Brain | `e863b804cc7fe4e1` |  | Soundslice |  |  |  |
 | Street Spirit | Radiohead | `9218b1b6c813558e` |  | Soundslice |  |  |  |
-| Strolling Down the highway | Bert Jansch | `4cc190c6b61e55f2` |  | **bar search** 11-08 (run 11) |  | 🟡 11-08 (endings; heard, not yet watched) | 🟡 verse 1 only |
+| Strolling Down the highway | Bert Jansch | `4cc190c6b61e55f2` |  | **bar search** 11-08 (run 11) | 🟡 11-09 (owner's fixes; items open) | 🟡 11-08 (endings; heard, not yet watched) | 🟡 11-09 (all verses; not yet watched) |
 | Sun did glide | Chris Brain | `dcbc40c2dcd33f45` |  | **bar search** 10-27 (run 6) | ✅ 10-27 | ✅ 10-27 |  |
 | Suzanne | Leonard Cohen | `3a6e7d1ae0e9b4dd` |  | Soundslice |  |  |  |
 | Sweet Child O Mine |  | `f4d2a15b7dfa926d` |  | Soundslice |  |  |  |
@@ -144,6 +144,27 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-09 — Strolling Down the Highway (Bert Jansch) · `4cc190c6b61e55f2` — pickup, notes, every verse
+
+- **Notes** (revision 155, after the owner's fixes to bars 4 and 12 and the bar-13 triplet swap): 75% of written notes
+  heard (was 74%), never heard 22 (was 25), every-pass extras 4 (was 6). Open for the owner's ear: bar 13's "on" chord
+  heard with B3 in every pass (21.6 s); bar 11 beat 3 G3/C4 never heard (17.7 s); bar 10 "and" of 2 written E4, heard C4
+  (15.8 s); bars 2 and 5 beat 3 C#4 never heard (1.3 s, 6.8 s); bar 14 beat 2 E4 (22.2 s); bar 3 "and" of 4 F#4 (3.8 s).
+  Bars 1, 6, 8 (the bend), 16 and 18 explained and left.
+- **Form**: bar 1 is now a pickup (`pickup` on the bar rung, revision 160 — [core-anacrusis](roadmap/complete/core-anacrusis.md)):
+  4/4 drawn once, no 3/4 on bar 18, numbered from the first full bar. Bar numbers above are the written ones (pickup = 1).
+- **Lyrics** (revisions 161–162), from the owner's text, placed on verse 1's syllable slots and checked against the
+  separated vocal's per-bar loudness and onsets: pass 1 unsung (an empty row holds its place); pass 2 verse 1 + chorus;
+  pass 3 verse 2 + chorus; pass 4 instrumental verse, chorus sung (bars 11–13, 16); pass 5 verse 3 with its own chorus
+  ("No, the cars they won't stop…", bars 11–14); pass 6 verse 1 again + chorus; pass 7 unsung (faint vocal in bars 12–13,
+  not in the text — humming or bleed). The chorus's "high-way" sits on bar 16 in the passes that take that ending.
+  154 syllables; two simulated saves clean. "rock" stays on the owner's grace note at bar 11.
+- **Found on the way**, all landed: the player skipped an empty verse row and a Guitar Pro save dropped it, moving every
+  verse a pass early (b8d07db8); a syllable on a rest could not be edited (671ee203); a word hyphenated across a note
+  its verse skips read back as two (888c7f13); a verse sung only on a grace note was not written at all (4c36c7d7).
+- **Open**: the notes items above; bar 9's provisional triplet (owner's call); the lyrics want watching against the
+  recording. The lyric panel does not show syllables on rests ("can you", "I", "stroll" …): they are kept, not lost.
 
 ### 2026-11-08 — Strolling Down the Highway (Bert Jansch) · `4cc190c6b61e55f2` — [run 11](tools/recording-align/RUNS.md#run-11--2026-11-08--strolling-down-the-highway-bert-jansch-a-singer-and-the-readers-own-bug-under-the-overfull-bars)
 
