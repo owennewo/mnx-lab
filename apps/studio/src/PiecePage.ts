@@ -46,7 +46,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot, type ProjectedTag } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument, type MnxStructure } from '../../../src/model/mnx.ts';
 import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
-import { PieceSaveContext, projectPieceTags, acquirePieceLock } from '../../../src/storage/pieceSaveContext.ts';
+import { PieceSaveContext, projectPieceTags, acquirePieceLock, pieceLockFreed } from '../../../src/storage/pieceSaveContext.ts';
 import type { WorkChange } from '../../../src/edit/ops.ts';
 import type { EditorIntent } from '../../../src/edit/intents.ts';
 import { refusalNotice, type RefusalContext, type RefusalReason } from '../../../src/edit/clipboardFeedback.ts';
@@ -273,6 +273,8 @@ export class PiecePage extends LitElement {
   /** Once the document has been edited here, the heading reads the document, not the library's tags. */
   private touched = false;
   private releaseLock: (() => void) | null = null;
+  /** A read-only page's wait for the lock to come free (`pieceLockFreed`). */
+  private lockWait: AbortController | null = null;
   private ticker: ReturnType<typeof setInterval> | undefined;
   /** Every write this page makes to the piece, one at a time: they all move one revision. */
   private writes: Promise<unknown> = Promise.resolve();
@@ -637,6 +639,15 @@ export class PiecePage extends LitElement {
     if (generation !== this.generation) { lock.release(); return null; }
     this.releaseLock = lock.release;
     this.readOnly = !lock.writable;
+    // Read-only because the lock was taken: wait for it, then reopen with editing (and
+    // with whatever the other page saved). A reload of this same tab is the usual cause.
+    if (!lock.writable && !this.playOnly) {
+      const waiting = new AbortController();
+      this.lockWait?.abort(); this.lockWait = waiting;
+      void pieceLockFreed(pieceId, navigator.locks, waiting.signal).then(() => {
+        if (!waiting.signal.aborted && generation === this.generation && this.pieceId === pieceId && this.readOnly) void this.load();
+      });
+    }
     const revisionOf = async () => (this.snapshot?.piece.id === pieceId ? this.snapshot : (await this.client.piece(pieceId)).snapshot).piece.revision;
     const session = new SaveSession<MnxStructure>(pieceId, document, { renditionId }, {
       prepare: doc => context.prepare(doc),
@@ -737,6 +748,7 @@ export class PiecePage extends LitElement {
     this.editor?.dispose(); this.editor = null;
     const session = this.session;
     this.session = null; this.save = null;
+    this.lockWait?.abort(); this.lockWait = null;
     const release = this.releaseLock; this.releaseLock = null;
     if (session) void session.flush().finally(() => { session.dispose(); release?.(); });
     else release?.();

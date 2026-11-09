@@ -67,3 +67,27 @@ export function acquirePieceLock(pieceId: string, locks?: Pick<LockManager, 'req
     }).catch(() => resolve({ writable: true, release: () => {} }));
   });
 }
+
+/**
+ * Resolves when nobody holds the piece's lock — the tab that held it closed, or
+ * (the common case) this same tab's previous page let go a moment after a
+ * reload asked for it. A read-only page waits on this and reopens with editing;
+ * asked once with `ifAvailable`, it used to stay read-only until reloaded again,
+ * and a reload hits exactly that race. It LOOKS (`query`) rather than queueing a
+ * request: a queued request that was granted to a page and never called back
+ * would hold the lock with nobody editing (seen in the save-pipeline smoke).
+ * Aborting stops the wait without resolving.
+ */
+export function pieceLockFreed(pieceId: string, locks: Pick<LockManager, 'query'> | undefined, signal: AbortSignal, everyMs = 1500): Promise<void> {
+  if (!locks) return new Promise(() => {});
+  const name = `mnx-studio.piece.${pieceId}`;
+  return new Promise(resolve => {
+    const timer = setInterval(() => {
+      void locks.query().then(state => {
+        if (signal.aborted || state.held?.some(lock => lock.name === name)) return;
+        clearInterval(timer); resolve();
+      }, () => {});
+    }, everyMs);
+    signal.addEventListener('abort', () => clearInterval(timer), { once: true });
+  });
+}

@@ -635,7 +635,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   };
   /** Open on the cursor's part — or on `target`, the part and voice asked for. */
   const openLyrics = (focus = true, target?: { partIndex: number; voiceIndex: number | null }): boolean => {
-    if (!surfaces || lyrics || suspended() || readOnly()) return false;
+    // A read-only page still SHOWS the words: the panel opens read-only, as it is while playing.
+    if (!surfaces || lyrics || suspended()) return false;
     tabDigits.flush();
     options.onOpenLyrics?.();
     const el = document_.createElement('mnx-lyric-text-editor');
@@ -646,7 +647,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     const partIndex = target?.partIndex ?? session.cursor.partIndex ?? 0;
     const voiceIndex = target?.voiceIndex ?? lyricVoiceFor(partIndex);
     Object.assign(el, {
-      playing, doc: session.doc, partIndex, voiceIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '',
+      playing, readOnly: readOnly(), doc: session.doc, partIndex, voiceIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '',
       focusPlace: lyricPlace(), draft: options.lyricDrafts?.read(partIndex, voiceIndex) ?? null
     });
     lyricStep = null;
@@ -1038,7 +1039,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     handleIntent: intent => { tabDigits.flush(); return dispatch(intent); },
     undo: () => undoAction(),
     redo: () => redoAction(),
-    refresh: () => { tabDigits.flush(); if (suspended()) { closeInspector(false); closeLyrics(false); } else if (readOnly()) closeLyrics(false); followProjection(); draw(); },
+    refresh: () => { tabDigits.flush(); if (suspended()) { closeInspector(false); closeLyrics(false); } else if (lyrics) lyrics.readOnly = readOnly(); followProjection(); draw(); },
     keys: () => {
       const mounted = (shell: ReturnType<typeof resolveShellAction>) => shell === 'abandonPending'
         || (surfaces !== null && (shell === 'commitPending' || shell === 'lyricTextEditor'))

@@ -174,6 +174,23 @@ try {
   await wait(`navigator.locks.query().then(q => !q.held.some(l => l.name === 'mnx-studio.piece.${copyId}'))`);
   assert.match(await c.evaluate(heading), /the tablet's/, 'old save changed the new piece heading');
   assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean', 'old save changed the new piece save state');
-  console.log(`Save-pipeline smoke passed: ${pieceId} edited in the Edit piece panel; the unsaved edit recovered from IndexedDB after a reload; Save now → an edit rendition with a 'clean' check and the tags following; undo back to clean; a named version; and another device's save met as a conflict, kept as copy ${copyId}.`);
+
+  // A second tab on the same piece opens read-only — and still SHOWS the words: the lyric
+  // panel opens read-only. When the first tab lets go, the second reopens with editing. (A
+  // reload of one tab is the same race: it used to stay read-only until reloaded again.)
+  const port = await devtoolsPort(profile);
+  const tab = await (await fetch(`http://127.0.0.1:${port}/json/new?${encodeURIComponent(`${origin}/studio/#/piece/${pieceId}`)}`, { method: 'PUT' })).json();
+  const ws2 = new WebSocket(tab.webSocketDebuggerUrl); await once(ws2, 'open');
+  try {
+    const c2 = client(ws2); await c2.send('Runtime.enable'); await c2.send('Page.enable');
+    const wait2 = expression => until(c2, expression, { timeoutMs: 20000, describe: STUDIO_STATE });
+    await wait2(`${chip}?.textContent.trim() === 'Open in another tab · read only'`);
+    await c2.evaluate(`${app}.querySelector('mnx-studio-piece').editor.openLyrics()`);
+    await wait2(`${piece}?.querySelector('mnx-lyric-text-editor')?.shadowRoot?.querySelector('textarea')?.readOnly === true`);
+    await c.send('Page.navigate', { url: 'about:blank' });
+    await wait2(`${chip}?.textContent.trim() === 'Saved' && ${chip}.dataset.save === 'clean'`);
+    await wait2(`navigator.locks.query().then(q => q.held.some(l => l.name === 'mnx-studio.piece.${pieceId}'))`);
+  } finally { ws2.close(); }
+  console.log(`Save-pipeline smoke passed: ${pieceId} edited in the Edit piece panel; the unsaved edit recovered from IndexedDB after a reload; Save now → an edit rendition with a 'clean' check and the tags following; undo back to clean; a named version; and another device's save met as a conflict, kept as copy ${copyId}; a second tab read-only with the lyric panel showing, editing once the first let go.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }
