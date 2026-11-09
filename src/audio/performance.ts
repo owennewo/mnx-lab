@@ -67,6 +67,9 @@ interface EventSpan {
   weight: Rational;
   grace?: { id: string; kind: NonNullable<MnxGrace['graceType']> };
   tremolo?: { id: string; index: number; count: number; step: Rational };
+  /** The written span [from, until) of the outermost tuplet holding this event:
+   *  under swing its members are spaced evenly between the span's PLAYED ends. */
+  tuplet?: { from: Rational; until: Rational };
 }
 interface Visit extends EventSpan {
   ordinal: number;
@@ -145,6 +148,7 @@ function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
           eventIndex: number,
           path: number[],
           grace?: EventSpan['grace'],
+          tuplet?: EventSpan['tuplet'],
         ): Rational => {
           if (path.length > 32 || events.length >= LIMIT) limit();
           const base = {
@@ -156,6 +160,7 @@ function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
             eventIndex,
             path,
             offset,
+            ...(tuplet ? { tuplet } : {}),
           };
           if (Array.isArray((item as MnxEvent).duration))
             return multiply(
@@ -193,20 +198,22 @@ function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
               kind: item.graceType ?? 'stealFollowing',
             };
             item.content.forEach((child, i) =>
-              walk(child, offset, scale, eventIndex, [...path, i], group),
+              walk(child, offset, scale, eventIndex, [...path, i], group, tuplet),
             );
             return ZERO;
           }
           if (isTuplet(item)) {
             const own = multiply(scale, tupletScale(item));
-            let cursor = offset;
-            item.content.forEach((child, i) => {
-              cursor = add(cursor, walk(child, cursor, own, eventIndex, [...path, i], grace));
-            });
             const declared = multiply(
               multiply(noteDuration(item.outer.duration), integer(item.outer.multiple)),
               scale,
             );
+            // The OUTERMOST tuplet's span: a nested tuplet is evened out inside it.
+            const span = tuplet ?? { from: offset, until: add(offset, declared) };
+            let cursor = offset;
+            item.content.forEach((child, i) => {
+              cursor = add(cursor, walk(child, cursor, own, eventIndex, [...path, i], grace, span));
+            });
             if (!grace && compare(subtract(cursor, offset), declared) !== 0)
               diagnostic(
                 'tuplet-content-span',
@@ -333,16 +340,25 @@ function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
           : compare(until, from) <= 0
       )
         continue;
+      // A tuplet is its own subdivision, so swing moves its ENDS and leaves its
+      // inside even: members sit at their proportion of the played span. Warping
+      // them with the bar put a triplet's second note at 1.44 of the beat, not
+      // 1⅓, and every triplet in a swung piece played lopsided (Strolling Down
+      // the Highway, 2026-11-08). The written offset, `metricOffset`, is kept.
+      const at = (offset: Rational) => {
+        const t = event.tuplet;
+        if (!t || swingMaps[measure.measureIndex]?.straight !== false) return swung(measure.measureIndex, offset);
+        const a = swung(measure.measureIndex, t.from), b = swung(measure.measureIndex, t.until);
+        return add(a, multiply(subtract(offset, t.from), divide(subtract(b, a), subtract(t.until, t.from))));
+      };
       const metricPosition = add(
         measure.metricPosition,
-        subtract(swung(measure.measureIndex, from), swung(measure.measureIndex, measure.from)),
+        subtract(at(from), swung(measure.measureIndex, measure.from)),
       );
       // `metricDuration` is the WRITTEN span the golden records; the played
       // span is the same notes over the warped axis.
       const duration = event.grace ? ZERO : subtract(until, from);
-      const played = event.grace
-        ? ZERO
-        : subtract(swung(measure.measureIndex, until), swung(measure.measureIndex, from));
+      const played = event.grace ? ZERO : subtract(at(until), at(from));
       visits.push({
         ...event,
         ordinal: measure.ordinal,

@@ -147,3 +147,40 @@ describe('the compiler honours the feel', () => {
     expect(compile(feel([1, 1]))).toEqual(compile());
   });
 });
+
+// A triplet is its own subdivision: swing moves where it starts and ends, not
+// how it divides. Warping its members with the bar played a triplet of eighths
+// on beat 2 at 2, 2.44, 2.78 — lopsided — in every swung piece (Strolling Down
+// the Highway's "high-way" figure and hammer-ons, 2026-11-08).
+describe('swing leaves a tuplet even inside', () => {
+  const c4 = { pitch: { step: 'C', octave: 4 } };
+  const piece = (swing?: MnxLabSwing): MnxStructure => ({
+    mnx: { version: 1 },
+    global: { measures: [{ ...bar(swing), time: { count: 4, unit: 4 } }] },
+    parts: [{ id: 'p', measures: [{ sequences: [{ content: [
+      { duration: { base: 'quarter' }, notes: [c4] },
+      { type: 'tuplet', inner: { multiple: 3, duration: { base: 'eighth' } }, outer: { multiple: 2, duration: { base: 'eighth' } },
+        content: [{ duration: { base: 'eighth' }, notes: [c4] }, { duration: { base: 'eighth' }, notes: [c4] }, { duration: { base: 'eighth' }, notes: [c4] }] },
+      { duration: { base: 'eighth' }, notes: [c4] }, { duration: { base: 'eighth' }, notes: [c4] },
+      { duration: { base: 'quarter' }, notes: [c4] }
+    ] }] }] }]
+  } as unknown as MnxStructure);
+  const compile = (swing?: MnxLabSwing) => {
+    const result = compilePerformance(piece(swing));
+    if (!result.ok) throw new Error('compilation failed');
+    return result.performance;
+  };
+
+  it('plays the triplet in even thirds, and still swings the eighths after it', () => {
+    const swung = compile(feel([2, 1]));
+    expect(swung.written.map(w => w.position)).toEqual([
+      ZERO,
+      q(1n, 4n), q(1n, 3n), q(5n, 12n),   // beat 2, 2⅓, 2⅔ — even thirds
+      q(1n, 2n), q(2n, 3n),               // beat 3 and its swung "and" (3⅔)
+      q(3n, 4n)
+    ]);
+    expect(swung.written.slice(1, 4).map(w => w.duration)).toEqual([q(1n, 12n), q(1n, 12n), q(1n, 12n)]);
+    // Written identities untouched.
+    expect(swung.written.map(w => w.metricOffset)).toEqual(compile().written.map(w => w.metricOffset));
+  });
+});
