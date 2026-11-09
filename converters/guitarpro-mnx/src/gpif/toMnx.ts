@@ -917,10 +917,10 @@ function buildLyrics(
 
   for (const [index, raw] of chunks.entries()) {
     const chunk = (raw ?? '').trim();
-    if (!chunk) {
-      previousContinued[index] = false;
-      continue;
-    }
+    // A blank line on this beat is a note the verse does not sing: a word
+    // hyphenated across it ("Strol- · lin'") is still one word. The blank is
+    // only there because another verse sings on this beat.
+    if (!chunk) continue;
 
     const continues = chunk.endsWith('-');
     // `+` is Guitar Pro's escape for a space inside a single syllable.

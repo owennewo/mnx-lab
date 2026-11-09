@@ -519,10 +519,9 @@ function buildLyrics(
 
   for (const [index, raw] of chunks.entries()) {
     const chunk = (raw ?? '').trim();
-    if (!chunk) {
-      previousContinued[index] = false;
-      continue;
-    }
+    // A blank line here is a note this verse does not sing; a word hyphenated
+    // across it is still one word (the clean-room reader's rule, gpif/toMnx.ts).
+    if (!chunk) continue;
 
     const continues = chunk.endsWith('-');
     // `+` is Guitar Pro's escape for a space inside a single syllable.

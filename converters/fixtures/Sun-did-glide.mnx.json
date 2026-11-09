@@ -7473,7 +7473,7 @@
                     "lines": {
                       "2": {
                         "text": "der",
-                        "type": "whole"
+                        "type": "end"
                       }
                     }
                   }
@@ -7487,7 +7487,7 @@
                     "lines": {
                       "3": {
                         "text": "to",
-                        "type": "whole"
+                        "type": "end"
                       }
                     }
                   }

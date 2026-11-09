@@ -10258,7 +10258,7 @@
     {
       "id": "reference/Sun-did-glide",
       "exported": {
-        "sha256": "683ea7252eacc0bc51ccb5c173bb2a478be947bfcb5dc872decb1bff453cfa54",
+        "sha256": "b8f248fb404836ad906f82caccc99a6c9a3c15a2f71e1f7401eda00332f33bda",
         "semantic": {
           "status": "ok",
           "table": {
@@ -16464,7 +16464,7 @@
                   [
                     "2",
                     "der",
-                    "single"
+                    "end"
                   ]
                 ]
               },
@@ -16483,7 +16483,7 @@
                   [
                     "3",
                     "to",
-                    "single"
+                    "end"
                   ]
                 ]
               },
@@ -28242,7 +28242,7 @@
                   [
                     "2",
                     "der",
-                    "single"
+                    "end"
                   ]
                 ]
               },
@@ -28261,7 +28261,7 @@
                   [
                     "3",
                     "to",
-                    "single"
+                    "end"
                   ]
                 ]
               },
