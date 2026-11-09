@@ -1,4 +1,5 @@
 import type { MediaEvent, MediaPort } from '../recordingBackend.ts';
+import { encodeWav, isMp3 } from '../wav.ts';
 /** All browser media ownership is here. Constructed lazily on source selection. */
 export class HtmlAudioPort implements MediaPort {
   private readonly audio: HTMLAudioElement;
@@ -10,14 +11,16 @@ export class HtmlAudioPort implements MediaPort {
   private timer?: ReturnType<typeof setInterval>;
   private closed = false;
   private seekVersion = 0;
+  /** The recording as given — a URL or a file — until `prepare` decides what the element plays. */
+  private readonly media: string | Blob;
   constructor(media: string | Blob) {
     this.audio = new Audio();
     this.audio.preload = 'metadata';
     if (typeof media === 'string') {
       const url = new URL(media, document.baseURI);
       if (!['http:', 'https:', 'blob:'].includes(url.protocol)) throw new Error('Audio must use an HTTP or blob URL.');
-      this.audio.src = url.href;
-    } else this.audio.src = this.objectUrl = URL.createObjectURL(media);
+      this.media = url.href;
+    } else this.media = media;
     const events: [string, MediaEvent][] = [['timeupdate', 'time'], ['playing', 'playing'], ['pause', 'pause'],
       ['waiting', 'waiting'], ['seeking', 'seeking'], ['seeked', 'seeked'], ['ended', 'ended'], ['ratechange', 'rate'], ['error', 'error']];
     for (const [native, event] of events) {
@@ -59,7 +62,34 @@ export class HtmlAudioPort implements MediaPort {
   prepare() {
     if (this.closed) return Promise.reject(new Error('Audio source is disposed.'));
     if (this.audio.readyState >= 1) return Promise.resolve();
-    return this.ready ??= this.waitFor('loadedmetadata', () => this.audio.load()).catch(error => { this.ready = undefined; throw error; });
+    return this.ready ??= (async () => {
+      if (!this.audio.getAttribute('src')) await this.attach();
+      await this.waitFor('loadedmetadata', () => this.audio.load());
+    })().catch(error => { this.ready = undefined; throw error; });
+  }
+  /**
+   * Give the element what it can seek EXACTLY: an MP3 decoded once to WAV (`../wav.ts` says why —
+   * a seek into a variable-bitrate MP3 lands up to ±0.7 s from where it reports). Anything else,
+   * or an MP3 the browser will not decode, plays as given.
+   */
+  private async attach() {
+    const original = typeof this.media === 'string' ? this.media : (this.objectUrl = URL.createObjectURL(this.media));
+    try {
+      const blob = typeof this.media === 'string'
+        ? await (await fetch(this.media, { credentials: 'include' })).blob()
+        : this.media;
+      const bytes = new Uint8Array(await blob.arrayBuffer());
+      if (this.closed || !isMp3(bytes)) { this.audio.src = original; return; }
+      const context = new OfflineAudioContext(1, 1, 44_100);
+      const decoded = await context.decodeAudioData(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+      if (this.closed) return;
+      const channels = Array.from({ length: Math.min(2, decoded.numberOfChannels) }, (_, c) => decoded.getChannelData(c));
+      const wav = new Blob([encodeWav(channels, decoded.sampleRate)], { type: 'audio/wav' });
+      if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
+      this.audio.src = this.objectUrl = URL.createObjectURL(wav);
+    } catch {
+      if (!this.closed) this.audio.src = original;
+    }
   }
   async play() {
     if (this.closed) return;
