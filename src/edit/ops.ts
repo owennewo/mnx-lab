@@ -1729,6 +1729,17 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         // Shrinking opens a gap at the end (later events slide earlier) —
         // pad it; growing eats trailing rests instead.
         padMeasureRests(next, op.measureIndex, op);
+        return next;
+      }
+      // A tuplet's member is re-valued in place: the tuplet keeps its span, and
+      // content that no longer fills it is the badge's to report — the same
+      // rule as a bar. Before this an onset inside a tuplet found nothing and
+      // the change was silently dropped (the owner, 2026-11-09: swapping a
+      // triplet's eighth and quarter in Strolling Down the Highway, bar 13).
+      {
+        // At a tuplet's own onset the top-level search finds the TUPLET (no event): its first member.
+        const member = eventStartingAt(seq, { num: op.onset[0], den: op.onset[1] });
+        if (member) member.duration = { ...op.duration };
       }
       return next;
     }

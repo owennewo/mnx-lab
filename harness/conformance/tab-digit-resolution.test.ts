@@ -286,3 +286,44 @@ describe('a fret added to a chord inside a triplet', () => {
     expect(at(1, 4)?.duration.base).toBe('quarter'); // the next top-level event
   });
 });
+
+// The owner, 2026-11-09 (Strolling Down the Highway, bar 13): the bass's
+// hammered triplets, written short-long (eighth D3, quarter F♯3), were to be
+// swapped to long-short. Re-valuing a triplet's note reported success and
+// changed nothing, leaving phantom "edits": the duration op looked only at the
+// bar's top level.
+describe('a duration changed inside a triplet', () => {
+  const n = (step: 'D' | 'F' | 'A', octave: number, alter?: number) => ({ pitch: { step, octave, ...(alter ? { alter } : {}) }, _x: { mnxLab: { string: 5 } } });
+  const bar13 = (): MnxStructure => {
+    const base = entryDoc();
+    const pair = () => ({ type: 'tuplet', inner: { multiple: 3, duration: { base: 'eighth' } }, outer: { multiple: 2, duration: { base: 'eighth' } },
+      content: [{ duration: { base: 'eighth' }, notes: [n('D', 3)] }, { duration: { base: 'quarter' }, notes: [n('F', 3, 1)] }] });
+    base.parts![0]!.measures![0]!.sequences = [{ voice: 'v1', content: [
+      { duration: { base: 'quarter' }, notes: [n('F', 3, 1)] }, pair(), pair(),
+      { duration: { base: 'eighth' }, notes: [n('F', 3, 1)] }, { duration: { base: 'eighth' }, notes: [n('A', 2)] }
+    ] }] as never;
+    return base;
+  };
+  const shape = (doc: MnxStructure) => (doc.parts![0]!.measures![0]!.sequences![0]!.content as { type?: string; content?: { duration: { base: string } }[]; duration?: { base: string } }[])
+    .map(item => item.type === 'tuplet' ? `3[${item.content!.map(c => c.duration.base).join(' ')}]` : item.duration!.base).join(' ');
+
+  it('swaps a triplet’s eighth and quarter in place, leaving the triplet whole', () => {
+    const session = new EditorSession(bar13(), 'tab-entry');
+    for (const [eighth, quarter] of [[[1, 4], [1, 3]], [[1, 2], [7, 12]]] as const) {
+      session.handleIntent({ type: 'goToPerformed', ordinal: 0, onset: [quarter[0], quarter[1]] });
+      expect(session.handleIntent({ type: 'setEventDuration', base: 'eighth' })).toBe(true);
+      session.handleIntent({ type: 'goToPerformed', ordinal: 0, onset: [eighth[0], eighth[1]] });
+      expect(session.handleIntent({ type: 'setEventDuration', base: 'quarter' })).toBe(true);
+    }
+    expect(shape(session.doc)).toBe('quarter 3[quarter eighth] 3[quarter eighth] eighth eighth');
+  });
+
+  it('a change that changes nothing is refused, and leaves nothing to undo', () => {
+    const session = new EditorSession(bar13(), 'tab-entry');
+    const before = session.canUndo;
+    // The triplet's first note is already an eighth: nothing to change.
+    session.handleIntent({ type: 'goToPerformed', ordinal: 0, onset: [1, 4] });
+    expect(session.handleIntent({ type: 'setEventDuration', base: 'eighth' })).toBe(false); // already an eighth
+    expect(session.canUndo).toBe(before);
+  });
+});

@@ -1198,6 +1198,7 @@ export class EditorSession {
         if (event.duration.base === intent.base && (event.duration.dots ?? 0) === (intent.dots ?? 0))
           return false;
         if (event.rest) return this.setDurationHere(duration);
+        const unchanged = JSON.stringify(this.doc);
         this.apply({
           type: 'setDuration',
           measureIndex: this.cursorState.measureIndex,
@@ -1205,6 +1206,12 @@ export class EditorSession {
           duration,
           ...this.entryTarget
         });
+        // Nothing moved: no edit to count, nothing to undo — a refusal, not a silent success.
+        if (JSON.stringify(this.doc) === unchanged) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
         return true;
       }
       case 'toggleTechnique': {
