@@ -27,3 +27,21 @@ describe('a hyphenated word across a beat its verse skips', () => {
     expect(content[1]!.lyrics!.lines['2']!.type).toBe('end');
   });
 });
+
+describe('a verse sung only inside a group', () => {
+  it('keeps its row: the verses after it do not move up', () => {
+    const grace = { type: 'grace', content: [{ duration: { base: 'eighth' }, notes: [{ pitch: { step: 'D', octave: 4 } }], lyrics: { lines: { '1': { text: 'rock' } } } }] };
+    const doc = {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 2, unit: 4 } }] },
+      parts: [{ id: 'g', name: 'Guitar', measures: [{ sequences: [{ content: [
+        grace,
+        ev({ '2': { text: 'two' } }),
+        ev({})
+      ] }] }] }]
+    } as unknown as MnxStructure;
+    const back = gpifToMnx(parseGpif(mnxToGpifXml(doc)));
+    const content = back.parts[0]!.measures[0]!.sequences![0]!.content as { lyrics?: { lines: Record<string, { text: string }> } }[];
+    expect(content.find(e => e.lyrics)?.lyrics!.lines['2']?.text).toBe('two');
+  });
+});

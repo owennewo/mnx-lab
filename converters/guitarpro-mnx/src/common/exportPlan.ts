@@ -2,6 +2,7 @@ import {
   MnxStructure,
   MnxSequence,
   MnxEvent,
+  MnxSequenceItem,
   MnxNote,
   MnxHarmony,
   isTimedEvent
@@ -28,12 +29,19 @@ import { mnxDurationToWholes } from './duration.js';
 export function resolveLyricLineOrder(mnx: MnxStructure): string[] {
   const declared = mnx.global?.lyrics?.lineOrder ?? [];
   const used = new Set<string>();
+  // Inside tuplets and grace groups too: a verse whose only words sit on a
+  // grace note (Strolling Down the Highway's "rock", bar 11) is still a row,
+  // and leaving it out shifted every verse after it a pass earlier.
+  const visit = (items: readonly MnxSequenceItem[]) => {
+    for (const item of items) {
+      for (const id of Object.keys((item as MnxEvent).lyrics?.lines ?? {})) used.add(id);
+      const content = (item as { content?: MnxSequenceItem[] }).content;
+      if (Array.isArray(content)) visit(content);
+    }
+  };
   for (const part of mnx.parts)
     for (const measure of part.measures)
-      for (const sequence of measure.sequences ?? [])
-        for (const item of sequence.content ?? [])
-          if (isTimedEvent(item))
-            for (const id of Object.keys(item.lyrics?.lines ?? {})) used.add(id);
+      for (const sequence of measure.sequences ?? []) visit(sequence.content ?? []);
   // A row declared in `lineMetadata` with no words is an unsung verse that
   // holds its place (pass 1 of a song whose first pass is instrumental): it is
   // written as a blank line, so the verses after it keep their positions.
