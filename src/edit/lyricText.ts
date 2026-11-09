@@ -563,8 +563,8 @@ function trailingHyphenOpen(tokens: RawToken[], start: number): boolean {
 // ── Diff: parsed buffer vs document → the plan ─────────────────────────────
 
 export type LyricPlanEdit =
-  | { op: 'setSyllable'; noteKey: string; line: string; text: string; syllableType?: SyllableType }
-  | { op: 'removeSyllable'; noteKey: string; line: string }
+  | { op: 'setSyllable'; noteKey?: string; event?: import('./ops.ts').EventAddress; line: string; text: string; syllableType?: SyllableType }
+  | { op: 'removeSyllable'; noteKey?: string; event?: import('./ops.ts').EventAddress; line: string }
   | { op: 'setLyricLine'; line: string; lang?: string; lineOrder?: string[] };
 
 /** The plan's edits as EditOps — ONE mapping, shared by the session's
@@ -575,13 +575,15 @@ export function lyricPlanOps(edits: LyricPlanEdit[]): import('./ops.ts').EditOp[
     edit.op === 'setSyllable'
       ? {
           type: 'setSyllable' as const,
-          noteKey: edit.noteKey,
+          ...(edit.noteKey !== undefined ? { noteKey: edit.noteKey } : {}),
+          ...(edit.event ? { event: edit.event } : {}),
           line: edit.line,
           text: edit.text,
           ...(edit.syllableType ? { syllableType: edit.syllableType } : {})
         }
       : edit.op === 'removeSyllable'
-        ? { type: 'removeSyllable' as const, noteKey: edit.noteKey, line: edit.line }
+        ? { type: 'removeSyllable' as const, ...(edit.noteKey !== undefined ? { noteKey: edit.noteKey } : {}),
+            ...(edit.event ? { event: edit.event } : {}), line: edit.line }
         : {
             type: 'setLyricLine' as const,
             line: edit.line,

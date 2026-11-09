@@ -437,8 +437,11 @@ export type EditOp =
   // Lyrics (campaign item 12, roadmap/complete/core-element-ops-lyrics.md).
   // A syllable is a key on the EVENT's lyric line; the line's metadata is a
   // key on the document. Two owners, so two pairs — item 7's test.
-  | { type: 'setSyllable'; noteKey: string; line: string; text: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
-  | { type: 'removeSyllable'; noteKey: string; line: string }
+  /** A syllable is the EVENT's: `noteKey` names it by one of its notes, `event`
+   *  by address — the only way to reach a rest, which a sung syllable may sit
+   *  on (the voice rests while the singer goes on). One of the two. */
+  | { type: 'setSyllable'; noteKey?: string; event?: EventAddress; line: string; text: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
+  | { type: 'removeSyllable'; noteKey?: string; event?: EventAddress; line: string }
   | { type: 'setLyricLine'; line: string; label?: string; lang?: string; lineOrder?: string[] }
   | { type: 'removeLyricLine'; line: string }
   // Tab technique + fingering (campaign item 9,
@@ -1308,9 +1311,11 @@ function applyLyricOpInPlace(
   /** Find the event that owns a note: by default a walk of the document per call. */
   eventOf: (key: string) => MnxEvent | undefined = key => findKeyedNote(doc, key)?.event
 ): void {
+  const owner = (o: { noteKey?: string; event?: EventAddress }) =>
+    o.event ? eventAtAddress(doc, o.event) ?? undefined : o.noteKey ? eventOf(o.noteKey) : undefined;
   switch (op.type) {
     case 'setSyllable': {
-      const event = eventOf(op.noteKey);
+      const event = owner(op);
       if (!event) return;
       const lines = ((event.lyrics ??= {}).lines ??= {});
       lines[op.line] = {
@@ -1320,7 +1325,7 @@ function applyLyricOpInPlace(
       return;
     }
     case 'removeSyllable': {
-      const event = eventOf(op.noteKey);
+      const event = owner(op);
       if (!event) return;
       const lines = event.lyrics?.lines;
       if (!lines?.[op.line]) return;
