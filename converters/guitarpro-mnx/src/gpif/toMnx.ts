@@ -155,7 +155,14 @@ export function gpifToMnx(source: GpifDocument, options: GpifImportOptions = {})
       }
     }
   }
-  const lineOrder = [...usedVerses].sort((a, b) => a - b).map(i => `${i + 1}`);
+  // A blank line BELOW a sung one is an unsung verse holding its place (an
+  // instrumental first pass): declared empty, in order, so verse 2 stays verse 2
+  // (src/model/lyricRows.ts). Blank lines past the last sung one say nothing.
+  const highest = Math.max(-1, ...usedVerses);
+  const held = Array.from({ length: highest + 1 }, (_, i) => i).filter(i => !usedVerses.has(i));
+  const lineOrder = (held.length ? Array.from({ length: highest + 1 }, (_, i) => i) : [...usedVerses].sort((a, b) => a - b))
+    .map(i => `${i + 1}`);
+  const lineMetadata = Object.fromEntries(held.map(i => [`${i + 1}`, {}]));
 
   for (const [label, { count, firstMeasure }] of unrepresented) {
     warn(`measure ${firstMeasure + 1}: ${label} is not represented (${count} in the file).`);
@@ -165,7 +172,7 @@ export function gpifToMnx(source: GpifDocument, options: GpifImportOptions = {})
     mnx: { version: 1 },
     global: {
       measures: globalMeasures,
-      ...(lineOrder.length > 0 ? { lyrics: { lineOrder } } : {})
+      ...(lineOrder.length > 0 ? { lyrics: { lineOrder, ...(held.length ? { lineMetadata } : {}) } } : {})
     },
     parts,
     _x: rootExtension(gpScoreInfoToWork(doc.metadata), options.encodingDate)

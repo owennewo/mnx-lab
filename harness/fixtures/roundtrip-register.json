@@ -248,6 +248,30 @@
       "count": 3
     },
     {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/en#1",
+      "kind": "lost",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/es#1",
+      "kind": "lost",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/nl#1",
+      "kind": "lost",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/uk#1",
+      "kind": "lost",
+      "documents": 1,
+      "count": 3
+    },
+    {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]",
       "kind": "lost",
       "documents": 1,
@@ -592,12 +616,6 @@
       "count": 4
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
-      "kind": "gained",
-      "documents": 3,
-      "count": 7
-    },
-    {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/graceType",
       "kind": "gained",
       "documents": 3,
@@ -610,10 +628,10 @@
       "count": 55
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2/type",
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
       "kind": "gained",
       "documents": 2,
-      "count": 5
+      "count": 4
     },
     {
       "path": "parts/[]/measures/[]/dynamics/[]",
@@ -634,13 +652,37 @@
       "count": 3
     },
     {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#4/type",
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1",
+      "kind": "gained",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2",
+      "kind": "gained",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#3",
+      "kind": "gained",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#4",
       "kind": "gained",
       "documents": 1,
       "count": 3
     },
     {
       "path": "global/measures/[]/segno/id",
+      "kind": "gained",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2/type",
       "kind": "gained",
       "documents": 1,
       "count": 2
@@ -677,12 +719,6 @@
     },
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/duration",
-      "kind": "gained",
-      "documents": 1,
-      "count": 1
-    },
-    {
-      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#3/type",
       "kind": "gained",
       "documents": 1,
       "count": 1
@@ -1598,23 +1634,43 @@
             "count": 1
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#1",
             "kind": "gained",
             "count": 3
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#2",
             "kind": "gained",
             "count": 3
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#3/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#3",
             "kind": "gained",
-            "count": 1
+            "count": 3
           },
           {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#4/type",
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/#4",
             "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/en#1",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/es#1",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/nl#1",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/uk#1",
+            "kind": "lost",
             "count": 3
           },
           {

@@ -1,4 +1,5 @@
 import { containerEventsWithPaths } from '../model/noteWalk.ts';
+import { lyricRowGroups } from '../model/lyricRows.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
 // The lyric text surface's format engine (one-surface item 6, phase 2:
 // roadmap/inprogress/workbench-one-surface-lyrics.md).
@@ -123,40 +124,11 @@ interface LineGroups {
   groups: Map<string, string[]>;
 }
 
-/** Every lyric row with words anywhere in the document — every part, voice and container. */
-function documentLyricRows(doc: MnxStructure): Set<string> {
-  const rows = new Set<string>();
-  const visit = (items: readonly MnxSequenceItem[]) => {
-    for (const item of items) {
-      for (const id of Object.keys((item as MnxEvent).lyrics?.lines ?? {})) rows.add(id);
-      const content = (item as { content?: MnxSequenceItem[] }).content;
-      if (Array.isArray(content)) visit(content);
-    }
-  };
-  for (const part of doc.parts ?? []) for (const measure of part.measures ?? []) for (const sequence of measure.sequences ?? []) visit(sequence.content ?? []);
-  return rows;
-}
-
 function lineGroups(doc: MnxStructure, walk: LyricEventEntry[]): LineGroups {
-  const metadata = doc.global?.lyrics?.lineMetadata ?? {};
   // Rows are the document's, not one voice's: verse 2 is the same row whichever voice sings it,
   // as the renderer stacks them — so a voice with no words yet reuses the rows another voice made.
-  const order = [...new Set(doc.global?.lyrics?.lineOrder ?? [])];
-  const present = new Set<string>([...Object.keys(metadata), ...documentLyricRows(doc)]);
-  for (const entry of walk)
-    for (const id of Object.keys(entry.event.lyrics?.lines ?? {})) present.add(id);
-  const stacked = [
-    ...order.filter(id => present.has(id)),
-    ...[...present].filter(id => !order.includes(id)).sort()
-  ];
-  const groups = new Map<string, string[]>();
-  for (const id of stacked) {
-    const key = metadata[id]?.lang ?? '';
-    const ids = groups.get(key) ?? [];
-    ids.push(id);
-    groups.set(key, ids);
-  }
-  return { groups };
+  // The player counts the same rows (src/model/lyricRows.ts).
+  return { groups: lyricRowGroups(doc, walk.flatMap(entry => Object.keys(entry.event.lyrics?.lines ?? {}))) };
 }
 
 /** The smallest positive-integer id not yet taken — the lab's own convention;

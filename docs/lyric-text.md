@@ -103,6 +103,12 @@ Morn-ing
 New rows are declared in the document only where their words alone would not
 keep them — an empty row holding a later one's number, or an order the row ids
 would not sort into — because a Guitar Pro save cannot store a declaration.
+An empty row that holds a later verse's place (an instrumental first pass) is
+counted wherever passes are counted — the player's lamp, a press on a lyric, the
+save check (`src/model/lyricRows.ts`) — and a Guitar Pro save keeps it as a blank
+line, which reads back as a declared empty row. Until 2026-11-09 the player
+skipped it, lighting verse 2's words on pass 1, and a save dropped it, moving
+them there for good.
 
 Two blocks can name one stored syllable, and conflicting assignments are
 diagnosed rather than silently choosing the last one. Two mistakes look alike

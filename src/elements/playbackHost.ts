@@ -11,7 +11,7 @@ import {
   followPlayback,
   verseForPass,
 } from '../model/playback.ts';
-import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
+import { verseRows } from '../model/lyricRows.ts';
 import { compilePerformance } from '../audio/performance.ts';
 import { beatOfKey } from './scoreSeek.ts';
 import type { MnxDocument } from '../model/mnx.ts';
@@ -41,7 +41,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   const publish = () => {
     provider.setValue(state);
     if (document)
-      viewer.selectedVerse = verseForPass(documentLyricLineIds(document.mnxJson), state);
+      viewer.selectedVerse = verseForPass(verseRows(document.mnxJson), state);
   };
   const update = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;

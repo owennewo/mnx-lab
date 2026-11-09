@@ -22,7 +22,8 @@ import { mnxDurationToWholes } from './duration.js';
  * (`orderedLyricLineIds`, src/engine/layout/lyricRuns.ts), so each verse is
  * written in the row it is shown in. Guitar Pro identifies verses only by
  * position, so this ordering IS the mapping, and an id left out of it is a
- * verse the file never stores.
+ * verse the file never stores. Declared empty rows count, as the lyric panel
+ * and the player count them (src/model/lyricRows.ts).
  */
 export function resolveLyricLineOrder(mnx: MnxStructure): string[] {
   const declared = mnx.global?.lyrics?.lineOrder ?? [];
@@ -33,7 +34,13 @@ export function resolveLyricLineOrder(mnx: MnxStructure): string[] {
         for (const item of sequence.content ?? [])
           if (isTimedEvent(item))
             for (const id of Object.keys(item.lyrics?.lines ?? {})) used.add(id);
-  return [...new Set(declared), ...[...used].filter(id => !declared.includes(id)).sort()];
+  // A row declared in `lineMetadata` with no words is an unsung verse that
+  // holds its place (pass 1 of a song whose first pass is instrumental): it is
+  // written as a blank line, so the verses after it keep their positions.
+  for (const id of Object.keys(mnx.global?.lyrics?.lineMetadata ?? {})) used.add(id);
+  // `lineOrder` orders rows; it does not make one — an id with no words and no
+  // declaration is not a verse, and writing it would read back as a held place.
+  return [...new Set(declared.filter(id => used.has(id))), ...[...used].filter(id => !declared.includes(id)).sort()];
 }
 
 /**

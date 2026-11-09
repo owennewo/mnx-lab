@@ -18,7 +18,7 @@
  */
 import type { PassModel } from '../../model/passes.ts';
 import type { MnxStructure } from '../../model/mnx.ts';
-import { documentLyricLineIds } from '../layout/lyricRuns.ts';
+import { lyricRowGroups } from '../../model/lyricRows.ts';
 
 // ── slots ─────────────────────────────────────────────────────────────────
 
@@ -206,12 +206,13 @@ export class PressCounter {
  * The visit a verse is sung on, for a press on a lyric in the WRITTEN view —
  * the lamp's own rule (`model/passes.ts`: a visit's `verse` lights row N), so
  * pressing verse 2 of a repeated bar lands on its second visit. Verse rows
- * count in `documentLyricLineIds` order, as the lamp counts them. Undefined
+ * count within their language group, declared empty rows included
+ * (`model/lyricRows.ts`), as the lamp and the lyric panel count them. Undefined
  * when no visit sings that row (a verse past the repeats) — the cursor then
  * keeps whichever pass it is on.
  */
 export function lyricVisit(doc: MnxStructure, model: PassModel, measureIndex: number, lyricLine: string): number | undefined {
-  const verse = documentLyricLineIds(doc).indexOf(lyricLine) + 1;
+  const verse = [...lyricRowGroups(doc).values()].map(ids => ids.indexOf(lyricLine) + 1).find(at => at > 0) ?? 0;
   if (verse < 1) return undefined;
   return model.entries.find(entry => entry.measureIndex === measureIndex && entry.verse === verse)?.ordinal;
 }

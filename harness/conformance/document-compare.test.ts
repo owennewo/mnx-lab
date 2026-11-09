@@ -102,7 +102,27 @@ describe('document comparison: what is not a difference', () => {
     const moved = sung([['1', 'one'], ['2', 'nine'], ['3', 'ten']], { lineOrder: ['1', '2', '3'] });
     expect(compareDocuments(edited, moved).length).toBeGreaterThan(0);
     const lang = sung([['1', 'one']], { lineMetadata: { '1': { lang: 'fr' } } });
-    expect(compareDocuments(lang, sung([['1', 'one']]))).toEqual([{ path: ['global', 'lyrics'], kind: 'lost', before: { lineMetadata: { '#1': { lang: 'fr' } } } }]);
+    // A French row read back as the primary language's verse 1 is sung on pass 1
+    // now: the verse itself moved groups, not only its label.
+    expect(compareDocuments(lang, sung([['1', 'one']])).map(d => [d.path.join('/'), d.kind])).toEqual([
+      ['global/lyrics', 'lost'],
+      ['parts/0/measures/0/sequences/0/content/0/lyrics/lines/fr#1', 'lost'],
+      ['parts/0/measures/0/sequences/0/content/0/lyrics/lines/#1', 'gained']
+    ]);
+  });
+
+  it('an empty row that holds a verse\'s place is a row: losing it moves the verses after it', () => {
+    const sung = (lines: [string, string][], lyrics?: object) => ({
+      ...score(), global: { ...score().global, ...(lyrics ? { lyrics } : {}) },
+      parts: [{ ...score().parts[0], measures: [{ sequences: [{ content: lines.map(([id, text]) =>
+        ({ duration: { base: 'quarter' }, lyrics: { lines: { [id]: { text } } }, notes: [{ pitch: { step: 'C', octave: 4 } }] })) }] }] }]
+    });
+    // As the lyric panel leaves an instrumental first pass: row 1 declared, unsung.
+    const held = sung([['2', 'two']], { lineMetadata: { '1': {}, '2': {} } });
+    expect(compareDocuments(held, sung([['2', 'two']], { lineOrder: ['1', '2'], lineMetadata: { '1': {} } }))).toEqual([]);
+    expect(compareDocuments(held, sung([['1', 'two']])).length).toBeGreaterThan(0);
+    // An empty row with no sung row after it holds nothing.
+    expect(compareDocuments(sung([['1', 'one']], { lineMetadata: { '2': {} } }), sung([['1', 'one']]))).toEqual([]);
   });
 
   it('key order is not a difference, and canonicalising never mutates', () => {
