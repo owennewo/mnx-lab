@@ -22,8 +22,8 @@ function library() {
 const insert = (db: DatabaseSync, table: string, row: Row) =>
   db.prepare(`INSERT INTO ${table} (${Object.keys(row)}) VALUES (${Object.keys(row).map(() => '?')})`).run(...Object.values(row));
 const snapshot = (db: DatabaseSync) => Object.fromEntries(TABLES.map(t => [t, db.prepare(`SELECT * FROM ${t}`).all().map(r => ({ ...r }))]));
-function sync(a: DatabaseSync, b: DatabaseSync) {
-  const plan = planSync(snapshot(a), snapshot(b));
+function sync(a: DatabaseSync, b: DatabaseSync, options?: { views: boolean }) {
+  const plan = planSync(snapshot(a), snapshot(b), undefined, options);
   a.exec(renderSql(statements(plan.into.a)));
   b.exec(renderSql(statements(plan.into.b)));
   return plan;
@@ -51,11 +51,11 @@ describe('library sync', () => {
     canonical(a, 'p1', 'e2');
     insert(a, 'tags', { owner: 'operator', piece_id: 'p1', dimension: 'title', value: 'Song', origin: 'derived' });
     insert(a, 'piece_views', { owner: 'operator', piece_id: 'p1', opened_at: T(5), prefs: '{"x":1}', prefs_updated_at: T(5) });
-    const plan = sync(a, b);
+    const plan = sync(a, b, { views: true });
     expect([...plan.into.b.blobs.keys()]).toHaveLength(3);
     expect(row(b, 'SELECT canonical_rendition_id c, revision r FROM pieces')).toEqual({ c: 'e2', r: 3 });
     expect(row(b, 'SELECT prefs FROM piece_views').prefs).toBe('{"x":1}');
-    expect(quiet(planSync(snapshot(a), snapshot(b)))).toBe(true);
+    expect(quiet(planSync(snapshot(a), snapshot(b), undefined, { views: true }))).toBe(true);
   });
 
   it('fast-forwards each pointer along derived_from, one revision each, and takes the derived tags along', () => {
@@ -108,13 +108,26 @@ describe('library sync', () => {
     insert(b, 'tags', { owner: 'operator', piece_id: 'p1', dimension: 'list', value: 'Old', origin: 'asserted' });
     insert(a, 'piece_views', { owner: 'operator', piece_id: 'p1', opened_at: T(9), prefs: '{"old":1}', prefs_updated_at: T(2) });
     insert(b, 'piece_views', { owner: 'operator', piece_id: 'p1', opened_at: T(4), prefs: '{"new":1}', prefs_updated_at: T(4) });
-    sync(a, b);
+    sync(a, b, { views: true });
     for (const db of [a, b]) {
       expect(row(db, 'SELECT deleted_at d FROM pieces').d).toBe(T(9));
       expect(db.prepare('SELECT value FROM tags').all().map(t => t.value)).toEqual(['Gig']);
       expect(row(db, 'SELECT opened_at, prefs FROM piece_views')).toEqual({ opened_at: T(9), prefs: '{"new":1}' });
     }
+    expect(quiet(planSync(snapshot(a), snapshot(b), undefined, { views: true }))).toBe(true);
+  });
+
+  it('leaves piece views alone unless asked, on a new piece and on one both sides have', () => {
+    const [a, b] = [library(), library()];
+    piece(a, 'p1', { updated: 2 }); piece(b, 'p1', { updated: 2 }); piece(a, 'p2', { updated: 2 });
+    insert(a, 'piece_views', { owner: 'operator', piece_id: 'p1', opened_at: T(9), prefs: '{"a":1}', prefs_updated_at: T(9) });
+    insert(b, 'piece_views', { owner: 'operator', piece_id: 'p1', opened_at: T(4), prefs: '{"b":1}', prefs_updated_at: T(4) });
+    insert(a, 'piece_views', { owner: 'operator', piece_id: 'p2', opened_at: T(5), prefs: '{"x":1}', prefs_updated_at: T(5) });
+    const plan = sync(a, b);
+    expect(plan.into.b.summary).toEqual([expect.stringMatching(/^p2 \(p2\): new piece/)]);
+    expect(b.prepare('SELECT piece_id, prefs FROM piece_views').all().map(r => ({ ...r }))).toEqual([{ piece_id: 'p1', prefs: '{"b":1}' }]);
     expect(quiet(planSync(snapshot(a), snapshot(b)))).toBe(true);
+    expect(quiet(planSync(snapshot(a), snapshot(b), undefined, { views: true }))).toBe(false);
   });
 
   it('limited to some pieces, moves only theirs and leaves every other row and the aliases alone', () => {

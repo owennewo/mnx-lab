@@ -23,7 +23,10 @@
 //     that only ever gain: `duration_s`, a measurement of the media rather than
 //     an edit, which a side that lacks it gains; and `provenance`, which merges
 //     key by key, the newer row's keys winning.
-//   - A piece view keeps the later `opened_at` and the later prefs.
+//   - A piece view keeps the later `opened_at` and the later prefs — only with
+//     --views (`{ views: true }`). By default views are per-library: when a piece
+//     was last opened and how its page is set up rarely need to travel, so
+//     neither side's piece_views rows are read, planned or written.
 //   - `revision` is a per-library compare-and-set counter, never compared across
 //     libraries. A changed piece is bumped by one under compare-and-set, and both
 //     sides end with the later `updated_at`, so a second run plans nothing.
@@ -118,7 +121,8 @@ export function onlyPieces(snapshot, ids) {
  * what each side must receive, the conflicts left alone, and per-piece lines
  * a person can read. Pure: the caller decides whether to write it.
  */
-export function planSync(a, b, names = { a: 'a', b: 'b' }) {
+export function planSync(a, b, names = { a: 'a', b: 'b' }, { views = false } = {}) {
+  if (!views) [a, b] = [a, b].map(s => ({ ...s, piece_views: [] }));
   const migrations = s => s.d1_migrations.map(m => m.name).sort().join();
   if (migrations(a) !== migrations(b)) throw new Error(`Schema differs: apply migrations to both libraries first (${names.a}: ${migrations(a)}; ${names.b}: ${migrations(b)})`);
   const A = index(a), B = index(b);
@@ -368,20 +372,21 @@ async function copyBlobs(from, to, blobs, scratch) {
   });
 }
 
-function report(plan, names) {
+function report(plan, names, views) {
   const lines = [];
   for (const [to, from] of [['a', 'b'], ['b', 'a']]) {
     const c = plan.into[to];
-    lines.push(`\n${names[from]} → ${names[to]}: ${c.summary.length} piece${c.summary.length === 1 ? '' : 's'} changed, ${c.blobs.size} blob${c.blobs.size === 1 ? '' : 's'}, ${c.views.length} piece view${c.views.length === 1 ? '' : 's'} (last opened / setup)`);
+    lines.push(`\n${names[from]} → ${names[to]}: ${c.summary.length} piece${c.summary.length === 1 ? '' : 's'} changed, ${c.blobs.size} blob${c.blobs.size === 1 ? '' : 's'}${views ? `, ${c.views.length} piece view${c.views.length === 1 ? '' : 's'} (last opened / setup)` : ''}`);
     for (const s of c.summary) lines.push(`  ${s}`);
   }
+  if (!views) lines.push('\npiece views (last opened / setup) left alone; --views syncs them');
   lines.push(`\nconflicts: ${plan.conflicts.length}`);
   for (const s of plan.conflicts) lines.push(`  ${s}`);
   return lines.join('\n');
 }
 const empty = plan => ['a', 'b'].every(s => !plan.into[s].summary.length && !plan.into[s].blobs.size && !plan.into[s].views.length);
 
-const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--piece <id>]... [--local-state <dir>] [--remote-state <dir>] [--backup <dir>]
+const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--views] [--piece <id>]... [--local-state <dir>] [--remote-state <dir>] [--backup <dir>]
 
   Plans a two-way sync between the local dev library and the deployed one and
   prints it. --apply writes it, after backing both databases up to --backup
@@ -393,32 +398,34 @@ const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--pie
   primary checkout's .wrangler/state; --remote-state replaces the deployed
   library with a local one (a rehearsal). --piece (repeatable) syncs only those
   pieces and leaves every other row, and the aliases, as they are; the backups
-  and the check that nothing moved while planning still cover both libraries.`;
+  and the check that nothing moved while planning still cover both libraries.
+  --views also syncs piece views (when each piece was last opened, and its page
+  setup); without it they are left as each library has them.`;
 
 async function main(argv) {
   const flags = new Set(), values = {}, pieces = [];
   for (let i = 0; i < argv.length; i++) {
     if (['--local-state', '--remote-state', '--backup'].includes(argv[i])) { if (!argv[i + 1]) throw new Error(USAGE); values[argv[i]] = resolve(argv[++i]); }
     else if (argv[i] === '--piece') { if (!argv[i + 1]) throw new Error(USAGE); pieces.push(argv[++i]); }
-    else if (['--apply', '--writers-stopped', '--help'].includes(argv[i])) flags.add(argv[i]);
+    else if (['--apply', '--writers-stopped', '--views', '--help'].includes(argv[i])) flags.add(argv[i]);
     else throw new Error(USAGE);
   }
   if (flags.has('--help')) return console.log(USAGE);
   if (flags.has('--apply') && !flags.has('--writers-stopped')) throw new Error('Stop every writer to BOTH libraries (dev servers on the local state, studio tabs on the deployed site), then pass --writers-stopped.');
   const local = side('local', values['--local-state'] ?? await primaryState());
   const remote = side('remote', values['--remote-state'] ?? null);
-  try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state'], pieces.length ? pieces : null); }
+  try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state'], pieces.length ? pieces : null, flags.has('--views')); }
   finally { await Promise.all([local.close(), remote.close()]); }
 }
 
-async function sync(local, remote, apply, backup, deployed, pieces) {
+async function sync(local, remote, apply, backup, deployed, pieces, views) {
   const names = { a: 'local', b: 'remote' };
   console.error(`local:  ${local.describe}\nremote: ${remote.describe}${pieces ? `\npieces: ${pieces.join(', ')}` : ''}`);
   const [a, b] = await Promise.all([local.snapshot(), remote.snapshot()]);
   const cut = s => pieces ? onlyPieces(s, pieces) : s;
   if (pieces) for (const id of pieces) if (![a, b].some(s => s.pieces.some(p => p.id === id))) throw new Error(`No piece ${id} in either library`);
-  const plan = planSync(cut(a), cut(b), names);
-  console.log(report(plan, names));
+  const plan = planSync(cut(a), cut(b), names, { views });
+  console.log(report(plan, names, views));
   if (!apply || empty(plan)) return;
 
   const stamp = new Date().toISOString().replace(/[:.]/g, '-'), prefix = `library-sync/${stamp}`;
@@ -448,8 +455,8 @@ async function sync(local, remote, apply, backup, deployed, pieces) {
   // The record of what changed joins the backups; the writes are done whether or not it arrives.
   if (deployed && applied.length) await offsite(backup, prefix, applied).catch(e => console.error(`off-site copy of ${applied} failed (${e.message}); it is in ${backup}`));
 
-  const after = planSync(...(await Promise.all([local.snapshot(), remote.snapshot()])).map(cut), names);
-  if (!empty(after)) { console.log(`\nNOT converged — run again to finish, or read what remains:${report(after, names)}`); process.exitCode = 1; }
+  const after = planSync(...(await Promise.all([local.snapshot(), remote.snapshot()])).map(cut), names, { views });
+  if (!empty(after)) { console.log(`\nNOT converged — run again to finish, or read what remains:${report(after, names, views)}`); process.exitCode = 1; }
   else console.log(`\nconverged${after.conflicts.length ? `, with ${after.conflicts.length} conflict(s) left for a person` : ''}.`);
 }
 

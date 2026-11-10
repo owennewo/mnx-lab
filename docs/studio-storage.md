@@ -572,7 +572,12 @@ reconciles them row by row, in both directions:
 npm run sync:library                                   # the plan: what moves each way, and any conflicts
 npm run sync:library -- --apply --writers-stopped      # back both up, write, re-plan (must come back empty)
 npm run sync:library -- --remote-state <dir> ...       # rehearse against a local stand-in for the deployed one
+npm run sync:library -- --views ...                    # also sync piece views (last opened, page setup)
 ```
+
+Piece views (`piece_views`: when each piece was last opened, and its page setup) stay
+per-library unless `--views` is passed: they rarely need to travel, and left in they
+crowd the plan with lines nobody acts on.
 
 Stop every writer first: the primary checkout's `npm run dev`, which holds the local D1
 open, and any studio tab on the deployed site. `--apply` backs both up before writing (to
