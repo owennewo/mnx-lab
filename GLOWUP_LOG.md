@@ -59,7 +59,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | cirillo-2025-08-09 | Marco Cirillo | `1733e4ec08a1acce` |  | unsynced |  |  |  |
 | Classical Gas | Mason Williams | `9d9d1772c97f1629` |  | Soundslice |  |  |  |
 | Colours | Donavan (Chris Brain) | `5c96fd4139c593d1` |  | Soundslice |  |  |  |
-| Cormorant (draft, Meneer Frits 2022) | John Blek | `5df759c729c55db9` |  | **bar search** 10-27 | draft |  |  |
+| Cormorant (draft, Meneer Frits 2022) | John Blek | `5df759c729c55db9` |  | **bar search** 11-10 | draft | 🟡  |  |
 | Cruel Summer | Bananarama | `d63697e5db3ca97a` |  | Soundslice |  |  |  |
 | Curragh of Kildare | Bert Jansch | `af9f36d69555abb9` |  | Soundslice |  |  |  |
 | Day is Done | Nick Drake | `429dc263a1d42287` |  | Soundslice |  |  |  |
@@ -156,7 +156,14 @@ checkpoints.
   later throughout (Frits has a longer intro), so Intro 1, Verse 13, Pre-chorus 42, Chorus 47,
   Instrumental 56, Verse 62, Pre-chorus 92, Chorus 97, Instrumental 105, Verse 112,
   Pre-chorus 125, Chorus 130, Outro 138 — checkpoint *Section marks (from the Musicstar draft)*.
-- Open: still a draft — bar 3 and bars 148–150 are empty; the notes are uncorrected.
+- **Form**: the owner heard bars 1–3 as a false start before the song; they and the three
+  empty bars at the end are removed (150 → 144 bars; the old bar 4 is bar 1, so every
+  section mark is three bars earlier) — checkpoint *Song starts at the old bar 4; empty
+  end bars removed*.
+- **Sync** rewritten for the 144 bars: the same bar lines, three bars on (bar 1 at 50.10 s);
+  free and fixed-order searches agree exactly. 94% of 971 written notes heard against 13%
+  chance, 140 of 145 bar lines on a heard downbeat, one weak bar (134).
+- Open: still a draft — the notes are uncorrected.
 
 ### 2026-11-09 — Strolling Down the Highway (Bert Jansch) · `4cc190c6b61e55f2` — pickup, notes, every verse
 
