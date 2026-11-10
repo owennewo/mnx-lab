@@ -170,7 +170,8 @@ checkpoints.
   verse, Pre-chorus, Chorus (80%). Three section marks copied from the Musicstar draft were
   a bar early (Verse 2, the second Instrumental, Verse 3). Now one strain ×3: bars 10–59,
   with the link + second verse (22–38) a "1.2." ending, the Instrumental (52–59) a "1.2."
-  ending holding `:|x3`, and the Outro a "3." ending — 144 → 69 written bars, the player's
+  ending holding `:|x3`, and the Outro after it (a "3." bracket there was dropped: the
+  third pass skips the "1.2." ending and reaches it anyway) — 144 → 69 written bars, the player's
   order exactly the recording's 144. Where the passes' drafts differed, each written bar
   keeps the version that best matches every pass it stands for (pass 1 on ties; 10, 46, 47,
   59 from later passes), so 24 performed bars changed notes. The sync still fits as stored
