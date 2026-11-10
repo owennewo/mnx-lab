@@ -59,7 +59,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | cirillo-2025-08-09 | Marco Cirillo | `1733e4ec08a1acce` |  | unsynced |  |  |  |
 | Classical Gas | Mason Williams | `9d9d1772c97f1629` |  | Soundslice |  |  |  |
 | Colours | Donavan (Chris Brain) | `5c96fd4139c593d1` |  | Soundslice |  |  |  |
-| Cormorant (draft, Meneer Frits 2022) | John Blek | `5df759c729c55db9` |  | **bar search** 11-10 | draft | 🟡  |  |
+| Cormorant (draft, Meneer Frits 2022) | John Blek | `5df759c729c55db9` |  | **bar search** 11-10 | draft | ✅  |  |
 | Cruel Summer | Bananarama | `d63697e5db3ca97a` |  | Soundslice |  |  |  |
 | Curragh of Kildare | Bert Jansch | `af9f36d69555abb9` |  | Soundslice |  |  |  |
 | Day is Done | Nick Drake | `429dc263a1d42287` |  | Soundslice |  |  |  |
@@ -163,7 +163,20 @@ checkpoints.
 - **Sync** rewritten for the 144 bars: the same bar lines, three bars on (bar 1 at 50.10 s);
   free and fixed-order searches agree exactly. 94% of 971 written notes heard against 13%
   chance, 140 of 145 bar lines on a heard downbeat, one weak bar (134).
-- Open: still a draft — the notes are uncorrected.
+- **Form, written as played** (the owner's hypothesis, checked on the recording's own notes
+  rather than the draft, whose passes were drafted by voting): the 29-bar "Verse 1" is two
+  12-bar verses with a 5-bar link (bars 17 apart match 83% against 26% for any two bars);
+  bars 10–59 and 60–109 are one 50-bar cycle played twice (84–88%); the last pass is one
+  verse, Pre-chorus, Chorus (80%). Three section marks copied from the Musicstar draft were
+  a bar early (Verse 2, the second Instrumental, Verse 3). Now one strain ×3: bars 10–59,
+  with the link + second verse (22–38) a "1.2." ending, the Instrumental (52–59) a "1.2."
+  ending holding `:|x3`, and the Outro a "3." ending — 144 → 69 written bars, the player's
+  order exactly the recording's 144. Where the passes' drafts differed, each written bar
+  keeps the version that best matches every pass it stands for (pass 1 on ties; 10, 46, 47,
+  59 from later passes), so 24 performed bars changed notes. The sync still fits as stored
+  (verify: 94% of 973 notes against 13%) — checkpoint *Repeats: verse pairs and the cycle
+  written once (144 → 69 bars)*.
+- Open: still a draft — the notes are uncorrected; per-pass variations are gone with the repeats.
 
 ### 2026-11-09 — Strolling Down the Highway (Bert Jansch) · `4cc190c6b61e55f2` — pickup, notes, every verse
 
