@@ -59,7 +59,6 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | cirillo-2025-08-09 | Marco Cirillo | `1733e4ec08a1acce` |  | unsynced |  |  |  |
 | Classical Gas | Mason Williams | `9d9d1772c97f1629` |  | Soundslice |  |  |  |
 | Colours | Donavan (Chris Brain) | `5c96fd4139c593d1` |  | Soundslice |  |  |  |
-| Cormorant (draft) | John Blek | `9b093e5a2114a1c3` |  | draft pipeline 10-26 | draft |  |  |
 | Cormorant (draft, Meneer Frits 2022) | John Blek | `5df759c729c55db9` |  | **bar search** 10-27 | draft |  |  |
 | Cruel Summer | Bananarama | `d63697e5db3ca97a` |  | Soundslice |  |  |  |
 | Curragh of Kildare | Bert Jansch | `af9f36d69555abb9` |  | Soundslice |  |  |  |
@@ -144,6 +143,20 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-10 — Cormorant (John Blek) · `5df759c729c55db9`, `9b093e5a2114a1c3` deleted
+
+- **One draft kept.** The two drafts, each checked against its own recording (MuScriptor on
+  the INSTV7N instrumental, fixed order near the stored sync): Meneer Frits 94% of 979
+  notes found by pitch class against 15% chance, 1 weak bar (137); Musicstar 90% of 935
+  against 17%, 5 weak bars (54, 86, 103, 127, 137) and 4 s played past its last bar. Both
+  were drafted from these recordings, so the numbers flatter both; the gap is the evidence.
+  The Musicstar draft (`9b093e5a2114a1c3`) is deleted (restorable from studio's deleted list).
+- **Sections** copied from the Musicstar draft: its bars match the Frits draft's ten bars
+  later throughout (Frits has a longer intro), so Intro 1, Verse 13, Pre-chorus 42, Chorus 47,
+  Instrumental 56, Verse 62, Pre-chorus 92, Chorus 97, Instrumental 105, Verse 112,
+  Pre-chorus 125, Chorus 130, Outro 138 — checkpoint *Section marks (from the Musicstar draft)*.
+- Open: still a draft — bar 3 and bars 148–150 are empty; the notes are uncorrected.
 
 ### 2026-11-09 — Strolling Down the Highway (Bert Jansch) · `4cc190c6b61e55f2` — pickup, notes, every verse
 
