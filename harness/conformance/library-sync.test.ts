@@ -130,6 +130,16 @@ describe('library sync', () => {
     expect(quiet(planSync(snapshot(a), snapshot(b), undefined, { views: true }))).toBe(false);
   });
 
+  it('leaves a piece deleted on its only side where it is', () => {
+    const [a, b] = [library(), library()];
+    piece(a, 'gone', { updated: 3, deleted: T(3) }); rendition(a, 'gone', 'go', { role: 'original' }); canonical(a, 'gone', 'go');
+    const plan = sync(a, b);
+    expect(plan.into.b.leftBehind).toEqual(['gone (gone)']);
+    expect(plan.into.b.blobs.size).toBe(0);
+    expect(b.prepare('SELECT count(*) n FROM pieces').get()).toEqual({ n: 0 });
+    expect(quiet(planSync(snapshot(a), snapshot(b)))).toBe(true);
+  });
+
   it('limited to some pieces, moves only theirs and leaves every other row and the aliases alone', () => {
     const [a, b] = [library(), library()];
     for (const id of ['p1', 'p2']) { piece(a, id, { revision: 1, updated: 2 }); rendition(a, id, `${id}o`, { role: 'original' }); canonical(a, id, `${id}o`); }

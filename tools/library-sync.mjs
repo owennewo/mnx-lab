@@ -9,8 +9,10 @@
 //
 // The rules, one per kind of row:
 //   - A piece, rendition, recording, view or alias on one side only is copied,
-//     blobs first. Deletion does not propagate (there are no tombstones), so a
-//     row deleted on one side comes back; the plan lists every copy.
+//     blobs first — except a piece on one side only that is soft-deleted there
+//     (`deleted_at`): it stays where it is, with all its rows, and the plan names
+//     it as left behind. Hard deletion does not propagate (there are no
+//     tombstones), so a row removed on one side comes back; the plan lists every copy.
 //   - The canonical pointer FAST-FORWARDS: a side whose canonical rendition is
 //     an ancestor (`derived_from`) of the other's moves to it. Two sides that
 //     each saved past their common version are a conflict, reported and left
@@ -102,7 +104,7 @@ function lineageOrder(rows) {
 }
 
 function emptyChanges() {
-  return { newPieces: [], renditions: [], recordings: [], recordingUpdates: [], tagsRemoved: [], tagsAdded: [], pieceUpdates: [], views: [], aliases: [], blobs: new Map(), summary: [] };
+  return { leftBehind: [], newPieces: [], renditions: [], recordings: [], recordingUpdates: [], tagsRemoved: [], tagsAdded: [], pieceUpdates: [], views: [], aliases: [], blobs: new Map(), summary: [] };
 }
 
 /**
@@ -139,6 +141,7 @@ export function planSync(a, b, names = { a: 'a', b: 'b' }, { views = false } = {
     if (!pa || !pb) {
       const [to, from, target] = pa ? ['b', A, B] : ['a', B, A];
       const piece = pa ?? pb, change = into[to];
+      if (piece.deleted_at) { change.leftBehind.push(`${name} (${id})`); continue; }
       change.newPieces.push(piece);
       for (const r of lineageOrder(from.renditionsOf.get(id) ?? [])) { change.renditions.push(r); needBlob(to, target, r); }
       for (const r of from.recordingsOf.get(id) ?? []) { change.recordings.push(r); needBlob(to, target, r); }
@@ -378,6 +381,7 @@ function report(plan, names, views) {
     const c = plan.into[to];
     lines.push(`\n${names[from]} → ${names[to]}: ${c.summary.length} piece${c.summary.length === 1 ? '' : 's'} changed, ${c.blobs.size} blob${c.blobs.size === 1 ? '' : 's'}${views ? `, ${c.views.length} piece view${c.views.length === 1 ? '' : 's'} (last opened / setup)` : ''}`);
     for (const s of c.summary) lines.push(`  ${s}`);
+    if (c.leftBehind.length) lines.push(`  left behind, deleted on ${names[from]} only: ${c.leftBehind.join(', ')}`);
   }
   if (!views) lines.push('\npiece views (last opened / setup) left alone; --views syncs them');
   lines.push(`\nconflicts: ${plan.conflicts.length}`);

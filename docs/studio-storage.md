@@ -594,8 +594,10 @@ Each kind of row has one rule, in the tool's header. The canonical pointer **fas
 along `derived_from`, and two sides that each saved past a common version are a conflict,
 reported and left alone (both lines of renditions are still copied). Recordings and piece
 settings follow the newer row. `revision` is never compared across libraries, because it is
-each library's own compare-and-set counter. **Deletion does not propagate**: there are no
-tombstones, so a row removed on one side comes back from the other. Read the plan before
+each library's own compare-and-set counter. A piece **deleted on the only side
+that has it** is not copied; the plan names it as left behind. A piece both sides have
+takes the deletion of the side whose piece row changed last. **Hard deletion does not
+propagate**: there are no tombstones, so a row removed on one side comes back from the other. Read the plan before
 applying it.
 
 ## Out of scope here
