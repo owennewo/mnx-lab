@@ -765,7 +765,17 @@
         "kind": "rect",
         "x": 32.616,
         "y": 6.7743,
-        "w": 2.5759,
+        "w": 1.0653,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "harmonic-held-bg",
+        "sourceId": "@m0.v0.e6.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 33.558,
+        "y": 6.7743,
+        "w": 1.6339,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",

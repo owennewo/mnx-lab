@@ -149,7 +149,7 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
       'technique-vibrato',
       'technique-palm-mute', 'technique-palm-mute-line',
       'technique-harmonic', 'technique-harmonic-label',
-      'harmonic-diamond', 'harmonic-held'
+      'harmonic-diamond', 'harmonic-held', 'harmonic-held-bg'
     ],
     note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a letterless slur (one adornment — direction implicit in the pitches), vibrato as a wiggle, palm mute as the span its run reads as, natural harmonics as `<12>` in the tab digit and a circle over the notation note, stopped (artificial) ones as the touch fret in a diamond and a diamond notehead — removing one lowers the note to the fret held, a dead note as `x` in place of the digit and an x notehead.',
     construct: ['setTechnique'],

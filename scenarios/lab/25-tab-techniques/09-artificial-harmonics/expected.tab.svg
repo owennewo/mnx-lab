@@ -34,7 +34,8 @@
 <text x="414" y="134.8576" font-size="16.44" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e4.n0">19</text>
 <rect x="473.4512" y="71.8176" width="17.0976" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e5.n0"></rect>
 <text x="482" y="80" font-size="21.92" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--score-font-fret, var(--font-family-sans))" class="fret-number" data-source-id="@m0.v0.e5.n0">9</text>
-<rect x="521.856" y="108.3888" width="41.2144" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e6.n0"></rect>
+<rect x="521.856" y="108.3888" width="17.0448" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="harmonic-held-bg" data-source-id="@m0.v0.e6.n0"></rect>
+<rect x="536.928" y="108.3888" width="26.1424" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e6.n0"></rect>
 <line x1="538.9008" y1="116.5712" x2="550" y2="105.3712" stroke-width="1.6" class="harmonic-diamond" data-source-id="@m0.v0.e6.n0"></line>
 <line x1="550" y1="105.3712" x2="561.0992" y2="116.5712" stroke-width="1.6" class="harmonic-diamond" data-source-id="@m0.v0.e6.n0"></line>
 <line x1="561.0992" y1="116.5712" x2="550" y2="127.7712" stroke-width="1.6" class="harmonic-diamond" data-source-id="@m0.v0.e6.n0"></line>

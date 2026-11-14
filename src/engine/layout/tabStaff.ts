@@ -879,15 +879,25 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // otherwise the mask and the digit come apart as the staff grows.
       const air = FRET_MASK_AIR * fontSize * 0.6;
       const heldWidthSp = held ? fontSize * 0.6 * held.length : 0;
-      // Left and right of the event's x, in ink: the digits (or the diamond,
-      // and the held fret before it) plus a little air.
-      const rightSp = shape ? shape.halfWidth + air : charWidthSp / 2 + air;
-      const leftSp = shape ? shape.halfWidth + (held ? DIAMOND_HELD_GAP_SP + heldWidthSp : 0) + air : rightSp;
+      // Either side of the event's x, in ink: the digits, or the diamond,
+      // plus a little air. The mask stays centred on what it masks; a held
+      // fret before the diamond gets a mask of its own, below.
+      const halfSp = shape ? shape.halfWidth + air : charWidthSp / 2 + air;
+      if (held) primitives.push({
+        kind: 'rect',
+        x: eventX - (shape!.halfWidth + DIAMOND_HELD_GAP_SP + heldWidthSp + air) * ink,
+        y: stringY - bgHeight / 2,
+        w: DIAMOND_HELD_GAP_SP + heldWidthSp + air,
+        h: bgHeight,
+        fill: FRET_BG_FILL,
+        className: 'harmonic-held-bg',
+        sourceId: noteId
+      });
       primitives.push({
         kind: 'rect',
-        x: eventX - leftSp * ink,
+        x: eventX - halfSp * ink,
         y: stringY - bgHeight / 2,
-        w: leftSp + rightSp,
+        w: 2 * halfSp,
         h: bgHeight,
         fill: FRET_BG_FILL,
         className: 'fret-bg',
