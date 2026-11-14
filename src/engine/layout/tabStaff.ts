@@ -925,7 +925,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           baseline: 'central',
           weight: FRET_FONT_WEIGHT,
           fill: fretFill,
-          className: 'fret-number harmonic-held' + fretClass,
+          className: 'harmonic-held' + fretClass,
           sourceId: noteId
         });
       }

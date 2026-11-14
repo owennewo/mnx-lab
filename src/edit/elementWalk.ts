@@ -129,8 +129,10 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   },
   technique: {
     // Only what the corpus actually draws — a claim is a statement about the
-    // goldens, so `slideIn`/`slideOut` and the non-natural harmonic labels
-    // stay unclaimed until a scenario exercises them. A natural harmonic has
+    // goldens, so `slideIn`/`slideOut` stay unclaimed until a scenario
+    // exercises them. A stopped harmonic (artificial; lab 25/09) draws a
+    // diamond around the touch fret, the fret held before it when the node is
+    // not the octave, and its word over the notation note. A natural harmonic has
     // no class of its own on the TAB staff: it is spelled into the digit
     // (`<12>`), which `note` already claims as `fret-number`. The DEAD note
     // is that case on both staves at once and so claims nothing anywhere: it
@@ -146,9 +148,10 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
       'technique-slide-legato-slur',
       'technique-vibrato',
       'technique-palm-mute', 'technique-palm-mute-line',
-      'technique-harmonic'
+      'technique-harmonic', 'technique-harmonic-label',
+      'harmonic-diamond', 'harmonic-held'
     ],
-    note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a letterless slur (one adornment — direction implicit in the pitches), vibrato as a wiggle, palm mute as the span its run reads as, harmonics as `<12>` in the tab digit and a circle over the notation note, a dead note as `x` in place of the digit and an x notehead.',
+    note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a letterless slur (one adornment — direction implicit in the pitches), vibrato as a wiggle, palm mute as the span its run reads as, natural harmonics as `<12>` in the tab digit and a circle over the notation note, stopped (artificial) ones as the touch fret in a diamond and a diamond notehead — removing one lowers the note to the fret held, a dead note as `x` in place of the digit and an x notehead.',
     construct: ['setTechnique'],
     remove: ['removeTechnique']
   },

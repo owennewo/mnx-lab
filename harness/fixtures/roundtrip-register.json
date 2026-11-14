@@ -3,15 +3,15 @@
   "verdicts": {
     "clean": 7,
     "gains": 30,
-    "differs": 102,
+    "differs": 103,
     "error": 0
   },
   "lostOrChanged": [
     {
       "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
       "kind": "lost",
-      "documents": 27,
-      "count": 27
+      "documents": 28,
+      "count": 28
     },
     {
       "path": "global/measures/[]/barline",
@@ -534,20 +534,20 @@
     {
       "path": "parts/[]/transposition",
       "kind": "gained",
-      "documents": 129,
-      "count": 155
+      "documents": 130,
+      "count": 156
     },
     {
       "path": "parts/[]/measures/[]/sequences/[]/voice",
       "kind": "gained",
-      "documents": 128,
-      "count": 372
+      "documents": 129,
+      "count": 373
     },
     {
       "path": "global/measures/[]/key",
       "kind": "gained",
-      "documents": 124,
-      "count": 124
+      "documents": 125,
+      "count": 125
     },
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
@@ -4701,6 +4701,31 @@
             "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
             "kind": "gained",
             "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/artificial-harmonics": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
           },
           {
             "path": "parts/[]/measures/[]/sequences/[]/voice",

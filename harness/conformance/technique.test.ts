@@ -318,7 +318,9 @@ describe('a touched harmonic is drawn as one', () => {
     const doc = bar([twelfth]);
     const note = (doc.parts[0].measures[0].sequences![0].content![0] as { notes: { pitch: unknown }[] }).notes[0];
     note.pitch = { step: 'D', octave: 5 };
-    expect(texts(projections(doc).tab, 'fret-number')).toEqual(['0', '7']);
+    const tab = projections(doc).tab;
+    expect(texts(tab, 'fret-number')).toEqual(['7']);
+    expect(texts(tab, 'harmonic-held')).toEqual(['0']);
   });
 
   it('a natural harmonic keeps its brackets and its circle', () => {

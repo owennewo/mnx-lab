@@ -124,7 +124,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "string": 1
+                          "string": 1,
+                          "fret": 9
                         }
                       }
                     }
@@ -173,7 +174,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "string": 2
+                          "string": 2,
+                          "fret": 7
                         }
                       }
                     }
@@ -222,7 +224,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "string": 1
+                          "string": 1,
+                          "fret": 9
                         }
                       }
                     }
@@ -271,7 +274,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "string": 2
+                          "string": 2,
+                          "fret": 7
                         }
                       }
                     }

@@ -152,6 +152,13 @@ function unexplainedChanges(
       change.removed.every(entry => removedIds.some(id => id && entry.includes(`"${id}"`)))
     )
       return false;
+    // The declared cascade of removing a STOPPED harmonic: the note sounded at
+    // a node above the fret held, and without the harmonic it sounds that fret
+    // — its own pitch moves, and nothing else (core-artificial-harmonics.md).
+    if (element.kind === 'technique' && element.jsonPath.at(-1) === 'harmonic') {
+      const note = element.jsonPath.slice(0, element.jsonPath.lastIndexOf('_x'));
+      if (pathWithin(change.path, [...note, 'pitch'])) return false;
+    }
 
     return true;
   });

@@ -821,7 +821,7 @@
         "anchor": "middle",
         "baseline": "central",
         "weight": 700,
-        "className": "fret-number harmonic-held",
+        "className": "harmonic-held",
         "sourceId": "@m0.v0.e6.n0"
       },
       {

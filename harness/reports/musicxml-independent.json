@@ -60,15 +60,15 @@
       "xsdValid": 4
     },
     "scenario": {
-      "cases": 131,
+      "cases": 132,
       "import": {},
       "export": {
         "match": 83,
-        "adapter-limited": 34,
+        "adapter-limited": 35,
         "different": 13,
         "oracle-limited": 1
       },
-      "xsdValid": 128
+      "xsdValid": 129
     },
     "w3c": {
       "cases": 27,
@@ -1051,6 +1051,18 @@
     },
     {
       "id": "scenario/lab/25-tab-techniques/08-hammer-pull-chord",
+      "group": "scenario",
+      "export": {
+        "status": "adapter-limited",
+        "reason": "Default notation/TAB display duplication requires part correspondence; not a semantic loss verdict"
+      },
+      "xsd": {
+        "valid": true,
+        "errors": []
+      }
+    },
+    {
+      "id": "scenario/lab/25-tab-techniques/09-artificial-harmonics",
       "group": "scenario",
       "export": {
         "status": "adapter-limited",

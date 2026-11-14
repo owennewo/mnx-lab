@@ -63995,6 +63995,237 @@
       }
     },
     {
+      "id": "scenario/lab/25-tab-techniques/09-artificial-harmonics",
+      "exported": {
+        "sha256": "9a3bbb0ae4b43c530582d54afd467cd0da7a50ed78200f8a37f92f0eabb94f86",
+        "semantic": {
+          "status": "ok",
+          "table": {
+            "parts": 2,
+            "measures": [
+              1,
+              1
+            ],
+            "rows": [
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "0/1",
+                "duration": "1/2",
+                "pitch": "69/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/2",
+                "duration": "1/2",
+                "pitch": "73/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/1",
+                "duration": "1/2",
+                "pitch": "76/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "3/2",
+                "duration": "1/2",
+                "pitch": "66/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "2/1",
+                "duration": "1/2",
+                "pitch": "69/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "5/2",
+                "duration": "1/2",
+                "pitch": "73/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "3/1",
+                "duration": "1/2",
+                "pitch": "76/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "7/2",
+                "duration": "1/2",
+                "pitch": "66/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "0/1",
+                "duration": "1/2",
+                "pitch": "69/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/2",
+                "duration": "1/2",
+                "pitch": "73/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/1",
+                "duration": "1/2",
+                "pitch": "76/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "3/2",
+                "duration": "1/2",
+                "pitch": "66/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "2/1",
+                "duration": "1/2",
+                "pitch": "69/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "5/2",
+                "duration": "1/2",
+                "pitch": "73/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "3/1",
+                "duration": "1/2",
+                "pitch": "76/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 1,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "7/2",
+                "duration": "1/2",
+                "pitch": "66/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              }
+            ]
+          },
+          "warnings": []
+        },
+        "xsd": {
+          "valid": true,
+          "errors": []
+        }
+      }
+    },
+    {
       "id": "scenario/lab/26-tab-rhythm/01-triplets-on-tab",
       "exported": {
         "sha256": "3c1f6c42e351876227d482918abcf1681de2c5d29454255294ee89a3daa21d83",

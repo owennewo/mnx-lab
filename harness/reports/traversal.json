@@ -4612,6 +4612,35 @@
       ]
     ]
   },
+  "lab/tab-techniques/artificial-harmonics": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1,
+        "verse": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
   "lab/tab-rhythm/triplets-on-tab": {
     "order": [
       0,
