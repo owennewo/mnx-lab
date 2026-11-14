@@ -115,6 +115,9 @@ bar 10 = 6
 bar 32 = 30 ds-al-coda
 ```
 
+Note suffixes: `~` tie, `h` natural harmonic, `a` artificial (harp) harmonic — held at the
+fret written, touched and sounding an octave up — `x` dead, `p` hammer-on/pull-off, `s` slide.
+
 `build` refuses a bar whose voice does not fill it and a tie that lands nowhere or on another
 pitch, then makes what studio would store and reads it back, so `score`, `check` and
 `structure` can judge the transcription against the recording **before** the piece exists.

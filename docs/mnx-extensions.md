@@ -155,6 +155,14 @@ cannot. The fret, when there is one, is already in `position`.
 `type` is `natural | artificial | pinch | tap | semi | feedback`. MusicXML knows
 only the first two; the other four are Guitar Pro's.
 
+Every type but `natural` is a **stopped** harmonic: the string is held at a fret and
+sounded at a node counted up from it. The note's `pitch` is still what sounds, its
+`fret` is the fret **held** (stored, because the derivation ladder would otherwise
+derive the sounding position), and `touchingPitch` names the node — absent, the octave.
+A harp harmonic held at 7 on the D string is `pitch` A4, `string` 4, `fret` 7,
+`touchingPitch` A4. In a `.gp` file the node is `HarmonicFret`, counted from the held
+fret (12 = the octave) on these types and from the nut on a natural one.
+
 ## Part level: `part._x.mnxLab`
 
 ```jsonc

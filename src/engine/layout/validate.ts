@@ -1,6 +1,7 @@
 import { MnxEvent, MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
 import { MAX_FRET, midiOfMnxPitch, tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
+import { isStoppedHarmonic, stoppedHarmonicPosition } from '../../model/harmonics.ts';
 
 /**
  * Semantic (musical) validation — problems the schema can't see but the user
@@ -230,6 +231,42 @@ function validateTabPositions(
               `string ${x.string} is not declared in the part's strings`,
               at
             );
+            continue;
+          }
+          const harmonic = x.tab?.technique?.harmonic;
+          if (isStoppedHarmonic(harmonic)) {
+            // Sounds at a node above the fret held: the held fret is what the
+            // stored one is checked against (model/harmonics.ts).
+            const held = stoppedHarmonicPosition(
+              midiOfMnxPitch(note.pitch), open,
+              harmonic!.touchingPitch ? midiOfMnxPitch(harmonic!.touchingPitch) : undefined,
+              x.fret
+            );
+            if (!held || held.stopped > MAX_FRET || held.touch > MAX_FRET) {
+              error(
+                measureIndex,
+                `${fmtPitch(note.pitch)} as a ${harmonic!.type} harmonic on string ${x.string}` +
+                  ` has no held fret and node that sound it` +
+                  (harmonic!.touchingPitch ? ` touching ${fmtPitch(harmonic!.touchingPitch)}` : ' an octave up'),
+                at
+              );
+              continue;
+            }
+            if (x.fret !== undefined && x.fret !== held.stopped) {
+              error(
+                measureIndex,
+                `stored fret ${x.fret} disagrees with the held fret ${held.stopped} of this` +
+                  ` ${harmonic!.type} harmonic on string ${x.string} (the derived one is rendered)`,
+                at
+              );
+            }
+            if (claimOnset === null) continue;
+            const key = Math.round(claimOnset * 1e6) / 1e6;
+            const byString = claims.get(key) ?? new Map<number, PositionClaim[]>();
+            const list = byString.get(x.string) ?? [];
+            list.push({ fret: held.stopped, voiceIndex });
+            byString.set(x.string, list);
+            claims.set(key, byString);
             continue;
           }
           const derived = midiOfMnxPitch(note.pitch) - open;

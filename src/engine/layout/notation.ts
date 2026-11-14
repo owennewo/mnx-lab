@@ -1,3 +1,4 @@
+import { isStoppedHarmonic } from '../../model/harmonics.ts';
 import { SELECTED_CLASS_MARK, selectionHooked, selectionMark } from './selectionHooks.ts';
 import { qualifyMeasure, qualifyTechniques, occurrenceTarget, performedSpans, performedKeys, occurrenceKey, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
 import { resolveSwingTimeline } from '../../model/swing.ts';
@@ -248,6 +249,14 @@ const DOT_RIGHT_PAD_SP = 0.35;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
+
+/** A harmonic sounded at a node above a stopped note (any type but natural):
+ *  a diamond at the sounding pitch (roadmap/inprogress/core-artificial-harmonics.md).
+ *  A natural harmonic keeps the plain head and its circle. */
+const DIAMOND_NOTEHEAD_GLYPH_BY_BASE: Record<string, string> = {
+  whole: 'noteheadDiamondWhole',
+  half: 'noteheadDiamondHalf'
+};
 
 /** A dead note's head: the same value, drawn as an x. */
 const X_NOTEHEAD_GLYPH_BY_BASE: Record<string, string> = {
@@ -4586,10 +4595,14 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // Noteheads
   notes.forEach((n, idx) => {
     const y = staffTop + staffYs[idx];
-    // A dead note keeps its pitch's line and swaps only the head's shape.
-    const glyph = techniqueOf(n)?.dead
+    // A dead note, or a stopped harmonic, keeps its pitch's line and swaps
+    // only the head's shape.
+    const technique = techniqueOf(n);
+    const glyph = technique?.dead
       ? X_NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadXBlack'
-      : noteheadGlyph;
+      : isStoppedHarmonic(technique?.harmonic)
+        ? DIAMOND_NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadDiamondBlack'
+        : noteheadGlyph;
     const w = glyph === noteheadGlyph ? headW : glyphBBox(glyph)?.w ?? headW;
     primitives.push({
       kind: 'glyph',

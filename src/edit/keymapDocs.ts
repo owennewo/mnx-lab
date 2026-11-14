@@ -449,6 +449,12 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { note: 'tab: natural harmonic (toggles)' }
   },
   {
+    keys: 'Shift+O',
+    strokes: [{ code: 'KeyO', shift: true }],
+    group: 'adornments',
+    meaning: { note: 'tab: artificial (harp) harmonic — the fret held, sounding an octave up (toggles)' }
+  },
+  {
     keys: 'S',
     strokes: [{ code: 'KeyS' }],
     group: 'adornments',

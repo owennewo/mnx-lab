@@ -1,3 +1,4 @@
+import { isStoppedHarmonic, stoppedHarmonicPosition } from '../model/harmonics.ts';
 import type { MnxStructure, MnxEvent, MnxNote, MnxDynamic } from '../model/mnx.ts';
 import type { Performance, SoundingEvent, WrittenOccurrence } from './performanceTypes.ts';
 import {
@@ -216,7 +217,16 @@ export function applyExpression(
       const harmonic = technique.harmonic;
       const part = doc.parts[source.part]._x?.mnxLab;
       const string = part?.strings?.find((v) => v.string === source.note?._x?.mnxLab?.string);
-      if (harmonic.type !== 'natural' || !string || !harmonic.touchingPitch)
+      if (isStoppedHarmonic(harmonic) && string) {
+        // Held at a fret, sounded at a node above it: the written (sounding)
+        // pitch must be one some held fret and node produce.
+        const open = midiOf(string.pitch) + (part?.capo ?? 0);
+        if (!stoppedHarmonicPosition(s.midi, open, harmonic.touchingPitch ? midiOf(harmonic.touchingPitch) : undefined, source.note?._x?.mnxLab?.fret))
+          report(
+            'inconsistent-harmonic',
+            `A ${harmonic.type} harmonic's sounded pitch is no node above a held fret; pitch is preserved.`,
+          );
+      } else if (harmonic.type !== 'natural' || !string || !harmonic.touchingPitch)
         report(
           'unsupported-harmonic-validation',
           'Harmonic metadata lacks a known natural open-string node; sounded pitch is preserved.',

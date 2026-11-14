@@ -168,6 +168,10 @@ export interface GpifNote {
   bend: GpifBend | null;
   /** `HarmonicType/HType` string, e.g. "Natural". */
   harmonicType: string | null;
+  /** `HarmonicFret/HFret`: on a natural harmonic the fret touched (= the fret
+   *  played); on any other type the node counted up FROM the stopped fret —
+   *  12 is the octave, 7 the twelfth (alphaTab's `harmonicPitch` reads it so). */
+  harmonicFret?: number | null;
   /** `<Accent>` bitmask: 1 staccato, 4 heavy accent, 8 accent, 16 tenuto
    *  (field notes §9 #1, settled by alphaTab's reader and writer). */
   accentFlags?: number;
@@ -182,8 +186,7 @@ export interface GpifNote {
  * What each parser reads, plus what it may skip because it carries no music:
  * layout (`…StemOrientation`), display-only duplicates (`TransposedPitch`,
  * `HopoDestination` — the origin carries the pairing), GP's own extension
- * bags (`XProperties`) and values folded into another field (`HarmonicFret`
- * is the touch fret `HarmonicType` implies). Anything else is reported.
+ * bags (`XProperties`). Anything else is reported.
  */
 const MASTER_BAR_CHILDREN = new Set([
   'Key', 'Time', 'Bars', 'Repeat', 'AlternateEndings', 'DoubleBar', 'Section',
@@ -483,6 +486,9 @@ function parseNote(node: Element): GpifNote {
         break;
       case 'HarmonicType':
         note.harmonicType = text(property, 'HType') ?? null;
+        break;
+      case 'HarmonicFret':
+        note.harmonicFret = float(text(property, 'HFret'));
         break;
       case 'Muted':
         if (child(property, 'Enable') !== null) note.dead = true;

@@ -1773,3 +1773,22 @@ One new scenario, unverified: `lab/11-rhythm/06-pickup-bar` (`expected.svg`,
 The pickup's two eighths beam together and sit as one beat's worth of bar, not a
 stretched 4/4 bar. The performance plays the pickup as one beat: bar 1's downbeat at a
 quarter in.
+
+## Artificial (harp) harmonics — 2026-11-14
+
+Owner: [core-artificial-harmonics](core-artificial-harmonics.md). A non-natural harmonic
+is a stopped one: the ladder derives the fret held from its node, tab draws a touched one
+(artificial, tap) as its touch fret in a diamond, and notation draws every stopped one
+with a diamond notehead. No existing golden moved (no scenario held a non-natural
+harmonic).
+
+One new scenario, unverified: `lab/25-tab-techniques/09-artificial-harmonics`
+(`expected.svg`, `expected.tab.svg`, `expected.both.svg`, `expected.primitives.json`,
+`expected.performance.json`, `expected.midi.json`).
+
+**What a reviewer should look for.** Tab: ◇19 on the D string and ◇21 on the G string
+(twice each), the touch fret drawn small inside a diamond that clears the string lines,
+the plain 9s and 7s between them as ever; the seventh event reads `2◇9` — held at 2,
+touched seven frets up. Notation: diamond noteheads at A4 and E5 with "A.H." over each,
+no circle; the plain C♯5 and F♯4 drawn as ever. The tab shows no "A.H." word — the
+diamond says it.

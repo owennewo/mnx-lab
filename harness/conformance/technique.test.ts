@@ -58,7 +58,7 @@ const STANDARD_STRINGS = [
 
 type Item =
   | { rest: true }
-  | { string: number; technique?: MnxTabTechnique; id?: string };
+  | { string: number; technique?: MnxTabTechnique; id?: string; octaveUp?: boolean };
 
 /** One 4/4 bar of quarter notes on the open strings, each optionally annotated.
  *  `strings: false` declares no instrument — the case that has no tab staff at
@@ -90,7 +90,9 @@ function bar(items: Item[], opts: { strings?: boolean } = {}): MnxStructure {
                         duration: { base: 'quarter' },
                         notes: [
                           {
-                            pitch: OPEN[item.string],
+                            pitch: item.octaveUp
+                              ? { ...OPEN[item.string], octave: OPEN[item.string].octave + 1 }
+                              : OPEN[item.string],
                             ...(item.id ? { id: item.id } : {}),
                             _x: {
                               mnxLab: {
@@ -275,15 +277,54 @@ describe('technique marks say what the technique is', () => {
       ['semi', 'S.H.'], ['feedback', 'Fdbk.']
     ];
     for (const [type, label] of kinds) {
+      // Held open, sounding the octave above: a stopped harmonic's pitch.
       const p = projections(
-        bar([{ string: 3, technique: { harmonic: { type } } as MnxTabTechnique }])
+        bar([{ string: 3, octaveUp: true, technique: { harmonic: { type } } as MnxTabTechnique }])
       );
-      expect(texts(p.tab, 'technique-harmonic-label'), type).toEqual([label]);
+      // Tab: a touched harmonic's diamond says it without a word.
+      const touched = type === 'artificial' || type === 'tap';
+      expect(texts(p.tab, 'technique-harmonic-label'), type).toEqual(touched ? [] : [label]);
       expect(texts(p.notation, 'technique-harmonic-label'), type).toEqual([label]);
     }
     // A natural one says it with the brackets alone — no word.
     const natural = projections(bar([{ string: 3, technique: { harmonic: { type: 'natural' } } }]));
     expect(marks(natural.tab, 'technique-harmonic-label')).toHaveLength(0);
+  });
+});
+
+describe('a touched harmonic is drawn as one', () => {
+  // A harp harmonic: G string held at 2 (A3), touched at 14, sounding A4.
+  const harp = (touching?: { step: string; octave: number }, octaveUp = true): Item => ({
+    string: 3, octaveUp,
+    technique: { harmonic: { type: 'artificial', ...(touching ? { touchingPitch: touching } : {}) } } as MnxTabTechnique
+  });
+
+  it('tab prints the touch fret in a diamond, and notation a diamond notehead', () => {
+    // Held open, touched at 12: the octave node.
+    const p = projections(bar([harp({ step: 'G', octave: 4 })]));
+    expect(marks(p.tab, 'harmonic-diamond')).toHaveLength(4);
+    expect(texts(p.tab, 'fret-number')).toEqual(['12']);
+    expect(p.notation.primitives.filter(q => q.kind === 'glyph' && q.glyph === 'noteheadDiamondBlack')).toHaveLength(1);
+    // The circle is a natural harmonic's mark, not this one's.
+    expect(marks(p.notation, 'technique-harmonic')).toHaveLength(0);
+  });
+
+  it('prints the fret held before the diamond when the node is not the octave', () => {
+    // G string held open, touched at 7: sounds a twelfth up (D5).
+    const twelfth: Item = {
+      string: 3,
+      technique: { harmonic: { type: 'artificial', touchingPitch: { step: 'D', octave: 4 } } } as MnxTabTechnique
+    };
+    const doc = bar([twelfth]);
+    const note = (doc.parts[0].measures[0].sequences![0].content![0] as { notes: { pitch: unknown }[] }).notes[0];
+    note.pitch = { step: 'D', octave: 5 };
+    expect(texts(projections(doc).tab, 'fret-number')).toEqual(['0', '7']);
+  });
+
+  it('a natural harmonic keeps its brackets and its circle', () => {
+    const p = projections(bar([{ string: 3, technique: { harmonic: { type: 'natural' } } }]));
+    expect(marks(p.tab, 'harmonic-diamond')).toHaveLength(0);
+    expect(marks(p.notation, 'technique-harmonic')).toHaveLength(1);
   });
 });
 

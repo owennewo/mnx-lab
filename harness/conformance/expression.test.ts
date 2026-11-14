@@ -241,7 +241,8 @@ it.each([
   ['natural', 0, true, true, 72, 'inconsistent-harmonic'],
   ['natural', 0, false, true, 72, 'unsupported-harmonic-validation'],
   ['natural', 0, true, false, 72, 'unsupported-harmonic-validation'],
-  ['artificial', 0, true, true, 72, 'unsupported-harmonic-validation'],
+  // C3 string touched at C4 (fret 12), sounding C5: held at 5, node 7 frets up.
+  ['artificial', 0, true, true, 72, undefined],
 ] as const)(
   'preserves sounded MIDI for %s capo=%s string=%s touching=%s',
   (type, capo, string, touching, midi, diagnostic) => {
@@ -265,6 +266,20 @@ it.each([
     );
   },
 );
+it.each([
+  // The C3 string held at 12 (C4), touched an octave up: sounds C5.
+  [72, { step: 'C', octave: 5 }, undefined],
+  // No touching pitch: the octave node is assumed.
+  [72, undefined, undefined],
+  // Held at 14 (D4), touched at 21 (A4), seven frets up: sounds a twelfth over, A5.
+  [81, { step: 'A', octave: 4 }, undefined],
+  // Sounding a semitone off any node above any held fret.
+  [73, { step: 'C', octave: 5 }, 'inconsistent-harmonic'],
+] as const)('an artificial harmonic sounding %s touched at %o is checked against its node', (midi, touchingPitch, diagnostic) => {
+  const p = compile(doc([note('a', midi - 60, { harmonic: { type: 'artificial', ...(touchingPitch ? { touchingPitch } : {}) } })]));
+  expect(p.sounding[0]).toMatchObject({ midi, timbre: ['harmonic'] });
+  expect(p.diagnostics.filter((d) => d.code.includes('harmonic')).map((d) => d.code)).toEqual(diagnostic ? [diagnostic] : []);
+});
 it('preserves already resolved converter harmonic pitches', () => {
   const d = JSON.parse(
     fs.readFileSync(

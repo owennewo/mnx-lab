@@ -27,7 +27,8 @@ import type {
   MnxSequenceItem,
   MnxSlur,
   MnxStructure,
-  MnxTuningEntry
+  MnxTuningEntry,
+  MnxTabTechnique
 } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import type { SelectionState } from './selection.ts';
@@ -35,6 +36,7 @@ import type { SelectionClipEnvelope } from './selectionClip.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import { syntheticNoteKey } from '../model/noteKeys.ts';
 import { isTimedEvent, isTuplet } from '../model/mnx.ts';
+import { isStoppedHarmonic, stoppedHarmonicPosition } from '../model/harmonics.ts';
 import { parseChordSymbol, renderChordSymbol } from '../model/harmony.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
 import { enharmonicSpellings, keyFifthsAt, midiOfSpelling, spellPitch } from './staffSpace.ts';
@@ -845,7 +847,12 @@ export type TechniqueChoice =
   | { kind: 'hammerPull' }
   | { kind: 'vibrato' }
   | { kind: 'palmMute' }
-  | { kind: 'harmonic' }
+  /** Natural when `harmonicType` is absent. Any other type is a stopped
+   *  harmonic (model/harmonics.ts): sounded at a node above the fret held, so
+   *  setting one lifts the pitch an octave to what sounds, keeps the fret held,
+   *  and records the octave node as the touching pitch; removing it lowers the
+   *  pitch back to the fret held. */
+  | { kind: 'harmonic'; harmonicType?: Exclude<NonNullable<MnxTabTechnique['harmonic']>['type'], 'natural'> }
   /** The dead (muted, percussive) note — struck, not stopped. A FLAG on a
    *  note, not an event of its own: the written pitch stays (MNX requires
    *  one, and a consumer that ignores the flag still has a note), and the
@@ -1196,9 +1203,11 @@ export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
     const slideType = slide.type === 'shift' ? 'shift' as const : slide.type === 'legato' ? 'legato' as const : undefined;
     out.push({ kind: 'slide', ...(slideType ? { slideType } : {}) });
   }
-  for (const kind of ['hammerPull', 'vibrato', 'palmMute', 'harmonic', 'dead'] as const) {
+  for (const kind of ['hammerPull', 'vibrato', 'palmMute', 'dead'] as const) {
     if (technique[kind] !== undefined && technique[kind] !== false) out.push({ kind });
   }
+  const harmonic = technique.harmonic;
+  if (harmonic) out.push(harmonic.type === 'natural' ? { kind: 'harmonic' } : { kind: 'harmonic', harmonicType: harmonic.type });
   return out;
 }
 
@@ -1900,9 +1909,16 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         case 'dead':
           technique[op.technique.kind] = true;
           break;
-        case 'harmonic':
-          technique.harmonic = { type: 'natural' };
+        case 'harmonic': {
+          const type = op.technique.harmonicType ?? 'natural';
+          const had = technique.harmonic as NonNullable<MnxTabTechnique['harmonic']> | undefined;
+          if (isStoppedHarmonic(had) && type === 'natural') lowerFromHarmonic(next, located);
+          if (type !== 'natural' && !isStoppedHarmonic(had)) liftToHarmonic(next, located);
+          technique.harmonic = type === 'natural'
+            ? { type }
+            : { type, touchingPitch: { ...((had && isStoppedHarmonic(had) && had.touchingPitch) || located.note.pitch) } };
           break;
+        }
         default: {
           // hammerPull / slide travel to the FOLLOWING note — any pitch;
           // same string preferred (`techniqueTarget`) — minting its id the
@@ -1922,6 +1938,9 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const located = findKeyedNote(next, op.noteKey);
       const tab = located?.note._x?.mnxLab?.tab as { technique?: Record<string, unknown> } | undefined;
       if (!located || !tab?.technique?.[op.kind]) return next;
+      // A stopped harmonic sounded above its fret: without it the note sounds the fret held.
+      if (op.kind === 'harmonic' && isStoppedHarmonic(tab.technique.harmonic as NonNullable<MnxTabTechnique['harmonic']>))
+        lowerFromHarmonic(next, located);
       delete tab.technique[op.kind];
       // No tombstones, all the way up the vendor chain.
       if (Object.keys(tab.technique).length === 0) delete tab.technique;
@@ -2936,6 +2955,43 @@ interface LocatedNote {
    *  inner events do not (campaign item 11b). */
   event: MnxEvent;
   note: MnxNote;
+}
+
+/** The open string under a note, capo applied (MIDI), when the part declares one. */
+function openUnder(doc: MnxStructure, located: LocatedNote): number | undefined {
+  const part = doc.parts?.[located.partIndex];
+  const string = located.note._x?.mnxLab?.string ?? defaultStringFor(located.note.pitch, tuningOf(part), capoOf(part));
+  const entry = tuningOf(part).find(e => e.string === string);
+  return entry ? midiOfPitch(entry.pitch) + capoOf(part) : undefined;
+}
+
+/** Make a plain note a stopped harmonic at the octave node: it now sounds an
+ *  octave up, and the fret held — what the plain pitch fretted — is stored,
+ *  because the ladder would derive the sounding one. */
+function liftToHarmonic(doc: MnxStructure, located: LocatedNote): void {
+  const open = openUnder(doc, located);
+  const lab = ((located.note._x ??= {}).mnxLab ??= {});
+  if (open !== undefined) {
+    const held = midiOfPitch(located.note.pitch) - open;
+    if (held >= 0) lab.fret = held;
+  }
+  located.note.pitch = { ...located.note.pitch, octave: located.note.pitch.octave + 1 };
+}
+
+/** Undo `liftToHarmonic`: the note sounds the fret it is held at again. */
+function lowerFromHarmonic(doc: MnxStructure, located: LocatedNote): void {
+  const harmonic = located.note._x?.mnxLab?.tab?.technique?.harmonic;
+  const open = openUnder(doc, located);
+  const held = open === undefined ? null : stoppedHarmonicPosition(
+    midiOfPitch(located.note.pitch), open, harmonic?.touchingPitch ? midiOfPitch(harmonic.touchingPitch) : undefined,
+    located.note._x?.mnxLab?.fret
+  );
+  const sounding = midiOfPitch(located.note.pitch);
+  const target = held ? open! + held.stopped : sounding - 12;
+  // An octave keeps its spelling; any other node is spelled in the key.
+  located.note.pitch = (sounding - target) % 12 === 0
+    ? { ...located.note.pitch, octave: located.note.pitch.octave - (sounding - target) / 12 }
+    : spellPitch(target, keyFifthsAt(doc, located.measureIndex));
 }
 
 function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {

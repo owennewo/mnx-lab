@@ -128,8 +128,6 @@ const ARROWHEAD_SCALE = 0.6;
 const ARROWHEAD_SP = 1.196 * ARROWHEAD_SCALE;
 /** Advance of one `guitarVibratoStroke`. */
 const VIBRATO_ADVANCE_SP = 0.608;
-/** Ink height of `stringsHarmonic`. */
-const HARMONIC_CIRCLE_SP = 0.8;
 /** How far a bend's peak rises above the lane. */
 const BEND_RISE_SP = 1.8;
 /** Minimum drawn length of a bend, however short the note's column. */
@@ -148,10 +146,8 @@ const BEND_MAX_SPAN_SP = 4;
 const BEND_END_CLEAR_SP = 1.2;
 /** A slide or bend stub, where the far end is off this system row. */
 const STUB_SP = 0.9;
-/** Baseline drop of a label under the mark it names. */
-const LABEL_GAP_SP = 0.25;
-/** Baseline of a bend label above the ink it names — a shade more than
- *  `LABEL_GAP_SP`, for the slash of "1/2" dipping below the baseline. */
+/** Baseline of a bend label above the ink it names — a shade more than a
+ *  plain label's gap, for the slash of "1/2" dipping below the baseline. */
 const BEND_LABEL_GAP_SP = 0.35;
 /** How far a hammer/pull slur bulges away from its endpoints. */
 const SLUR_BULGE_SP = 0.8;
@@ -212,6 +208,13 @@ export function bendLabel(semitones: number): string {
  */
 export function harmonicFretText(fret: string): string {
   return `<${fret}>`;
+}
+
+/** A harmonic sounded by touching a node above the fret held — artificial
+ *  (the right hand's finger) or tapped. Tab draws its touch fret in a diamond,
+ *  which says "harmonic" without a word; notation gives it a diamond notehead. */
+export function isTouchedHarmonic(type: string): boolean {
+  return type === 'artificial' || type === 'tap';
 }
 
 /** The short label a non-natural harmonic prints; a natural one says it with
@@ -741,7 +744,9 @@ export function emitTabTechnique(input: TechniqueInput): void {
       );
     }
 
-    if (t.harmonic) {
+    // The diamond already says a touched harmonic is one, as the brackets do
+    // a natural; only the other types need their word in the lane.
+    if (t.harmonic && !isTouchedHarmonic(t.harmonic.type)) {
       laneLabel(
         harmonicLabel(t.harmonic.type), site.x, lane - LANE_LABEL_DROP_SP,
         'technique-harmonic-label', primitives
@@ -839,9 +844,9 @@ export function emitNotationTechnique(input: TechniqueInput): void {
       );
     }
 
-    if (t.harmonic) {
-      // The small circle over the note — this staff's own word for a harmonic,
-      // and the one mark here that is not the tab staff's.
+    if (t.harmonic?.type === 'natural') {
+      // The small circle over the note — this staff's own word for a natural
+      // harmonic, and the one mark here that is not the tab staff's.
       primitives.push({
         kind: 'glyph',
         glyph: 'stringsHarmonic',
@@ -850,8 +855,11 @@ export function emitNotationTechnique(input: TechniqueInput): void {
         anchor: 'middle',
         className: 'technique-harmonic'
       });
+    } else if (t.harmonic) {
+      // Any other type is a diamond notehead (notation.ts) and says which
+      // kind in its word, where the circle would have stood.
       laneLabel(
-        harmonicLabel(t.harmonic.type), site.x, lane - HARMONIC_CIRCLE_SP - LABEL_GAP_SP,
+        harmonicLabel(t.harmonic.type), site.x, lane - LANE_LABEL_DROP_SP,
         'technique-harmonic-label', primitives
       );
     }

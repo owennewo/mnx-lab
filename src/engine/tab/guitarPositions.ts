@@ -1,11 +1,14 @@
 import { MnxNote, MnxPart, MnxPitch, MnxTuningEntry } from '../../model/mnx.ts';
+import { isStoppedHarmonic, stoppedHarmonicPosition } from '../../model/harmonics.ts';
 
 /**
  * Fingerboard position derivation (roadmap/complete/core-derived-positions.md).
  *
  * The authority ladder:
  *   string + fret  → the DERIVED fret renders; a disagreeing stored fret is
- *                    flagged (validate.ts), never drawn.
+ *                    flagged (validate.ts), never drawn. A stopped harmonic
+ *                    (any type but natural) derives the fret HELD, from its
+ *                    node (model/harmonics.ts), not the fret that sounds.
  *   string only    → the fret is arithmetic: pitch − (open + capo).
  *   neither        → the default assignment below — presentation, not content,
  *                    never written back to the document.
@@ -107,6 +110,9 @@ export interface ResolvedTabPosition {
   fret: number;
   /** The stored fret disagreed with the derived one (the derived one is used). */
   mismatch?: boolean;
+  /** A stopped (non-natural) harmonic: the fret TOUCHED, counted like `fret`.
+   *  `fret` is then the fret held — the sounding pitch is a node above it. */
+  touch?: number;
 }
 
 /**
@@ -131,6 +137,24 @@ export function resolveEventPositions(
     usedStrings.add(x.string);
     const open = ctx.openMidi.get(x.string);
     if (open === undefined) return;
+    const harmonic = x.tab?.technique?.harmonic;
+    if (isStoppedHarmonic(harmonic)) {
+      // Sounds at a node above the fret held: derive the held fret from the
+      // node, or the ladder would print the sounding position.
+      const held = stoppedHarmonicPosition(
+        midiOfMnxPitch(note.pitch), open,
+        harmonic!.touchingPitch ? midiOfMnxPitch(harmonic!.touchingPitch) : undefined,
+        x.fret
+      );
+      if (!held || held.stopped > MAX_FRET || held.touch > MAX_FRET) return;
+      resolved[index] = {
+        str: x.string,
+        fret: held.stopped,
+        touch: held.touch,
+        ...(x.fret !== undefined && x.fret !== held.stopped ? { mismatch: true } : {})
+      };
+      return;
+    }
     const fret = midiOfMnxPitch(note.pitch) - open;
     if (fret < 0 || fret > MAX_FRET) return;
     resolved[index] = {

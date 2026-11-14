@@ -31,6 +31,19 @@ bar 2
     expect(checkStorage(document).check.verdict).not.toBe('differs');
   });
 
+  it('writes a harp harmonic held at the fret, sounding and touched an octave up, and stores it', () => {
+    const { document } = bars(`bar 1
+  v1: q:4/7a q:1/9 q:3/9a q:2/7
+  v2: w:6/0
+`);
+    const notes = document.parts[0].measures[0].sequences[0].content.flatMap(e => 'notes' in e ? e.notes ?? [] : []);
+    expect(notes.map(n => [n.pitch.step, n.pitch.alter ?? 0, n.pitch.octave, n._x?.mnxLab?.fret])).toEqual([
+      ['A', 0, 4, 7], ['C', 1, 5, 9], ['E', 0, 5, 9], ['F', 1, 4, 7]]);
+    expect(notes[0]._x?.mnxLab?.tab?.technique?.harmonic).toEqual({ type: 'artificial', touchingPitch: { step: 'A', octave: 4 } });
+    expect(notes[1]._x?.mnxLab?.tab).toBeUndefined();
+    expect(checkStorage(document).check.verdict).not.toBe('differs');
+  });
+
   it('copies a bar with fresh ids and plays segno, D.S. al Coda and a repeat as written', () => {
     const one = '  v1: w:3/0\n';
     const { document } = bars(`bar 1\n${one}bar 2 segno\n${one}bar 3 |:\n${one}bar 4 :| tocoda\n${one}bar 5 = 4 ds-al-coda\nbar 6 coda\n${one}`);

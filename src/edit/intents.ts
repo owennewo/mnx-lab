@@ -238,6 +238,9 @@ export type MutationIntent =
       /** Shift+S's dialect: the slide that re-picks. Toggle semantics stay
        *  physical — same type removes, the other type retypes in place. */
       slideType?: 'shift' | 'legato';
+      /** Shift+O's: an artificial harmonic (absent = natural), toggled the
+       *  same way — same kind removes, the other retypes in place. */
+      harmonicType?: 'artificial';
     }
   | { type: 'setFingering'; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering' }

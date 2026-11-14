@@ -1,3 +1,4 @@
+import { harmonicInterval } from '../common/harmonics.js';
 import {
   GpifBar,
   GpifBeat,
@@ -718,17 +719,6 @@ function harmonicSoundingMidi(
   return interval === undefined ? null : open + interval + track.gpif.capo;
 }
 
-function harmonicInterval(fret: number): number | undefined {
-  return new Map<number, number>([
-    [12, 12],
-    [7, 19],
-    [5, 24],
-    [4, 28],
-    [9, 28],
-    [3, 31],
-    [2, 36]
-  ]).get(fret);
-}
 
 function readNoteEffects(
   reader: GpBinaryReader,

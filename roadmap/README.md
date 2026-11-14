@@ -148,6 +148,10 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-artificial-harmonics.md](inprogress/core-artificial-harmonics.md)** — **built 2026-11-14**:
+  artificial (harp) harmonics drawn as a touch fret in a diamond (tab) and a diamond notehead
+  (notation), kept through the `.gp` round trip, played, entered with Shift+O and the tab-text
+  `a` suffix; the scenario awaits `/verify`.
 - **[studio-mix-layers.md](inprogress/studio-mix-layers.md)** — **built 2026-10-22**, awaiting the
   owner's hands-on check: a recording, the synth and a click as three layers, toggled from the
   tray's Mix field and headed the same in the Mix panel; the synth follows a recording through its

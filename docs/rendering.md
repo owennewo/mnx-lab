@@ -36,7 +36,14 @@ sounding): an annotated `_x.mnxLab.string` derives its fret against the declared
 `strings[]` + capo (a stored `fret` is validation-only — a mismatch renders the
 derived fret plus a red badge), bare notes get the lowest-playable-fret
 assignment, and unplayable notes draw nothing plus a red `scope: 'tab'` badge —
-never a silent clamp. **No instrument is assumed**: absent `strings[]` means no
+never a silent clamp. A **stopped harmonic** (any `harmonic.type` but `natural`) sounds
+at a node above the fret held, so the ladder derives the *held* fret from the node
+(`src/model/harmonics.ts`, preferring the stored fret, then the octave, when a touch
+point has two explanations). Tab draws a touched one (artificial, tap) as its touch fret
+in a diamond — `◇19`, the held fret printed before it when the node is not the octave
+(`2◇9`) — and notation gives every stopped harmonic a diamond notehead at the sounding
+pitch plus its label; a natural harmonic keeps `<12>` and the circle
+([roadmap/inprogress/core-artificial-harmonics.md](../roadmap/inprogress/core-artificial-harmonics.md)). **No instrument is assumed**: absent `strings[]` means no
 fingerboard (the shim materializes standard into older tab documents); a viewer
 override (`TabSetup`) may supply strings/capo as presentation. Layouts render **forgivingly**:
 unsupported content degrades to a placeholder and per-measure "!" badges

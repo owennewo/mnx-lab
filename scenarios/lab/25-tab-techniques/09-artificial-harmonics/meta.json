@@ -1,0 +1,32 @@
+{
+  "title": "Artificial (harp) harmonics",
+  "description": "A harp-harmonic figure, as Tommy Emmanuel's arrangements use it: the left hand holds a shape (D string at 7, G string at 9) and the right hand touches each string an octave above the fret held and plucks it, alternating with ordinary notes on the B and E strings. MNX pitch is sounding, so each harmonic stores what is heard (A4, E5), the stopped fret is stored on the note, and harmonic.touchingPitch names the node; the derivation ladder works out the fret held from the node rather than from the sounding pitch. Tab prints the TOUCH fret in a diamond, as published tab does (◇19, ◇21) — the held fret is implied an octave below — and prints the held fret before the diamond when the node is not the octave: the seventh event is held at 2 on the G string and touched at 9, a twelfth up, drawn 2◇9. Notation gives each harmonic a diamond notehead at the sounding pitch with its label (A.H.); the natural harmonic's circle is not used. The plain notes are drawn as ever.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:harmonic"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/179"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered",
+  "performance": true
+}

@@ -26,6 +26,7 @@ import { mnxTuningToAlphaTab, pitchToMidi, choosePosition } from '../common/tuni
 import { mnxTranspositionToGp } from '../common/transposition.js';
 import { describeSwing, tripletFeelFromSwing, type GpTripletFeel } from '../common/swing.js';
 import { writeGpContainer } from './container.js';
+import { harmonicInterval, harmonicNode } from '../common/harmonics.js';
 import { documentWork, workToGpScoreInfo } from '../common/scoreMetadata.js';
 import { pickupSignature } from '../common/pickup.js';
 
@@ -84,6 +85,19 @@ const NOTE_VALUES: Partial<Record<MnxNoteValueBase, string>> = {
 };
 
 const CLEFS: Record<string, string> = { G: 'G2', F: 'F4', C: 'C3' };
+
+/**
+ * A non-natural harmonic's `HarmonicFret`: the node counted up from the stopped
+ * note — from `touchingPitch` when the document states it, else from what the
+ * note sounds above the stopped one, else the octave.
+ */
+function artificialNodeOf(sounding: number, touching: MnxPitch | undefined, stopped: number): number {
+  if (touching) {
+    const touch = pitchToMidi(touching) - stopped;
+    if (harmonicInterval(touch) !== undefined) return touch;
+  }
+  return harmonicNode(sounding - stopped) ?? 12;
+}
 
 const HARMONIC_TYPES: Record<string, string> = {
   natural: 'Natural',
@@ -146,8 +160,9 @@ interface WriterNote {
   bend: WriterBend | null;
   harmonicType: string | null;
   /** The touch fret. Guitar Pro states it on every harmonic note, and alphaTab
-   *  mis-pitches a harmonic that lacks it; MNX carries no touch fret, so the
-   *  played fret stands in — exactly what GP itself writes for naturals. */
+   *  mis-pitches a harmonic that lacks it. A natural harmonic is touched at the
+   *  fret it is played at — exactly what GP itself writes; any other type
+   *  states its node counted up from the stopped fret (12 = the octave). */
   harmonicFret: number | null;
   /** `<Accent>` bitmask, 0 for none. */
   accentFlags: number;
@@ -913,8 +928,12 @@ function buildBeat(
       x?.string !== undefined && x?.fret !== undefined
         ? { string: x.string, fret: x.fret }
         : undefined;
+    const harmonic = note._x?.mnxLab?.tab?.technique?.harmonic;
+    const artificial = harmonic !== undefined && harmonic.type !== 'natural';
     if (!position) {
-      const chosen = choosePosition(midi, tuningsHighToLow, 24, capo);
+      // A non-natural harmonic sounds above the fret it is played at; with no
+      // stored fret, place the stopped note an octave below what sounds.
+      const chosen = choosePosition(artificial ? midi - 12 : midi, tuningsHighToLow, 24, capo);
       if (!chosen) {
         warn(
           `measure ${measureIndex + 1}: pitch is outside the instrument's range ` +
@@ -940,7 +959,11 @@ function buildBeat(
       slideFlags: slideFlagsOf(technique?.slide),
       bend: bendOf(technique?.bend?.points, measureIndex, warn),
       harmonicType: technique?.harmonic ? (HARMONIC_TYPES[technique.harmonic.type] ?? null) : null,
-      harmonicFret: technique?.harmonic ? position.fret : null,
+      harmonicFret: technique?.harmonic
+        ? artificial
+          ? artificialNodeOf(midi, harmonic!.touchingPitch, tuningsHighToLow[position.string - 1] + position.fret + capo)
+          : position.fret
+        : null,
       accentFlags,
       tieOrigin: false,
       tieDestination: false,

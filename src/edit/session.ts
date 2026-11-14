@@ -1238,7 +1238,12 @@ export class EditorSession {
         // place (an upsert — setTechnique replaces by kind).
         const wantedSlide = kind === 'slide' ? (intent.slideType ?? 'legato') : undefined;
         const existingSlide = kind === 'slide' && existing ? ((existing as { type?: string }).type ?? 'legato') : undefined;
-        const retype = kind === 'slide' && existing !== undefined && existingSlide !== wantedSlide;
+        // O vs Shift+O, the same way: the same harmonic toggles off; the other
+        // kind retypes in place (natural ↔ artificial moves the pitch with it).
+        const wantedHarmonic = kind === 'harmonic' ? (intent.harmonicType ?? 'natural') : undefined;
+        const existingHarmonic = kind === 'harmonic' && existing ? ((existing as { type?: string }).type ?? 'natural') : undefined;
+        const retype = (kind === 'slide' && existing !== undefined && existingSlide !== wantedSlide) ||
+          (kind === 'harmonic' && existing !== undefined && existingHarmonic !== wantedHarmonic);
         const before = JSON.stringify(this.doc);
         this.apply(
           existing && !retype
@@ -1252,7 +1257,9 @@ export class EditorSession {
                   ? { kind, alters: [0, 2] }
                   : kind === 'slide'
                     ? { kind, ...(wantedSlide === 'shift' ? { slideType: 'shift' } : {}) }
-                    : { kind }) as never
+                    : kind === 'harmonic' && wantedHarmonic !== 'natural'
+                      ? { kind, harmonicType: wantedHarmonic }
+                      : { kind }) as never
               }
         );
         if (JSON.stringify(this.doc) === before) {

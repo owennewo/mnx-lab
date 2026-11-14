@@ -20,6 +20,7 @@ import {
 import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 import {
   harmonicFretText,
+  isTouchedHarmonic,
   nextOrdinal,
   recordSite,
   tabTechniqueLaneY,
@@ -92,6 +93,28 @@ const FRET_FONT_WEIGHT = 700;
 /** Air the mask leaves either side of a fret's digits, as a fraction of one
  *  digit's width: the string line stops short of the ink instead of touching it. */
 const FRET_MASK_AIR = 0.15;
+
+/** A touched harmonic's diamond (roadmap/inprogress/core-artificial-harmonics.md):
+ *  the touch fret drawn smaller inside it, as published tab does, so the
+ *  diamond stands about one string space tall and does not swallow the staff. */
+const DIAMOND_DIGIT_SCALE = 0.75;
+const DIAMOND_HALF_HEIGHT_SP = 0.7;
+const DIAMOND_THICKNESS_SP = 0.1;
+/** Between the held fret and the diamond's left corner, when both print. */
+const DIAMOND_HELD_GAP_SP = 0.12;
+
+/**
+ * The diamond around a touched harmonic's digits. Wide enough that the digit
+ * box (half its cap height tall) clears the slanted edges: a box of half-width
+ * a and half-height b fits a diamond of half-diagonals W, H when a/W + b/H ≤ 1.
+ */
+function diamondShape(text: string, fontSize: number, scale: number): { halfWidth: number; halfHeight: number; digitSize: number } {
+  const digitSize = fontSize * DIAMOND_DIGIT_SCALE;
+  const halfHeight = DIAMOND_HALF_HEIGHT_SP * scale;
+  const a = (digitSize * 0.6 * Math.max(1, text.length)) / 2;
+  const b = digitSize * 0.36;
+  return { halfWidth: Math.max(halfHeight * 0.85, a / (1 - b / halfHeight) + 0.04 * scale), halfHeight, digitSize };
+}
 
 const FRET_BG_HEIGHT_SP = Math.min(
   FRET_FONT_SIZE_SP * 0.85,
@@ -807,15 +830,25 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // fret is a node to touch, not a note to stop. Drawn here, with the
       // digit, so one mask still covers exactly one text.
       const technique = note ? techniqueOf(note) : undefined;
+      // A harmonic touched at a node above the fret held (artificial, tapped)
+      // prints the TOUCH fret in a diamond, as published tab does; the fret
+      // held is implied an octave below, and printed before the diamond when
+      // the node is anything else (`7◇17`).
+      const diamond = !technique?.dead && pos.touch !== undefined && technique?.harmonic !== undefined &&
+        isTouchedHarmonic(technique.harmonic.type);
       // A dead note replaces the digit outright: `x` says "struck, not
       // stopped", and the fret it would have been is not the point.
       const digits = technique?.dead
         ? 'x'
-        : technique?.harmonic
-          ? harmonicFretText(String(pos.fret))
-          : String(pos.fret);
+        : diamond
+          ? String(pos.touch)
+          : technique?.harmonic
+            ? harmonicFretText(String(pos.fret))
+            : String(pos.fret);
       const fretStr = carried ? `(${digits})` : digits;
       const charWidthSp = fontSize * 0.6 * Math.max(1, fretStr.length);
+      const held = diamond && pos.touch! - pos.fret !== 12 ? String(pos.fret) : undefined;
+      const shape = diamond ? diamondShape(fretStr, fontSize, scale) : undefined;
 
       // The geometry the technique post-pass draws against — recorded even
       // when this note carries none, because another note's hammer-on may
@@ -844,12 +877,17 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // Background rect obscures the staff line under the digit. Its width
       // is drawn on the ink scale, so its left edge is placed on it too —
       // otherwise the mask and the digit come apart as the staff grows.
-      const maskWidthSp = charWidthSp + 2 * FRET_MASK_AIR * fontSize * 0.6;
+      const air = FRET_MASK_AIR * fontSize * 0.6;
+      const heldWidthSp = held ? fontSize * 0.6 * held.length : 0;
+      // Left and right of the event's x, in ink: the digits (or the diamond,
+      // and the held fret before it) plus a little air.
+      const rightSp = shape ? shape.halfWidth + air : charWidthSp / 2 + air;
+      const leftSp = shape ? shape.halfWidth + (held ? DIAMOND_HELD_GAP_SP + heldWidthSp : 0) + air : rightSp;
       primitives.push({
         kind: 'rect',
-        x: eventX - (maskWidthSp / 2) * ink,
+        x: eventX - leftSp * ink,
         y: stringY - bgHeight / 2,
-        w: maskWidthSp,
+        w: leftSp + rightSp,
         h: bgHeight,
         fill: FRET_BG_FILL,
         className: 'fret-bg',
@@ -858,21 +896,52 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         // bar's end — is what the playback mask stretches to.
         ...(durationSpans ? { spanEndX: eventEndX, spanEndDx: -MASK_END_CLEAR_SP } : {})
       });
+      const fretClass = (isActive ? ' active' : '') +
+        (isSelected ? ' selected' : fretFill !== undefined && !isActive ? SELECTED_CLASS_MARK : '');
+      if (shape) {
+        const { halfWidth: w, halfHeight: h } = shape;
+        const corners: [number, number][] = [[-w, 0], [0, -h], [w, 0], [0, h]];
+        corners.forEach(([dx1, dy1], c) => {
+          const [dx2, dy2] = corners[(c + 1) % 4];
+          primitives.push({
+            kind: 'line',
+            x1: eventX, dx1, y1: stringY + dy1,
+            x2: eventX, dx2, y2: stringY + dy2,
+            thickness: DIAMOND_THICKNESS_SP * scale,
+            ...(fretFill !== undefined ? { stroke: fretFill } : {}),
+            className: 'harmonic-diamond' + fretClass,
+            sourceId: noteId
+          });
+        });
+        if (held) primitives.push({
+          kind: 'text',
+          text: held,
+          x: eventX,
+          dx: -(w + DIAMOND_HELD_GAP_SP + heldWidthSp / 2),
+          y: stringY,
+          font: 'fret',
+          size: fontSize,
+          anchor: 'middle',
+          baseline: 'central',
+          weight: FRET_FONT_WEIGHT,
+          fill: fretFill,
+          className: 'fret-number harmonic-held' + fretClass,
+          sourceId: noteId
+        });
+      }
       primitives.push({
         kind: 'text',
         text: fretStr,
         x: eventX,
         y: stringY,
         font: 'fret',
-        size: fontSize,
+        size: shape ? shape.digitSize : fontSize,
         anchor: 'middle',
         baseline: 'central',
         weight: FRET_FONT_WEIGHT,
         fill: fretFill,
         role: 'event',
-        className: 'fret-number' +
-          (isActive ? ' active' : '') +
-          (isSelected ? ' selected' : fretFill !== undefined && !isActive ? SELECTED_CLASS_MARK : ''),
+        className: 'fret-number' + fretClass,
         sourceId: noteId
       });
     }

@@ -6,6 +6,7 @@
 // HUD's row labels, and the harness exercises THIS, headlessly.
 //
 // Stages 3–5: pills at every rung the session can edit, merged over a range.
+import { isStoppedHarmonic, stoppedHarmonicPosition } from '../model/harmonics.ts';
 import type { MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 import { midiOfSpelling } from './staffSpace.ts';
@@ -567,6 +568,7 @@ export function positionedText(attribute: PositionedAttribute): { word: string; 
  *  stored positions are only approximated by the spelt weights. */
 export function techniqueText(technique: TechniqueChoice): string {
   if (technique.kind === 'slide') return technique.slideType ?? '';
+  if (technique.kind === 'harmonic') return technique.harmonicType ?? '';
   if (technique.kind !== 'bend') return '';
   let out = technique.approx ? '≈' : '';
   technique.alters.forEach((alter, i) => {
@@ -629,6 +631,17 @@ export function fingerboardOf(doc: MnxStructure, noteKey: string): Fingerboard |
   const capo = capoOf(part);
   const annotated = located.note._x?.mnxLab?.string;
   const string = annotated ?? defaultStringFor(located.note.pitch, tuning, capo);
+  // A stopped harmonic sounds above the fret held; the fret is the one held.
+  const harmonic = located.note._x?.mnxLab?.tab?.technique?.harmonic;
+  const entry = tuning.find(e => e.string === string);
+  if (isStoppedHarmonic(harmonic) && entry) {
+    const held = stoppedHarmonicPosition(
+      midiOfPitch(located.note.pitch), midiOfPitch(entry.pitch) + capo,
+      harmonic!.touchingPitch ? midiOfPitch(harmonic!.touchingPitch) : undefined,
+      located.note._x?.mnxLab?.fret
+    );
+    return { string, chosen: annotated !== undefined, fret: held ? held.stopped : null, tuning, capo };
+  }
   return { string, chosen: annotated !== undefined, fret: fretOn({ tuning, capo }, string, located.note.pitch), tuning, capo };
 }
 
@@ -706,7 +719,12 @@ export function notePills(doc: MnxStructure, member: Extract<SelectionMember, { 
   if (x?.fingering)
     pills.push(annotation('fingering', 'fingering', `${x.fingering.hand} ${x.fingering.finger}`, { type: 'removeFingering' }));
   for (const technique of readTechniques(note))
-    pills.push(annotation(`technique:${technique.kind}`, technique.kind, techniqueText(technique), { type: 'toggleTechnique', kind: technique.kind }));
+    pills.push(annotation(`technique:${technique.kind}`, technique.kind, techniqueText(technique), {
+      type: 'toggleTechnique',
+      kind: technique.kind,
+      // The pill's ✕ toggles the harmonic it shows, so it removes rather than retypes.
+      ...(technique.kind === 'harmonic' && technique.harmonicType === 'artificial' ? { harmonicType: 'artificial' as const } : {})
+    }));
   return [...pills, ...eventPills(doc, member)];
 }
 
@@ -916,7 +934,10 @@ const NOTE_WORDS: InspectorWord[] = [
   { word: 'accidental', hint: 'show · hide · parens', values: ['show', 'hide', 'parens'] },
   { word: 'finger', hint: '3 · left 2 · right p' },
   { word: 'bend', hint: '0>full · 1/2>0 · 0>full>1/2 · 0>1/2>1/2>0' },
-  ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({ word, hint: word === 'slide' ? 'shift · legato — bare = legato' : '' })),
+  ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({
+    word,
+    hint: word === 'slide' ? 'shift · legato — bare = legato' : word === 'harmonic' ? 'natural · artificial — bare = natural' : ''
+  })),
   ...EVENT_WORDS
 ];
 
@@ -1111,6 +1132,8 @@ export function parseInspectorLine(
     const techniqueKind = TECHNIQUE_WORDS.find(k => k.toLowerCase() === head);
     if (techniqueKind === 'slide' && ['', 'shift', 'legato'].includes(rest))
       return { intent: { type: 'setTechnique', technique: { kind: 'slide', ...(rest === 'shift' ? { slideType: 'shift' } : rest === 'legato' ? { slideType: 'legato' } : {}) } as TechniqueChoice } };
+    if (techniqueKind === 'harmonic' && ['natural', 'artificial'].includes(rest))
+      return { intent: { type: 'setTechnique', technique: { kind: 'harmonic', ...(rest === 'artificial' ? { harmonicType: 'artificial' } : {}) } as TechniqueChoice } };
     if (techniqueKind && techniqueKind !== 'bend' && rest === '')
       return { intent: { type: 'setTechnique', technique: { kind: techniqueKind } as TechniqueChoice } };
     if (head === 'bend') {

@@ -17,7 +17,8 @@
 // Durations w h q 8 16 32, each with dots (`q.`). Notes `string/fret`, string 1 the
 // highest-pitched, joined with `+` into a chord; `r` is a rest. A note's suffixes: `~`
 // ties it to the same string's next note in its voice (into the next bar, too), `h`
-// makes it a natural harmonic, `x` a dead note. Bar markers: `|:` `:|` `:|x3`
+// makes it a natural harmonic, `a` an artificial (harp) harmonic — held at that fret,
+// touched and sounding an octave up — `x` a dead note. Bar markers: `|:` `:|` `:|x3`
 // `volta=1` (every bar of the ending; `volta=1,2` for shared), `segno` `coda` `tocoda`
 // `ds` `ds-al-coda` `ds-al-fine` `dc` `dc-al-coda` `dc-al-fine` `fine` `final`
 // `double` `section="Verse 1"` `time=3/4` `key=2` `tempo=100`.
@@ -37,7 +38,7 @@ import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxPitch, MnxSequenceItem, Mn
 type Base = 'whole' | 'half' | 'quarter' | 'eighth' | '16th' | '32nd';
 const BASES: Record<string, [Base, number]> = { w: ['whole', 1], h: ['half', 1 / 2], q: ['quarter', 1 / 4], '8': ['eighth', 1 / 8], '16': ['16th', 1 / 16], '32': ['32nd', 1 / 32] };
 
-interface TextNote { string: number; fret: number; tie: boolean; harmonic: boolean; dead: boolean; legato: boolean; slide: boolean }
+interface TextNote { string: number; fret: number; tie: boolean; harmonic: boolean; artificial: boolean; dead: boolean; legato: boolean; slide: boolean }
 /** `grace` takes no time; events sharing a `triplet` number are one triplet. */
 interface TextEvent { base: Base; dots: number; length: number; notes: TextNote[] | null; grace?: boolean; triplet?: number }
 interface TextBar { number: number; line: number; markers: string[]; voices: Map<string, TextEvent[]>; copyOf?: number }
@@ -105,8 +106,9 @@ function event(token: string, line: number): TextEvent {
   const length = value * (2 - 2 ** -dots);
   if (m[3] === 'r') return { base, dots, length, notes: null };
   const notes = m[3].split('+').map(part => {
-    const n = /^(\d+)\/(\d+)([~hxps]*)$/.exec(part) ?? fail(line, `"${part}" in "${token}" is not a note like 3/0, 1/12h or 2/3~`);
-    return { string: Number(n[1]), fret: Number(n[2]), tie: n[3].includes('~'), harmonic: n[3].includes('h'), dead: n[3].includes('x'), legato: n[3].includes('p'), slide: n[3].includes('s') };
+    const n = /^(\d+)\/(\d+)([~hxpsa]*)$/.exec(part) ?? fail(line, `"${part}" in "${token}" is not a note like 3/0, 1/12h, 4/7a or 2/3~`);
+    if (n[3].includes('h') && n[3].includes('a')) fail(line, `"${part}": a harmonic is natural (h) or artificial (a), not both`);
+    return { string: Number(n[1]), fret: Number(n[2]), tie: n[3].includes('~'), harmonic: n[3].includes('h'), artificial: n[3].includes('a'), dead: n[3].includes('x'), legato: n[3].includes('p'), slide: n[3].includes('s') };
   });
   const strings = notes.map(n => n.string);
   if (new Set(strings).size !== strings.length) fail(line, `"${token}" puts two notes on one string`);
@@ -241,8 +243,12 @@ export function buildTabText(text: string): { document: MnxStructure; warnings: 
         if (!e.notes) return { duration, rest: {} };
         const notes = e.notes.map(text => {
           const base = open.get(text.string) ?? fail(bar.line, `bar ${bar.number} ${voice}: string ${text.string} is not one of the tuning's ${open.size}`);
-          const mnx: MnxNote = { id: `n${nextId++}`, pitch: spellPitch(base + piece.capo + text.fret, fifths), _x: { mnxLab: { string: text.string, fret: text.fret } } };
-          if (text.harmonic || text.dead) mnx._x!.mnxLab!.tab = { technique: { ...(text.harmonic ? { harmonic: { type: 'natural' as const } } : {}), ...(text.dead ? { dead: true } : {}) } };
+          // An artificial harmonic sounds the octave over the fret held, which is
+          // where it is touched; MNX pitch is what sounds.
+          const pitch = spellPitch(base + piece.capo + text.fret + (text.artificial ? 12 : 0), fifths);
+          const mnx: MnxNote = { id: `n${nextId++}`, pitch, _x: { mnxLab: { string: text.string, fret: text.fret } } };
+          const harmonic = text.harmonic ? { type: 'natural' as const } : text.artificial ? { type: 'artificial' as const, touchingPitch: { ...pitch } } : undefined;
+          if (harmonic || text.dead) mnx._x!.mnxLab!.tab = { technique: { ...(harmonic ? { harmonic } : {}), ...(text.dead ? { dead: true } : {}) } };
           return { text, mnx };
         });
         run.push({ bar: bar.number, line: bar.line, event: k, notes });

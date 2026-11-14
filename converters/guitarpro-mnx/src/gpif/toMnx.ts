@@ -26,6 +26,7 @@ import { parseChordSymbol } from '../common/harmony.js';
 import { gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
 import { swingFromTripletFeel } from '../common/swing.js';
 import { mnxDurationToWholes, tupletRatio, wholesToFraction } from '../common/duration.js';
+import { harmonicInterval } from '../common/harmonics.js';
 import { alphaTabTuningToMnx, midiToPitch, pitchToMidi } from '../common/tuning.js';
 import { gpTranspositionToMnx } from '../common/transposition.js';
 import {
@@ -981,15 +982,23 @@ function buildNote(
   grace: boolean
 ): MnxNote {
   const id = `n${state.nextNoteId++}`;
-  const midi = soundingMidi(gpNote, track);
+  const stopped = soundingMidi(gpNote, track);
+  const node = artificialNode(gpNote, measureIndex, warn);
+  // An artificial harmonic sounds at its node, counted up from the stopped fret;
+  // MNX pitch is what sounds, and the stopped fret stays on the note.
+  const midi = node ? stopped + node.interval : stopped;
   const authored = gpNote.concertPitch;
   const matches = authored && pitchToMidi(authored) === midi;
-  if (authored && !matches) {
+  // Guitar Pro may spell the stopped note; the octave above keeps its spelling.
+  const lifted = !matches && authored && node && node.interval % 12 === 0 && pitchToMidi(authored) === stopped
+    ? { ...authored, octave: authored.octave + node.interval / 12 }
+    : undefined;
+  if (authored && !matches && !lifted) {
     warn(`note ${sourceId}: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.`);
   }
   const mnxNote: MnxNote = {
     id,
-    pitch: matches ? { ...authored } : spellAuthored(gpNote.accidental, midi, track.capo) ?? midiToPitch(midi, fifths)
+    pitch: matches ? { ...authored } : lifted ?? spellAuthored(gpNote.accidental, midi, track.capo) ?? midiToPitch(midi, fifths)
   };
   const stringCount = track.tuningLowToHigh.length;
   const onFingerboard = gpNote.string !== null && stringCount > 0;
@@ -1004,6 +1013,9 @@ function buildNote(
   }
 
   const { technique, wantsHammerTarget, wantsSlideTarget } = readTechniques(gpNote);
+  if (node && technique?.harmonic) {
+    technique.harmonic.touchingPitch = midiToPitch(stopped + node.touch, fifths);
+  }
   if (technique) {
     mnxNote._x = mnxNote._x ?? {};
     mnxNote._x.mnxLab = { ...mnxNote._x.mnxLab, tab: { technique } };
@@ -1118,6 +1130,27 @@ function soundingMidi(note: GpifNote, track: GpifTrack): number {
   if (note.tone !== null && note.octave !== null) return note.tone + 12 * note.octave - 12;
   if (note.concertPitch) return pitchToMidi(note.concertPitch);
   return 60;
+}
+
+/**
+ * An artificial harmonic's node, from `HarmonicFret` (absent = the octave):
+ * how far up from the stopped fret it is touched, and what it sounds. Only for
+ * a `.gpif` note — a binary GP3–5 note arrives with its sounding pitch already
+ * worked out (`soundingMidiOverride`).
+ */
+function artificialNode(
+  note: GpifNote,
+  measureIndex: number,
+  warn: (message: string) => void
+): { touch: number; interval: number } | null {
+  if (note.harmonicType !== 'Artificial' || note.soundingMidiOverride != null || note.string === null || note.fret === null) return null;
+  const touch = note.harmonicFret ?? 12;
+  const interval = harmonicInterval(touch);
+  if (interval === undefined) {
+    warn(`measure ${measureIndex + 1}: an artificial harmonic touched ${touch} frets up is not a known node; it sounds at the stopped fret.`);
+    return null;
+  }
+  return { touch, interval };
 }
 
 function readTechniques(note: GpifNote): {

@@ -206,7 +206,8 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
     // Palm mute lost the key to it and keeps no other: it is a SPAN rather
     // than a notehead, and the inspector's pill still types it.
     { code: 'KeyX', intent: { type: 'toggleTechnique', kind: 'dead' } as EditorIntent },
-    { code: 'KeyO', intent: { type: 'toggleTechnique', kind: 'harmonic' } as EditorIntent }
+    { code: 'KeyO', intent: { type: 'toggleTechnique', kind: 'harmonic' } as EditorIntent },
+    { code: 'KeyO', shift: true, intent: { type: 'toggleTechnique', kind: 'harmonic', harmonicType: 'artificial' } as EditorIntent }
   ]
 };
 
