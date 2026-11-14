@@ -1,8 +1,9 @@
 # Artificial (harp) harmonics: drawn, stored, played, entered
 
-Status: built 2026-11-14; the scenario's approval is registered in
-[lab-verify.md](lab-verify.md#artificial-harp-harmonics--2026-11-14), and the owner's piece is
-re-encoded after landing (item 8).
+Status: complete 2026-11-14 (landed as `1a1303f5`…`6cc55179`). The scenario's approval is
+owed and registered in [lab-verify.md](../inprogress/lab-verify.md#artificial-harp-harmonics--2026-11-14).
+Item 8 done: "Imagine (tab reading)" bars 63–66 saved as the named version "Outro harp
+harmonics as artificial harmonics: held fret, touched an octave up" (revision 4).
 
 ## Why
 
@@ -54,7 +55,7 @@ sounding pitch), `harmonic: { type: "artificial", touchingPitch: A4 }`. The touc
 6. **Tab text** (`tools/recording-align/tabText.ts`): suffix `a` = artificial harmonic at the
    octave node.
 7. **Scenario** `scenarios/lab/25-tab-techniques/09-artificial-harmonics`, registered in
-   [lab-verify.md](lab-verify.md) for the owner's approval.
+   [lab-verify.md](../inprogress/lab-verify.md) for the owner's approval.
 8. The owner's piece: bars 63–66 re-encoded as artificial harmonics by a named checkpoint.
 
 Out of scope, named: MusicXML's `touching-pitch`/diamond notehead (the converter already

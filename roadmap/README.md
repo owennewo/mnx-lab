@@ -148,10 +148,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-artificial-harmonics.md](inprogress/core-artificial-harmonics.md)** — **built 2026-11-14**:
-  artificial (harp) harmonics drawn as a touch fret in a diamond (tab) and a diamond notehead
-  (notation), kept through the `.gp` round trip, played, entered with Shift+O and the tab-text
-  `a` suffix; the scenario awaits `/verify`.
 - **[studio-mix-layers.md](inprogress/studio-mix-layers.md)** — **built 2026-10-22**, awaiting the
   owner's hands-on check: a recording, the synth and a click as three layers, toggled from the
   tray's Mix field and headed the same in the Mix panel; the synth follows a recording through its
@@ -533,6 +529,10 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-artificial-harmonics.md](complete/core-artificial-harmonics.md)** — **complete 2026-11-14**:
+  artificial (harp) harmonics drawn as the touch fret in a diamond (tab) and a diamond notehead
+  (notation), kept through the `.gp` round trip, played, entered with Shift+O and the tab-text
+  `a` suffix; scenario 25/09 owes `/verify`.
 - **[core-anacrusis.md](complete/core-anacrusis.md)** — **complete 2026-11-09**: a pickup
   is the first bar, numbered 0, shorter than the next. Stored at its true length; engraving
   draws the next bar's signature once and none on the bar completing it, and numbers from the

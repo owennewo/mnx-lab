@@ -1776,7 +1776,7 @@ quarter in.
 
 ## Artificial (harp) harmonics — 2026-11-14
 
-Owner: [core-artificial-harmonics](core-artificial-harmonics.md). A non-natural harmonic
+Owner: [core-artificial-harmonics](../complete/core-artificial-harmonics.md). A non-natural harmonic
 is a stopped one: the ladder derives the fret held from its node, tab draws a touched one
 (artificial, tap) as its touch fret in a diamond, and notation draws every stopped one
 with a diamond notehead. No existing golden moved (no scenario held a non-natural
