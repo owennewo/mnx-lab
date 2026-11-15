@@ -155,6 +155,8 @@ checkpoints.
   0.26–219.35 s. Written past `verify`'s refusal on verse 6's bars 49–52, where the transcription (not the recording)
   heard a semitone low.
 - **Notes**: read from the book, not checked against the recording bar by bar. No checkpoints yet.
+- **Promoted**: the new piece and both deletions synced to the deployed library with `sync:library --piece`;
+  backups under `library-sync/2026-11-15T23-58-14-380Z`.
 - Open: a notes check by ear (bar 42's roll; verse 6's bars 49–52 the tools cannot hear); accents, rolled chords,
   slide-ins, palm muting and the coda's half-step bends are not entered; no lyrics (the book has all six verses).
 
