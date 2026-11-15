@@ -508,3 +508,45 @@ to do — each is a gap to close.
   against ≈4 s).
 - **Owner**: approved every note change by picture; heard bar 25's G-string 0 and bar 37's rolled chord, both confirmed in the
   transcription; asked for the piece to be promoted to the deployed library and the old one removed (done).
+
+## Run 13 — 2026-11-15 — Blackwaterside (Bert Jansch): a piece read from photographs of a book, form as the recording plays it
+
+- **Recording** YouTube `f5Gcu0Sv6lk`, Jansch's *Jack Orion* recording, 225 s, voice and guitar, drop D, capo 4, +40 cents.
+  **Source** six phone photographs of the owner's book (pages 46–47 and the coda page: tab and notation, 36 bars, with
+  block lyrics). **Piece** `94f7ec7a2b23cfad` "Blackwaterside (book)", made by this run. The owner's two earlier attempts
+  (Soundslice "Blackwaterside" `71a3ad5c18aec9c4`, "Blackwaterside lesson" `fb8d1013ffab87ca`) were not consulted, and were
+  deleted at the owner's request once this one was synced (restorable from studio's deleted list).
+- **Method**: each bar read from full-resolution crops of the photos (rotated upright; crops of a few bars at a time), tab
+  first, notation for rhythm and voices, into tab text (`score.tab.txt`). Voice separated with Gabox INSTV7N, MuScriptor on the
+  instrumental, then transcribed again with `--retune` (+40 cents → +1). `build`, then free and fixed-order searches against
+  the transcription before the piece existed; `create`, `attach`, `tuning --cents 40`, `sync`.
+- **Form**: the book repeats bars 13–30 six times ("1 & 2° only" on bar 29, a "1–6." ending, To Coda at bar 28, and no
+  D.S.), which the player cannot express: its To Coda fires only after a D.S./D.C. The first draft wrote that as endings
+  (1,2 / 3,4,5 / 6 = the coda). The free search on it (86% of 1184 written notes by pitch class, against 18% chance) found
+  one departure: **verse 3, the instrumental, replays intro bars 1–8 instead of verse bars 13–19**, then verse bars 20–28,
+  with **bar 22 cut to two beats**. The owner chose to write the form as played: intro 1–12; `|: 13–29 :|` for verses 1–2
+  with endings 30 / 31 (the intro's pickup); the instrumental written out (32–48); `|: 49–64 :|x3` for verses 4–6 with ending
+  65; the coda (66–72) as ending 3. 72 bars written, 122 performed.
+- **Sync** (revision 3): free and fixed-order searches agree bar for bar. Follows the score's order (122 of 122 bars),
+  **86% by pitch class, 83% exact, of 1183 written notes, against 18% chance**; downbeats median 10 ms, 90th percentile
+  20 ms; 102–116 bpm (median 107) against 104 marked. 122 segments, 123 cuts (117 snapped), 0.26–219.35 s. `verify`: 90% of
+  1073 against 19%, but FAILED on performed bars 100–103 (bars 49–52 in verse 6), so it was written with `--unverified`
+  after the owner agreed. Weak bars: 42 (a rolled chord: its onsets spread past the matching window) and 49–52 in verse 6.
+- **A wrong diagnosis, retracted**: in verse 6, bars 49–52 (2:54.9–3:00.2), MuScriptor wrote nearly every note a semitone
+  low. I told the owner that was a pitch dip in the tape. It was not: measured afterwards, the tuning (`librosa.estimate_tuning`)
+  is +36 to +40 cents throughout, and the bars' chroma matches verses 4 and 5 unshifted (0.996, 0.997; shifted ±1, 0.80–0.83).
+  The transcription failed there, probably on the voice left in the separated track. **Lesson: measure the audio before
+  telling the owner about a fault in the recording**; a transcription a semitone off for a few seconds is evidence about the
+  transcription first. `verify`'s "under 50% heard" there is a false failure; the bar lines are anchored on both sides.
+- **Improvised, not in the skill**: Step 0b assumes a video showing the score; a book photographed by phone needs rotation
+  and per-bar crops (pages curl at the spine and slope across the page, so each digit's string is read against that bar's
+  own lines). The book's numbering diverges from the score's after bar 29 (header comment maps them). `build`'s storage check
+  rejects a repeated time signature on a copied bar (bar 31). `create` in a fresh run directory needs `score.built.mnx.json`
+  beside `score.gp`.
+- **Not carried by tab text**: accents, slide-ins from no fret, rolled chords, palm-muted bass / let ring, the coda's
+  half-step bends (written as unbent quarters, one attack each).
+- **Fixed on the way** (asked for by the owner while listening): a legato slide's tab arc floated in the technique lane,
+  detached from its digits (e0643f47); switching Mix layers while paused parked the cursor and the BAR readout on bar 1,
+  because the new source's start was read as the playhead moving (d25a6b8b).
+- **Owner**: chose the form as played; asked for the piece to be the only version, the old two deleted, and the piece
+  promoted to the deployed library.

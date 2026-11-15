@@ -45,8 +45,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Begged | Olivia Rodrigo | `72329d5e9d53a613` |  | Soundslice |  |  |  |
 | Bizarre Love Triangle |  | `6be0c2ba1ce7b55d` |  | Soundslice |  |  |  |
 | Blackbird | Beatles | `b0bcd1230724657d` |  | **bar search** 10-28 | 🟡 10-28 |  |  |
-| Blackwaterside | Bert Jansch | `71a3ad5c18aec9c4` |  | Soundslice |  |  |  |
-| Blackwaterside lesson | Bert Jansch | `fb8d1013ffab87ca` |  | Soundslice |  |  |  |
+| Blackwaterside (book) | Bert Jansch | `94f7ec7a2b23cfad` |  | **bar search** 11-15 |  | ✅ |  |
 | Blues Run The Game | Jackson C.Frank (Ole Kirkeng) | `b599d2b96aaaa6ca` |  | Soundslice |  |  |  |
 | Both Sides Now | Joni Mitchel (Emil Ernebro) | `90bcab067aced626` |  | no recording |  |  |  |
 | Broken Man | Narimasa | `c9c7c27a4893a866` |  | Soundslice |  |  |  |
@@ -143,6 +142,21 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-15 — Blackwaterside (Bert Jansch) · `94f7ec7a2b23cfad` new, `71a3ad5c18aec9c4` and `fb8d1013ffab87ca` deleted — [run 13](tools/recording-align/RUNS.md#run-13--2026-11-15--blackwaterside-bert-jansch-a-piece-read-from-photographs-of-a-book-form-as-the-recording-plays-it)
+
+- **A new piece, read from the owner's book.** "Blackwaterside (book)": Jansch's arrangement as the book prints it
+  (36 bars, drop D, capo 4), read bar by bar from six photographs, guitar part only, a third attempt from scratch.
+  Synced to the *Jack Orion* recording (`f5Gcu0Sv6lk`), tuning +40 cents stored. The owner's two earlier attempts,
+  "Blackwaterside" and "Blackwaterside lesson", are deleted (restorable from studio's deleted list).
+- **Form**, as the recording plays it (the owner's choice): verse 3, the instrumental, is intro bars 1–8 then verse
+  bars 20–28, with bar 22 cut to two beats, so it is written out; verses 1–2 and 4–6 are repeats. 72 bars, 122 played.
+- **Sync**: 86% of 1183 written notes heard (pitch class) against 18% chance, downbeats median 10 ms; 122 segments,
+  0.26–219.35 s. Written past `verify`'s refusal on verse 6's bars 49–52, where the transcription (not the recording)
+  heard a semitone low.
+- **Notes**: read from the book, not checked against the recording bar by bar. No checkpoints yet.
+- Open: a notes check by ear (bar 42's roll; verse 6's bars 49–52 the tools cannot hear); accents, rolled chords,
+  slide-ins, palm muting and the coda's half-step bends are not entered; no lyrics (the book has all six verses).
 
 ### 2026-11-15 — Imagine (Tommy Emmanuel's arrangement, as Tim Van Roy plays it) · `389e012102576c3f` new, `7c1f69e8a92f21b4` deleted — [run 12](tools/recording-align/RUNS.md#run-12--2026-11-14--imagine-tim-van-roy-a-piece-read-from-a-tutorials-tab-then-checked-bar-by-bar)
 
