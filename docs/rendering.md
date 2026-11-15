@@ -43,7 +43,7 @@ point has two explanations). Tab draws a touched one (artificial, tap) as its to
 in a diamond — `◇19`, the held fret printed before it when the node is not the octave
 (`2◇9`) — and notation gives every stopped harmonic a diamond notehead at the sounding
 pitch plus its label; a natural harmonic keeps `<12>` and the circle
-([roadmap/inprogress/core-artificial-harmonics.md](../roadmap/inprogress/core-artificial-harmonics.md)). **No instrument is assumed**: absent `strings[]` means no
+([roadmap/inprogress/core-artificial-harmonics.md](../roadmap/complete/core-artificial-harmonics.md)). **No instrument is assumed**: absent `strings[]` means no
 fingerboard (the shim materializes standard into older tab documents); a viewer
 override (`TabSetup`) may supply strings/capo as presentation. Layouts render **forgivingly**:
 unsupported content degrades to a placeholder and per-measure "!" badges
