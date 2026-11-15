@@ -5,6 +5,9 @@ class AlignmentUnavailable extends Error {}
 export interface PlaybackSnapshot extends BackendSnapshot {
   readonly capabilities: PlaybackCapabilities;
   readonly loading: boolean;
+  /** A source switch is in flight: the new source is loading and has not yet been taken to the
+   *  place the old one stood, so the position it reports is its own start, not a move. */
+  readonly switching: boolean;
   readonly wantsPlayback: boolean;
   readonly needsStart: boolean;
   readonly issue: string;
@@ -34,7 +37,7 @@ export class PlaybackSession {
   get backend() { return this.active; }
   get snapshot(): PlaybackSnapshot {
     const state = this.active.snapshot;
-    return { ...state, capabilities: this.active.capabilities, loading: this.selecting || this.pendingPlay,
+    return { ...state, capabilities: this.active.capabilities, loading: this.selecting || this.pendingPlay, switching: this.selecting,
       wantsPlayback: this.intent || state.state === 'playing' || state.state === 'buffering', needsStart: this.needsStart, alignmentIssue: this.alignmentIssue, issue: this.issue || state.error || '' };
   }
   private notify() {

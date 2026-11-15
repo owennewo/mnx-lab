@@ -114,6 +114,9 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   const cursor: CursorPlayback = {
     get playing() { return player.playback?.wantsPlayback ?? false; },
     get playhead() {
+      // Mid-switch the new source reports its own start; read as the playhead moving, a paused
+      // cursor would be parked on bar 1. There is no playhead until the switch has landed.
+      if (player.playback?.switching) return null;
       const at = player.scorePosition;
       return at ? { ordinal: at.ordinal, offset: at.metricOffset } : null;
     },

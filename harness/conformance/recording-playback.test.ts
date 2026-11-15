@@ -111,6 +111,18 @@ describe('source handoff ownership', () => {
     expect(second.snapshot.needsStart).toBe(true); expect(second.snapshot.alignmentIssue).toBeTruthy(); await second.play(); expect(c.media.plays).toBe(0);
     await second.start(); expect(second.snapshot.alignmentIssue).toBeUndefined(); expect(c.media.plays).toBe(1); second.dispose();
   });
+  it('says it is switching while the new source loads, so its start is not read as the playhead moving', async () => {
+    // A paused cursor follows a playhead that moves; mid-switch the new source sits at its own start.
+    const a=backend(), b=backend('b'); await a.backend.prepare(); await a.backend.seek(pos(1));
+    const gate=deferred(); b.media.gate=gate.promise;
+    const session=new PlaybackSession(a.backend,()=>b.backend,()=>{});
+    expect(session.snapshot.switching).toBe(false);
+    const switched=session.select('b'); await flush();
+    expect(session.snapshot.switching).toBe(true); expect(session.snapshot.scorePosition).not.toEqual(pos(1));
+    gate.resolve(); expect(await switched).toBe(true);
+    expect(session.snapshot.switching).toBe(false); expect(session.snapshot.scorePosition).toEqual(pos(1));
+    session.dispose();
+  });
   it('starts the next source at its own beginning from a synth paused at the start (core-single-cursor)', async () => {
     // The single cursor parks a fresh piece's synth PAUSED at the first beat; that is the stopped synth's handoff.
     class Synth extends RecordingBackend { override get snapshot() { return { ...super.snapshot, kind: 'synth' as const }; } }
