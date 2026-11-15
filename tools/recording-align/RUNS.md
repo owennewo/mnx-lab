@@ -482,3 +482,29 @@ to do — each is a gap to close.
   `--local`; a "which ending does each pass play" report — the per-pass swap — would be one command. The skill should say to
   **re-read the source with the current reader** before trusting an "overfull" bar.
 - **Owner**: chose the ending fix and the rewrite; the sync not yet watched.
+
+## Run 12 — 2026-11-14 — Imagine (Tim Van Roy): a piece read from a tutorial's tab, then checked bar by bar
+
+- **Recording** YouTube `Z4DHY0qbRVg`, Tim Van Roy's playthrough of Tommy Emmanuel's arrangement, Drop D. **Tab** from his
+  tutorial `S9SBMhlMGeU` (on-screen tab panel, no notation). **Piece** `389e012102576c3f` "Imagine (tab reading)", made by
+  this run; the owner's Soundslice "Imagine" (`7c1f69e8a92f21b4`) was the comparison and is now deleted.
+- **Method**: the tutorial's pages from `screen.py` (2.5 GB video), read by hand into tab text (strings and frets; slots
+  provisional), each column snapped to the 16th where the playthrough sounds one of its pitches (`snap.py`, reach 2.5
+  16ths). Then a fixed-order search and, bar by bar, written-against-heard tables from per-section clip transcriptions
+  (MuScriptor; half speed where full speed was unclear), each proposed change rendered as a before/after PNG and approved.
+- **Sync** (revision 3): 67 segments, 68 cuts (51 snapped to a heard downbeat), 0.30–254.80 s; `verify` OK, 72% of 774
+  written notes against 12% chance. Bars 54–62's lines were found late and moved (revision 14, 74% of 796). After the notes
+  passes (revision 15): **77% of 807 against 12%**, 67 of 67 bars placed.
+- **Fixed on the way**: `screen.py` held every frame of the video in memory and was OOM-killed (/tmp is tmpfs here; run files
+  belong in `~/.cache/mnx-lab-runs/`) — it now streams in two passes (63b3fbd6). Artificial harmonics did not exist: built and
+  landed (`core-artificial-harmonics`), tab text gained the `a` suffix.
+- **Guitar Pro storage limits met** (each a checkpoint refusal, each worked around): at most 4 bend points per note (a 5-point
+  bend became two tied notes); bend positions on a coarse grid (quarters, not sevenths); a tuplet's outer value as eighth×2;
+  invisible rests (`space`) are lost; a grace container needs `graceType`; an arpeggio is stored with `arrow: true`.
+- **Traps**: a proposal regenerated from its script drops hand edits made to its output (bars 28 and 43 came back) — keep every
+  change in the script. A helper that `exec`s a loader overrides the document loaded before it. Clip-transcription tables read
+  arpeggiated chords as separate 16ths; their spacing (≈140 ms against a 230–250 ms 16th) tells a roll from a figure.
+- **Not carried**: fermatas and let-ring; the held bars are written in 4/4 and the sync absorbs the rubato (bar 35 runs 5.1 s
+  against ≈4 s).
+- **Owner**: approved every note change by picture; heard bar 25's G-string 0 and bar 37's rolled chord, both confirmed in the
+  transcription; asked for the piece to be promoted to the deployed library and the old one removed (done).

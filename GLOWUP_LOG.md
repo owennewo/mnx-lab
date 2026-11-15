@@ -83,7 +83,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | House of the Rising Sun |  | `5839c1574c4756d1` |  | no recording |  |  |  |
 | Hurt | Johnny Cash | `82388dda5c5fb2c0` |  | Soundslice |  |  |  |
 | I'm on Fire | Bruce Springsteen (Carson Mckee) | `72bca5cbd9c73569` |  | Soundslice |  |  |  |
-| Imagine | John Lennon (Tim Van Roy) | `7c1f69e8a92f21b4` |  | Soundslice |  |  |  |
+| Imagine (tab reading) | John Lennon (arr. Tommy Emmanuel, Tim Van Roy) | `389e012102576c3f` |  | **bar search** 11-15 | ✅ | ✅ |  |
 | Is There Anybody Out There? | Pink Floyd | `53d84e3e1bada9f3` |  | Soundslice |  |  |  |
 | Jesse | Joshua Kadison | `b982792a06ed1a7e` |  | Soundslice |  |  |  |
 | Just Like Heaven | The Cure | `3023ca1345b2164b` |  | Soundslice |  |  |  |
@@ -143,6 +143,38 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-15 — Imagine (Tommy Emmanuel's arrangement, as Tim Van Roy plays it) · `389e012102576c3f` new, `7c1f69e8a92f21b4` deleted — [run 12](tools/recording-align/RUNS.md#run-12--2026-11-14--imagine-tim-van-roy-a-piece-read-from-a-tutorials-tab-then-checked-bar-by-bar)
+
+- **A new piece, read from the tab.** "Imagine (tab reading)": 67 bars read off the tab panel
+  of Tim Van Roy's tutorial (`S9SBMhlMGeU`), Drop D, timed against his playthrough
+  (`Z4DHY0qbRVg`), which is attached and synced. The owner's Soundslice "Imagine"
+  (`7c1f69e8a92f21b4`) was kept for comparison until this one was settled, then deleted
+  (restorable from studio's deleted list); bar 11's figure came from it, because the
+  recording agrees with the owner there rather than with the tutorial.
+- **New in the lab for it**: artificial (harp) harmonics, drawn as a diamond with the
+  held fret, stored, played and entered (Shift+O) — `core-artificial-harmonics`; the outro
+  (bars 63–66) uses them.
+- **Sync**: fixed order, 67 bars, 68 cuts (51 snapped), 0.30–254.80 s (revision 3: 72% of
+  774 written notes against 12% chance). Bars 54–62's bar lines were late and were moved
+  (revision 14: 74% of 796). On the final notes (revision 15), `verify`: **77% of 807
+  written notes against 12% chance**, 67 of 67 bars placed.
+- **Notes**, every change seen as a before/after picture and approved by the owner, one
+  checkpoint per batch: *Rhythm in the held and slowing bars*; *Outro harp harmonics as
+  artificial harmonics*; *Intro: the bass F# hammered from the held D*; *Bar 16* (the
+  whole-step bend); *Bars 30 and 51*; *Bar 38* (bent and released twice); *Bar 49*;
+  *Bar 57* (settled from clip transcriptions at full and half speed); *Chorus bars 31–34
+  and 53–55*; *Tag bars 58–60*; *Bar 61*; *Verse bars as the recording plays them*
+  (11, 13, 18–20, 22, 23, 25, 37, 42, 43, 46 — the G-string 0 on the 4th 16th of bars 13,
+  25 and 46, and bar 37's chord rolled, both from the owner's ear).
+- **Form**: the tab's order is the recording's (fixed-order search end to end).
+- **Promoted**: both pieces synced to the deployed library (the new one copied, the old
+  one's deletion carried) with `sync:library --piece`; backups under
+  `library-sync/2026-11-15T21-01-03-760Z`.
+- Open: the held bars (35, 56, 60, 62) are rubato in 4/4; bar 35's extra time is the held
+  B-string 3 and A chord (about a beat), so a fermata there was suggested instead of 5/4,
+  not yet decided. Bar 28 stays as the tab has it (bar 49's lick fitted worse). The
+  synth's sustain on bent notes is weak. No lyrics (instrumental).
 
 ### 2026-11-10 — Cormorant (John Blek) · `5df759c729c55db9`, `9b093e5a2114a1c3` deleted
 
