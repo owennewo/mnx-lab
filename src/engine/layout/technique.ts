@@ -628,8 +628,9 @@ function emitSlide(
   site: TechniqueSite,
   slide: { type: string; direction?: 'up' | 'down'; target?: string },
   /** Where a LEGATO slide's extra slur goes — the one thing about a slide the
-   *  two staves disagree on. */
-  legatoSlur: (a: TechniqueSite, b: TechniqueSite) => { y: number; dir: 1 | -1 }
+   *  two staves disagree on. `centres` spans it digit to digit, as the tab
+   *  hammer/pull arc does, rather than across the gap between them. */
+  legatoSlur: (a: TechniqueSite, b: TechniqueSite) => { y: number; dir: 1 | -1; centres?: boolean }
 ): void {
   const { byNoteId, ink, primitives } = input;
   const clear = site.halfWidthSp + CLEAR_SP;
@@ -686,10 +687,10 @@ function emitSlide(
   });
 
   if (slide.type === 'legato') {
-    const { y, dir } = legatoSlur(site, target);
+    const { y, dir, centres } = legatoSlur(site, target);
     slur(
-      site.x + clear * ink, y,
-      target.x - targetClear * ink, y,
+      centres ? site.x : site.x + clear * ink, y,
+      centres ? target.x : target.x - targetClear * ink, y,
       dir,
       'technique-slur technique-slide-legato-slur',
       primitives
@@ -785,8 +786,12 @@ export function emitTabTechnique(input: TechniqueInput): void {
       }
     }
 
+    // A legato slide's slur hugs the string like the hammer/pull arc, digit to
+    // digit just above them. Parked in the lane at the top of the staff it read
+    // as a mark attached to nothing — a tiny cap floating over a grace slide
+    // (found on Blackwaterside's opening 6/7, 2026-11-15).
     if (t.slide) {
-      emitSlide(input, site, t.slide, (a, b) => ({ y: Math.min(a.laneY, b.laneY), dir: -1 }));
+      emitSlide(input, site, t.slide, (a, b) => ({ y: Math.min(a.y, b.y) - TAB_HP_LIFT_SP, dir: -1, centres: true }));
     }
   }
 }

@@ -22,5 +22,5 @@
 <rect x="560.8" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="174.576" y1="121.3712" x2="265.424" y2="111.7712" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
 <line x1="398.576" y1="139.6576" x2="489.424" y2="130.0576" stroke-width="1.92" class="technique-slide technique-slide-legato"></line>
-<path d="M 398.576 73.6 C 425.8304 60.16, 462.1696 60.16, 489.424 73.6 C 462.1696 61.44, 425.8304 61.44, 398.576 73.6 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
+<path d="M 388 121.2576 C 421.6 107.8176, 466.4 107.8176, 500 121.2576 C 466.4 109.0976, 421.6 109.0976, 388 121.2576 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
 </svg>

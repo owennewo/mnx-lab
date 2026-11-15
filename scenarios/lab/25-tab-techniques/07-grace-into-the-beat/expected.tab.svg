@@ -40,6 +40,6 @@
 <line x1="171.9456" y1="84.8" x2="182.224" y2="75.2" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
 <path d="M 304.8 121.2576 C 313.44 107.8176, 324.96 107.8176, 333.6 121.2576 C 324.96 109.0976, 313.44 109.0976, 304.8 121.2576 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
 <line x1="453.5456" y1="103.0864" x2="463.824" y2="93.4864" stroke-width="1.92" class="technique-slide technique-slide-legato"></line>
-<path d="M 453.5456 73.6 C 457.3856 60.16, 459.984 60.16, 463.824 73.6 C 459.984 61.44, 457.3856 61.44, 453.5456 73.6 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
+<path d="M 445.6 84.6864 C 454.24 71.2464, 465.76 71.2464, 474.4 84.6864 C 465.76 72.5264, 454.24 72.5264, 445.6 84.6864 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
 <line x1="596.976" y1="139.6576" x2="710.224" y2="130.0576" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
 </svg>

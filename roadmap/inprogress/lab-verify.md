@@ -1792,3 +1792,23 @@ the plain 9s and 7s between them as ever; the seventh event reads `2◇9` — he
 touched seven frets up. Notation: diamond noteheads at A4 and E5 with "A.H." over each,
 no circle; the plain C♯5 and F♯4 drawn as ever. The tab shows no "A.H." word — the
 diamond says it.
+
+## Legato-slide slurs hug the string on tab — 2026-11-15
+
+Owner: no roadmap item — a rendering fix asked for while transcribing Blackwaterside
+(the opening grace 6/7 slide's arc floated in the technique lane, detached from its
+digits). On a tab staff a legato slide's slur now spans digit to digit just above them,
+at the hammer/pull arc's lift (`TAB_HP_LIFT_SP`), instead of sitting in the lane at the
+top of the staff between the digits' edges. The notation staff is unchanged. Neither
+scenario was `verified`, so none was demoted.
+
+Two scenarios moved (`expected.primitives.json`, `expected.tab.svg`, `expected.both.svg`):
+
+- `lab/25-tab-techniques/02-slides`
+- `lab/25-tab-techniques/07-grace-into-the-beat`
+
+**What a reviewer should look for.** Each legato slide's arc starts over the first digit
+and ends over the second, a little above both, on the string the slide travels — not a
+small cap up at the staff's top line. A grace digit's arc still reaches its small digit.
+The slant line between the digits is unchanged and the arc does not touch it; shift
+slides (no arc) are unchanged.

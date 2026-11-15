@@ -80,7 +80,7 @@
 <line x1="187.9456" y1="269.24" x2="216.624" y2="259.64" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
 <path d="M 339.2 305.6976 C 347.84 292.2576, 359.36 292.2576, 368 305.6976 C 359.36 293.5376, 347.84 293.5376, 339.2 305.6976 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
 <line x1="487.9456" y1="287.5264" x2="498.224" y2="277.9264" stroke-width="1.92" class="technique-slide technique-slide-legato"></line>
-<path d="M 487.9456 258.04 C 491.7856 244.6, 494.384 244.6, 498.224 258.04 C 494.384 245.88, 491.7856 245.88, 487.9456 258.04 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
+<path d="M 480 269.1264 C 488.64 255.6864, 500.16 255.6864, 508.8 269.1264 C 500.16 256.9664, 488.64 256.9664, 480 269.1264 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
 <line x1="631.376" y1="324.0976" x2="744.624" y2="314.4976" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
 <line x1="189.664" y1="128" x2="213.76" y2="120" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
 <path d="M 339.2 212.8 C 347.84 226.24, 359.36 226.24, 368 212.8 C 359.36 224.96, 347.84 224.96, 339.2 212.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
