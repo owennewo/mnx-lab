@@ -116,6 +116,21 @@ describe('derivation: string + pitch → fret', () => {
     expect(pos).toEqual({ str: 5, fret: 3, mismatch: true });
   });
 
+  it('keeps a natural harmonic at the node its stored fret names (7, not 19)', () => {
+    const natural = (pitch: MnxPitch, string: number, fret?: number): MnxNote => ({
+      pitch,
+      _x: { mnxLab: { string, ...(fret !== undefined ? { fret } : {}), tab: { technique: { harmonic: { type: 'natural' } } } } }
+    });
+    // B5 on the high E string: the twelfth, touched at 7 or 19.
+    expect(resolveEventPositions([natural(p('B', 5), 1, 7)], STANDARD)[0]).toEqual({ str: 1, fret: 7 });
+    expect(resolveEventPositions([natural(p('B', 5), 1, 19)], STANDARD)[0]).toEqual({ str: 1, fret: 19 });
+    // No stored fret: the arithmetic, as before.
+    expect(resolveEventPositions([natural(p('B', 5), 1)], STANDARD)[0]).toEqual({ str: 1, fret: 19 });
+    // A stored fret that is not a node for this pitch is still a mismatch.
+    expect(resolveEventPositions([natural(p('B', 5), 1, 5)], STANDARD)[0]).toEqual({ str: 1, fret: 19, mismatch: true });
+    expect(tabIssues(docWith(partWith({ notes: [natural(p('B', 5), 1, 7)] })))).toEqual([]);
+  });
+
   it('assigns chords highest-pitch-first with no string collisions', () => {
     // Open C major from pitches alone: E4 C4 G3 E3 C3 (sounding).
     const chord = [bare(p('E', 4)), bare(p('C', 4)), bare(p('G', 3)), bare(p('E', 3)), bare(p('C', 3))];

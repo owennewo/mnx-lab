@@ -78,3 +78,13 @@ export function stoppedHarmonicPosition(
     : [...candidates].sort((a, b) => NODE_PREFERENCE.indexOf(touch - a) - NODE_PREFERENCE.indexOf(touch - b))[0];
   return { stopped, touch };
 }
+
+/**
+ * The fret a NATURAL harmonic is touched at, `aboveOpen` semitones over its
+ * (capo-shifted) open string: the stored fret when it is a node that sounds
+ * that — the twelfth is reached at 7 and at 19 — else the arithmetic, which is
+ * right at the octave and is what an unstated fret has always derived to.
+ */
+export function naturalHarmonicFret(aboveOpen: number, storedFret: number | undefined): number {
+  return storedFret !== undefined && harmonicInterval(storedFret) === aboveOpen ? storedFret : aboveOpen;
+}

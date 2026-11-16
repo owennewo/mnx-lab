@@ -42,7 +42,8 @@ at a node above the fret held, so the ladder derives the *held* fret from the no
 point has two explanations). Tab draws a touched one (artificial, tap) as its touch fret
 in a diamond — `◇19`, the held fret printed before it when the node is not the octave
 (`2◇9`) — and notation gives every stopped harmonic a diamond notehead at the sounding
-pitch plus its label; a natural harmonic keeps `<12>` and the circle
+pitch plus its label; a natural harmonic keeps `<12>` and the circle, and its stored fret
+when that is the node it sounds (`<7>` rather than `<19>` for the twelfth)
 ([roadmap/inprogress/core-artificial-harmonics.md](../roadmap/complete/core-artificial-harmonics.md)). **No instrument is assumed**: absent `strings[]` means no
 fingerboard (the shim materializes standard into older tab documents); a viewer
 override (`TabSetup`) may supply strings/capo as presentation. Layouts render **forgivingly**:

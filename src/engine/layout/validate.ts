@@ -1,7 +1,7 @@
 import { MnxEvent, MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
 import { MAX_FRET, midiOfMnxPitch, tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
-import { isStoppedHarmonic, stoppedHarmonicPosition } from '../../model/harmonics.ts';
+import { isStoppedHarmonic, naturalHarmonicFret, stoppedHarmonicPosition } from '../../model/harmonics.ts';
 
 /**
  * Semantic (musical) validation — problems the schema can't see but the user
@@ -269,7 +269,8 @@ function validateTabPositions(
             claims.set(key, byString);
             continue;
           }
-          const derived = midiOfMnxPitch(note.pitch) - open;
+          const aboveOpen = midiOfMnxPitch(note.pitch) - open;
+          const derived = harmonic?.type === 'natural' ? naturalHarmonicFret(aboveOpen, x.fret) : aboveOpen;
           if (derived < 0 || derived > MAX_FRET) {
             error(
               measureIndex,

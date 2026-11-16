@@ -1,5 +1,5 @@
 import { MnxNote, MnxPart, MnxPitch, MnxTuningEntry } from '../../model/mnx.ts';
-import { isStoppedHarmonic, stoppedHarmonicPosition } from '../../model/harmonics.ts';
+import { isStoppedHarmonic, naturalHarmonicFret, stoppedHarmonicPosition } from '../../model/harmonics.ts';
 
 /**
  * Fingerboard position derivation (roadmap/complete/core-derived-positions.md).
@@ -8,7 +8,9 @@ import { isStoppedHarmonic, stoppedHarmonicPosition } from '../../model/harmonic
  *   string + fret  → the DERIVED fret renders; a disagreeing stored fret is
  *                    flagged (validate.ts), never drawn. A stopped harmonic
  *                    (any type but natural) derives the fret HELD, from its
- *                    node (model/harmonics.ts), not the fret that sounds.
+ *                    node (model/harmonics.ts), not the fret that sounds; a
+ *                    natural harmonic keeps a stored fret that is its node (7
+ *                    or 19 for the twelfth).
  *   string only    → the fret is arithmetic: pitch − (open + capo).
  *   neither        → the default assignment below — presentation, not content,
  *                    never written back to the document.
@@ -155,7 +157,10 @@ export function resolveEventPositions(
       };
       return;
     }
-    const fret = midiOfMnxPitch(note.pitch) - open;
+    // A natural harmonic keeps a stored fret that is its node (7 or 19 for the
+    // twelfth); everything else is the arithmetic.
+    const sounding = midiOfMnxPitch(note.pitch) - open;
+    const fret = harmonic?.type === 'natural' ? naturalHarmonicFret(sounding, x.fret) : sounding;
     if (fret < 0 || fret > MAX_FRET) return;
     resolved[index] = {
       str: x.string,
