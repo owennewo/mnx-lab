@@ -99,6 +99,27 @@ function artificialNodeOf(sounding: number, touching: MnxPitch | undefined, stop
   return harmonicNode(sounding - stopped) ?? 12;
 }
 
+/**
+ * Where a natural harmonic sounding `sounding` is touched: the lowest-numbered
+ * node on `string` (or, with none stated, on the first string that has one),
+ * counted from the nut over the capo.
+ */
+function naturalPosition(
+  sounding: number,
+  string: number | undefined,
+  tuningsHighToLow: number[],
+  capo: number
+): { string: number; fret: number } | undefined {
+  const strings = string !== undefined ? [string] : tuningsHighToLow.map((_, i) => i + 1);
+  for (const candidate of strings) {
+    const open = tuningsHighToLow[candidate - 1];
+    if (open === undefined) continue;
+    const node = harmonicNode(sounding - open - capo);
+    if (node !== undefined) return { string: candidate, fret: node };
+  }
+  return undefined;
+}
+
 const HARMONIC_TYPES: Record<string, string> = {
   natural: 'Natural',
   artificial: 'Artificial',
@@ -930,6 +951,12 @@ function buildBeat(
         : undefined;
     const harmonic = note._x?.mnxLab?.tab?.technique?.harmonic;
     const artificial = harmonic !== undefined && harmonic.type !== 'natural';
+    if (!position && harmonic?.type === 'natural') {
+      // A natural harmonic with no stored fret is touched at the node that
+      // sounds it — on its stated string when there is one — never at a fret
+      // whose own pitch happens to match, which reads back a node higher.
+      position = naturalPosition(midi, x?.string, tuningsHighToLow, capo);
+    }
     if (!position) {
       // A non-natural harmonic sounds above the fret it is played at; with no
       // stored fret, place the stopped note an octave below what sounds.

@@ -984,9 +984,11 @@ function buildNote(
   const id = `n${state.nextNoteId++}`;
   const stopped = soundingMidi(gpNote, track);
   const node = artificialNode(gpNote, measureIndex, warn);
+  const naturalLift = naturalNodeLift(gpNote, measureIndex, warn);
   // An artificial harmonic sounds at its node, counted up from the stopped fret;
-  // MNX pitch is what sounds, and the stopped fret stays on the note.
-  const midi = node ? stopped + node.interval : stopped;
+  // a natural one at its node counted from the nut, so 7 sounds the twelfth, not
+  // the fret. MNX pitch is what sounds, and the fret played stays on the note.
+  const midi = node ? stopped + node.interval : stopped + naturalLift;
   const authored = gpNote.concertPitch;
   const matches = authored && pitchToMidi(authored) === midi;
   // Guitar Pro may spell the stopped note; the octave above keeps its spelling.
@@ -1151,6 +1153,21 @@ function artificialNode(
     return null;
   }
   return { touch, interval };
+}
+
+/**
+ * How far a natural harmonic sounds above its fret's own pitch: the node's
+ * interval less the fret (0 at 12, where the two agree). Only for a `.gpif`
+ * note — a binary GP3–5 note arrives with its sounding pitch already worked out.
+ */
+function naturalNodeLift(note: GpifNote, measureIndex: number, warn: (message: string) => void): number {
+  if (note.harmonicType !== 'Natural' || note.soundingMidiOverride != null || note.string === null || note.fret === null) return 0;
+  const interval = harmonicInterval(note.fret);
+  if (interval === undefined) {
+    warn(`measure ${measureIndex + 1}: a natural harmonic at fret ${note.fret} is not a known node; it sounds at the fret.`);
+    return 0;
+  }
+  return interval - note.fret;
 }
 
 function readTechniques(note: GpifNote): {

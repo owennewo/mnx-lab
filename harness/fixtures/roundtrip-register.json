@@ -34,8 +34,8 @@
     {
       "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
       "kind": "changed",
-      "documents": 8,
-      "count": 15
+      "documents": 7,
+      "count": 13
     },
     {
       "path": "layouts",
@@ -4574,11 +4574,6 @@
           {
             "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
             "kind": "gained",
-            "count": 2
-          },
-          {
-            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
-            "kind": "changed",
             "count": 2
           },
           {
