@@ -68,7 +68,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Eleanor Rigby | Beatles (fingerstyle book) | `243e798f04b5ff1f` |  | no recording |  |  |  |
 | Erwan | Meic Stevens | `2ba9acbdad27fe6b` |  | Soundslice |  |  |  |
 | Every Breath You Take | The Police | `05fa6b889b0481b6` |  | Soundslice |  |  |  |
-| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 | 🟡 10-29 much improved; strings to check | 🟡 10-30 (bars 2–4 folded; the rest not yet) | — |
+| Everybody Wants To Rule The World | Tears For Fears | `2b156138db0c7716` | ▶ | **fixed-order** 10-29 (still fits r60, 11-16) | 🟡 10-31 first half and choruses by ear; drafted bars' strings not yet checked | 🟡 10-30 (intro, riff and verse repeats; bridge and interlude not yet) | — |
 | Fast Car | Tracy Chapman | `10537b9c88cc5329` |  | Soundslice |  |  |  |
 | Fields of Gold | Sting (Dominic Miller, trans. Serge Kottelat) | `18b7fb82180507ec` |  | **bar search**, 18 bars placed by hand, 11-03 | 🟡 | 🟡 |  |
 | Fingerstyle Mastery: Travis Picking Part 2 | Mike Dawes | `8dee0f5649ee664d` |  | no recording |  |  |  |
@@ -142,6 +142,39 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-16 — Everybody Wants To Rule The World · `2b156138db0c7716` — a second opinion: not finished yet
+
+The owner thought the piece was finished and asked for a second opinion. Read-only: nothing in the
+library changed. The score checked is r60 (the latest save, 10-31), with the 10-30 run's
+transcription (`.scratchpad/glowup/ewtrtw/run`, audio retuned to open D) and the stored sync, walked
+in the performed order the repeats now give. Bar numbers are r60's (102 written, 110 performed).
+
+- **Sync: holds.** The stored sync's 111 cuts are the ones the 10-31 session read against r60, and
+  93% of 2070 written attacks are heard (the 10-29 check heard 95% of 1790; the owner has since
+  added full chords). Folding repeats moves no bar line, so the "final sync" this piece was waiting
+  for is in effect this one: a `verify` run once the strings are settled is all it needs.
+- **Strings: not done.** Every drafted bar — bridge 38–43, interlude 50–57 and 84–87, solos 58–71,
+  chorus 78–81 — is byte-identical to r35 and so still carries the 10-29 fret step's guesses.
+  These are the bars the owner's verdict was about. Places to look first: bar 78's G3 on string 4,
+  fret 5, where every other chorus plays it on string 3, fret 1; the bridge's B3, on string 3,
+  fret 5 in bar 39 but string 2, fret 2 in bars 41 and 43; and the solo's reach in bars 58–60
+  (string 6, fret 9 under string 1, fret 11 and string 3, fret 12). The bridge's up-the-neck chord
+  (string 6, fret 7 and string 5, fret 5 in bars 39, 41 and 43) is the owner's own refingering from
+  10-29 and is right.
+- **Notes: a short list for the ear**, heard in every pass (or all but one) of the bar:
+  chorus bars 46, 74 and 90
+  end on a G2 not heard, and sound B3 on 14 and 16 and E4 on 20 and 22 (sixteenths of the bar)
+  that are not written; bar 82 has six chord tones in 8–14 not heard. The solos, played once each,
+  have more misses (bar 60: D4, D5 and A3 throughout; bars 64 and 67), as drafted bars would.
+  The verse's grace notes, A♯3 into B3 on the downbeat and F4 into F♯4, go unheard in most passes,
+  as the 10-29 check found graces heard a sixteenth off; dismissed again. Slaps were not checked (the percussive measure was not kept). The
+  10-29 findings list is superseded by this one.
+- **Form: optional.** Interlude 50–53 and 54–57 are identical, so they can fold to a repeat
+  ×2. The bridge's three passes (38–39, 40–41, 42–43) differ only in strings, plus 43's ending, so
+  the bridge folds once its strings are settled.
+- To finish: the string pass on the drafted bars (the owner, with the video), the notes list
+  above, then fold, `verify`, and mark the piece done.
 
 ### 2026-11-15 — Blackwaterside (Bert Jansch) · `94f7ec7a2b23cfad` new, `71a3ad5c18aec9c4` and `fb8d1013ffab87ca` deleted — [run 13](tools/recording-align/RUNS.md#run-13--2026-11-15--blackwaterside-bert-jansch-a-piece-read-from-photographs-of-a-book-form-as-the-recording-plays-it)
 
@@ -269,6 +302,25 @@ A new piece, read off the score in Kottelat's video, 79 bars, no checkpoints bey
 because he plays them freely. Sync done but not yet watched. **Form** is 🟡 by the letter: the score's order is what he plays,
 heard note by note, but the free search still reports departures in the free passages. **Notes** is 🟡: not yet checked by
 the disagreements method. Open for the owner's ear: bar 8 (7.7–10.2 s), printed frets 4, 2, 1, heard 2, 1, 0; kept as printed.
+
+### 2026-10-30 → 31 — Everybody Wants To Rule The World · `2b156138db0c7716` — the owner's pass by ear, r36–r60
+
+Reconstructed on 11-16 from the library's checkpoints; this session did not log itself. Bar numbers
+here are r60's. 25 versions after r35, the last at 00:35 on 10-31 (r60); nothing has been saved
+since. Unnamed versions (r43–r48, r50–r59) were saved between the named ones below.
+
+- **Form**: intro bars 4–7 repeated, with a first ending at 7 and a second ending at 8, the fill into
+  the verse (r37). Verse bars 9–12 repeated, with a first ending at 12 and a second ending at 13,
+  the slap fill into the chorus (r42), after bars 13–14 were merged into 9–10 (r41). 102 written
+  bars, still 110 performed.
+- **Notes, by the owner's ear**: slaps on string 5 and new slaps in the riff (r36); the verses' low D
+  on beat 5 of the odd bars, plus the full chord and the missing G and A in the even bars (r38); the
+  low D on beat 1 of bars 9, 13, 27 and 31 (r39); a slap fill in 16 and 34, and the melody of 32–33
+  an eighth earlier (r40); bar 14's wider chords carried to every chorus (15–19, 32–37, 72–77), with
+  a low-D pull-off in 15 and 17 (r49); the later choruses (44–49, 82–83, 88–93) given full chords,
+  and bar 15, 16 and 19's changes carried to 33, 37, 73, 74 and 77 (r60).
+- Not touched: the drafted bars (bridge, interludes, solos, chorus 78–81), so their strings were
+  not checked — see 11-16.
 
 ### 2026-10-30 — Everybody Wants To Rule The World · `2b156138db0c7716` — the owner's manual pass begins
 
