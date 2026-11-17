@@ -86,3 +86,49 @@ export function screenWakeLock(): ScreenWakeLock {
     },
   };
 }
+
+/**
+ * Holds the screen awake while the page is IN USE, not only while it plays:
+ * held from the last touch, key or playback change for `idleMs`, then let go.
+ *
+ * The playing-only lock above was device-checked on a tablet, and on a phone it
+ * is not enough: practice is play, stop, look, fiddle, play again, and the gaps
+ * where nothing sounds are exactly where a phone's short system timeout (often a
+ * minute or two) blanks the score (reported 2026-11-17). Holding for the whole
+ * time a page is open would drain a phone left on a desk, so it is idle-timed:
+ * a score nobody has touched or played for `idleMs` sleeps as before.
+ *
+ * A shell policy, not a viewer one — studio opts in; the embed keeps the
+ * playing-only lock its Player brings, since a host page may not want a
+ * third-party widget holding its visitor's screen.
+ */
+export interface ActivityWakeLock {
+  /** Something happened that a reader did: restart the idle clock. */
+  poke(): void;
+  dispose(): void;
+}
+
+export function activityWakeLock(target: EventTarget, idleMs: number): ActivityWakeLock {
+  const lock = screenWakeLock();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let disposed = false;
+  const poke = () => {
+    if (disposed) return;
+    lock.want(true);
+    clearTimeout(timer);
+    timer = setTimeout(() => lock.want(false), idleMs);
+  };
+  const events = ['pointerdown', 'keydown', 'wheel'] as const;
+  for (const name of events) target.addEventListener(name, poke, { capture: true, passive: true });
+  poke();
+  return {
+    poke,
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      clearTimeout(timer);
+      for (const name of events) target.removeEventListener(name, poke, { capture: true });
+      lock.dispose();
+    },
+  };
+}

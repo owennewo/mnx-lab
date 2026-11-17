@@ -26,10 +26,14 @@
  * genuinely diagonal drag drives both. The pad is untouched.
  *
  * A pinch steps the SAME ladder, by the change in the fingers' span rather
- * than by one finger's travel, at half the drag's rate: two fingers moving
- * apart cover twice the pixels of one finger moving, so the halved rate is
- * what makes a pinch and a drag of the same hand movement zoom the same
- * amount. Stepping by span change rather than span ratio is deliberate too —
+ * than by one finger's travel, at a quarter of the drag's rate. Half was the
+ * first cut — two fingers moving apart cover twice the pixels of one finger
+ * moving, so half made a pinch and a drag of the same hand movement zoom the
+ * same amount — but on a phone that raced: a pinch is a big, fast, imprecise
+ * movement across a narrow screen, and it overshot by several steps at a time
+ * (reported 2026-11-17). Halving again keeps the ladder and the dedupe, and
+ * slows only the touch route. Stepping by span change rather than span ratio
+ * is deliberate too —
  * a ratio explodes when the fingers start close together, and it would need
  * a rate curve of its own.
  *
@@ -42,8 +46,12 @@ import { walkDensity } from '../engine/layout/spacing.ts';
 
 /** ±1 step per 6px of travel. */
 const DRAG_PX_PER_STEP = 6;
-/** ±1 step per 12px of span change — half the drag's rate, see above. */
-const PINCH_PX_PER_STEP = 12;
+/** ±1 step per 24px of span change — a quarter of the drag's rate, see above. */
+const PINCH_PX_PER_STEP = 24;
+/** A pinch must change the span this much before it takes an axis — more than
+ *  the drag's snap, because two fingers landing are never quite still and a
+ *  phone pinch that engaged on that wobble jumped before it was meant. */
+const PINCH_SNAP_PX = 16;
 /** The axis snap decides once, after this much travel, and is then held —
  *  deciding per move lets a curving drag flip axes mid-gesture. */
 const AXIS_SNAP_PX = 8;
@@ -74,6 +82,12 @@ const WHEEL_UNIT_CLAMP = 30;
 /** No wheel event for this long ends the pinch: the release the fingers
  *  cannot report. */
 const WHEEL_IDLE_MS = 250;
+
+/** How long a readout stays up on its own. A finished zoom gets longer: its
+ *  numbers are the result, and a reader lifting their fingers off a phone has
+ *  only just uncovered the screen to read them. */
+const HUD_FADE_MS = 900;
+const HUD_RESULT_MS = 2000;
 
 /** What the readout says the moment a zoom gesture is armed, before any
  *  travel. The earlier cut showed nothing until the first step had landed,
@@ -284,7 +298,7 @@ export class ScoreGestures {
       this.wheel = null;
       this.targets.active(false);
       // Let the numbers linger, then fade, as a touch release does.
-      this.showHud(this.lastHud);
+      this.showResult();
     }, WHEEL_IDLE_MS) as unknown as number;
   };
 
@@ -425,7 +439,7 @@ export class ScoreGestures {
     const ddy = Math.abs(a.cy - b.cy) - pinch.dy0;
     const travel = Math.hypot(ddx, ddy);
     if (pinch.snap === null) {
-      if (travel < AXIS_SNAP_PX) return;
+      if (travel < PINCH_SNAP_PX) return;
       pinch.snap = snapFor(ddx, ddy);
     }
     if (!pinch.engaged) {
@@ -537,7 +551,7 @@ export class ScoreGestures {
     this.drag = null;
     this.armed = false;
     this.targets.active(false);
-    this.showHud(null);
+    this.showResult();
   }
 
   private endPinch() {
@@ -546,15 +560,23 @@ export class ScoreGestures {
     this.pinch = null;
     if (pinch.engaged) {
       this.targets.active(false);
-      this.showHud(null);
+      this.showResult();
     }
+  }
+
+  /** A gesture ended: leave its new values up for a moment rather than
+   *  clearing them with the fingers, or clear the bare hint if it never
+   *  stepped. */
+  private showResult() {
+    if (this.lastCommit) this.showHud(this.lastHud, false, HUD_RESULT_MS);
+    else this.showHud(null);
   }
 
   /** The readout exists because the control does not: on touch there is no pad
    *  on screen printing these numbers, and an invisible continuous control with
    *  no feedback is unlearnable. `hold` keeps it up for as long as the gesture
    *  lasts; otherwise it fades on its own. */
-  private showHud(text: string | null, hold = false) {
+  private showHud(text: string | null, hold = false, fadeMs = HUD_FADE_MS) {
     if (this.hudTimer !== null) clearTimeout(this.hudTimer);
     this.hudTimer = null;
     this.lastHud = text;
@@ -563,6 +585,6 @@ export class ScoreGestures {
     this.hudTimer = setTimeout(() => {
       this.hudTimer = null;
       this.targets.hud(null);
-    }, 900) as unknown as number;
+    }, fadeMs) as unknown as number;
   }
 }

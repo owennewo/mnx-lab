@@ -87,6 +87,7 @@ import { hostSetup } from '../../../src/audio/hostSetup.ts';
 import type { FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import { loadFactoryDesigns } from '../../../src/audio/native/hostPort.ts';
 import { playbackNotes, playbackNotice } from './playbackNotes.ts';
+import { activityWakeLock, type ActivityWakeLock } from '../../../src/elements/screenWakeLock.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, SOUND_KEY, AUDITION_KEY, write, readSound, readAuditionNotes, soundRate, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, DEFAULT_LAYERS, type PiecePreferences } from './scorePreferences.ts';
 
@@ -516,17 +517,31 @@ export class PiecePage extends LitElement {
     setTheme(this.theme);
   }
 
+  /** How long the screen stays held after the last touch, key or playback
+   *  change — long enough to read a page and pick up the instrument, short
+   *  enough that a phone left on a desk still sleeps. */
+  private static readonly AWAKE_IDLE_MS = 10 * 60_000;
+  private awake: ActivityWakeLock | null = null;
+  /** A stop, a bar change, a loop wrapping: playback is the reader using the page. */
+  private onPlaybackActivity = () => this.awake?.poke();
+
   connectedCallback() {
     super.connectedCallback();
     document.addEventListener('visibilitychange', this.onHidden);
     window.addEventListener('pagehide', this.onPageHide);
     this.ticker = setInterval(() => { if (this.save) this.now = Date.now(); }, 30_000);
+    // The player holds the screen while it sounds; this holds it between takes
+    // too, for as long as the reader keeps touching or playing.
+    this.awake = activityWakeLock(document, PiecePage.AWAKE_IDLE_MS);
+    this.addEventListener('playback-state-changed', this.onPlaybackActivity);
   }
 
   disconnectedCallback() {
     document.removeEventListener('visibilitychange', this.onHidden);
     window.removeEventListener('pagehide', this.onPageHide);
     clearInterval(this.ticker);
+    this.removeEventListener('playback-state-changed', this.onPlaybackActivity);
+    this.awake?.dispose(); this.awake = null;
     this.endSession();
     void this.flushSync();
     void this.flushPrefs();
