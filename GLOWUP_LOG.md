@@ -134,7 +134,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Things Behind The Sun | Nick Drake | `3129e94f26a161a2` |  | Soundslice |  |  |  |
 | Vestapol | Stefan Grossman | `d626ac54313aecbb` |  | Soundslice |  |  |  |
 | Wicked game |  | `a8497181ef214b91` |  | Soundslice |  |  |  |
-| With Or Without You | U2 (Jacques Stotzem, trans. Tim Van Roy) | `cb825f7b750b67f4` |  | no recording |  |  |  |
+| With Or Without You | U2 (Jacques Stotzem, trans. Tim Van Roy) | `cb825f7b750b67f4` |  | **bar search** 11-20 |  | ✅ |  |
 | Yankee Doodle |  | `7569b56c26ca752a` |  | no recording |  |  |  |
 
 ## Log
@@ -143,6 +143,16 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-20 — With Or Without You · `cb825f7b750b67f4` — synced to Tim Van Roy's playthrough — [run 14](tools/recording-align/RUNS.md#run-14--2026-11-20--with-or-without-you-tim-van-roy-a-piece-read-from-a-pdf-one-bar-more-in-the-playthrough)
+- **Form**: the playthrough follows the PDF bar for bar, the `|: 101–104 :|` repeat included, and adds one bar before
+  the final chord: harmonics over the open low D, slowing. Added as bar 105 (checkpoint "Outro harmonics bar from Tim
+  Van Roy's playthrough", r2; frets inferred from the pitches, not read). 106 bars written, 110 played.
+- **Sync** (r4): 110 of 110 bars in the score's order, 89% of written notes heard (pitch class) against 37% chance,
+  `verify` 92% against 23%; downbeats median 10 ms. Owner: "lines up well".
+- **Promoted** to the deployed library with `sync:library --piece` (backups `library-sync/2026-11-20T22-15-06-128Z`).
+- Open: a notes check by ear; the weak bars are the dead-strum bars (30, 46, 51, 83, 87) and the ritardando (104–105).
+  The owner kept the repeats written out (2–5 = 6–9 and 66–69 = 70–73 are exact; verses 2 and 3 differ by one fretting).
 
 ### 2026-11-20 — With Or Without You (U2, Jacques Stotzem's arrangement, trans. Tim Van Roy) · `cb825f7b750b67f4` new — a piece read from a PDF, no recording yet
 - **Made**: from Tim Van Roy's Patreon PDF (7 pages, drop D, D major, ♩=110), read page by page into tab text

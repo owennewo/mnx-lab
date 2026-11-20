@@ -550,3 +550,32 @@ to do — each is a gap to close.
   because the new source's start was read as the playhead moving (d25a6b8b).
 - **Owner**: chose the form as played; asked for the piece to be the only version, the old two deleted, and the piece
   promoted to the deployed library.
+
+## Run 14 — 2026-11-20 — With Or Without You (Tim Van Roy): a piece read from a PDF, one bar more in the playthrough
+
+- **Recording** YouTube `5hrBObcvuCo`, Tim Van Roy's playthrough of Jacques Stotzem's arrangement (Patreon), guitar
+  alone, drop D, 254 s. **Piece** `cb825f7b750b67f4`, made the same day from his PDF (`align.ts build` / `create`;
+  the frets then checked against the PDF's own text with `align.ts pdf`, which found 12 half-tied chords).
+- **Check**: key fit +0 (1.00, next 0.78), tuning +0 cents, 1733 notes heard against 1724 written. No separation.
+- **Departure**: the free search followed the score for 108 of 109 bars and stopped before the final chord. Between
+  the second bar 104 and the last bar he plays a bar the PDF does not have — harmonics (A4 D5 F#5 D5 A4 G4 A4) over
+  the open low D, slowing. The owner chose to add it to the score: bar 105, frets inferred from the pitches
+  (7th-fret harmonics on D, G and B, the G string's 12th), saved as a checkpoint with `--resize`. 106 bars written,
+  110 played.
+- **Sync** (revision 4): follows the score's order (110 of 110), **89% by pitch class, 83% exact, of 1732; chance 37%**;
+  downbeats median 10 ms, 90th percentile 20 ms; 105–112 bpm (median 110) against 110 marked, the last two bars
+  slowing to 76 and 48. `verify` OK: 92% of 1660 written notes against 23%. 110 segments, 111 cuts (109 snapped),
+  0.20–251.20 s. Weak bars 30, 46, 51, 83, 87 — every one holds dead-note strums, which have no pitch to hear —
+  and 104–105, the ritardando.
+- **Fixed on the way**: `close_ending` looked for a held-back bar's downbeat at most one bar past the bar before,
+  whose length it had itself guessed at the old tempo, so the final chord (2.2× a bar late) was never placed; bar 105's
+  line was put on the heard chord by hand in a copy of `structure.json`. The window now reaches two bars past, and
+  a selftest case ('holds back the end hard', the last bars at 2.3×) fails without it. Rerun with the fix, the search
+  places 105 and 106 exactly where the hand did (236.90, 241.95 s). Jansch regression unchanged: the same order,
+  86% / 86% against 11%, cuts mean 13 ms, max 39 ms from the stored sync.
+- **Improvised, not in the skill**: a piece `create` made has no recording, so `fetch` refuses it; the run directory
+  was seeded from the build directory and `piece.json`'s revision and canonical refreshed by hand, then `attach`, then
+  `fetch`. `checkpoint` needs exactly the bars that changed: a tie's landing bar does not count (bars 12, 15 … refused).
+- **Owner**: "lines up well". Asked about repeats: two passages are exact repeats (2–5, 66–69) and verses 2 and 3
+  differ only by one note's fretting; the owner kept the score written out. Promoted to the deployed library
+  (`sync:library --piece`, backups under `library-sync/2026-11-20T22-15-06-128Z`).
