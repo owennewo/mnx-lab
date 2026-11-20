@@ -289,7 +289,14 @@ function build() {
   writeJson('score.storage.json', { options: stored.options, check: stored.check, losses: stored.losses });
   const order = linearizePasses(reread).entries.map(e => e.measureIndex + 1);
   console.log(`${document.global.measures.length} bars written, ${order.length} performed: ${order.join(' ')}`);
-  console.log(`storage check: ${stored.check.verdict}${stored.losses.length ? ` — ${stored.losses.map(l => `${l.kind} ${l.path}`).join('; ')}` : ''}`);
+  // One line per kind of difference, with its count — a hundred notes that differ the same
+  // way are one finding, and listing them each buried the one barline that was lost.
+  console.log(`storage check: ${stored.check.verdict}`);
+  for (const d of stored.check.differences) {
+    const bars = [...new Set(stored.losses.filter(l => l.kind === d.kind && l.path.replace(/\/\d+(?=\/|$)/g, '/[]') === d.path)
+      .map(l => /measures\/(\d+)/.exec(l.path)?.[1]).filter(Boolean).map(m => Number(m) + 1))];
+    console.log(`  ${d.kind} ${d.path} ×${d.count}${bars.length ? ` (bar ${bars.slice(0, 8).join(' ')}${bars.length > 8 ? ' …' : ''})` : ''}`);
+  }
   stored.check.warnings.forEach(w => console.log(`  export warning: ${w}`));
   initSmufl();
   const widthSp = Number(option('width', '200'));
