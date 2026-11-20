@@ -422,11 +422,15 @@ async function main(argv) {
   if (flags.has('--apply') && !flags.has('--writers-stopped')) throw new Error('Stop every writer to BOTH libraries (the dev server on the local state — or pass --stop-dev-server — and studio tabs on the deployed site), then pass --writers-stopped.');
   const state = values['--local-state'] ?? await primaryState();
   // The dev server holds the local D1 open: writing under it is the one thing --writers-stopped
-  // asserts that can be checked, so it is — and stopped and restarted here when asked.
+  // asserts that can be checked, so it is — and stopped and restarted here when asked. Whose
+  // server is the checkout that owns the state directory, so a rehearsal on a worktree's own
+  // library (--local-state <worktree>/.wrangler/state --remote-state <copy>) exercises the same
+  // stop and restart without touching either real library; a state directory outside any
+  // checkout has no server to find.
   const checkout = dirname(dirname(state));
-  const server = flags.has('--apply') && !values['--local-state'] ? devServerProcesses(checkout) : [];
+  const server = flags.has('--apply') ? devServerProcesses(checkout) : [];
   if (server.length && !flags.has('--stop-dev-server'))
-    throw new Error(`The primary checkout's dev server is running and holds the local library open:\n${server.map(p => `  ${p.pid} ${p.cmd.slice(0, 100)}`).join('\n')}\nStop it, or pass --stop-dev-server to have it stopped for the write and started again after.`);
+    throw new Error(`The dev server of ${checkout} is running and holds the local library open:\n${server.map(p => `  ${p.pid} ${p.cmd.slice(0, 100)}`).join('\n')}\nStop it, or pass --stop-dev-server to have it stopped for the write and started again after.`);
   if (server.length) { console.error(`stopping the dev server (${server.map(p => p.pid).join(' ')}) for the write`); await stopDevServer(server); }
   try {
     const local = side('local', state);

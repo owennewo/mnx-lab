@@ -584,7 +584,13 @@ Stop every writer first: the primary checkout's `npm run dev`, which holds the l
 open, and any studio tab on the deployed site. The first is checked: `--apply` refuses, naming
 its processes, while that dev server runs, and `--stop-dev-server` stops it for the write and
 starts it again after, detached (`tools/devServer.mjs`; its log in `~/.cache/mnx-lab/dev-server.log`).
-The studio tabs cannot be seen from here, so `--writers-stopped` still asserts them. `--apply` backs both up before writing (to
+The studio tabs cannot be seen from here, so `--writers-stopped` still asserts them.
+The server checked is the one of the checkout that owns the local state, so the whole
+path — refusal, stop, write, restart — can be rehearsed without either real library: in a
+worktree, run `npm run dev` once, copy its `.wrangler/state` aside as the stand-in, make a
+piece, then `npm run sync:library -- --local-state $PWD/.wrangler/state --remote-state <copy>
+--apply --writers-stopped --stop-dev-server` (rehearsed 2026-11-20: stopped, wrote, converged,
+started again on the worktree's port). `--apply` backs both up before writing (to
 `~/.cache/mnx-lab/library-sync/<time>/`, or `--backup`): a copy of the local D1 directory,
 and a data-only export of the deployed one. A data-only export is used because wrangler's
 schema dump does not load back. Both are also copied to the R2 bucket `mnx-studio-backups`

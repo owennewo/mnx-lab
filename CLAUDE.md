@@ -240,6 +240,9 @@ consumer needing independent versioning — a check, not a debate.
   regeneration and human-verification rules below.
 - Prefer assertions about behavior and invariants. Avoid source-text checks that only
   pin imports or spellings, and do not add tests solely to mirror implementation.
+- A new `.mjs` module that a harness test imports needs a `.d.mts` beside it declaring
+  what the test uses (`harness/verify/chromeBin.d.mts`, `tools/devServer.d.mts`): the
+  harness type check is strict and fails the gate with TS7016 otherwise.
 
 ## The corpus: one format, two axes
 
