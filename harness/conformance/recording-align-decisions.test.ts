@@ -1,5 +1,7 @@
 import { expect, it } from 'vitest';
-import { misfitBars, parseBars, syncReach, syncRefusal, type SyncWrite } from '../../tools/recording-align/decisions.ts';
+import { audibleSounding, deadNoteIds, misfitBars, parseBars, syncReach, syncRefusal, type SyncWrite } from '../../tools/recording-align/decisions.ts';
+import { buildTabText } from '../../tools/recording-align/tabText.ts';
+import { compilePerformance } from '../../src/audio/performance.ts';
 
 // What the recording-align tool will and will not write. Each refusal is something that went wrong once (RUNS.md run 9).
 const good: SyncWrite = { misfits: [], verified: true, bars: 10, stored: null, scoreMoved: false, allow: {} };
@@ -54,4 +56,17 @@ it('parses the bars an edit names', () => {
   expect(parseBars('1,5-8,3')).toEqual([1, 3, 5, 6, 7, 8]);
   expect(parseBars(' 2 , 2 ')).toEqual([2]);
   for (const bad of [undefined, '', 'x', '0', '8-5', '1,,2', '1-']) expect(parseBars(bad)).toBeNull();
+});
+
+it('leaves dead strums out of what the bar search listens for, and keeps palm mutes', () => {
+  // A dead strum has no pitch to hear: counted, it made every dead-strum bar weak (run 14).
+  const { document } = buildTabText('title: T\nbar 1\n  v1: q:3/2 q:2/0x+3/0x q:3/4 q:3/5\n');
+  const compiled = compilePerformance(document);
+  if (!compiled.ok) throw new Error('no performance');
+  const { sounding, written } = compiled.performance;
+  const dead = deadNoteIds(document);
+  expect(dead.size).toBe(2);
+  const audible = audibleSounding(sounding, written, dead);
+  expect(sounding.length).toBe(5);
+  expect(audible.map(s => s.midi)).toEqual([57, 59, 60]);
 });

@@ -90,7 +90,8 @@ does this for a PDF whose tab numbers are text, and drafts the frets to read the
    misreading until shown otherwise.
 5. **Make the piece** once the numbers are good and the owner has asked for it: `$T create`,
    then `$T attach --video <url>` (dry runs; `--write` to do it). `piece.json` then stands in
-   for Step 1; carry on from Step 6.
+   for Step 1; carry on from Step 6. A piece made earlier, still without a recording: `$T fetch`
+   reads it all the same, then `attach` and `fetch` again (run 14).
 
 ## Step 1 — the piece: `$T fetch --piece <id> --out $OUT [--recording <id>]`
 

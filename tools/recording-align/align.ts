@@ -6,7 +6,7 @@
 //
 //   npx vite-node --config vitest.config.ts tools/recording-align/align.ts -- <command> --out <dir> [options]
 //
-//   fetch  --piece <id> [--recording <id>]   the piece, its stored score and the recording to align
+//   fetch  --piece <id> [--recording <id>]   the piece, its stored score and the recording to align (or none yet)
 //   score                                     the performed score: bar order, notes, structural starts,
 //                                             and the recording's existing sync as bar-line seconds
 //   audio  [--video <url>]                    the recording's audio as mono 22.05 kHz WAV (yt-dlp / the library)
@@ -47,7 +47,7 @@ import { segmentsFromBarStarts, syncpointsFromSegments, staleSegmentBars, decode
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
 import { storedSyncSegments, storedTuningCents } from '../../src/model/recordingAttachment.ts';
 import { verifySync, verdictLines } from './verifySync.ts';
-import { misfitBars, parseBars, syncRefusal } from './decisions.ts';
+import { audibleSounding, deadNoteIds, misfitBars, parseBars, syncRefusal } from './decisions.ts';
 import { barsAlone, checkpointBody, prepareCheckpoint } from './checkpoint.ts';
 import { bboxPages, compareFrets, draftBars, draftTabText, staffTuning, svgLines } from './pdfTab.ts';
 import { createRecordingSync, performedBarBeats } from '../../src/audio/recordingSync.ts';
@@ -102,11 +102,16 @@ async function fetchPiece() {
   const recordings = snapshot.recordings as { id: string; kind: string; name: string | null; external_id: string | null; syncpoints: string | null; provenance: string | null }[];
   const wanted = option('recording');
   const candidates = wanted ? recordings.filter(r => r.id === wanted) : recordings;
-  if (candidates.length !== 1) fail(`${candidates.length} recordings match; pass --recording <id> from: ${recordings.map(r => `${r.id} (${r.kind} "${r.name ?? ''}")`).join(', ') || 'none'}`);
-  const recording = candidates[0];
+  // A piece with no recording yet (made by `create`, say) is fetched all the same, so the run
+  // starts from what the library holds; `attach` then puts the recording on it (run 14).
+  const none = !wanted && !recordings.length;
+  if (!none && candidates.length !== 1) fail(`${candidates.length} recordings match; pass --recording <id> from: ${recordings.map(r => `${r.id} (${r.kind} "${r.name ?? ''}")`).join(', ') || 'none'}`);
+  const recording = none ? null : candidates[0];
   writeJson('piece.json', { pieceId, revision: snapshot.piece.revision, canonical: rendition.id, recording, origin });
   writeJson('score.mnx.json', document);
-  console.log(`piece ${pieceId} r${snapshot.piece.revision}: ${document.global.measures.length} bars; recording ${recording.id} (${recording.kind}${recording.external_id ? ` ${recording.external_id}` : ''})${recording.syncpoints ? ' — ALREADY SYNCED' : ''}`);
+  console.log(`piece ${pieceId} r${snapshot.piece.revision}: ${document.global.measures.length} bars; ${recording
+    ? `recording ${recording.id} (${recording.kind}${recording.external_id ? ` ${recording.external_id}` : ''})${recording.syncpoints ? ' — ALREADY SYNCED' : ''}`
+    : 'no recording yet — `audio --video <url>` reads one, `attach --video <url>` puts it on the piece'}`);
 }
 
 /** The score as the player performs it: what every later step aligns against. */
@@ -117,7 +122,9 @@ function score() {
   if (!compiled.ok) fail(`the score does not compile: ${JSON.stringify(compiled.diagnostics)}`);
   const p = compiled.performance;
   const measures = p.measures.map(m => ({ ordinal: m.ordinal, bar: m.measureIndex + 1, position: n(m.position), duration: n(m.duration), metricDuration: n(m.metricDuration) }));
-  const sounding = p.sounding.map(s => ({ position: n(s.position), duration: n(s.duration), midi: s.midi }));
+  const audible = audibleSounding(p.sounding, p.written, deadNoteIds(document));
+  if (audible.length < p.sounding.length) console.log(`${p.sounding.length - audible.length} dead-note attacks left out of the search: they have no pitch to hear`);
+  const sounding = audible.map(s => ({ position: n(s.position), duration: n(s.duration), midi: s.midi }));
   // What each bar's time signature holds, in whole notes: an unfinished score's placeholder rests
   // rarely fill it exactly, so an empty bar is measured by this instead (align.py).
   const signatures: number[] = [];
@@ -185,6 +192,7 @@ async function audio() {
   // --video: a video not (yet) on a piece — a candidate, or the source of a piece still to be made.
   const video = option('video');
   const { recording } = video ? { recording: { kind: 'youtube', external_id: null } } : readJson('piece.json');
+  if (!recording) fail('the piece has no recording: pass --video <url>, or `attach` one first');
   const dir = join(out, 'audio');
   mkdirSync(dir, { recursive: true });
   const raw = join(dir, 'source.wav');

@@ -50,3 +50,25 @@ export function parseBars(text: string | undefined): number[] | null {
   }
   return [...bars].sort((a, b) => a - b);
 }
+
+/**
+ * The attacks the bar search can hear: every sounding event but those whose notes are all dead.
+ * A dead note is a strum's click with no pitch, so no transcriber hears its written one, and
+ * counted it made every dead-strum bar a "weak bar" (run 14: five of five mid-piece weak bars).
+ * Palm mutes stay: damped too, but their pitch is heard.
+ */
+export function audibleSounding<S extends { writtenIds: readonly string[] }>(
+  sounding: readonly S[], written: readonly { id: string; noteKey: string }[], deadNoteIds: ReadonlySet<string>): S[] {
+  const keyOf = new Map(written.map(w => [w.id, w.noteKey]));
+  return sounding.filter(s => !s.writtenIds.length || !s.writtenIds.every(id => deadNoteIds.has(keyOf.get(id) ?? '')));
+}
+
+/** The ids of a document's dead notes (`_x.mnxLab.tab.technique.dead`). */
+export function deadNoteIds(document: unknown): Set<string> {
+  const ids = new Set<string>();
+  JSON.stringify(document, (_, v) => {
+    if (v && typeof v === 'object' && typeof v.id === 'string' && v._x?.mnxLab?.tab?.technique?.dead) ids.add(v.id);
+    return v;
+  });
+  return ids;
+}
