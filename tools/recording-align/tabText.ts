@@ -284,6 +284,14 @@ export function buildTabText(text: string): { document: MnxStructure; warnings: 
   // A hammer, pull or slide lands there too, on a different fret.
   for (const [voice, run] of placed) {
     for (const [k, here] of run.entries()) {
+      // `~` ties the one note it follows, so `2/7+3/7~` ties only the 3/7. When a chord ties
+      // some notes and an untied one sounds again next on its string, the `~` was probably
+      // meant for the chord (With Or Without You: twelve bars re-struck what the page tied).
+      if (here.notes.some(n => n.text.tie)) for (const { text } of here.notes.filter(n => !n.text.tie)) {
+        const again = run.slice(k + 1).find(e => e.notes.some(n => n.text.string === text.string))?.notes.find(n => n.text.string === text.string);
+        if (again?.text.fret === text.fret && run[k + 1]?.notes.includes(again))
+          warnings.push(`bar ${here.bar} ${voice}: ${text.string}/${text.fret} is not tied though the chord's other notes are, and sounds again next — tie each note: ${text.string}/${text.fret}~`);
+      }
       for (const { text, mnx } of here.notes) {
         if (text.legato || text.slide) {
           const landing = run.slice(k + 1).find(e => e.notes.some(n => n.text.string === text.string))?.notes.find(n => n.text.string === text.string);

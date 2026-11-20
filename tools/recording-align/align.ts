@@ -24,6 +24,9 @@
 //
 // A piece that does not exist yet — written as tab text (tabText.ts), say read off a video:
 //
+//   pdf    --pdf <file>                      a tab PDF's frets, string by string and bar by bar, as a draft
+//                                            pdf.draft.tab.txt (pdfTab.ts) — the rhythm is left to read; with a
+//                                            score.built.mnx.json here, every bar whose frets differ from it
 //   build  [--text <file>] [--width <sp>]    tab text → checked score: score.gp as studio would store it,
 //                                             score.mnx.json read back from it, preview.png to compare
 //   create [--write]                          make the piece from score.gp (writes piece.json)
@@ -46,6 +49,7 @@ import { storedSyncSegments, storedTuningCents } from '../../src/model/recording
 import { verifySync, verdictLines } from './verifySync.ts';
 import { misfitBars, parseBars, syncRefusal } from './decisions.ts';
 import { barsAlone, checkpointBody, prepareCheckpoint } from './checkpoint.ts';
+import { bboxPages, compareFrets, draftBars, draftTabText, staffTuning, svgLines } from './pdfTab.ts';
 import { createRecordingSync, performedBarBeats } from '../../src/audio/recordingSync.ts';
 import { ZERO } from '../../src/audio/time.ts';
 import { checkStorage } from '../../src/importers/storageCheckCore.ts';
@@ -348,6 +352,29 @@ async function checkpoint() {
   console.log(`saved "${name}": piece revision ${saved.snapshot.piece.revision}${saved.unchanged ? ' (unchanged)' : ''}. Fetch again before the next edit or sync.`);
 }
 
+/** A tab PDF read as drawn: its frets as a draft tab text, and — once a transcription is built
+ *  here — every bar where that transcription's struck notes and the page's numbers differ. */
+function pdf() {
+  const file = resolve(option('pdf') ?? fail('--pdf <file> is required'));
+  const run = (cmd: string, args: string[]) => {
+    try { return execFileSync(cmd, args, { encoding: 'utf8', maxBuffer: 1 << 28 }); }
+    catch (e) { fail(`${cmd} failed (poppler-utils): ${e instanceof Error ? e.message : e}`); }
+  };
+  const words = bboxPages(run('pdftotext', ['-bbox', file, '-']));
+  const pages = words.map((w, i) => ({ words: w, lines: svgLines(run('pdftocairo', ['-svg', '-f', String(i + 1), '-l', String(i + 1), file, '-'])) }));
+  const bars = draftBars(pages);
+  if (!bars.some(b => b.columns.length)) fail('no fret numbers found as text: a scanned PDF has none to read');
+  const title = /^Title:\s*(.+)$/m.exec(run('pdfinfo', [file]))?.[1]?.trim();
+  writeFileSync(join(out, 'pdf.draft.tab.txt'), draftTabText(bars, { title, tuning: staffTuning(pages) }));
+  console.log(`${pages.length} pages, ${bars.length} bars, ${bars.reduce((n, b) => n + b.columns.length, 0)} fret columns → pdf.draft.tab.txt`);
+  if (!existsSync(join(out, 'score.built.mnx.json'))) return;
+  const built = readJson('score.built.mnx.json') as MnxStructure;
+  if (built.global.measures.length !== bars.length) console.log(`  the transcription has ${built.global.measures.length} bars, the PDF ${bars.length}`);
+  const differ = compareFrets(bars, built as never);
+  console.log(`against score.built.mnx.json: ${bars.length - differ.length} of ${bars.length} bars strike the frets the page prints`);
+  for (const d of differ) console.log(`  bar ${d.bar}: transcription only ${d.transcriptionOnly.join(' ') || '-'} · PDF only ${d.pdfOnly.join(' ') || '-'}`);
+}
+
 /** The piece, made from build's score.gp exactly as studio's New piece page makes one. */
 async function create() {
   if (existsSync(join(out, 'piece.json'))) fail('piece.json exists: this run already has a piece');
@@ -409,6 +436,6 @@ async function tuning() {
   console.log(`written: piece revision ${body.snapshot.piece.revision}; tuning ${storedTuningCents(saved.provenance) ?? 'unset'}`);
 }
 
-const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, verify, checkpoint, build, create, attach, tuning };
+const commands: Record<string, () => unknown> = { fetch: fetchPiece, score, audio, sync, verify, checkpoint, build, create, attach, tuning, pdf };
 if (!commands[command]) fail(`unknown command ${command ?? '(none)'}; one of ${Object.keys(commands).join(', ')}`);
 await commands[command]();

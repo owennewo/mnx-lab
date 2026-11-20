@@ -98,4 +98,12 @@ bar 2
     expect(() => bars('bar 2\n  v1: w:3/0\n')).toThrow(/bar 2 follows bar 0/);
     expect(() => bars('bar 1\n  v1: w:7/0\n')).toThrow(/string 7 is not one of the tuning's 6/);
   });
+
+  it('warns when a chord ties some notes and an untied one sounds again next', () => {
+    const half = bars('bar 1\n  v1: h:2/7+3/7~ h:2/7+3/7\n');
+    expect(half.warnings).toEqual([expect.stringMatching(/bar 1 v1: 2\/7 is not tied .* 2\/7~/)]);
+    expect(bars('bar 1\n  v1: h:2/7~+3/7~ h:2/7+3/7\n').warnings).toEqual([]);
+    // Re-struck on purpose after something else on the string: no warning.
+    expect(bars('bar 1\n  v1: q:2/7+3/7~ q:2/5+3/7 h:2/7\n').warnings).toEqual([]);
+  });
 });

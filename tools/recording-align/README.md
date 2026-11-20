@@ -29,6 +29,7 @@ Each command reads and writes files in `--out`:
 | `checkpoint.gp`, `checkpoint.png` | `checkpoint` | the file a scripted edit would store, and its changed bars drawn |
 | `verify.json` | `sync`, `verify` | the sync as the player would play it, bar by bar: written notes heard, against chance; bars that went stale, bar lines it would miss, stretches that leave the recording |
 | `screen/pages.json`, `screen/page-NN*.png` | `screen.py pages` | the notation a video shows: when each page is on screen, each page and overlapping slices of it |
+| `pdf.draft.tab.txt` | `pdf` | a tab PDF's frets, bar by bar, as a draft of `score.tab.txt` |
 | `score.gp`, `score.built.mnx.json`, `score.storage.json`, `score.mnx.json`, `preview.png` | `build` | from `score.tab.txt`: the `.gp` studio would store, the built document, its storage check, the document read back from the `.gp` (what `score` reads), a picture of it |
 | `piece.json` | `create`, `attach` | the piece made from `score.gp`, then the recording put on it |
 
@@ -117,6 +118,20 @@ bar 32 = 30 ds-al-coda
 
 Note suffixes: `~` tie, `h` natural harmonic (pitched at its node, so `3/7h` sounds the twelfth; a fret that is no node is refused), `a` artificial (harp) harmonic — held at the
 fret written, touched and sounding an octave up — `x` dead, `p` hammer-on/pull-off, `s` slide.
+A suffix belongs to the one note it follows: a tied chord is `2/7~+3/7~`, and `build` warns
+when a chord ties some notes and an untied one sounds again next.
+
+A **tab PDF** exported by a notation program carries its fret numbers as text, so they need not
+be read by eye: `align.ts pdf --pdf <file>` joins each page's drawing (`pdftocairo -svg`: the
+six-line staves and the barlines) to its words (`pdftotext -bbox`) and writes
+`pdf.draft.tab.txt` — the title, the tuning the staff's string letters name, and every bar's
+fret columns in order, each at its place in the bar, over a voice to fill in. What is left to
+read from the page is the rhythm and which voice each note is in. Once a transcription is
+built in the same run directory, `pdf` also names every bar where it strikes frets the page
+does not print, or misses ones it does (a tie's landing is not struck; tab leaves it
+unwritten). On With Or Without You that check found twelve bars the eye had misread. A
+scanned PDF has no text to read and is refused; brackets round a number are drawn, not
+text, so a bracketed note reads as a plain one.
 
 `build` refuses a bar whose voice does not fill it and a tie that lands nowhere or on another
 pitch, then makes what studio would store and reads it back, so `score`, `check` and
