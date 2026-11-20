@@ -134,6 +134,7 @@ partly done · blank not yet · *draft* a piece drafted from audio, not yet a tr
 | Things Behind The Sun | Nick Drake | `3129e94f26a161a2` |  | Soundslice |  |  |  |
 | Vestapol | Stefan Grossman | `d626ac54313aecbb` |  | Soundslice |  |  |  |
 | Wicked game |  | `a8497181ef214b91` |  | Soundslice |  |  |  |
+| With Or Without You | U2 (Jacques Stotzem, trans. Tim Van Roy) | `cb825f7b750b67f4` |  | no recording |  |  |  |
 | Yankee Doodle |  | `7569b56c26ca752a` |  | no recording |  |  |  |
 
 ## Log
@@ -142,6 +143,20 @@ Newest first. One entry per glow-up session: what was done, the numbers that say
 worked, the checkpoints it left, and what is still open on the piece. Entries before
 2026-10-29 were reconstructed from RUNS.md, the tab-draft results and the library's
 checkpoints.
+
+### 2026-11-20 — With Or Without You (U2, Jacques Stotzem's arrangement, trans. Tim Van Roy) · `cb825f7b750b67f4` new — a piece read from a PDF, no recording yet
+- **Made**: from Tim Van Roy's Patreon PDF (7 pages, drop D, D major, ♩=110), read page by page into tab text
+  (`.scratchpad/glowup/wowy/score.tab.txt`, the PDF beside it in `src/`) and made with `align.ts build` / `create`.
+  105 bars, 109 played: Intro 1–9, Verses 1–3, Choruses 1–4, Bridge 50–81, Ending 98–100, then `|: 101–104 :|`
+  (the intro's harmonics again) and a final D in 105. Sections, dead strums, grace hammer-ons and slides are entered.
+- **Where the PDF disagrees with itself**, the transcription keeps the tab unless the tab drops a note: bar 17 beat 1
+  (and 33, 97, copies of it) and bar 65's open G are in the notation only, kept; bars 31 and 90 open with a bass note
+  the tab leaves out, kept; bars 62, 77 and 88 re-strike in the tab what the notation ties, kept re-struck.
+- **Not carried**: let-ring and the tab's bracketed (ringing) harmonics are plain natural harmonics; chord symbols
+  are not entered.
+- Open: no recording. Tim Van Roy's playthrough is expected on YouTube within the week; when it is up, `attach`
+  it and run `/sync-recording` — the form check will say whether he plays the repeat at 101–104 as written. The
+  notes have not been checked against any recording.
 
 ### 2026-11-16 — Everybody Wants To Rule The World · `2b156138db0c7716` — a second opinion: not finished yet
 
