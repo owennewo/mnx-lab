@@ -560,7 +560,10 @@ def close_ending(rows, score, heard, missing_at_most=2, window=0.15):
         if not down:
             break
         best = None
-        for t in starts[(starts >= s0 + 0.6 * (e0 - s0)) & (starts <= e0 + (e0 - s0))]:
+        # In a ritardando each bar outlasts the one before, and the bar it follows was itself
+        # given that bar's length: so the downbeat may come well past it (run 14: the final
+        # chord 2.2× a bar late). The earliest onset sounding the most of it wins.
+        for t in starts[(starts >= s0 + 0.6 * (e0 - s0)) & (starts <= e0 + 2 * (e0 - s0))]:
             sounding = set(pitches[(starts >= t - 0.01) & (starts <= t + window)].tolist()) & down
             if len(sounding) * 2 >= len(down) and (best is None or len(sounding) > best[1]):
                 best = (float(t), len(sounding))
@@ -735,6 +738,7 @@ def selftest(_out):
         'stops early': (order[:13], 1.2, 0.0),
         'skips the repeat': (list(range(1, 13)), 1.1, 0.0),
         'holds back the end': (order, 1.15, 0.0, 1.5),
+        'holds back the end hard': (order, 1.15, 0.0, 2.3),            # run 14: the last bars at less than half speed
     }
     performances = {}
     for name, (played, whole, drift, *held) in cases.items():
