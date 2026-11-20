@@ -43,6 +43,7 @@ import { join, resolve, dirname } from 'node:path';
 import { tmpdir, homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { devServerProcesses, stopDevServer, startDevServer } from './devServer.mjs';
 
 const run = promisify(execFile);
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -390,7 +391,7 @@ function report(plan, names, views) {
 }
 const empty = plan => ['a', 'b'].every(s => !plan.into[s].summary.length && !plan.into[s].blobs.size && !plan.into[s].views.length);
 
-const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--views] [--piece <id>]... [--local-state <dir>] [--remote-state <dir>] [--backup <dir>]
+const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped [--stop-dev-server]] [--views] [--piece <id>]... [--local-state <dir>] [--remote-state <dir>] [--backup <dir>]
 
   Plans a two-way sync between the local dev library and the deployed one and
   prints it. --apply writes it, after backing both databases up to --backup
@@ -404,22 +405,37 @@ const USAGE = `Usage: npm run sync:library -- [--apply --writers-stopped] [--vie
   pieces and leaves every other row, and the aliases, as they are; the backups
   and the check that nothing moved while planning still cover both libraries.
   --views also syncs piece views (when each piece was last opened, and its page
-  setup); without it they are left as each library has them.`;
+  setup); without it they are left as each library has them. --apply refuses
+  while the primary checkout's dev server holds the local library open;
+  --stop-dev-server stops it for the write and starts it again after (studio
+  tabs on the deployed site are still yours to close).`;
 
 async function main(argv) {
   const flags = new Set(), values = {}, pieces = [];
   for (let i = 0; i < argv.length; i++) {
     if (['--local-state', '--remote-state', '--backup'].includes(argv[i])) { if (!argv[i + 1]) throw new Error(USAGE); values[argv[i]] = resolve(argv[++i]); }
     else if (argv[i] === '--piece') { if (!argv[i + 1]) throw new Error(USAGE); pieces.push(argv[++i]); }
-    else if (['--apply', '--writers-stopped', '--views', '--help'].includes(argv[i])) flags.add(argv[i]);
+    else if (['--apply', '--writers-stopped', '--stop-dev-server', '--views', '--help'].includes(argv[i])) flags.add(argv[i]);
     else throw new Error(USAGE);
   }
   if (flags.has('--help')) return console.log(USAGE);
-  if (flags.has('--apply') && !flags.has('--writers-stopped')) throw new Error('Stop every writer to BOTH libraries (dev servers on the local state, studio tabs on the deployed site), then pass --writers-stopped.');
-  const local = side('local', values['--local-state'] ?? await primaryState());
-  const remote = side('remote', values['--remote-state'] ?? null);
-  try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state'], pieces.length ? pieces : null, flags.has('--views')); }
-  finally { await Promise.all([local.close(), remote.close()]); }
+  if (flags.has('--apply') && !flags.has('--writers-stopped')) throw new Error('Stop every writer to BOTH libraries (the dev server on the local state — or pass --stop-dev-server — and studio tabs on the deployed site), then pass --writers-stopped.');
+  const state = values['--local-state'] ?? await primaryState();
+  // The dev server holds the local D1 open: writing under it is the one thing --writers-stopped
+  // asserts that can be checked, so it is — and stopped and restarted here when asked.
+  const checkout = dirname(dirname(state));
+  const server = flags.has('--apply') && !values['--local-state'] ? devServerProcesses(checkout) : [];
+  if (server.length && !flags.has('--stop-dev-server'))
+    throw new Error(`The primary checkout's dev server is running and holds the local library open:\n${server.map(p => `  ${p.pid} ${p.cmd.slice(0, 100)}`).join('\n')}\nStop it, or pass --stop-dev-server to have it stopped for the write and started again after.`);
+  if (server.length) { console.error(`stopping the dev server (${server.map(p => p.pid).join(' ')}) for the write`); await stopDevServer(server); }
+  try {
+    const local = side('local', state);
+    const remote = side('remote', values['--remote-state'] ?? null);
+    try { await sync(local, remote, flags.has('--apply'), values['--backup'], !values['--remote-state'], pieces.length ? pieces : null, flags.has('--views')); }
+    finally { await Promise.all([local.close(), remote.close()]); }
+  } finally {
+    if (server.length) { const { port, log } = await startDevServer(checkout); console.error(`dev server started again on port ${port} (log: ${log})`); }
+  }
 }
 
 async function sync(local, remote, apply, backup, deployed, pieces, views) {

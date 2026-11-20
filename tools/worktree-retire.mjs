@@ -40,7 +40,7 @@ const alive = pid => { try { process.kill(pid, 0); return true; } catch { return
 const pause = ms => new Promise(r => setTimeout(r, ms));
 
 /** SIGTERM, then SIGKILL what ignores it (workerd does); the survivors. */
-async function stop(procs) {
+export async function stop(procs) {
   for (const { pid } of procs) try { process.kill(pid, 'SIGTERM'); } catch {}
   for (let i = 0; i < 30 && procs.some(p => alive(p.pid)); i++) await pause(100);
   for (const { pid } of procs) if (alive(pid)) try { process.kill(pid, 'SIGKILL'); } catch {}

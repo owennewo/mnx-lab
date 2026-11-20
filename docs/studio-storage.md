@@ -571,6 +571,7 @@ reconciles them row by row, in both directions:
 ```bash
 npm run sync:library                                   # the plan: what moves each way, and any conflicts
 npm run sync:library -- --apply --writers-stopped      # back both up, write, re-plan (must come back empty)
+npm run sync:library -- --apply --writers-stopped --stop-dev-server   # the same, stopping the dev server for the write
 npm run sync:library -- --remote-state <dir> ...       # rehearse against a local stand-in for the deployed one
 npm run sync:library -- --views ...                    # also sync piece views (last opened, page setup)
 ```
@@ -580,7 +581,10 @@ per-library unless `--views` is passed: they rarely need to travel, and left in 
 crowd the plan with lines nobody acts on.
 
 Stop every writer first: the primary checkout's `npm run dev`, which holds the local D1
-open, and any studio tab on the deployed site. `--apply` backs both up before writing (to
+open, and any studio tab on the deployed site. The first is checked: `--apply` refuses, naming
+its processes, while that dev server runs, and `--stop-dev-server` stops it for the write and
+starts it again after, detached (`tools/devServer.mjs`; its log in `~/.cache/mnx-lab/dev-server.log`).
+The studio tabs cannot be seen from here, so `--writers-stopped` still asserts them. `--apply` backs both up before writing (to
 `~/.cache/mnx-lab/library-sync/<time>/`, or `--backup`): a copy of the local D1 directory,
 and a data-only export of the deployed one. A data-only export is used because wrangler's
 schema dump does not load back. Both are also copied to the R2 bucket `mnx-studio-backups`
