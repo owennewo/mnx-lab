@@ -154,6 +154,10 @@ checkpoints.
   the tab leaves out, kept; bars 62, 77 and 88 re-strike in the tab what the notation ties, kept re-struck.
 - **Not carried**: let-ring and the tab's bracketed (ringing) harmonics are plain natural harmonics; chord symbols
   are not entered.
+- **Checkpoint "Chord ties from the PDF"** (r1, same day): `align.ts pdf` checked the transcription against
+  the PDF's own fret numbers and found twelve bars (10, 11, 13, 14, 18, 19, 21, 22, 34, 35, 37, 38) where a
+  tied chord had the tie on one note only, re-striking the other. Now 100 of 105 bars strike exactly the
+  frets the page prints; the five others are the notation-only notes above.
 - Open: no recording. Tim Van Roy's playthrough is expected on YouTube within the week; when it is up, `attach`
   it and run `/sync-recording` — the form check will say whether he plays the repeat at 101–104 as written. The
   notes have not been checked against any recording.
