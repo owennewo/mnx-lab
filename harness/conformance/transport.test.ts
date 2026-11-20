@@ -120,6 +120,20 @@ describe('pure audio-clock transport', () => {
     expect(transport.snapshot.activeWritten).toEqual([]);
     expect(events.some((e) => e.kind === 'end' && e.writtenId === 'b')).toBe(true);
   });
+  it('never leaves a zero-length written note lit (a silent grace after a rest)', async () => {
+    // A stealing grace with no neighbour to steal from is written but silent: its
+    // occurrence starts and ends at one instant. Lit forever, it stayed first in
+    // activeWritten and the viewer's follow-scroll stuck on it for the rest of the piece.
+    const p = performance([sound('a'), sound('b', q(1n, 4n)), sound('c', q(1n, 2n))]);
+    p.written.push({ id: 'g', noteKey: 'g', ordinal: 0, metricOffset: q(1n, 4n), metricDuration: ZERO,
+      position: q(1n, 4n), duration: ZERO, soundingIds: [] });
+    const { transport, clock } = setup(p);
+    await transport.play();
+    clock.advance(0.7);
+    expect(transport.snapshot.activeWritten.map((w) => w.id)).toEqual(['b']);
+    clock.advance(1.2);
+    expect(transport.snapshot.activeWritten.map((w) => w.id)).toEqual(['c']);
+  });
   it('pause cancels lookahead; resume reconstructs only remaining sound and schedules the next attack once', async () => {
     const { transport, clock, sink } = setup();
     await transport.play();

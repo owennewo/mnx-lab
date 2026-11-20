@@ -593,6 +593,10 @@ export class Transport {
         );
     }
     for (const w of this.performance.written) {
+      // A zero-length occurrence (a stealing grace with nothing to steal from, silent)
+      // has nothing to light — and its two notices would tie, the end sorting first, so
+      // it would light at its onset and never go out.
+      if (compare(w.duration, ZERO) <= 0) continue;
       if (compare(endOf(w), v.from) <= 0 || compare(w.position, v.until) >= 0) continue;
       this.notices.push({
         audioTime: this.audioAt(max(w.position, v.from), v),
