@@ -115,7 +115,7 @@ bar 10 = 6
 bar 32 = 30 ds-al-coda
 ```
 
-Note suffixes: `~` tie, `h` natural harmonic, `a` artificial (harp) harmonic — held at the
+Note suffixes: `~` tie, `h` natural harmonic (pitched at its node, so `3/7h` sounds the twelfth; a fret that is no node is refused), `a` artificial (harp) harmonic — held at the
 fret written, touched and sounding an octave up — `x` dead, `p` hammer-on/pull-off, `s` slide.
 
 `build` refuses a bar whose voice does not fill it and a tie that lands nowhere or on another

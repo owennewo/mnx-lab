@@ -17,7 +17,7 @@
 // Durations w h q 8 16 32, each with dots (`q.`). Notes `string/fret`, string 1 the
 // highest-pitched, joined with `+` into a chord; `r` is a rest. A note's suffixes: `~`
 // ties it to the same string's next note in its voice (into the next bar, too), `h`
-// makes it a natural harmonic, `a` an artificial (harp) harmonic — held at that fret,
+// makes it a natural harmonic (sounding at its node: 7 the twelfth, 5 two octaves), `a` an artificial (harp) harmonic — held at that fret,
 // touched and sounding an octave up — `x` a dead note. Bar markers: `|:` `:|` `:|x3`
 // `volta=1` (every bar of the ending; `volta=1,2` for shared), `segno` `coda` `tocoda`
 // `ds` `ds-al-coda` `ds-al-fine` `dc` `dc-al-coda` `dc-al-fine` `fine` `final`
@@ -33,6 +33,7 @@ import { buildNewDocument } from '../../src/edit/newDocument.ts';
 import { spellPitch } from '../../src/edit/staffSpace.ts';
 import { midiOfPitch } from '../../src/edit/tabStrings.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
+import { harmonicInterval } from '../../src/model/harmonics.ts';
 import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxPitch, MnxSequenceItem, MnxStructure, MnxTuningEntry } from '../../src/model/mnx.ts';
 
 type Base = 'whole' | 'half' | 'quarter' | 'eighth' | '16th' | '32nd';
@@ -243,9 +244,13 @@ export function buildTabText(text: string): { document: MnxStructure; warnings: 
         if (!e.notes) return { duration, rest: {} };
         const notes = e.notes.map(text => {
           const base = open.get(text.string) ?? fail(bar.line, `bar ${bar.number} ${voice}: string ${text.string} is not one of the tuning's ${open.size}`);
-          // An artificial harmonic sounds the octave over the fret held, which is
-          // where it is touched; MNX pitch is what sounds.
-          const pitch = spellPitch(base + piece.capo + text.fret + (text.artificial ? 12 : 0), fifths);
+          // MNX pitch is what sounds. A natural harmonic sounds at its node, counted
+          // from the nut (7 → the twelfth, as the .gp reader pitches it); an artificial
+          // one the octave over the fret held, which is where it is touched.
+          const above = text.harmonic
+            ? harmonicInterval(text.fret) ?? fail(bar.line, `bar ${bar.number} ${voice}: fret ${text.fret} is not a natural harmonic node (12, 7, 19, 5, 24, 4, 9, 16, 3, 2)`)
+            : text.fret + (text.artificial ? 12 : 0);
+          const pitch = spellPitch(base + piece.capo + above, fifths);
           const mnx: MnxNote = { id: `n${nextId++}`, pitch, _x: { mnxLab: { string: text.string, fret: text.fret } } };
           const harmonic = text.harmonic ? { type: 'natural' as const } : text.artificial ? { type: 'artificial' as const, touchingPitch: { ...pitch } } : undefined;
           if (harmonic || text.dead) mnx._x!.mnxLab!.tab = { technique: { ...(harmonic ? { harmonic } : {}), ...(text.dead ? { dead: true } : {}) } };

@@ -31,6 +31,18 @@ bar 2
     expect(checkStorage(document).check.verdict).not.toBe('differs');
   });
 
+  it('pitches a natural harmonic at its node, so 7 sounds the twelfth and stores unchanged', () => {
+    const { document } = buildTabText('title: Test\ntuning: D2 A2 D3 G3 B3 E4\n' + `bar 1
+  v1: q:3/7h q:4/7h q:3/5h q:4/5h
+  v2: w:6/0
+`);
+    const notes = document.parts[0].measures[0].sequences[0].content.flatMap(e => 'notes' in e ? e.notes ?? [] : []);
+    expect(notes.map(n => [n.pitch.step, n.pitch.octave, n._x?.mnxLab?.fret])).toEqual([
+      ['D', 5, 7], ['A', 4, 7], ['G', 5, 5], ['D', 5, 5]]);
+    expect(checkStorage(document).check.verdict).not.toBe('differs');
+    expect(() => bars('bar 1\n  v1: w:3/6h\n')).toThrow(/line 5: .*fret 6 is not a natural harmonic node/);
+  });
+
   it('writes a harp harmonic held at the fret, sounding and touched an octave up, and stores it', () => {
     const { document } = bars(`bar 1
   v1: q:4/7a q:1/9 q:3/9a q:2/7
